@@ -5,9 +5,9 @@
         <!-- Breadcrumbs -->
         <div class="mb-4">
           <Breadcrumbs :breadcrumbs="[
-            { title: 'Beranda', url: '/' },
-            { title: item.category, url: `/informasi/${getCategorySlug(item.category)}` },
-            { title: truncate(item.title, 25), url: '' }
+            { title: 'Beranda', url: '/', icon: 'fas fa-home' },
+            { title: item.category, url: `/informasi/${getCategorySlug(item.category)}`, icon: getCategoryIcon(item.category) },
+            { title: truncate(item.title, 25), url: '', icon: 'fas fa-file-alt' }
           ]" />
         </div>
 
@@ -333,6 +333,15 @@ const previewUrl = computed(() => {
   if (!isGoogleDrive.value) return fileUrl.value
   return fileUrl.value.replace('/view', '/preview')
 })
+
+const getCategoryIcon = (categoryStr) => {
+  if (!categoryStr) return 'fas fa-info-circle'
+  if (categoryStr.includes('Berkala')) return 'fas fa-calendar-alt'
+  if (categoryStr.includes('Setiap Saat')) return 'fas fa-clock'
+  if (categoryStr.includes('Serta Merta')) return 'fas fa-exclamation-triangle'
+  if (categoryStr.includes('Dikecualikan')) return 'fas fa-ban'
+  return 'fas fa-info-circle'
+}
 
 const getCategorySlug = (category) => {
   if (!category) return ''

@@ -335,11 +335,18 @@ const categoryName = computed(() => {
 
 const isAdmin = computed(() => authStore.isAuthenticated && (authStore.isAdmin || authStore.user?.unit_id))
 
-const breadcrumbData = computed(() => [
-  { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-  { title: 'Informasi Publik', url: '', icon: 'fas fa-folder-open' },
-  { title: categoryName.value, url: '', icon: 'fas fa-file-alt' }
-])
+const breadcrumbData = computed(() => {
+  let categoryIcon = 'fas fa-info-circle';
+  if (categoryName.value.includes('Berkala')) categoryIcon = 'fas fa-calendar-alt';
+  else if (categoryName.value.includes('Setiap Saat')) categoryIcon = 'fas fa-clock';
+  else if (categoryName.value.includes('Serta Merta')) categoryIcon = 'fas fa-exclamation-triangle';
+  else if (categoryName.value.includes('Dikecualikan')) categoryIcon = 'fas fa-ban';
+
+  return [
+    { title: 'Beranda', url: '/', icon: 'fas fa-home' },
+    { title: categoryName.value, url: '', icon: categoryIcon }
+  ]
+})
 
 const filters = reactive({
   search: '',
