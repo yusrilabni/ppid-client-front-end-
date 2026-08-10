@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUpdated, nextTick } from 'vue'
+import { ref, onMounted, onUpdated, nextTick, watch } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -106,17 +106,25 @@ const initSwiper = () => {
   })
 }
 
+
 const { isLoading: loading } = useQuery({
   queryKey: ['home_data'],
   queryFn: async () => {
     const res = await api.get('/home')
     homeData.value = res.data.data
     rss_items.value = res.data.data.news || []
-    initSwiper()
     return res.data.data
   },
   staleTime: 60000,
   refetchOnWindowFocus: true,
+})
+
+watch(loading, (newLoading) => {
+  if (!newLoading) {
+    nextTick(() => {
+      initSwiper()
+    })
+  }
 })
 
 const formatDate = (dateString) => {
