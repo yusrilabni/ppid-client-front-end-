@@ -65,26 +65,50 @@
                   <div class="h-px bg-gray-200 flex-grow"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-                  <div v-for="org in organizations" :key="org.id" class="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col h-full border border-gray-100 hover:border-blue-100 transform hover:-translate-y-2">
-                    <div class="p-8 flex-grow flex flex-col">
-                      <div class="flex items-center justify-center mb-6">
-                        <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-                          <i class="fas fa-building text-blue-600 text-3xl group-hover:text-white transition-colors duration-300"></i>
+                  <div v-for="org in organizations" :key="org.id" class="group h-full bg-white rounded-[2.5rem] shadow-md hover:shadow-2xl border border-gray-100 overflow-hidden flex flex-col transition-all duration-500 hover:-translate-y-2 relative">
+                    <!-- Decorative background -->
+                    <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-gray-50 to-white opacity-50"></div>
+                    
+                    <div class="p-8 pb-8 flex flex-col items-center text-center flex-grow relative z-10">
+                        <div class="relative mb-6">
+                            <div class="absolute inset-0 bg-blue-600 rounded-full blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+                            
+                            <img v-if="org.officials && org.officials[0] && org.officials[0].photo" 
+                                 :src="getStorageUrl(org.officials[0].photo)"
+                                 :alt="org.officials[0].full_name"
+                                 class="w-32 h-32 md:w-36 md:h-36 rounded-full object-cover border-4 border-white shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105">
+                            <div v-else class="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 border-4 border-white shadow-2xl flex items-center justify-center text-gray-300 text-4xl md:text-5xl relative z-10">
+                                <i class="fas fa-building"></i>
+                            </div>
                         </div>
-                      </div>
-                      <h2 class="text-xl font-bold text-gray-800 mb-3 text-center leading-tight">{{ org.name }}</h2>
-                      <div class="flex items-start text-gray-500 mb-6 text-center justify-center text-sm">
-                        <i class="fas fa-map-marker-alt text-blue-500 mr-2 mt-0.5 flex-shrink-0"></i>
-                        <p class="flex-grow line-clamp-2" v-html="org.api_address || 'Alamat belum ditambahkan.'"></p>
-                      </div>
-                      <div class="mt-auto space-y-3">
-                        <router-link :to="`/profil/organisasi/${org.slug}`" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 w-full shadow-lg shadow-blue-100 hover:shadow-blue-200">
-                          <i class="fas fa-book-open mr-2"></i> Lihat DIP OPD
-                        </router-link>
-                        <a v-if="org.website_url" :href="org.website_url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 w-full border border-gray-100">
-                          <i class="fas fa-globe mr-2 text-blue-500"></i> Website Resmi
-                        </a>
-                      </div>
+
+                        <div class="min-h-[4rem] flex items-center justify-center mb-2">
+                            <h3 class="text-xl font-black text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+                                {{ org.name }}
+                            </h3>
+                        </div>
+
+                        <p v-if="org.officials && org.officials[0]" class="text-sm font-bold text-gray-500 mb-4 min-h-[1.25rem]">{{ org.officials[0].full_name }}</p>
+                        <div v-else class="mb-4 min-h-[1.25rem]"></div>
+                        
+                        <div class="flex items-start text-gray-500 font-bold text-[11px] mb-8 bg-gray-50 px-5 py-3 rounded-2xl border border-gray-100 w-full min-h-[60px]">
+                            <i class="fas fa-map-marker-alt mr-3 mt-0.5 text-blue-400"></i>
+                            <span class="leading-relaxed text-left line-clamp-2" v-html="org.api_address || 'Alamat belum ditambahkan.'"></span>
+                        </div>
+
+                        <div class="mt-auto space-y-3 w-full">
+                            <router-link :to="`/profil/organisasi/${org.slug}`" class="inline-flex items-center justify-center w-full bg-blue-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 group-hover:shadow-blue-200">
+                                <i class="fas fa-sitemap mr-1"></i> Struktur & Website
+                            </router-link>
+
+                            <template v-if="authStore.user && (authStore.user.role === 'superadmin' || authStore.user.unit_id == org.remote_id)">
+                                <div class="pt-2">
+                                    <a :href="`http://ppidkab.sinjaikab.go.id/profil/tentang-opd/${org.id}/manage`" target="_blank" class="inline-flex items-center justify-center w-full bg-white text-blue-600 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
+                                        <i class="fas fa-edit"></i> Kelola Profil Unit
+                                    </a>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -93,26 +117,50 @@
 
             <!-- Normal Grid -->
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-              <div v-for="org in data" :key="org.id" class="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col h-full border border-gray-100 hover:border-blue-100 transform hover:-translate-y-2">
-                <div class="p-8 flex-grow flex flex-col">
-                  <div class="flex items-center justify-center mb-6">
-                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-                      <i class="fas fa-building text-blue-600 text-3xl group-hover:text-white transition-colors duration-300"></i>
+              <div v-for="org in data" :key="org.id" class="group h-full bg-white rounded-[2.5rem] shadow-md hover:shadow-2xl border border-gray-100 overflow-hidden flex flex-col transition-all duration-500 hover:-translate-y-2 relative">
+                <!-- Decorative background -->
+                <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-gray-50 to-white opacity-50"></div>
+                
+                <div class="p-8 pb-8 flex flex-col items-center text-center flex-grow relative z-10">
+                    <div class="relative mb-6">
+                        <div class="absolute inset-0 bg-blue-600 rounded-full blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+                        
+                        <img v-if="org.officials && org.officials[0] && org.officials[0].photo" 
+                             :src="getStorageUrl(org.officials[0].photo)"
+                             :alt="org.officials[0].full_name"
+                             class="w-32 h-32 md:w-36 md:h-36 rounded-full object-cover border-4 border-white shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105">
+                        <div v-else class="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 border-4 border-white shadow-2xl flex items-center justify-center text-gray-300 text-4xl md:text-5xl relative z-10">
+                            <i class="fas fa-building"></i>
+                        </div>
                     </div>
-                  </div>
-                  <h2 class="text-xl font-bold text-gray-800 mb-3 text-center leading-tight">{{ org.name }}</h2>
-                  <div class="flex items-start text-gray-500 mb-6 text-center justify-center text-sm">
-                    <i class="fas fa-map-marker-alt text-blue-500 mr-2 mt-0.5 flex-shrink-0"></i>
-                    <p class="flex-grow line-clamp-2" v-html="org.api_address || 'Alamat belum ditambahkan.'"></p>
-                  </div>
-                  <div class="mt-auto space-y-3">
-                    <router-link :to="`/profil/organisasi/${org.slug}`" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 w-full shadow-lg shadow-blue-100 hover:shadow-blue-200">
-                      <i class="fas fa-book-open mr-2"></i> Lihat DIP OPD
-                    </router-link>
-                    <a v-if="org.website_url" :href="org.website_url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 w-full border border-gray-100">
-                      <i class="fas fa-globe mr-2 text-blue-500"></i> Website Resmi
-                    </a>
-                  </div>
+
+                    <div class="min-h-[4rem] flex items-center justify-center mb-2">
+                        <h3 class="text-xl font-black text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+                            {{ org.name }}
+                        </h3>
+                    </div>
+
+                    <p v-if="org.officials && org.officials[0]" class="text-sm font-bold text-gray-500 mb-4 min-h-[1.25rem]">{{ org.officials[0].full_name }}</p>
+                    <div v-else class="mb-4 min-h-[1.25rem]"></div>
+                    
+                    <div class="flex items-start text-gray-500 font-bold text-[11px] mb-8 bg-gray-50 px-5 py-3 rounded-2xl border border-gray-100 w-full min-h-[60px]">
+                        <i class="fas fa-map-marker-alt mr-3 mt-0.5 text-blue-400"></i>
+                        <span class="leading-relaxed text-left line-clamp-2" v-html="org.api_address || 'Alamat belum ditambahkan.'"></span>
+                    </div>
+
+                    <div class="mt-auto space-y-3 w-full">
+                        <router-link :to="`/profil/organisasi/${org.slug}`" class="inline-flex items-center justify-center w-full bg-blue-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 group-hover:shadow-blue-200">
+                            <i class="fas fa-sitemap mr-1"></i> Struktur & Website
+                        </router-link>
+
+                        <template v-if="authStore.user && (authStore.user.role === 'superadmin' || authStore.user.unit_id == org.remote_id)">
+                            <div class="pt-2">
+                                <a :href="`http://ppidkab.sinjaikab.go.id/profil/tentang-opd/${org.id}/manage`" target="_blank" class="inline-flex items-center justify-center w-full bg-white text-blue-600 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
+                                    <i class="fas fa-edit"></i> Kelola Profil Unit
+                                </a>
+                            </div>
+                        </template>
+                    </div>
                 </div>
               </div>
             </div>
@@ -127,8 +175,11 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import api from '@/services/api'
+import api, { getStorageUrl } from '@/services/api'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const groupedOrganizations = ref({})
 
