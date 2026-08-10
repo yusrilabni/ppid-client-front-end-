@@ -35,16 +35,62 @@
               <!-- Content Body -->
               <div class="p-6 sm:p-10">
                 
-                <!-- Quick Info Mobile Only Bar -->
-                <div class="lg:hidden flex items-center justify-between p-4 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
-                  <div class="flex items-center">
-                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm mr-3">
-                      <i class="fas fa-building text-blue-600 text-xs"></i>
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Unit Kerja</p>
-                      <p class="text-xs font-bold text-gray-700 truncate w-32">{{ item.organization_name }}</p>
-                    </div>
+                <!-- Metadata Mobile (Shows only on small screens) -->
+                <div class="lg:hidden mb-8 space-y-4">
+                  <!-- Unit Kerja -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-100">
+                          <i class="fas fa-building text-sm"></i>
+                      </div>
+                      <div class="min-w-0">
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight break-words">{{ item.organization_name }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Jenis Dokumen -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-orange-100">
+                          <i class="fas fa-file-signature text-sm"></i>
+                      </div>
+                      <div>
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item.jenis_dokumen || 'Informasi Publik' }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Pengunggah -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-100">
+                          <i class="fas fa-user-shield text-sm"></i>
+                      </div>
+                      <div>
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item.uploader_name }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Tanggal -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-purple-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-100">
+                          <i class="fas fa-calendar-day text-sm"></i>
+                      </div>
+                      <div>
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ formatDate(item.tanggal_upload) }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Stats -->
+                  <div class="grid grid-cols-2 gap-4">
+                      <div class="bg-blue-50 p-4 rounded-2xl text-center border border-blue-100">
+                          <p class="text-[10px] font-black text-blue-400 uppercase mb-1">Dilihat</p>
+                          <p class="text-xl font-black text-blue-700">{{ item.views_count || 0 }}</p>
+                      </div>
+                      <div class="bg-blue-50 p-4 rounded-2xl text-center border border-blue-100">
+                          <p class="text-[10px] font-black text-blue-400 uppercase mb-1">Unduh</p>
+                          <p class="text-xl font-black text-blue-700">{{ item.download_count || 0 }}</p>
+                      </div>
                   </div>
                 </div>
 
@@ -152,49 +198,64 @@
                 
                 <div class="space-y-8">
                   <div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Unit Kerja</p>
-                    <div class="flex items-start">
-                      <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center shrink-0 mt-1">
-                        <i class="fas fa-building text-blue-600 text-xs"></i>
-                      </div>
-                      <p class="text-sm font-bold text-gray-800 ml-3 leading-snug">{{ item.organization_name }}</p>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                            <i class="fas fa-building text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ item.organization_name }}</p>
+                        </div>
                     </div>
                   </div>
 
                   <div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Tanggal Publikasi</p>
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="far fa-calendar-alt text-purple-600 text-xs"></i>
-                      </div>
-                      <p class="text-sm font-bold text-gray-800 ml-3">{{ formatDate(item.tanggal_upload) }}</p>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
+                            <i class="fas fa-file-signature text-orange-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ item.jenis_dokumen || 'Informasi Publik' }}</p>
+                        </div>
                     </div>
                   </div>
 
-                  <div v-if="item.official">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Penanggung Jawab</p>
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
-                        <img v-if="item.official.photo" :src="getStorageUrl(item.official.photo)" class="w-full h-full object-cover">
-                        <i v-else class="fas fa-user-tie text-emerald-600 text-xs"></i>
-                      </div>
-                      <div class="ml-3">
-                        <p class="text-sm font-bold text-gray-800">{{ item.official.name }}</p>
-                        <p class="text-[10px] text-gray-500 font-medium">{{ item.official.position?.name }}</p>
-                      </div>
+                  <div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
+                            <i class="fas fa-user-check text-emerald-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ item.uploader_name }}</p>
+                        </div>
                     </div>
                   </div>
 
-                  <div class="pt-6 border-t border-gray-100">
-                    <div class="flex justify-between items-center">
-                      <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Dilihat</p>
-                        <p class="text-lg font-black text-gray-800">{{ item.views_count || 0 }}<span class="text-xs font-bold text-gray-400 ml-1">kali</span></p>
-                      </div>
-                      <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center">
-                        <i class="far fa-eye text-gray-400"></i>
-                      </div>
+                  <div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
+                            <i class="fas fa-calendar-alt text-purple-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ formatDate(item.tanggal_upload) }}</p>
+                        </div>
                     </div>
+                  </div>
+
+                  <div class="pt-8 border-t border-gray-50">
+                      <div class="grid grid-cols-2 gap-4">
+                          <div class="bg-gray-50 rounded-2xl p-4 text-center">
+                              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Dilihat</p>
+                              <p class="text-xl font-black text-slate-800">{{ item.views_count || 0 }}</p>
+                          </div>
+                          <div class="bg-gray-50 rounded-2xl p-4 text-center">
+                              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Unduh</p>
+                              <p class="text-xl font-black text-slate-800">{{ item.download_count || 0 }}</p>
+                          </div>
+                      </div>
                   </div>
                 </div>
               </div>
