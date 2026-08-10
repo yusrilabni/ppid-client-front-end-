@@ -108,7 +108,7 @@
               </thead>
               <tbody class="divide-y divide-gray-50">
                 <template v-if="items.length > 0">
-                  <tr v-for="(item, index) in items" :key="item.id" :class="['hover:bg-blue-50/30 transition-colors', item.status === 'ARSIP' ? 'bg-gray-50/50 opacity-70' : '']">
+                  <tr v-for="(item, index) in items" :key="item.id" :class="['hover:bg-blue-50/30 transition-colors', item.status?.toUpperCase() === 'ARSIP' ? 'bg-gray-50/50 opacity-70' : '']">
                     <td class="px-6 py-4 whitespace-nowrap text-xs font-bold text-gray-400 text-center">
                       {{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}
                     </td>
@@ -117,8 +117,8 @@
                         {{ item.title }}
                       </router-link>
                       <div class="flex items-center gap-2 mt-1">
-                        <span v-if="item.status === 'ARSIP'" class="inline-block px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">ARSIP</span>
-                        <span v-else-if="['BERLAKU', 'aktif', 'AKTIF'].includes(item.status)" class="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-[9px] font-black uppercase tracking-widest">BERLAKU</span>
+                        <span v-if="item.status?.toUpperCase() === 'ARSIP'" class="inline-block px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">ARSIP</span>
+                        <span v-else-if="['BERLAKU', 'AKTIF'].includes(item.status?.toUpperCase())" class="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-[9px] font-black uppercase tracking-widest">BERLAKU</span>
                       </div>
                     </td>
                     <td class="px-6 py-4 text-xs text-gray-500 leading-relaxed max-w-xs">
@@ -179,9 +179,12 @@
           <!-- Mobile Cards View -->
           <div class="md:hidden p-4 space-y-4">
             <template v-if="items.length > 0">
-              <div v-for="(item, index) in items" :key="item.id" class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-                <div v-if="item.status === 'ARSIP'" class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">
+              <div v-for="(item, index) in items" :key="item.id" :class="['bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative overflow-hidden', item.status?.toUpperCase() === 'ARSIP' ? 'bg-gray-50/50 opacity-70' : '']">
+                <div v-if="item.status?.toUpperCase() === 'ARSIP'" class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">
                   ARSIP
+                </div>
+                <div v-else-if="['BERLAKU', 'AKTIF'].includes(item.status?.toUpperCase())" class="absolute top-0 right-0 bg-green-100 text-green-700 text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">
+                  BERLAKU
                 </div>
                 <div class="mb-3">
                   <span class="inline-block px-2 py-1 rounded-lg bg-blue-50 text-blue-600 text-[8px] font-black uppercase tracking-widest mb-2 border border-blue-100">
