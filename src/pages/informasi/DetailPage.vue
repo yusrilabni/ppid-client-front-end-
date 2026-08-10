@@ -11,7 +11,7 @@
       <div v-else-if="item">
         <!-- Breadcrumbs -->
         <div class="mb-4">
-          <Breadcrumbs :items="[
+          <Breadcrumbs :breadcrumbs="[
             { title: 'Beranda', url: '/' },
             { title: item.category, url: `/informasi/${getCategorySlug(item.category)}` },
             { title: truncate(item.title, 25), url: '' }

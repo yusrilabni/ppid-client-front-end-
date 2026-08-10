@@ -95,12 +95,13 @@
                         <i class="fas fa-building"></i> Filter Unit
                     </div>
                     <div class="min-w-[280px] w-full md:w-auto">
-                        <select v-model="filters.unit_id" class="w-full px-4 py-2.5 text-xs border-none bg-transparent focus:ring-0 font-bold text-gray-600 appearance-none cursor-pointer">
-                            <option value="">Semua Unit Kerja</option>
-                            <option v-for="unit in units" :key="unit.id" :value="unit.remote_id || unit.id">
-                                {{ unit.name }}
-                            </option>
-                        </select>
+                        <CustomSelect 
+                          v-model="filters.unit_id"
+                          :options="[{ remote_id: '', name: 'Semua Unit Kerja' }, ...units]"
+                          labelKey="name"
+                          valueKey="remote_id"
+                          placeholder="Cari unit kerja..."
+                        />
                     </div>
                 </div>
               </div>
@@ -296,6 +297,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import CustomSelect from '@/components/CustomSelect.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
