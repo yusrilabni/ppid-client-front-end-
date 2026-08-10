@@ -50,8 +50,9 @@
                 <div class="min-w-[120px]">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Urutan</label>
                   <select v-model="filters.sort" class="w-full px-4 py-4 text-xs border-none bg-gray-50/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 font-bold text-gray-600 appearance-none">
-                    <option value="tanggal_upload_desc">Terbaru</option>
-                    <option value="tanggal_upload_asc">Terlama</option>
+                    <option value="created_at_desc">Waktu Sistem (Terbaru)</option>
+                    <option value="tanggal_upload_desc">Tgl Dokumen (Terbaru)</option>
+                    <option value="tanggal_upload_asc">Tgl Dokumen (Terlama)</option>
                     <option value="title_asc">Judul (A-Z)</option>
                     <option value="title_desc">Judul (Z-A)</option>
                   </select>
@@ -295,7 +296,7 @@ const filters = reactive({
   search: '',
   date_from: '',
   date_to: '',
-  sort: 'tanggal_upload_desc',
+  sort: 'created_at_desc',
   per_page: '10',
   page: 1
 })
@@ -370,7 +371,7 @@ const resetFilters = () => {
   filters.search = ''
   filters.date_from = ''
   filters.date_to = ''
-  filters.sort = 'tanggal_upload_desc'
+  filters.sort = 'created_at_desc'
   filters.per_page = '10'
   filters.page = 1
 }
