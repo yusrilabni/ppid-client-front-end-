@@ -108,25 +108,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import api, { getStorageUrl } from '@/services/api'
 
 const groupedData = ref({})
-const loading = ref(true)
 
-onMounted(async () => {
-  try {
+const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
+  queryKey: ['unit_lokal'],
+  queryFn: async () => {
     const res = await api.get('/profil/unit-lokal')
-    if (res.data && res.data.groupedData) {
-      groupedData.value = res.data.groupedData
-    }
-  } catch (err) {
-    console.error('Error fetching unit lokal data:', err)
-  } finally {
-    loading.value = false
-  }
+    return res.data
+  },
+  staleTime: 60000,
+  refetchOnWindowFocus: true
 })
+
+const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+
+watch(queryData, (newData) => {
+  if (newData && newData.groupedData) {
+    groupedData.value = newData.groupedData
+  }
+}, { immediate: true })
 
 const renderJabatan = (official) => {
   const orgName = official.organization?.name || ''

@@ -276,15 +276,38 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 
 const route = useRoute()
 const official = ref(null)
-const loading = ref(true)
-const error = ref(false)
+
+const { isLoading: queryLoading, data: queryData, isError: queryError, isFetching, refetch } = useQuery({
+  queryKey: computed(() => ['official_profile', route.params.slug]),
+  queryFn: async () => {
+    const slug = route.params.slug
+    if (!slug) throw new Error("Slug not found")
+    const res = await api.get(`/profil/${slug}`)
+    return res.data.official || res.data.data
+  },
+  staleTime: 60000,
+  refetchOnWindowFocus: true,
+  enabled: computed(() => !!route.params.slug)
+})
+
+const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+const error = computed(() => queryError.value)
+
+watch(queryData, (newData) => {
+  if (newData) {
+    official.value = newData
+  } else {
+    official.value = null
+  }
+}, { immediate: true })
 
 const breadcrumbData = computed(() => {
   const slug = route.params.slug || ''
@@ -306,34 +329,6 @@ const breadcrumbData = computed(() => {
 const spouseLabel = computed(() => {
   if (!official.value) return 'Suami/Istri'
   return official.value.jenis_kelamin === 'Perempuan' ? 'Nama Suami' : 'Nama Istri'
-})
-
-const fetchProfile = async () => {
-  loading.value = true
-  error.value = false
-  official.value = null
-  
-  try {
-    const slug = route.params.slug
-    if (!slug) throw new Error("Slug not found")
-    const res = await api.get(`/profil/${slug}`)
-    official.value = res.data.official || res.data.data
-  } catch (err) {
-    console.error('Error fetching official profile:', err)
-    error.value = true
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchProfile()
-})
-
-watch(() => route.params.slug, (newSlug) => {
-  if (newSlug) {
-    fetchProfile()
-  }
 })
 
 const jabatanTampilan = computed(() => {

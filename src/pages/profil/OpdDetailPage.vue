@@ -55,29 +55,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
 const organization = ref(null)
 const informasi = ref(null)
-const loading = ref(true)
-const error = ref(false)
 
-onMounted(async () => {
-  try {
+const { isLoading: queryLoading, data: queryData, isFetching, isError: error } = useQuery({
+  queryKey: computed(() => ['opd_detail', route.params.slug]),
+  queryFn: async () => {
     const slug = route.params.slug
     const res = await api.get(`/profil/tentang-opd/${slug}`)
-    if (res.data && res.data.organization) {
-      organization.value = res.data.organization
-      informasi.value = res.data.informasi
-    }
-  } catch (err) {
-    console.error('Error fetching OPD detail:', err)
-    error.value = true
-  } finally {
-    loading.value = false
-  }
+    return res.data
+  },
+  staleTime: 60000,
+  refetchOnWindowFocus: true,
+  enabled: computed(() => !!route.params.slug)
 })
+
+const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+
+watch(queryData, (newData) => {
+  if (newData && newData.organization) {
+    organization.value = newData.organization
+    informasi.value = newData.informasi
+  }
+}, { immediate: true })
 </script>

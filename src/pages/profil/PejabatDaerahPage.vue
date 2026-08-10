@@ -109,27 +109,32 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import api, { getStorageUrl } from '@/services/api'
 
 const eselon2 = ref([])
 const eselon3 = ref([])
-const loading = ref(true)
 
-onMounted(async () => {
-  try {
+const { isLoading: queryLoading, data: queryData, isFetching, isError, refetch } = useQuery({
+  queryKey: ['pejabat_daerah'],
+  queryFn: async () => {
     const res = await api.get('/profil/pejabat-daerah')
-    if (res.data && res.data.kepalaOpds) {
-      eselon2.value = res.data.kepalaOpds.eselon2 || []
-      eselon3.value = res.data.kepalaOpds.eselon3 || []
-    }
-  } catch (err) {
-    console.error('Error fetching pejabat daerah:', err)
-  } finally {
-    loading.value = false
-  }
+    return res.data
+  },
+  staleTime: 60000,
+  refetchOnWindowFocus: true
 })
+
+const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+
+watch(queryData, (newData) => {
+  if (newData && newData.kepalaOpds) {
+    eselon2.value = newData.kepalaOpds.eselon2 || []
+    eselon3.value = newData.kepalaOpds.eselon3 || []
+  }
+}, { immediate: true })
 
 const groups = computed(() => [
   { 

@@ -73,22 +73,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 
 const organizations = ref([])
-const loading = ref(true)
 
-onMounted(async () => {
-  try {
+const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
+  queryKey: ['tentang_opd'],
+  queryFn: async () => {
     const res = await api.get('/profil/tentang-opd')
-    if (res.data && res.data.organizations) {
-      organizations.value = res.data.organizations
-    }
-  } catch (err) {
-    console.error('Error fetching organizations:', err)
-  } finally {
-    loading.value = false
-  }
+    return res.data
+  },
+  staleTime: 60000,
+  refetchOnWindowFocus: true
 })
+
+const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+
+watch(queryData, (newData) => {
+  if (newData && newData.organizations) {
+    organizations.value = newData.organizations
+  }
+}, { immediate: true })
 </script>
