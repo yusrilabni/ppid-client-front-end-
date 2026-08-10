@@ -99,6 +99,7 @@
                 <tr class="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
                   <th class="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em]">No.</th>
                   <th class="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em]">Dokumen / Judul</th>
+                  <th class="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em]">Deskripsi Ringkas</th>
                   <th class="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em]">Unit Kerja</th>
                   <th class="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em]">Tgl Upload</th>
                   <th class="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em]">Aktivitas</th>
@@ -119,6 +120,9 @@
                         <span v-if="item.status === 'ARSIP'" class="inline-block px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">ARSIP</span>
                         <span v-else-if="['BERLAKU', 'aktif', 'AKTIF'].includes(item.status)" class="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-[9px] font-black uppercase tracking-widest">BERLAKU</span>
                       </div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-gray-500 leading-relaxed max-w-xs">
+                      {{ truncateText(item.deskripsi, 80) }}
                     </td>
                     <td class="px-6 py-4">
                       <span class="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-tight inline-block border border-blue-100/50">
@@ -183,9 +187,10 @@
                   <span class="inline-block px-2 py-1 rounded-lg bg-blue-50 text-blue-600 text-[8px] font-black uppercase tracking-widest mb-2 border border-blue-100">
                     {{ item.organization_name || 'Unit Tidak Terdaftar' }}
                   </span>
-                  <router-link :to="getDetailLink(item)" class="block text-sm font-bold text-gray-900 leading-snug">
+                  <router-link :to="getDetailLink(item)" class="block text-sm font-bold text-gray-900 leading-snug line-clamp-2">
                     {{ item.title }}
                   </router-link>
+                  <p class="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">{{ truncateText(item.deskripsi, 100) }}</p>
                 </div>
                 <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
                   <div class="flex flex-col">
@@ -363,6 +368,12 @@ const formatDate = (dateString) => {
   if (!dateString) return '-'
   const date = new Date(dateString)
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+const truncateText = (text, length = 80) => {
+  if (!text) return ''
+  if (text.length <= length) return text
+  return text.substring(0, length) + '...'
 }
 
 const isStruktur = (content) => {
