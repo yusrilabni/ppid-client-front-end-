@@ -3,20 +3,17 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Breadcrumbs -->
-      <div class="mb-4 flex items-center text-sm text-gray-600">
-        <router-link to="/" class="hover:text-blue-600 flex items-center">
-          <i class="fas fa-home h-4 w-4 mr-1"></i> Beranda
-        </router-link>
-        <span class="mx-2">/</span>
-        <span class="text-gray-900 font-medium flex items-center">
-          <i class="fas fa-building h-4 w-4 mr-1"></i> DIP OPD
-        </span>
-      </div>
+      <Breadcrumbs 
+        :items="[
+          { name: 'Tentang OPD', path: '/profil/tentang-opd' }
+        ]" 
+        class="mb-8 mt-20"
+      />
 
       <div class="mb-10 text-center">
-        <h1 class="text-3xl font-extrabold text-gray-900 md:text-4xl mb-4">Daftar Informasi Publik (DIP) Per OPD</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-          Pilih Organisasi Perangkat Daerah (OPD) untuk melihat Daftar Informasi Publik yang telah mereka sediakan.
+        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">Daftar Organisasi & Wilayah Daerah</h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Daftar OPD, Kecamatan, Desa, dan Kelurahan yang bertugas di wilayah Kabupaten Sinjai.
         </p>
       </div>
 
@@ -178,6 +175,7 @@ import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 import { useAuthStore } from '@/stores/auth'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
 
 const authStore = useAuthStore()
 
@@ -187,7 +185,70 @@ const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
   queryKey: ['tentang_opd'],
   queryFn: async () => {
     const res = await api.get('/profil/tentang-opd')
-    return res.data
+    const data = res.data
+    
+    // Fallback: If backend hasn't updated to include officials, fetch them manually
+    let needsOfficials = false;
+    if (data.groupedOrganizations) {
+        const firstGroup = Object.values(data.groupedOrganizations)[0];
+        if (firstGroup && firstGroup.length > 0 && !firstGroup[0].officials) {
+            needsOfficials = true;
+        }
+    } else if (data.organizations && data.organizations.length > 0 && !data.organizations[0].officials) {
+        needsOfficials = true;
+    }
+
+    if (needsOfficials) {
+        try {
+            const [pejabatRes, unitRes] = await Promise.all([
+                api.get('/profil/pejabat-daerah').catch(() => null),
+                api.get('/profil/unit-lokal').catch(() => null)
+            ]);
+            
+            const allOfficials = [];
+            if (pejabatRes?.data?.kepalaOpds) {
+                if (pejabatRes.data.kepalaOpds.eselon2) allOfficials.push(...pejabatRes.data.kepalaOpds.eselon2);
+                if (pejabatRes.data.kepalaOpds.eselon3) allOfficials.push(...pejabatRes.data.kepalaOpds.eselon3);
+            }
+            if (unitRes?.data?.groupedData) {
+                Object.values(unitRes.data.groupedData).forEach(group => {
+                    if (group.officials) allOfficials.push(...group.officials);
+                });
+            }
+
+            const officialsByOrgId = {};
+            allOfficials.forEach(official => {
+                if (official.organization_id && official.status === 'active') {
+                    officialsByOrgId[official.organization_id] = official;
+                }
+            });
+
+            const attachOfficials = (orgs) => {
+                orgs.forEach(org => {
+                    if (officialsByOrgId[org.id]) {
+                        org.officials = [officialsByOrgId[org.id]];
+                    }
+                });
+            };
+
+            if (data.groupedOrganizations) {
+                Object.values(data.groupedOrganizations).forEach(group => {
+                    if (Array.isArray(group)) {
+                        attachOfficials(group);
+                    } else if (typeof group === 'object') {
+                        Object.values(group).forEach(subGroup => attachOfficials(subGroup));
+                    }
+                });
+            }
+            if (data.organizations) {
+                attachOfficials(data.organizations);
+            }
+        } catch (e) {
+            console.error('Failed to fetch fallback officials:', e);
+        }
+    }
+
+    return data
   },
   staleTime: 60000,
   refetchOnWindowFocus: true
