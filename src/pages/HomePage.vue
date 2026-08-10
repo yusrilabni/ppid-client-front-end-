@@ -102,20 +102,6 @@ const initSwiper = () => {
         navigation: { nextEl: '.news-button-next', prevEl: '.news-button-prev' },
         pagination: { el: '.swiper-pagination', clickable: true }
       })
-      new window.Swiper('.info-carousel', {
-        slidesPerView: 1,
-        slidesPerGroup: 1,
-        spaceBetween: 20,
-        loop: true,
-        observer: true,
-        observeParents: true,
-        breakpoints: {
-          640: { slidesPerView: 1, slidesPerGroup: 1, spaceBetween: 20 },
-          768: { slidesPerView: 2, slidesPerGroup: 1, spaceBetween: 30 },
-          1024: { slidesPerView: 3, slidesPerGroup: 1, spaceBetween: 30 }
-        },
-        navigation: { nextEl: '.info-button-next', prevEl: '.info-button-prev' }
-      })
     }
   })
 }
@@ -417,10 +403,8 @@ const informasiItems = [
             <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-4">Akses informasi publik sesuai dengan kategori yang ditetapkan</h2>
             <p class="text-sm md:text-lg text-gray-600 max-w-2xl mx-auto">Kami menyediakan berbagai informasi publik yang dapat diakses oleh masyarakat secara transparan dan mudah</p>
           </div>
-          <div class="relative group px-1">
-            <div class="swiper-container info-carousel relative !px-2 !py-4 -mx-2 overflow-hidden">
-              <div class="swiper-wrapper mt-2">
-              <div v-for="(item, idx) in [...informasiItems, ...informasiItems]" :key="idx" class="swiper-slide h-auto p-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-8 px-1">
+              <div v-for="(item, idx) in informasiItems" :key="idx" class="h-auto">
                 <div class="h-full w-full">
                   <div class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full flex flex-col group border border-gray-100 overflow-hidden relative">
                     <!-- Subtle glow effect at the top -->
@@ -431,22 +415,22 @@ const informasiItems = [
                       <i :data-lucide="item.icon" class="w-40 h-40"></i>
                     </div>
 
-                    <div class="p-6 md:p-8 flex-grow flex flex-col relative z-10">
-                      <div class="flex items-center mb-6 md:mb-8">
-                        <div :class="['w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mr-4 shadow-md flex-shrink-0 group-hover:scale-110 transition-transform duration-500', getColorStyles(item.color, 'bgGradient')]">
-                          <i :data-lucide="item.icon" class="text-white w-6 h-6 md:w-7 md:h-7"></i>
+                    <div class="p-6 flex-grow flex flex-col relative z-10">
+                      <div class="flex items-center mb-6">
+                        <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center mr-4 shadow-md flex-shrink-0 group-hover:scale-110 transition-transform duration-500', getColorStyles(item.color, 'bgGradient')]">
+                          <i :data-lucide="item.icon" class="text-white w-6 h-6"></i>
                         </div>
-                        <h3 class="text-lg md:text-xl font-extrabold text-gray-800 leading-tight">{{ item.title }}</h3>
+                        <h3 class="text-lg font-extrabold text-gray-800 leading-tight">{{ item.title }}</h3>
                       </div>
-                      <ul class="space-y-4 mb-8">
-                        <li v-for="(point, pIdx) in item.points" :key="pIdx" class="flex items-start text-sm md:text-[15px] text-gray-600 font-medium group-hover:text-gray-900 transition-colors duration-300">
-                          <i data-lucide="check-circle" :class="['mt-0.5 mr-3 flex-shrink-0 w-4 h-4 md:w-5 md:h-5', getColorStyles(item.color, 'text600')]"></i>
+                      <ul class="space-y-4 mb-6">
+                        <li v-for="(point, pIdx) in item.points" :key="pIdx" class="flex items-start text-[13px] text-gray-600 font-medium group-hover:text-gray-900 transition-colors duration-300">
+                          <i data-lucide="check-circle" :class="['mt-0.5 mr-3 flex-shrink-0 w-4 h-4', getColorStyles(item.color, 'text600')]"></i>
                           <span class="leading-relaxed">{{ point }}</span>
                         </li>
                       </ul>
                     </div>
-                    <div class="mt-auto p-6 relative z-10 bg-white">
-                      <router-link :to="item.url" :class="['w-full py-3 md:py-4 px-4 rounded-xl text-white font-bold text-center flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 transform group-hover:-translate-y-1 text-sm md:text-base', getColorStyles(item.color, 'bgGradient')]">
+                    <div class="mt-auto p-5 relative z-10 bg-white">
+                      <router-link :to="item.url" :class="['w-full py-3 px-4 rounded-xl text-white font-bold text-center flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 transform group-hover:-translate-y-1 text-sm', getColorStyles(item.color, 'bgGradient')]">
                         Akses Informasi
                         <i data-lucide="arrow-right" class="ml-2 w-5 h-5 inline-block group-hover:translate-x-1.5 transition-transform"></i>
                       </router-link>
@@ -454,14 +438,8 @@ const informasiItems = [
                   </div>
                 </div>
               </div>
-              </div>
             </div>
-            <button class="info-button-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 hidden md:flex">
-              <i data-lucide="chevron-left" class="h-6 w-6 flex items-center justify-center"></i>
-            </button>
-            <button class="info-button-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 hidden md:flex">
-              <i data-lucide="chevron-right" class="h-6 w-6 flex items-center justify-center"></i>
-            </button>
+
           </div>
           <div class="mt-3 md:mt-6 text-center">
             <router-link :to="authStore.isAuthenticated ? '/permohonan/create' : '/login?redirect_to=/permohonan/create'" class="inline-flex items-center justify-center px-6 py-2 md:px-8 md:py-3 border border-transparent text-sm md:text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
