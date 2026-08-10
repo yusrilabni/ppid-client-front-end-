@@ -146,9 +146,53 @@ const loading = computed(() => queryLoading.value || (isFetching.value && !query
 useGlobalLoader(loading)
 
 watch(queryData, (newData) => {
-  if (newData && newData.groupedOrganizations) {
-    groupedOrganizations.value = newData.groupedOrganizations
+  if (newData) {
+    if (newData.groupedOrganizations) {
+      groupedOrganizations.value = newData.groupedOrganizations
+    } else if (newData.organizations && newData.organizations.length > 0) {
+      // Fallback frontend grouping in case backend hasn't updated yet
+      const grouped = {
+        'OPD': [],
+        'Kecamatan': [],
+        'Wilayah (Desa & Kelurahan)': {}
+      }
+      
+      newData.organizations.forEach(org => {
+        if (!org || !org.name) return;
+        const name = org.name;
+        if (name.toUpperCase().includes('PEMERINTAH DAERAH')) return;
+        
+        if (name.toLowerCase().includes('dinas') || name.toLowerCase().includes('badan')) {
+          grouped['OPD'].push(org);
+        } else if (name.toLowerCase().includes('kecamatan')) {
+          grouped['Kecamatan'].push(org);
+        } else if (name.toLowerCase().includes('desa ') || name.toLowerCase().includes('kelurahan ')) {
+          // Try to extract kecamatan from address if possible, otherwise use 'Wilayah Lain'
+          let kecKey = 'Wilayah Lain';
+          if (org.api_address && org.api_address.toLowerCase().includes('kec.')) {
+            const match = org.api_address.match(/Kec\.?\s*([A-Za-z\s]+)/i);
+            if (match && match[1]) {
+              kecKey = match[1].trim();
+            }
+          }
+          if (!grouped['Wilayah (Desa & Kelurahan)'][kecKey]) {
+            grouped['Wilayah (Desa & Kelurahan)'][kecKey] = [];
+          }
+          grouped['Wilayah (Desa & Kelurahan)'][kecKey].push(org);
+        } else {
+          grouped['OPD'].push(org);
+        }
+      });
+      
+      // Remove empty groups
+      if (Object.keys(grouped['Wilayah (Desa & Kelurahan)']).length === 0) {
+        delete grouped['Wilayah (Desa & Kelurahan)'];
+      }
+      if (grouped['Kecamatan'].length === 0) delete grouped['Kecamatan'];
+      if (grouped['OPD'].length === 0) delete grouped['OPD'];
+      
+      groupedOrganizations.value = grouped;
+    }
   }
-
 }, { immediate: true })
 </script>
