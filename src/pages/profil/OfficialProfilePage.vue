@@ -37,7 +37,7 @@
                    :alt="official.full_name"
                    class="w-64 h-80 object-contain max-w-full max-h-[320px] rounded-xl shadow-md bg-gray-50" />
               <div v-else class="w-64 h-80 bg-gray-200 flex items-center justify-center rounded-xl shadow-inner">
-                <i class="fas fa-user h-32 w-32 text-gray-400 text-7xl"></i>
+                <i class="fas fa-user text-gray-400 text-[6rem]"></i>
               </div>
             </div>
             <div class="text-center">
