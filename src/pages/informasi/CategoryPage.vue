@@ -21,7 +21,7 @@
         <div class="mt-8 mb-10">
           <form @submit.prevent class="relative">
             <!-- Minimalist Search Bar -->
-            <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl shadow-blue-500/5 border border-white mb-6">
+            <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl shadow-blue-500/5 border border-white mb-6 relative z-50">
               
               <!-- Search Input -->
               <div class="flex-1">
@@ -36,7 +36,7 @@
               </div>
 
               <!-- Grid Controls -->
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:w-auto">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:w-auto relative z-50">
                 <div class="min-w-[140px]">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Mulai</label>
                   <input type="date" v-model="filters.date_from"
@@ -47,7 +47,7 @@
                   <input type="date" v-model="filters.date_to"
                          class="w-full px-4 py-4 text-xs border-none bg-gray-50/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 font-bold text-gray-600" />
                 </div>
-                <div class="min-w-[120px]">
+                <div class="min-w-[120px] relative z-50">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Urutan</label>
                   <div class="bg-gray-50/50 rounded-2xl">
                     <CustomSelect 
@@ -63,7 +63,7 @@
                     />
                   </div>
                 </div>
-                <div class="min-w-[100px]">
+                <div class="min-w-[100px] relative z-40">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Limit</label>
                   <div class="bg-gray-50/50 rounded-2xl">
                     <CustomSelect 
@@ -81,7 +81,7 @@
             </div>
 
             <!-- Lower Filter Row -->
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-6 px-2">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6 px-2 relative z-40">
               <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
                 <!-- ADMIN TOGGLES -->
                 <label v-if="isAdmin && !authStore.isSuperAdmin" class="relative flex items-center cursor-pointer group select-none">
@@ -106,7 +106,7 @@
                     <div class="bg-blue-600 text-white px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 flex items-center gap-2 whitespace-nowrap">
                         <i class="fas fa-building"></i> Filter Unit
                     </div>
-                    <div class="min-w-[280px] w-full md:w-auto">
+                    <div class="min-w-[280px] w-full md:w-auto relative z-50">
                         <CustomSelect 
                           v-model="filters.unit_id"
                           :options="[{ remote_id: '', name: 'Semua Unit Kerja' }, ...units]"
