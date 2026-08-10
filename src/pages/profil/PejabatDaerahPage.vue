@@ -13,11 +13,7 @@
         <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Profil pimpinan tinggi pratama (Eselon II) dan pimpinan administrator (Eselon III) di lingkungan Pemerintah Kabupaten Sinjai.</p>
       </div>
 
-      <div v-if="loading" class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-      </div>
-
-      <div v-else-if="eselon2.length === 0 && eselon3.length === 0" class="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
+      <div v-if="!loading && (eselon2.length === 0 && eselon3.length === 0)" class="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
         <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
           <i class="fas fa-users-slash text-3xl"></i>
         </div>
@@ -25,7 +21,7 @@
         <p class="text-gray-500">Data pimpinan daerah belum tersedia atau sedang dalam proses pembaruan.</p>
       </div>
 
-      <div v-else class="space-y-24">
+      <div v-else-if="!loading" class="space-y-24">
         <template v-for="group in groups" :key="group.id">
           <section v-if="group.items.length > 0" class="relative">
             <!-- Category Header (Sticky) -->
@@ -113,6 +109,7 @@ import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import api, { getStorageUrl } from '@/services/api'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const eselon2 = ref([])
 const eselon3 = ref([])
@@ -128,6 +125,7 @@ const { isLoading: queryLoading, data: queryData, isFetching, isError, refetch }
 })
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+useGlobalLoader(loading)
 
 watch(queryData, (newData) => {
   if (newData && newData.kepalaOpds) {

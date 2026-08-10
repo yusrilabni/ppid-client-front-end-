@@ -14,19 +14,15 @@
         <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Daftar Kepala Desa dan Kelurahan yang bertugas di seluruh wilayah Kabupaten Sinjai.</p>
       </div>
 
-      <div v-if="loading" class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600"></div>
-      </div>
-
-      <div v-else-if="!groupedData || Object.keys(groupedData).length === 0" class="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
+      <div v-if="!loading && Object.keys(groupedData).length === 0" class="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
         <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
-          <i class="fas fa-users-slash text-3xl"></i>
+          <i class="fas fa-map-marked-alt text-3xl"></i>
         </div>
-        <h3 class="text-xl font-bold text-gray-800">Belum Ada Data</h3>
-        <p class="text-gray-500">Data profil pimpinan desa dan kelurahan belum tersedia.</p>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Ada Data</h3>
+        <p class="text-gray-500">Data unit lokal untuk kecamatan dan desa/kelurahan belum tersedia.</p>
       </div>
 
-      <div v-else class="space-y-24">
+      <div v-else-if="!loading" class="space-y-16">
         <section v-for="(group, kecName) in groupedData" :key="kecName" class="relative">
           <!-- Kecamatan Header (Sticky) -->
           <div class="sticky top-20 z-20 mb-10">
@@ -112,6 +108,7 @@ import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import api, { getStorageUrl } from '@/services/api'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const groupedData = ref({})
 
@@ -126,6 +123,7 @@ const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
 })
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+useGlobalLoader(loading)
 
 watch(queryData, (newData) => {
   if (newData && newData.groupedData) {

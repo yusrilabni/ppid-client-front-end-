@@ -17,11 +17,8 @@
         </span>
       </div>
 
-      <div v-if="loading" class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-      </div>
-
-      <div v-else-if="error || !organization" class="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <template v-if="!loading">
+      <div v-if="error || !organization" class="min-h-screen flex flex-col items-center justify-center bg-gray-50">
         <i class="fas fa-building h-24 w-24 text-gray-300 mb-4 text-6xl"></i>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">OPD Tidak Ditemukan</h1>
         <p class="text-gray-600 mb-6">Maaf, data OPD yang Anda cari tidak tersedia.</p>
@@ -50,6 +47,7 @@
           </div>
         </div>
       </div>
+      </template>
     </div>
   </div>
 </template>
@@ -59,6 +57,7 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
 const organization = ref(null)
@@ -77,6 +76,7 @@ const { isLoading: queryLoading, data: queryData, isFetching, isError: error } =
 })
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+useGlobalLoader(loading)
 
 watch(queryData, (newData) => {
   if (newData && newData.organization) {

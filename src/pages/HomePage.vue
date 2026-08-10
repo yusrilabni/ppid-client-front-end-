@@ -3,8 +3,8 @@ import { ref, onMounted, onUpdated, nextTick, watch } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
-
 import { useQuery } from '@tanstack/vue-query'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const authStore = useAuthStore()
 const homeData = ref({
@@ -116,6 +116,8 @@ const { isLoading: loading, data: queryData, isFetching, isError, refetch } = us
   staleTime: 60000,
   refetchOnWindowFocus: true,
 })
+
+useGlobalLoader(loading)
 
 watch([queryData, loading], ([newData, newLoading]) => {
   if (newData) {
@@ -258,29 +260,7 @@ const informasiItems = [
       </div>
     </div>
 
-    <!-- Loading Skeleton -->
-    <section v-else-if="loading || (isFetching && !queryData)" class="w-full min-h-screen pb-12">
-      <!-- Hero Skeleton -->
-      <div class="w-full h-[50vh] md:h-[70vh] bg-gray-200 animate-pulse"></div>
-      
-      <!-- Content Skeleton -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 md:-mt-16 relative z-10">
-        <!-- Stats Skeletons -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-          <div v-for="i in 3" :key="'stat'+i" class="bg-white rounded-lg shadow-md h-32 animate-pulse border border-gray-100"></div>
-        </div>
-        
-        <!-- Info Skeletons -->
-        <div class="mb-12">
-          <div class="h-8 bg-gray-200 rounded w-48 mb-6 animate-pulse"></div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div v-for="i in 4" :key="'info'+i" class="bg-white rounded-2xl h-80 animate-pulse border border-gray-100 shadow-sm"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div v-else>
+    <div v-else-if="!loading && !isFetching">
       <div v-if="homeData.sliders && homeData.sliders.length > 0" class="swiper hero-slider relative w-full overflow-hidden">
         <div class="swiper-wrapper">
           <div v-for="slider in homeData.sliders" :key="slider.id" class="swiper-slide relative">

@@ -8,32 +8,28 @@
         <Breadcrumbs :breadcrumbs="breadcrumbData" />
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="min-h-[60vh] flex items-center justify-center">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-      </div>
-
-      <!-- Error / Not Found State (Matches Blade) -->
-      <div v-else-if="error || !official" class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="p-12 text-center">
-          <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-            <i class="fas fa-user-slash text-4xl text-gray-400"></i>
+      <template v-if="!loading">
+        <!-- Error / Not Found State (Matches Blade) -->
+        <div v-if="error || !official" class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="p-12 text-center">
+            <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+              <i class="fas fa-user-slash text-4xl text-gray-400"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Profil Tidak Ditemukan</h1>
+            <p class="text-gray-600 mb-6">
+              Belum ada pejabat aktif untuk posisi ini.
+            </p>
+            <router-link to="/profil/pejabat-daerah" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition">
+              Kembali ke Profil
+            </router-link>
           </div>
-          <h1 class="text-2xl font-bold text-gray-800 mb-2">Profil Tidak Ditemukan</h1>
-          <p class="text-gray-600 mb-6">
-            Belum ada pejabat aktif untuk posisi ini.
-          </p>
-          <router-link to="/profil/pejabat-daerah" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition">
-            Kembali ke Profil
-          </router-link>
         </div>
-      </div>
 
-      <!-- Main Content -->
-      <div v-else class="bg-white rounded-2xl shadow-xl overflow-hidden">
-        
-        <!-- Header Section -->
-        <div class="p-8">
+        <!-- Main Content -->
+        <div v-else class="bg-white rounded-2xl shadow-xl overflow-hidden">
+          
+          <!-- Header Section -->
+          <div class="p-8">
           <div class="flex flex-col items-center gap-8">
             <div class="w-full flex justify-center">
               <img v-if="official.photo"
@@ -271,6 +267,7 @@
 
         </div>
       </div>
+      </template>
     </div>
   </div>
 </template>
@@ -281,6 +278,7 @@ import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
 const official = ref(null)
@@ -300,6 +298,7 @@ const { isLoading: queryLoading, data: queryData, isError: queryError, isFetchin
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
 const error = computed(() => queryError.value)
+useGlobalLoader(loading)
 
 watch(queryData, (newData) => {
   if (newData) {

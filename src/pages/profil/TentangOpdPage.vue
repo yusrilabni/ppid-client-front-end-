@@ -20,11 +20,7 @@
         </p>
       </div>
 
-      <div v-if="loading" class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-      </div>
-
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <template v-if="organizations.length > 0">
           <div v-for="org in organizations" :key="org.id" class="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col h-full border border-gray-100 hover:border-blue-100 transform hover:-translate-y-2">
             <div class="p-8 flex-grow flex flex-col">
@@ -76,6 +72,7 @@
 import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const organizations = ref([])
 
@@ -90,6 +87,7 @@ const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
 })
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
+useGlobalLoader(loading)
 
 watch(queryData, (newData) => {
   if (newData && newData.organizations) {

@@ -6,12 +6,7 @@
         <Breadcrumbs :breadcrumbs="breadcrumbItems" />
       </div>
 
-      <div v-if="loading" class="space-y-6">
-        <LoadingSkeleton class="h-64 w-full rounded-2xl" />
-        <LoadingSkeleton class="h-32 w-full rounded-xl" />
-        <LoadingSkeleton class="h-64 w-full rounded-xl" />
-      </div>
-      <div v-else-if="profile" class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+      <div v-if="!loading && profile" class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
         
         <!-- Hero Section -->
         <div class="relative bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-700 text-white p-8 md:p-12 overflow-hidden">
@@ -185,13 +180,14 @@ import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const breadcrumbItems = [
   { title: 'Beranda', url: '/', icon: 'fas fa-home' },
   { title: 'Profil PPID', url: '', icon: 'fas fa-info-circle' }
 ]
 
-const { data, isLoading: loading, error } = useQuery({
+const { data, isLoading: queryLoading, isFetching, error } = useQuery({
   queryKey: ['profil_ppid'],
   queryFn: async () => {
     const response = await api.get('/profil')
@@ -200,6 +196,9 @@ const { data, isLoading: loading, error } = useQuery({
   staleTime: 60000,
   refetchOnWindowFocus: true,
 })
+
+const loading = computed(() => queryLoading.value || (isFetching.value && !data.value))
+useGlobalLoader(loading)
 
 const profile = computed(() => data.value?.data)
 </script>
