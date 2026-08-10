@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" ref="dropdownRef">
+  <div class="relative" ref="dropdownRef" :class="isOpen ? 'z-[100]' : 'z-10'">
     <!-- Trigger Button -->
     <button 
       type="button" 
@@ -20,7 +20,7 @@
       leave-from-class="transform scale-100 opacity-100"
       leave-to-class="transform scale-95 opacity-0"
     >
-      <div v-if="isOpen" class="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <div v-if="isOpen" class="absolute z-[100] w-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         <!-- Search Input -->
         <div v-if="searchable" class="p-2 border-b border-gray-50 bg-gray-50/50">
           <div class="relative">

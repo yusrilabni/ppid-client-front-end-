@@ -49,21 +49,33 @@
                 </div>
                 <div class="min-w-[120px]">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Urutan</label>
-                  <select v-model="filters.sort" class="w-full px-4 py-4 text-xs border-none bg-gray-50/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 font-bold text-gray-600 appearance-none">
-                    <option value="created_at_desc">Waktu Sistem (Terbaru)</option>
-                    <option value="tanggal_upload_desc">Tgl Dokumen (Terbaru)</option>
-                    <option value="tanggal_upload_asc">Tgl Dokumen (Terlama)</option>
-                    <option value="title_asc">Judul (A-Z)</option>
-                    <option value="title_desc">Judul (Z-A)</option>
-                  </select>
+                  <div class="bg-gray-50/50 rounded-2xl">
+                    <CustomSelect 
+                      v-model="filters.sort"
+                      :options="[
+                        { value: 'created_at_desc', label: 'Waktu Sistem (Terbaru)' },
+                        { value: 'tanggal_upload_desc', label: 'Tgl Dokumen (Terbaru)' },
+                        { value: 'tanggal_upload_asc', label: 'Tgl Dokumen (Terlama)' },
+                        { value: 'title_asc', label: 'Judul (A-Z)' },
+                        { value: 'title_desc', label: 'Judul (Z-A)' }
+                      ]"
+                      :searchable="false"
+                    />
+                  </div>
                 </div>
                 <div class="min-w-[100px]">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Limit</label>
-                  <select v-model="filters.per_page" class="w-full px-4 py-4 text-xs border-none bg-gray-50/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 font-bold text-gray-600 appearance-none">
-                    <option value="10">10 Baris</option>
-                    <option value="20">20 Baris</option>
-                    <option value="50">50 Baris</option>
-                  </select>
+                  <div class="bg-gray-50/50 rounded-2xl">
+                    <CustomSelect 
+                      v-model="filters.per_page"
+                      :options="[
+                        { value: '10', label: '10 Baris' },
+                        { value: '20', label: '20 Baris' },
+                        { value: '50', label: '50 Baris' }
+                      ]"
+                      :searchable="false"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
