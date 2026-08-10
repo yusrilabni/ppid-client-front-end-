@@ -3,16 +3,22 @@ import { useLoadingStore } from '@/stores/loading'
 
 export function useGlobalLoader(loadingRef) {
   const loadingStore = useLoadingStore()
+  let isActive = false
   
   watch(loadingRef, (newVal) => {
-    if (newVal) {
+    if (newVal && !isActive) {
       loadingStore.startLoading()
-    } else {
+      isActive = true
+    } else if (!newVal && isActive) {
       loadingStore.stopLoading()
+      isActive = false
     }
   }, { immediate: true })
 
   onUnmounted(() => {
-    loadingStore.stopLoading()
+    if (isActive) {
+      loadingStore.stopLoading()
+      isActive = false
+    }
   })
 }

@@ -2,14 +2,22 @@ import { defineStore } from 'pinia'
 
 export const useLoadingStore = defineStore('loading', {
   state: () => ({
-    isLoading: false
+    loadingCount: 0
   }),
+  getters: {
+    isLoading: (state) => state.loadingCount > 0
+  },
   actions: {
     startLoading() {
-      this.isLoading = true
+      this.loadingCount++
     },
     stopLoading() {
-      this.isLoading = false
+      if (this.loadingCount > 0) {
+        this.loadingCount--
+      }
+    },
+    forceStop() {
+      this.loadingCount = 0
     }
   }
 })

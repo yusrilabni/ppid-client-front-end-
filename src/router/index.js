@@ -121,10 +121,12 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach(() => {
   const loadingStore = useLoadingStore()
-  // Tambahkan sedikit delay agar animasi loading terlihat smooth
+  // Berikan sedikit jeda (50ms) untuk memberi kesempatan komponen baru me-mount
+  // dan memanggil startLoading() (jika data belum ada di cache),
+  // sehingga count tidak sempat menyentuh 0 (mencegah loading berkedip).
   setTimeout(() => {
     loadingStore.stopLoading()
-  }, 500)
+  }, 50)
 })
 
 export default router
