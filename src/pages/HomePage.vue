@@ -302,8 +302,8 @@ const informasiItems = [
             <div class="swiper-pagination latest-info-pagination !relative !top-0 !bottom-auto mb-1 mt-1"></div>
             <div class="swiper-container latest-info-carousel overflow-hidden px-1">
               <div class="swiper-wrapper">
-                <div v-for="info in homeData.latest_informasi" :key="info.id" class="swiper-slide h-auto p-2">
-                  <div :class="['bg-white rounded-3xl border-l-4 shadow-sm hover:shadow-2xl transition-all duration-500 h-full flex flex-col group/card p-6 hover:-translate-y-2 relative overflow-hidden', getCardTheme(info.category).border]">
+                <div v-for="info in homeData.latest_informasi" :key="info.id" class="swiper-slide h-auto p-2 flex">
+                  <div :class="['w-full bg-white rounded-3xl border-l-4 shadow-sm hover:shadow-2xl transition-all duration-500 h-full flex flex-col group/card p-6 hover:-translate-y-2 relative overflow-hidden', getCardTheme(info.category).border]">
                     <div :class="['absolute -right-6 -top-6 group-hover/card:scale-110 transition-transform duration-700 opacity-50 pointer-events-none', getCardTheme(info.category).text50]">
                       <i data-lucide="file-text" class="w-32 h-32"></i>
                     </div>
@@ -370,8 +370,8 @@ const informasiItems = [
             <div class="swiper-container news-carousel relative overflow-hidden pt-0">
               <div class="swiper-pagination !relative !top-0 !bottom-auto mt-[1px] mb-6"></div>
               <div class="swiper-wrapper">
-                <div v-for="(item, idx) in rss_items" :key="idx" class="swiper-slide h-auto p-1">
-                  <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col border border-gray-100 m-1 group/news">
+                <div v-for="(item, idx) in rss_items" :key="idx" class="swiper-slide h-auto p-1 flex">
+                  <div class="w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col border border-gray-100 m-1 group/news">
                     <div class="aspect-w-16 aspect-h-9 overflow-hidden relative">
                       <img :src="item.image || 'https://via.placeholder.com/400x225.png?text=No+Image'" :alt="item.title" class="w-full h-48 object-cover transform group-hover/news:scale-105 transition-transform duration-500" />
                       <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/news:opacity-100 transition-opacity duration-300"></div>
