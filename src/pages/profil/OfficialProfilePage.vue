@@ -310,7 +310,13 @@ watch(queryData, (newData) => {
 
 const breadcrumbData = computed(() => {
   const slug = route.params.slug || ''
-  const title = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  let title = ''
+  
+  if (official.value) {
+    title = official.value.full_name || slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  } else {
+    title = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }
   
   if (error.value || !official.value) {
     return [
@@ -318,10 +324,36 @@ const breadcrumbData = computed(() => {
       { title: title || 'Profil', url: '', icon: 'fas fa-user-slash' }
     ]
   }
+
+  let middleTitle = 'Pejabat Daerah'
+  let middleUrl = '/profil/pejabat-daerah'
+  let middleIcon = 'fas fa-users'
+
+  const orgName = (official.value.organization?.name || '').toLowerCase()
+  const posSlug = (official.value.position?.slug || '').toLowerCase()
+
+  if (orgName.includes('kecamatan') || orgName.includes('desa ') || orgName === 'desa' || orgName.includes('kelurahan')) {
+    middleTitle = 'Unit Lokal'
+    middleUrl = '/profil/unit-lokal'
+    middleIcon = 'fas fa-map-marked-alt'
+  } else if (posSlug === 'bupati') {
+    middleTitle = 'Bupati'
+    middleUrl = '/profil/bupati'
+    middleIcon = 'fas fa-user-tie'
+  } else if (posSlug === 'wakil-bupati') {
+    middleTitle = 'Wakil Bupati'
+    middleUrl = '/profil/wakil-bupati'
+    middleIcon = 'fas fa-user-tie'
+  } else if (posSlug === 'sekretaris-daerah' || posSlug === 'sekda') {
+    middleTitle = 'Sekretaris Daerah'
+    middleUrl = '/profil/sekretaris-daerah'
+    middleIcon = 'fas fa-user-tie'
+  }
   
   return [
     { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-    { title: title, url: '', icon: 'fas fa-user' }
+    { title: middleTitle, url: middleUrl, icon: middleIcon },
+    { title: title.length > 25 ? title.substring(0, 25) + '...' : title, url: '', icon: 'fas fa-user' }
   ]
 })
 
