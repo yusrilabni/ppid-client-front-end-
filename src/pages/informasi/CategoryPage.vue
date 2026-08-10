@@ -70,6 +70,41 @@
 
             <!-- Lower Filter Row -->
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6 px-2">
+              <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+                <!-- ADMIN TOGGLES -->
+                <label v-if="isAdmin && !authStore.isSuperAdmin" class="relative flex items-center cursor-pointer group select-none">
+                  <input type="checkbox" v-model="filters.filter_unit" true-value="1" false-value="0" class="sr-only peer">
+                  <div class="px-6 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm transition-all duration-300 flex items-center gap-3 
+                      peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-blue-500 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-blue-200 peer-checked:border-transparent
+                      hover:border-blue-300 hover:shadow-md active:scale-95
+                      peer-checked:[&_.icon-box]:bg-emerald-500 peer-checked:[&_.fa-check]:scale-100 peer-checked:[&_.fa-check]:opacity-100 peer-checked:[&_.fa-check]:text-white peer-checked:[&_.fa-building]:scale-0 peer-checked:[&_.fa-building]:opacity-0">
+                      
+                      <div class="icon-box relative w-5 h-5 flex items-center justify-center rounded-lg bg-gray-100 transition-all duration-300 ring-4 ring-transparent peer-checked:ring-white/10">
+                          <i class="fas fa-check absolute text-[10px] opacity-0 scale-0 transition-all duration-300"></i>
+                          <i class="fas fa-building text-[10px] text-gray-400 transition-all duration-300"></i>
+                      </div>
+                      <span class="text-[10px] font-black uppercase tracking-[0.15em]">
+                          {{ filters.filter_unit === '1' ? 'Tampilkan Semua Unit' : 'Hanya Unit Saya' }}
+                      </span>
+                  </div>
+                </label>
+
+                <!-- PUBLIC / REGULAR USER: UNIT FILTER DROPDOWN -->
+                <div v-else class="flex flex-col md:flex-row items-center gap-4 bg-white/50 backdrop-blur-sm p-2 pr-6 rounded-3xl border border-gray-100 shadow-sm w-full lg:w-auto">
+                    <div class="bg-blue-600 text-white px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-building"></i> Filter Unit
+                    </div>
+                    <div class="min-w-[280px] w-full md:w-auto">
+                        <select v-model="filters.unit_id" class="w-full px-4 py-2.5 text-xs border-none bg-transparent focus:ring-0 font-bold text-gray-600 appearance-none cursor-pointer">
+                            <option value="">Semua Unit Kerja</option>
+                            <option v-for="unit in units" :key="unit.id" :value="unit.remote_id || unit.id">
+                                {{ unit.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+              </div>
+
               <button type="button" @click="resetFilters" class="px-6 py-3 rounded-2xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all duration-300 flex items-center gap-2 lg:ml-auto group border border-transparent hover:border-red-100 shadow-sm">
                 <i class="fas fa-sync-alt text-[10px] group-hover:rotate-180 transition-transform duration-500"></i>
                 <span class="text-[10px] font-black uppercase tracking-widest">Reset Filter</span>
@@ -298,7 +333,22 @@ const filters = reactive({
   date_to: '',
   sort: 'created_at_desc',
   per_page: '10',
+  unit_id: '',
+  filter_unit: '1',
   page: 1
+})
+
+const units = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await api.get('/units')
+    if (res.data?.success) {
+      units.value = res.data.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch units:', error)
+  }
 })
 
 const debouncedSearch = ref('')
@@ -312,12 +362,12 @@ watch(() => filters.search, (newVal) => {
   handleSearch(newVal)
 })
 
-watch([() => filters.date_from, () => filters.date_to, () => filters.sort, () => filters.per_page], () => {
+watch([() => filters.date_from, () => filters.date_to, () => filters.sort, () => filters.per_page, () => filters.unit_id, () => filters.filter_unit], () => {
   filters.page = 1
 })
 
 const { data: queryData, isFetching, isLoading } = useQuery({
-  queryKey: computed(() => ['informasi', category.value, debouncedSearch.value, filters.date_from, filters.date_to, filters.sort, filters.per_page, filters.page]),
+  queryKey: computed(() => ['informasi', category.value, debouncedSearch.value, filters.date_from, filters.date_to, filters.sort, filters.per_page, filters.unit_id, filters.filter_unit, filters.page]),
   queryFn: async () => {
     const params = {
       category: categoryName.value,
@@ -326,6 +376,8 @@ const { data: queryData, isFetching, isLoading } = useQuery({
       date_to: filters.date_to,
       sort: filters.sort,
       per_page: filters.per_page,
+      unit_id: filters.unit_id,
+      filter_unit: filters.filter_unit,
       page: filters.page
     }
     const res = await api.get('/informasi', { params })
@@ -373,6 +425,8 @@ const resetFilters = () => {
   filters.date_to = ''
   filters.sort = 'created_at_desc'
   filters.per_page = '10'
+  filters.unit_id = ''
+  filters.filter_unit = '1'
   filters.page = 1
 }
 
