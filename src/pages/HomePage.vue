@@ -4,8 +4,9 @@ import api, { getStorageUrl } from '@/services/api'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
 
+import { useQuery } from '@tanstack/vue-query'
+
 const authStore = useAuthStore()
-const loading = ref(true)
 const homeData = ref({
   sliders: [],
   latest_informasi: [],
@@ -29,7 +30,6 @@ const submitContactForm = async () => {
   formMessage.value = ''
   
   try {
-    // In a real app, you would send this to your API
     await new Promise(resolve => setTimeout(resolve, 1000))
     if (contactMethod.value === 'email') {
       formMessage.value = 'Pesan email Anda berhasil dikirim!'
@@ -48,84 +48,82 @@ const submitContactForm = async () => {
 
 const rss_items = ref([])
 
-onMounted(async () => {
-  try {
+const initSwiper = () => {
+  nextTick(() => {
+    if (window.lucide) {
+      window.lucide.createIcons()
+    }
+    if (window.Swiper) {
+      const isMultiple = homeData.value.sliders?.length > 1;
+      new window.Swiper('.hero-slider', {
+        loop: isMultiple,
+        watchOverflow: true,
+        observer: true,
+        observeParents: true,
+        autoplay: isMultiple ? { 
+          delay: 5000, 
+          disableOnInteraction: false 
+        } : false,
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' }
+      })
+      new window.Swiper('.latest-info-carousel', {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+        spaceBetween: 20,
+        loop: true,
+        observer: true,
+        observeParents: true,
+        breakpoints: {
+          640: { slidesPerView: 2, slidesPerGroup: 2 },
+          1024: { slidesPerView: 4, slidesPerGroup: 4 }
+        },
+        navigation: { nextEl: '.latest-info-next', prevEl: '.latest-info-prev' },
+        pagination: { el: '.latest-info-pagination', clickable: true }
+      })
+      new window.Swiper('.news-carousel', {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+        spaceBetween: 20,
+        loop: true,
+        observer: true,
+        observeParents: true,
+        breakpoints: {
+          640: { slidesPerView: 2, slidesPerGroup: 2 },
+          1024: { slidesPerView: 4, slidesPerGroup: 4 }
+        },
+        navigation: { nextEl: '.news-button-next', prevEl: '.news-button-prev' },
+        pagination: { el: '.swiper-pagination', clickable: true }
+      })
+      new window.Swiper('.info-carousel', {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+        spaceBetween: 20,
+        loop: true,
+        observer: true,
+        observeParents: true,
+        breakpoints: {
+          640: { slidesPerView: 1, slidesPerGroup: 1, spaceBetween: 20 },
+          768: { slidesPerView: 2, slidesPerGroup: 1, spaceBetween: 30 },
+          1024: { slidesPerView: 3, slidesPerGroup: 1, spaceBetween: 30 }
+        },
+        navigation: { nextEl: '.info-button-next', prevEl: '.info-button-prev' }
+      })
+    }
+  })
+}
+
+const { isLoading: loading } = useQuery({
+  queryKey: ['home_data'],
+  queryFn: async () => {
     const res = await api.get('/home')
     homeData.value = res.data.data
-    
-    // Simulate fetching RSS items if not in API response
     rss_items.value = res.data.data.news || []
-    
-    // Set loading to false so Vue starts rendering the DOM (unhiding the sliders)
-    loading.value = false
-    
-    // Initialize Swiper after data is loaded AND DOM has updated
-    nextTick(() => {
-      if (window.lucide) {
-        window.lucide.createIcons()
-      }
-      if (window.Swiper) {
-        const isMultiple = homeData.value.sliders?.length > 1;
-        new window.Swiper('.hero-slider', {
-          loop: isMultiple,
-          watchOverflow: true,
-          observer: true,
-          observeParents: true,
-          autoplay: isMultiple ? { 
-            delay: 5000, 
-            disableOnInteraction: false 
-          } : false,
-          pagination: { el: '.swiper-pagination', clickable: true },
-          navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' }
-        })
-        new window.Swiper('.latest-info-carousel', {
-          slidesPerView: 1,
-          slidesPerGroup: 1,
-          spaceBetween: 20,
-          loop: true,
-          observer: true,
-          observeParents: true,
-          breakpoints: {
-            640: { slidesPerView: 2, slidesPerGroup: 2 },
-            1024: { slidesPerView: 4, slidesPerGroup: 4 }
-          },
-          navigation: { nextEl: '.latest-info-next', prevEl: '.latest-info-prev' },
-          pagination: { el: '.latest-info-pagination', clickable: true }
-        })
-        new window.Swiper('.news-carousel', {
-          slidesPerView: 1,
-          slidesPerGroup: 1,
-          spaceBetween: 20,
-          loop: true,
-          observer: true,
-          observeParents: true,
-          breakpoints: {
-            640: { slidesPerView: 2, slidesPerGroup: 2 },
-            1024: { slidesPerView: 4, slidesPerGroup: 4 }
-          },
-          navigation: { nextEl: '.news-button-next', prevEl: '.news-button-prev' },
-          pagination: { el: '.swiper-pagination', clickable: true }
-        })
-        new window.Swiper('.info-carousel', {
-          slidesPerView: 1,
-          slidesPerGroup: 1,
-          spaceBetween: 20,
-          loop: true,
-          observer: true,
-          observeParents: true,
-          breakpoints: {
-            640: { slidesPerView: 1, slidesPerGroup: 1, spaceBetween: 20 },
-            768: { slidesPerView: 2, slidesPerGroup: 1, spaceBetween: 30 },
-            1024: { slidesPerView: 3, slidesPerGroup: 1, spaceBetween: 30 }
-          },
-          navigation: { nextEl: '.info-button-next', prevEl: '.info-button-prev' }
-        })
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching home data:', error)
-    loading.value = false
-  }
+    initSwiper()
+    return res.data.data
+  },
+  staleTime: 60000,
+  refetchOnWindowFocus: true,
 })
 
 const formatDate = (dateString) => {
