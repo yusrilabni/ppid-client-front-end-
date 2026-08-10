@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, onUpdated, nextTick } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -23,6 +23,13 @@ const contactForm = ref({
   email: '',
   subject: '',
   message: ''
+})
+
+// Automatically re-render icons when DOM updates
+onUpdated(() => {
+  if (window.lucide) {
+    window.lucide.createIcons()
+  }
 })
 
 const submitContactForm = async () => {
