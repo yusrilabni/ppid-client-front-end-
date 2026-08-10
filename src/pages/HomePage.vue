@@ -107,25 +107,28 @@ const initSwiper = () => {
 }
 
 
-const { isLoading: loading } = useQuery({
+const { isLoading: loading, data: queryData } = useQuery({
   queryKey: ['home_data'],
   queryFn: async () => {
     const res = await api.get('/home')
-    homeData.value = res.data.data
-    rss_items.value = res.data.data.news || []
     return res.data.data
   },
   staleTime: 60000,
   refetchOnWindowFocus: true,
 })
 
-watch(loading, (newLoading) => {
-  if (!newLoading) {
+watch([queryData, loading], ([newData, newLoading]) => {
+  if (newData) {
+    homeData.value = newData
+    rss_items.value = newData.news || []
+  }
+  
+  if (!newLoading && newData) {
     nextTick(() => {
       initSwiper()
     })
   }
-})
+}, { immediate: true })
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
