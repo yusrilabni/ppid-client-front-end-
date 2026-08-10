@@ -1,14 +1,7 @@
 <template>
   <div class="detail-page bg-gray-50 min-h-screen pb-24 lg:pb-8">
     <div class="container mx-auto py-4 px-4 max-w-7xl">
-      <div v-if="loading" class="space-y-4">
-        <LoadingSkeleton class="h-8 w-3/4" />
-        <LoadingSkeleton class="h-4 w-1/4 mb-8" />
-        <LoadingSkeleton class="h-64 w-full mb-8" />
-        <LoadingSkeleton v-for="i in 5" :key="i" class="h-4 w-full" />
-      </div>
-
-      <div v-else-if="item">
+      <div v-if="item">
         <!-- Breadcrumbs -->
         <div class="mb-4">
           <Breadcrumbs :breadcrumbs="[
@@ -226,11 +219,13 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api, { getStorageUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
-import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
 const item = ref(null)
 const loading = ref(true)
+
+useGlobalLoader(loading)
 
 const fetchDetail = async () => {
   loading.value = true
