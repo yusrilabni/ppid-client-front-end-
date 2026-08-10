@@ -3,7 +3,7 @@ import axios from 'axios'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api/v1`,
+  baseURL: import.meta.env.PROD ? '/api/v1' : `${API_BASE_URL}/api/v1`, // Use relative path in production for Vercel Edge Cache proxy
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

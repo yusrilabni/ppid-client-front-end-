@@ -17,6 +17,7 @@
     "vite": "^8.2.0"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^5.101.4",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vueuse/core": "^14.4.0",
     "axios": "^1.19.0",

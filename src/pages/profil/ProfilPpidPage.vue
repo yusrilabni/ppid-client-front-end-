@@ -180,29 +180,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
-
-const profile = ref(null)
-const loading = ref(true)
 
 const breadcrumbItems = [
   { title: 'Beranda', url: '/', icon: 'fas fa-home' },
   { title: 'Profil PPID', url: '', icon: 'fas fa-info-circle' }
 ]
 
-onMounted(async () => {
-  try {
-    const res = await api.get('/profil')
-    if (res.data && res.data.success) {
-      profile.value = res.data.data
-    }
-  } catch (error) {
-    console.error('Error fetching profile:', error)
-  } finally {
-    loading.value = false
-  }
+const { data, isLoading: loading, error } = useQuery({
+  queryKey: ['profil_ppid'],
+  queryFn: async () => {
+    const response = await api.get('/profil')
+    return response.data
+  },
+  staleTime: 60000,
+  refetchOnWindowFocus: true,
 })
+
+const profile = computed(() => data.value?.data)
 </script>
