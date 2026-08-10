@@ -1,0 +1,779 @@
+<script setup>
+import { ref, onMounted, nextTick } from 'vue'
+import api, { getStorageUrl } from '@/services/api'
+import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+const loading = ref(true)
+const homeData = ref({
+  sliders: [],
+  latest_informasi: [],
+  gallery: [],
+  statistics: {}
+})
+
+// Contact form state
+const contactMethod = ref('email')
+const isSending = ref(false)
+const formMessage = ref('')
+const contactForm = ref({
+  name: '',
+  email: '',
+  subject: '',
+  message: ''
+})
+
+const submitContactForm = async () => {
+  isSending.value = true
+  formMessage.value = ''
+  
+  try {
+    // In a real app, you would send this to your API
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    if (contactMethod.value === 'email') {
+      formMessage.value = 'Pesan email Anda berhasil dikirim!'
+      contactForm.value = { name: '', email: '', subject: '', message: '' }
+    } else {
+      const text = `Nama: ${contactForm.value.name}\nEmail: ${contactForm.value.email}\nSubjek: ${contactForm.value.subject}\n\nPesan:\n${contactForm.value.message}`
+      const encodedText = encodeURIComponent(text)
+      window.open(`https://wa.me/6281234567890?text=${encodedText}`, '_blank')
+    }
+  } catch (error) {
+    formMessage.value = 'Gagal mengirim pesan. Silakan coba lagi.'
+  } finally {
+    isSending.value = false
+  }
+}
+
+const rss_items = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await api.get('/home')
+    homeData.value = res.data.data
+    
+    // Simulate fetching RSS items if not in API response
+    rss_items.value = res.data.data.news || []
+    
+    // Set loading to false so Vue starts rendering the DOM (unhiding the sliders)
+    loading.value = false
+    
+    // Initialize Swiper after data is loaded AND DOM has updated
+    nextTick(() => {
+      if (window.lucide) {
+        window.lucide.createIcons()
+      }
+      if (window.Swiper) {
+        const isMultiple = homeData.value.sliders?.length > 1;
+        new window.Swiper('.hero-slider', {
+          loop: isMultiple,
+          watchOverflow: true,
+          observer: true,
+          observeParents: true,
+          autoplay: isMultiple ? { 
+            delay: 5000, 
+            disableOnInteraction: false 
+          } : false,
+          pagination: { el: '.swiper-pagination', clickable: true },
+          navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' }
+        })
+        new window.Swiper('.latest-info-carousel', {
+          slidesPerView: 1,
+          slidesPerGroup: 1,
+          spaceBetween: 20,
+          loop: true,
+          observer: true,
+          observeParents: true,
+          breakpoints: {
+            640: { slidesPerView: 2, slidesPerGroup: 2 },
+            1024: { slidesPerView: 4, slidesPerGroup: 4 }
+          },
+          navigation: { nextEl: '.latest-info-next', prevEl: '.latest-info-prev' },
+          pagination: { el: '.latest-info-pagination', clickable: true }
+        })
+        new window.Swiper('.news-carousel', {
+          slidesPerView: 1,
+          slidesPerGroup: 1,
+          spaceBetween: 20,
+          loop: true,
+          observer: true,
+          observeParents: true,
+          breakpoints: {
+            640: { slidesPerView: 2, slidesPerGroup: 2 },
+            1024: { slidesPerView: 4, slidesPerGroup: 4 }
+          },
+          navigation: { nextEl: '.news-button-next', prevEl: '.news-button-prev' },
+          pagination: { el: '.swiper-pagination', clickable: true }
+        })
+        new window.Swiper('.info-carousel', {
+          slidesPerView: 1,
+          slidesPerGroup: 1,
+          spaceBetween: 20,
+          loop: true,
+          observer: true,
+          observeParents: true,
+          breakpoints: {
+            640: { slidesPerView: 1, slidesPerGroup: 1, spaceBetween: 20 },
+            768: { slidesPerView: 2, slidesPerGroup: 1, spaceBetween: 30 },
+            1024: { slidesPerView: 3, slidesPerGroup: 1, spaceBetween: 30 }
+          },
+          navigation: { nextEl: '.info-button-next', prevEl: '.info-button-prev' }
+        })
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching home data:', error)
+    loading.value = false
+  }
+})
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  // Try to parse RSS date format
+  let date = new Date(dateString)
+  if (isNaN(date)) {
+    // Attempt manual parse or fallback
+    return dateString
+  }
+  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+const getCategoryColor = (category, type) => {
+  const map = {
+    'Informasi Berkala': { border: 'border-blue-500', text: 'text-blue-50', badge: 'bg-blue-50 text-blue-600', bg50: 'bg-blue-50', text600: 'text-blue-600', border100: 'border-blue-100' },
+    'Informasi Setiap Saat': { border: 'border-green-500', text: 'text-green-50', badge: 'bg-green-50 text-green-600', bg50: 'bg-green-50', text600: 'text-green-600', border100: 'border-green-100' },
+    'Informasi Serta Merta': { border: 'border-yellow-500', text: 'text-yellow-50', badge: 'bg-yellow-50 text-yellow-600', bg50: 'bg-yellow-50', text600: 'text-yellow-600', border100: 'border-yellow-100' },
+    'Informasi Dikecualikan': { border: 'border-red-500', text: 'text-red-50', badge: 'bg-red-50 text-red-600', bg50: 'bg-red-50', text600: 'text-red-600', border100: 'border-red-100' },
+  }
+  const defaultColors = { border: 'border-gray-500', text: 'text-gray-50', badge: 'bg-gray-50 text-gray-600', bg50: 'bg-gray-50', text600: 'text-gray-600', border100: 'border-gray-100' }
+  return (map[category] || defaultColors)[type]
+}
+
+const getCardTheme = (category) => {
+  const themes = {
+    'Informasi Berkala': { border: 'border-blue-500', text50: 'text-blue-50', bg50Hover: 'group-hover/card:bg-blue-50', text600Hover: 'group-hover/card:text-blue-600', btnBgHover: 'hover:bg-blue-50', btnTextHover: 'hover:text-blue-600', bg600Hover: 'hover:bg-blue-600' },
+    'Informasi Setiap Saat': { border: 'border-green-500', text50: 'text-green-50', bg50Hover: 'group-hover/card:bg-green-50', text600Hover: 'group-hover/card:text-green-600', btnBgHover: 'hover:bg-green-50', btnTextHover: 'hover:text-green-600', bg600Hover: 'hover:bg-green-600' },
+    'Informasi Serta Merta': { border: 'border-yellow-500', text50: 'text-yellow-50', bg50Hover: 'group-hover/card:bg-yellow-50', text600Hover: 'group-hover/card:text-yellow-600', btnBgHover: 'hover:bg-yellow-50', btnTextHover: 'hover:text-yellow-600', bg600Hover: 'hover:bg-yellow-600' },
+    'Informasi Dikecualikan': { border: 'border-red-500', text50: 'text-red-50', bg50Hover: 'group-hover/card:bg-red-50', text600Hover: 'group-hover/card:text-red-600', btnBgHover: 'hover:bg-red-50', btnTextHover: 'hover:text-red-600', bg600Hover: 'hover:bg-red-600' }
+  }
+  return themes[category] || { border: 'border-gray-500', text50: 'text-gray-50', bg50Hover: 'group-hover/card:bg-gray-50', text600Hover: 'group-hover/card:text-gray-600', btnBgHover: 'hover:bg-gray-50', btnTextHover: 'hover:text-gray-600', bg600Hover: 'hover:bg-gray-600' }
+}
+
+const getColorStyles = (color, type) => {
+  const map = {
+    'blue': { bg500: 'bg-blue-500', text600: 'text-blue-600', text500: 'text-blue-500', from500: 'from-blue-500', bgGradient: 'bg-gradient-to-br from-blue-500 to-blue-600' },
+    'green': { bg500: 'bg-green-500', text600: 'text-green-600', text500: 'text-green-500', from500: 'from-green-500', bgGradient: 'bg-gradient-to-br from-green-500 to-green-600' },
+    'yellow': { bg500: 'bg-yellow-500', text600: 'text-yellow-600', text500: 'text-yellow-500', from500: 'from-yellow-500', bgGradient: 'bg-gradient-to-br from-yellow-400 to-yellow-500' },
+    'red': { bg500: 'bg-red-500', text600: 'text-red-600', text500: 'text-red-500', from500: 'from-red-500', bgGradient: 'bg-gradient-to-br from-red-500 to-red-600' },
+  }
+  return map[color]?.[type] || ''
+}
+
+const formatNumber = (num) => {
+  return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '0'
+}
+
+const getUnitName = (info) => {
+  if (info.organization_name) return info.organization_name
+  if (info.unit) return info.unit.nama
+  if (info.user && info.user.opd_name) return info.user.opd_name
+  return 'Unit Kerja'
+}
+
+const getUploaderName = (info) => {
+  return info.user ? info.user.name : 'Administrator'
+}
+
+const informasiItems = [
+  {
+    title: 'Informasi Berkala',
+    url: '/informasi/berkala',
+    icon: 'calendar',
+    color: 'blue',
+    points: [
+      'Profil badan publik dan unit kerja',
+      'Profil pejabat dan tentang OPD',
+      'Program dan kegiatan yang diumumkan rutin',
+      'Ringkasan laporan kinerja dan keuangan',
+      'Informasi layanan publik dan jam pelayanan',
+    ]
+  },
+  {
+    title: 'Informasi Setiap Saat',
+    url: '/informasi/setiap-saat',
+    icon: 'clock',
+    color: 'green',
+    points: [
+      'Dokumen administratif dan arsip resmi',
+      'SOP, SK, dan kebijakan internal',
+      'Dokumen pendukung pelaksanaan kegiatan',
+      'Data dan dokumen yang diberikan jika diminta',
+      'Arsip dokumen tahun berjalan dan sebelumnya',
+    ]
+  },
+  {
+    title: 'Informasi Serta Merta',
+    url: '/informasi/serta-merta',
+    icon: 'zap',
+    color: 'yellow',
+    points: [
+      'Informasi bencana alam',
+      'Informasi keadaan darurat',
+      'Gangguan layanan publik berdampak luas',
+      'Ancaman terhadap keselamatan masyarakat',
+      'Kebijakan darurat yang harus segera diketahui',
+    ]
+  },
+  {
+    title: 'Informasi Dikecualikan',
+    url: '/informasi/dikecualikan',
+    icon: 'shield-alert',
+    color: 'red',
+    points: [
+      'Informasi yang mengandung data pribadi',
+      'Informasi rahasia negara atau jabatan',
+      'Dokumen hukum yang masih berjalan',
+      'Informasi yang berpotensi merugikan pihak tertentu',
+      'Informasi yang ditetapkan melalui uji konsekuensi',
+    ]
+  }
+]
+</script>
+
+<template>
+  <div class="home-page">
+    <section v-if="loading" class="w-full min-h-screen pb-12">
+      <!-- Hero Skeleton -->
+      <div class="w-full h-[50vh] md:h-[70vh] bg-gray-200 animate-pulse"></div>
+      
+      <!-- Content Skeleton -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 md:-mt-16 relative z-10">
+        <!-- Stats Skeletons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+          <div v-for="i in 3" :key="'stat'+i" class="bg-white rounded-lg shadow-md h-32 animate-pulse border border-gray-100"></div>
+        </div>
+        
+        <!-- Info Skeletons -->
+        <div class="mb-12">
+          <div class="h-8 bg-gray-200 rounded w-48 mb-6 animate-pulse"></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div v-for="i in 4" :key="'info'+i" class="bg-white rounded-2xl h-80 animate-pulse border border-gray-100 shadow-sm"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div v-else>
+      <div v-if="homeData.sliders && homeData.sliders.length > 0" class="swiper hero-slider relative w-full overflow-hidden">
+        <div class="swiper-wrapper">
+          <div v-for="slider in homeData.sliders" :key="slider.id" class="swiper-slide relative">
+            <router-link :to="slider.link || (slider.informasi ? `/informasi/${slider.informasi.slug}` : '#')" class="block w-full h-full">
+              <img :src="getStorageUrl(slider.image) || '/placeholder.jpg'" :alt="slider.title" class="w-full h-auto block" />
+              <div v-if="slider.show_title || slider.show_description" class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center overlay-content">
+                <div class="text-center text-white max-w-4xl mx-auto px-4">
+                  <h2 v-if="slider.show_title" class="text-2xl md:text-5xl font-bold mb-2 md:mb-4">{{ slider.title }}</h2>
+                  <p v-if="slider.show_description" class="text-sm md:text-xl font-light opacity-90">{{ slider.description }}</p>
+                  <div v-if="slider.link" class="mt-4 md:mt-6">
+                    <span class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 md:py-3 md:px-6 rounded-full transition-colors text-sm md:text-base shadow-lg">
+                      Selengkapnya <i data-lucide="arrow-right" class="ml-2 h-4 w-4 inline-block align-middle"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </router-link>
+          </div>
+        </div>
+        <button v-if="homeData.sliders.length > 1" class="swiper-button-prev-custom absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 md:p-3 rounded-full z-20 border-2 border-white/50 shadow-xl transition-all duration-300 group">
+          <i data-lucide="chevron-left" class="w-5 h-5 md:w-6 md:h-6 group-hover:-translate-x-0.5 transition-transform flex justify-center items-center"></i>
+        </button>
+        <button v-if="homeData.sliders.length > 1" class="swiper-button-next-custom absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 md:p-3 rounded-full z-20 border-2 border-white/50 shadow-xl transition-all duration-300 group">
+          <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-0.5 transition-transform flex justify-center items-center"></i>
+        </button>
+        <div v-if="homeData.sliders.length > 1" class="swiper-pagination !absolute !bottom-4 !left-0 !right-0 !z-30"></div>
+      </div>
+
+      <section class="py-10 bg-white">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-4">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Informasi Terbaru</h2>
+            <p class="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">Dokumen dan pengumuman publik terkini dari PPID Kabupaten Sinjai.</p>
+          </div>
+          <div class="relative group">
+            <div class="swiper-pagination latest-info-pagination !relative !top-0 !bottom-auto mb-1 mt-1"></div>
+            <div class="swiper-container latest-info-carousel overflow-hidden px-1">
+              <div class="swiper-wrapper">
+                <div v-for="info in homeData.latest_informasi" :key="info.id" class="swiper-slide h-auto p-2">
+                  <div :class="['bg-white rounded-3xl border-l-4 shadow-sm hover:shadow-2xl transition-all duration-500 h-full flex flex-col group/card p-6 hover:-translate-y-2 relative overflow-hidden', getCardTheme(info.category).border]">
+                    <div :class="['absolute -right-6 -top-6 group-hover/card:scale-110 transition-transform duration-700 opacity-50 pointer-events-none', getCardTheme(info.category).text50]">
+                      <i data-lucide="file-text" class="w-32 h-32"></i>
+                    </div>
+                    <div class="mb-5 relative z-10">
+                      <div class="flex items-center gap-3 mb-2">
+                        <div :class="['w-9 h-9 rounded-xl flex items-center justify-center border', getCategoryColor(info.category, 'bg50'), getCategoryColor(info.category, 'text600'), getCategoryColor(info.category, 'border100')]">
+                          <i data-lucide="building-2" class="w-4 h-4"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                          <span class="text-[11px] font-extrabold text-gray-800 uppercase tracking-tight line-clamp-1" :title="getUnitName(info)">{{ getUnitName(info) }}</span>
+                          <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Oleh: {{ getUploaderName(info) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <h3 :class="['text-gray-900 font-bold text-lg mb-6 line-clamp-2 leading-tight transition-colors relative z-10', getCardTheme(info.category).text600Hover]" :title="info.title">
+                      {{ info.title }}
+                    </h3>
+                    
+                    <div class="mt-auto pt-5 border-t border-gray-50 flex items-end justify-between relative z-10">
+                      <div class="flex flex-col gap-2">
+                        <div class="flex flex-col gap-1">
+                          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center">
+                            <i data-lucide="calendar" class="w-3 h-3 mr-1.5 text-blue-500"></i>
+                            {{ formatDate(info.tanggal_upload || info.created_at) }}
+                          </span>
+                          <span class="text-[10px] text-gray-500 font-bold flex items-center">
+                            <i data-lucide="file-text" class="w-3 h-3 mr-1.5 text-blue-500"></i>
+                            <span class="truncate max-w-[120px]" :title="info.jenis_dokumen || 'Dokumen Publik'">
+                              {{ info.jenis_dokumen || 'Dokumen Publik' }}
+                            </span>
+                          </span>
+                        </div>
+                        <span :class="['inline-flex items-center w-fit text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider border', getCategoryColor(info.category, 'badge'), getCategoryColor(info.category, 'border')]">
+                          {{ info.category }}
+                        </span>
+                      </div>
+                      
+                      <a :href="info.url || getStorageUrl(info.file)" target="_blank" :class="['w-11 h-11 rounded-2xl bg-gray-900 text-white flex items-center justify-center transition-all shadow-lg active:scale-90 group/btn', getCardTheme(info.category).bg600Hover]">
+                        <i data-lucide="arrow-up-right" class="w-5 h-5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="latest-info-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+              <i data-lucide="chevron-left" class="h-6 w-6 flex items-center justify-center"></i>
+            </button>
+            <button class="latest-info-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0">
+              <i data-lucide="chevron-right" class="h-6 w-6 flex items-center justify-center"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-3 md:py-6 bg-gray-50">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-4">
+            <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-4">Berita Terbaru</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto text-xs md:text-base mb-0">Dapatkan informasi terkini seputar kegiatan dan pengumuman dari Humas Sinjai.</p>
+          </div>
+          <div v-if="rss_items.length > 0" class="relative group px-1">
+            <div class="swiper-container news-carousel relative overflow-hidden pt-0">
+              <div class="swiper-pagination !relative !top-0 !bottom-auto mt-[1px] mb-6"></div>
+              <div class="swiper-wrapper">
+                <div v-for="(item, idx) in rss_items" :key="idx" class="swiper-slide h-auto p-1">
+                  <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col border border-gray-100 m-1 group/news">
+                    <div class="aspect-w-16 aspect-h-9 overflow-hidden relative">
+                      <img :src="item.image || 'https://via.placeholder.com/400x225.png?text=No+Image'" :alt="item.title" class="w-full h-48 object-cover transform group-hover/news:scale-105 transition-transform duration-500" />
+                      <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/news:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow">
+                      <div class="flex items-center text-xs text-gray-500 mb-3">
+                        <i data-lucide="calendar" class="h-3.5 w-3.5 mr-1.5 text-blue-500"></i>
+                        {{ formatDate(item.pubDate) }}
+                      </div>
+                      <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-2 leading-snug hover:text-blue-600 transition-colors" v-html="item.title"></h3>
+                      <p class="text-xs text-gray-600 line-clamp-3 mb-4 flex-grow" v-html="item.description"></p>
+                      <div class="mt-auto">
+                        <a :href="item.link" target="_blank" class="inline-flex items-center justify-center px-4 py-2.5 border border-blue-100 text-sm font-semibold rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white transition-all duration-300 w-full group">
+                          Baca Selengkapnya
+                          <i data-lucide="external-link" class="ml-2 h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="news-button-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 hidden md:flex">
+              <i data-lucide="chevron-left" class="h-6 w-6 flex items-center justify-center"></i>
+            </button>
+            <button class="news-button-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 hidden md:flex">
+              <i data-lucide="chevron-right" class="h-6 w-6 flex items-center justify-center"></i>
+            </button>
+          </div>
+          <div v-else class="text-center py-12"><p class="text-gray-500">Belum ada berita tersedia</p></div>
+        </div>
+      </section>
+
+      <section id="informasi" class="py-3 md:py-6 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-1">
+            <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-4">Akses informasi publik sesuai dengan kategori yang ditetapkan</h2>
+            <p class="text-sm md:text-lg text-gray-600 max-w-2xl mx-auto">Kami menyediakan berbagai informasi publik yang dapat diakses oleh masyarakat secara transparan dan mudah</p>
+          </div>
+          <div class="relative group px-1">
+            <div class="swiper-container info-carousel relative !px-2 !py-4 -mx-2 overflow-hidden">
+              <div class="swiper-wrapper mt-2">
+              <div v-for="(item, idx) in [...informasiItems, ...informasiItems]" :key="idx" class="swiper-slide h-auto p-2">
+                <div class="h-full w-full">
+                  <div class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full flex flex-col group border border-gray-100 overflow-hidden relative">
+                    <!-- Subtle glow effect at the top -->
+                    <div :class="['absolute top-0 inset-x-0 h-32 bg-gradient-to-b to-transparent opacity-10 group-hover:opacity-20 transition-opacity duration-500', getColorStyles(item.color, 'from500')]"></div>
+                    
+                    <!-- Decorative floating icon -->
+                    <div :class="['absolute -right-8 -top-8 opacity-[0.03] group-hover:scale-110 transition-transform duration-700 pointer-events-none', getColorStyles(item.color, 'text500')]">
+                      <i :data-lucide="item.icon" class="w-40 h-40"></i>
+                    </div>
+
+                    <div class="p-6 md:p-8 flex-grow flex flex-col relative z-10">
+                      <div class="flex items-center mb-6 md:mb-8">
+                        <div :class="['w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mr-4 shadow-md flex-shrink-0 group-hover:scale-110 transition-transform duration-500', getColorStyles(item.color, 'bgGradient')]">
+                          <i :data-lucide="item.icon" class="text-white w-6 h-6 md:w-7 md:h-7"></i>
+                        </div>
+                        <h3 class="text-lg md:text-xl font-extrabold text-gray-800 leading-tight">{{ item.title }}</h3>
+                      </div>
+                      <ul class="space-y-4 mb-8">
+                        <li v-for="(point, pIdx) in item.points" :key="pIdx" class="flex items-start text-sm md:text-[15px] text-gray-600 font-medium group-hover:text-gray-900 transition-colors duration-300">
+                          <i data-lucide="check-circle" :class="['mt-0.5 mr-3 flex-shrink-0 w-4 h-4 md:w-5 md:h-5', getColorStyles(item.color, 'text600')]"></i>
+                          <span class="leading-relaxed">{{ point }}</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="mt-auto p-6 relative z-10 bg-white">
+                      <router-link :to="item.url" :class="['w-full py-3 md:py-4 px-4 rounded-xl text-white font-bold text-center flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 transform group-hover:-translate-y-1 text-sm md:text-base', getColorStyles(item.color, 'bgGradient')]">
+                        Akses Informasi
+                        <i data-lucide="arrow-right" class="ml-2 w-5 h-5 inline-block group-hover:translate-x-1.5 transition-transform"></i>
+                      </router-link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+            <button class="info-button-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 hidden md:flex">
+              <i data-lucide="chevron-left" class="h-6 w-6 flex items-center justify-center"></i>
+            </button>
+            <button class="info-button-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-xl rounded-full p-3 z-10 text-gray-700 hover:bg-blue-600 hover:text-white transition-all border border-gray-100 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 hidden md:flex">
+              <i data-lucide="chevron-right" class="h-6 w-6 flex items-center justify-center"></i>
+            </button>
+          </div>
+          <div class="mt-3 md:mt-6 text-center">
+            <router-link :to="authStore.isAuthenticated ? '/permohonan/create' : '/login?redirect_to=/permohonan/create'" class="inline-flex items-center justify-center px-6 py-2 md:px-8 md:py-3 border border-transparent text-sm md:text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+              Ajukan Permohonan Informasi
+            </router-link>
+          </div>
+        </div>
+      </section>
+
+      <section id="galeri" class="py-3 md:py-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-1">
+            <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-4">Galeri</h2>
+            <p class="text-xs md:text-base text-gray-600 max-w-2xl mx-auto">Dokumentasi kegiatan dan momen penting PPID</p>
+          </div>
+          <div v-if="homeData.gallery && homeData.gallery.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div v-for="item in homeData.gallery" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
+              <div class="aspect-w-16 aspect-h-12 relative">
+                <router-link :to="`/galeri/${item.id}`" class="block">
+                  <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2">
+                    <i data-lucide="camera" class="h-3 w-3 md:h-4 md:w-4 text-gray-700 flex justify-center items-center"></i>
+                  </div>
+                </router-link>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-gray-900 mb-1 line-clamp-1 text-sm md:text-base">{{ item.title }}</h3>
+                <span v-if="item.category" class="inline-block px-2 py-0.5 text-[10px] md:text-xs bg-blue-100 text-blue-800 rounded-full mb-2">{{ item.category }}</span>
+                <p v-if="item.description" class="text-xs md:text-sm text-gray-600 line-clamp-2">{{ item.description }}</p>
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-center py-12">
+            <i data-lucide="image" class="h-12 w-12 md:h-16 md:w-16 text-gray-300 mx-auto mb-4 flex justify-center"></i>
+            <p class="text-gray-500">Belum ada galeri tersedia</p>
+          </div>
+          <div class="text-center mt-6 md:mt-8">
+            <router-link to="/galeri" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-xs md:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              Lihat Semua Galeri
+            </router-link>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-3 md:py-6 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-1">
+            <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-4">Statistik PPID</h2>
+            <p class="text-xs md:text-base text-gray-600 max-w-2xl mx-auto">Data statistik kinerja pelayanan informasi publik</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+            <!-- Box 1 -->
+            <div class="bg-blue-50 p-5 md:p-6 rounded-lg shadow-md text-center">
+              <i data-lucide="info" class="text-blue-600 w-8 h-8 md:w-9 md:h-9 mb-2 md:mb-3 mx-auto flex justify-center items-center"></i>
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">{{ formatNumber(homeData.statistics?.total_informasi) }}</h3>
+              <p class="text-sm md:text-base text-gray-600">Informasi Publik</p>
+            </div>
+            <!-- Box 2 -->
+            <div class="bg-green-50 p-5 md:p-6 rounded-lg shadow-md text-center">
+              <i data-lucide="file-text" class="text-green-600 w-8 h-8 md:w-9 md:h-9 mb-2 md:mb-3 mx-auto flex justify-center items-center"></i>
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">{{ formatNumber(homeData.statistics?.total_permohonan) }}</h3>
+              <p class="text-sm md:text-base text-gray-600">Jumlah Permohonan</p>
+            </div>
+            <!-- Box 3 -->
+            <div class="bg-purple-50 p-5 md:p-6 rounded-lg shadow-md text-center">
+              <i data-lucide="bar-chart-2" class="text-purple-600 w-8 h-8 md:w-9 md:h-9 mb-2 md:mb-3 mx-auto flex justify-center items-center"></i>
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">{{ formatNumber(homeData.statistics?.total_survey) }}</h3>
+              <p class="text-sm md:text-base text-gray-600">Jumlah Respon Survei</p>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-5 md:p-8">
+            <h3 class="text-lg md:text-xl font-semibold mb-4 md:mb-6 text-center">Laporan Kinerja</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center items-center">
+              <div class="p-4 md:p-0 bg-white md:bg-transparent rounded-lg shadow-sm md:shadow-none">
+                <div class="text-xl md:text-2xl font-bold text-blue-600 mb-1 md:mb-2">{{ homeData.statistics.tingkat_kepuasan || 0 }}%</div>
+                <p class="text-xs md:text-sm text-gray-600 mb-3">Tingkat Kepuasan Layanan</p>
+                
+                <!-- Overlapping Avatars for Ratings -->
+                <div class="flex items-center justify-center py-2">
+                  <div class="flex items-center -space-x-4 overflow-hidden">
+                    <template v-if="homeData.ticker && homeData.ticker.length">
+                      <div v-for="(rating, idx) in homeData.ticker.slice(0, 3)" :key="idx" class="inline-block h-10 w-10 rounded-full ring-2 ring-white overflow-hidden bg-gray-100 flex items-center justify-center" :style="{ zIndex: 30 - (idx * 10) }">
+                        <div class="h-full w-full flex items-center justify-center bg-blue-100 text-blue-600 text-xs font-bold">
+                          {{ rating.nama_pemohon ? rating.nama_pemohon.charAt(0).toUpperCase() : '?' }}
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                  <div class="ml-4 text-xs md:text-sm font-bold text-gray-700 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200 shadow-sm">
+                    {{ homeData.ticker ? homeData.ticker.length : 0 }} Penilaian
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 md:p-0 bg-white md:bg-transparent rounded-lg shadow-sm md:shadow-none">
+                <div class="text-xl md:text-2xl font-bold text-green-600 mb-1 md:mb-2">{{ homeData.statistics.rata_rata_respon || 0 }} Hari</div>
+                <p class="text-xs md:text-sm text-gray-600">Rata-rata Waktu Respon</p>
+              </div>
+              <div class="p-4 md:p-0 bg-white md:bg-transparent rounded-lg shadow-sm md:shadow-none">
+                <div class="text-xl md:text-2xl font-bold text-purple-600 mb-1 md:mb-2">{{ homeData.statistics.tingkat_penyelesaian || 0 }}%</div>
+                <p class="text-xs md:text-sm text-gray-600">Tingkat Penyelesaian Permohonan</p>
+              </div>
+            </div>
+
+            <div v-if="homeData.ticker && homeData.ticker.length" class="mt-8 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex items-center">
+              <div class="bg-blue-600 text-white px-4 py-3 font-bold text-xs md:text-sm whitespace-nowrap flex items-center gap-2 z-10 shadow-lg shrink-0">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-100 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                ULASAN PEMOHON
+              </div>
+              <div class="flex-1 overflow-hidden relative bg-gray-50/50 py-3">
+                <div class="animate-marquee whitespace-nowrap flex items-center gap-12">
+                  <div v-for="(rating, idx) in [...homeData.ticker, ...homeData.ticker]" :key="idx" class="inline-flex items-center gap-3 cursor-default group/item hover:bg-white/50 rounded-xl px-2 py-1 transition-all">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-[10px] font-bold border border-yellow-200">
+                        {{ rating.nama_pemohon ? rating.nama_pemohon.charAt(0).toUpperCase() : '?' }}
+                      </div>
+                      <span class="font-bold text-gray-800 text-xs">{{ rating.nama_pemohon || 'Unknown' }}</span>
+                    </div>
+                    <div class="flex text-yellow-400 text-[10px]">
+                      <i data-lucide="star" class="w-3 h-3 fill-current" v-for="n in rating.rating" :key="n"></i>
+                    </div>
+                    <span class="text-gray-400">|</span>
+                    <span class="text-xs text-gray-600 italic">"{{ rating.text && rating.text.length > 50 ? rating.text.substring(0, 50) + '...' : rating.text }}"</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Kontak Section -->
+      <section id="kontak" class="py-3 md:py-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-1">
+            <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-4">Kontak Kami</h2>
+            <p class="text-xs md:text-base text-gray-600 max-w-2xl mx-auto">
+              Hubungi kami untuk informasi lebih lanjut atau ajukan permohonan informasi publik
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mt-8">
+            <!-- Contact Info -->
+            <div>
+              <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">Informasi Kontak</h3>
+              
+              <div class="space-y-4 md:space-y-6">
+                <!-- Alamat -->
+                <div class="flex items-start">
+                  <div class="flex-shrink-0">
+                    <div class="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-lg bg-blue-100 text-blue-600">
+                      <i data-lucide="map-pin" class="h-5 w-5 md:h-6 md:w-6"></i>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-sm md:text-base font-semibold text-gray-900">Alamat</h4>
+                    <p class="mt-1 text-sm text-gray-600">Jl. Persatuan Raya No. 101 Kec. Sinjai Utara, Kabupaten Sinjai, Sulawesi Selatan 92611</p>
+                  </div>
+                </div>
+
+                <!-- Telepon -->
+                <div class="flex items-start">
+                  <div class="flex-shrink-0">
+                    <div class="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-lg bg-blue-100 text-blue-600">
+                      <i data-lucide="phone" class="h-5 w-5 md:h-6 md:w-6"></i>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-sm md:text-base font-semibold text-gray-900">Telepon</h4>
+                    <p class="mt-1 text-sm text-gray-600">0482-21432</p>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="flex items-start">
+                  <div class="flex-shrink-0">
+                    <div class="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-lg bg-blue-100 text-blue-600">
+                      <i data-lucide="mail" class="h-5 w-5 md:h-6 md:w-6"></i>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-sm md:text-base font-semibold text-gray-900">Email</h4>
+                    <p class="mt-1 text-sm text-gray-600">ppidkabsinjai@gmail.com</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Jam Pelayanan -->
+              <div class="mt-6 md:mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-sm md:text-base font-semibold text-gray-900 flex items-center">
+                    <i data-lucide="clock" class="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-600"></i> Jam Pelayanan
+                  </h4>
+                  <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">GRATIS</span>
+                </div>
+                <ul class="space-y-2 text-sm text-gray-600">
+                  <li class="flex justify-between">
+                    <span>Senin - Kamis:</span>
+                    <span class="font-medium text-gray-900">08:00 - 16:00 WITA</span>
+                  </li>
+                  <li class="flex justify-between">
+                    <span>Jumat:</span>
+                    <span class="font-medium text-gray-900">08:00 - 11:30 WITA</span>
+                  </li>
+                  <li class="flex justify-between text-red-600">
+                    <span>Sabtu - Minggu:</span>
+                    <span class="font-medium">Tutup</span>
+                  </li>
+                </ul>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                  <p class="text-xs text-gray-500 italic">*Seluruh layanan informasi publik tidak dipungut biaya apapun.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="bg-white rounded-2xl shadow-lg p-5 md:p-8 border border-gray-100">
+              <!-- Method Toggle -->
+              <div class="flex rounded-lg p-1 bg-gray-100 mb-6">
+                <button @click="contactMethod = 'email'" :class="contactMethod === 'email' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2 text-xs md:text-sm font-semibold rounded-md transition-all">
+                  <i data-lucide="mail" class="inline-block w-4 h-4 mr-1 md:mr-2"></i> Kirim via Email
+                </button>
+                <button @click="contactMethod = 'whatsapp'" :class="contactMethod === 'whatsapp' ? 'bg-white shadow-sm text-green-600' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2 text-xs md:text-sm font-semibold rounded-md transition-all">
+                  <i data-lucide="message-circle" class="inline-block w-4 h-4 mr-1 md:mr-2"></i> Kirim via WhatsApp
+                </button>
+              </div>
+
+              <form @submit.prevent="submitContactForm" class="space-y-4 md:space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                  <div>
+                    <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input v-model="contactForm.name" type="text" required class="w-full px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200 text-sm" placeholder="Masukkan nama lengkap">
+                  </div>
+                  <div>
+                    <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Email <span class="text-red-500">*</span></label>
+                    <input v-model="contactForm.email" type="email" required class="w-full px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200 text-sm" placeholder="email@contoh.com">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Subjek <span class="text-red-500">*</span></label>
+                  <input v-model="contactForm.subject" type="text" required class="w-full px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200 text-sm" placeholder="Subjek pesan">
+                </div>
+                <div>
+                  <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">Pesan <span class="text-red-500">*</span></label>
+                  <textarea v-model="contactForm.message" rows="4" required class="w-full px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200 resize-none text-sm" placeholder="Tulis pesan Anda di sini..."></textarea>
+                </div>
+
+                <button type="submit" :disabled="isSending" :class="contactMethod === 'email' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'" class="w-full inline-flex items-center justify-center px-6 py-3 md:py-3.5 border border-transparent text-sm md:text-base font-bold rounded-lg text-white transition duration-200 shadow-md">
+                  <i :data-lucide="contactMethod === 'email' ? 'send' : 'message-circle'" class="w-5 h-5 mr-2"></i>
+                  {{ contactMethod === 'email' ? 'Kirim Pesan Email' : 'Kirim Pesan WhatsApp' }}
+                  <i v-if="isSending" data-lucide="loader-2" class="w-5 h-5 ml-2 animate-spin"></i>
+                </button>
+                <div v-if="formMessage" class="text-center text-sm mt-4 text-green-600 font-medium">{{ formMessage }}</div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>
+
+<style>
+.latest-info-carousel:not(.swiper-initialized) .swiper-wrapper,
+.news-carousel:not(.swiper-initialized) .swiper-wrapper {
+    display: flex !important;
+    gap: 20px !important;
+    overflow: hidden !important;
+}
+.latest-info-carousel:not(.swiper-initialized) .swiper-slide,
+.news-carousel:not(.swiper-initialized) .swiper-slide {
+    flex: 0 0 100% !important;
+}
+@media (min-width: 640px) {
+    .latest-info-carousel:not(.swiper-initialized) .swiper-slide,
+    .news-carousel:not(.swiper-initialized) .swiper-slide { flex: 0 0 calc(50% - 10px) !important; }
+}
+@media (min-width: 1024px) {
+    .latest-info-carousel:not(.swiper-initialized) .swiper-slide,
+    .news-carousel:not(.swiper-initialized) .swiper-slide { flex: 0 0 calc(25% - 15px) !important; }
+}
+.hero-slider {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+.hero-slider .swiper-pagination {
+    line-height: 0 !important;
+    pointer-events: none;
+}
+.hero-slider .swiper-pagination-bullet {
+    pointer-events: auto;
+    background: white !important;
+    opacity: 0.5;
+    width: 8px;
+    height: 8px;
+    margin: 0 4px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.hero-slider .swiper-pagination-bullet-active {
+    background: #2563eb !important;
+    opacity: 1;
+    width: 20px;
+    border-radius: 4px;
+}
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+    display: inline-flex;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+}
+.animate-marquee:hover {
+    animation-play-state: paused;
+}
+</style>
