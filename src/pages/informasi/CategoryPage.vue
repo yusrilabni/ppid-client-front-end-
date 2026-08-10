@@ -259,7 +259,13 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 const category = computed(() => route.params.category || '')
-const categoryName = computed(() => category.value.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
+const categoryName = computed(() => {
+  let name = category.value.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  if (!name.toLowerCase().includes('informasi')) {
+    name = 'Informasi ' + name
+  }
+  return name
+})
 
 const isAdmin = computed(() => authStore.isAuthenticated && (authStore.isAdmin || authStore.user?.unit_id))
 
