@@ -107,7 +107,7 @@ const initSwiper = () => {
 }
 
 
-const { isLoading: loading, data: queryData } = useQuery({
+const { isLoading: loading, data: queryData, isFetching, isError, refetch } = useQuery({
   queryKey: ['home_data'],
   queryFn: async () => {
     const res = await api.get('/home')
@@ -245,7 +245,21 @@ const informasiItems = [
 
 <template>
   <div class="home-page">
-    <section v-if="loading" class="w-full min-h-screen pb-12">
+    <!-- Error State -->
+    <div v-if="isError" class="w-full min-h-[50vh] flex flex-col items-center justify-center p-8 text-center bg-gray-50">
+      <div class="bg-white p-8 rounded-2xl shadow-sm border border-red-100 max-w-md w-full">
+        <i data-lucide="alert-circle" class="w-16 h-16 text-red-500 mx-auto mb-4"></i>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Gagal Memuat Data</h3>
+        <p class="text-gray-500 mb-6">Terjadi kesalahan saat mengambil data dari server. Silakan coba lagi.</p>
+        <button @click="refetch()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors inline-flex items-center">
+          <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+          Coba Lagi
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <section v-else-if="loading || (isFetching && !queryData)" class="w-full min-h-screen pb-12">
       <!-- Hero Skeleton -->
       <div class="w-full h-[50vh] md:h-[70vh] bg-gray-200 animate-pulse"></div>
       
