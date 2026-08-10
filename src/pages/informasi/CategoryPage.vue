@@ -261,10 +261,18 @@ import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
-import debounce from 'lodash.debounce'
 
 const route = useRoute()
 const authStore = useAuthStore()
+
+// Custom debounce implementation
+const debounce = (fn, delay) => {
+  let timeout
+  return (...args) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => fn(...args), delay)
+  }
+}
 
 const category = computed(() => route.params.category || '')
 const categoryName = computed(() => {
