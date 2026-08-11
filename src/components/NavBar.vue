@@ -29,8 +29,7 @@ const openSearch = () => {
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    // Implement search logic, e.g., router.push
-    console.log('Searching for:', searchQuery.value)
+    router.push({ name: 'search', query: { q: searchQuery.value } })
     searchOpen.value = false
   }
 }
