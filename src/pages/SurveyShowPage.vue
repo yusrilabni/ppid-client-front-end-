@@ -151,16 +151,19 @@
                             <textarea v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" rows="4" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban..."></textarea>
                           </div>
 
-                          <!-- Radio -->
-                          <div v-else-if="['Pilihan Ganda', 'Pilihan Ganda (Berbobot)'].includes(question.question_type)" class="grid grid-cols-1 gap-3">
-                            <label v-for="option in question.options" :key="option.id" class="flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50 ring-2 ring-blue-200': answers[question.id] === option.option_text, 'border-gray-200': answers[question.id] !== option.option_text }">
-                              <div class="flex items-center h-6">
-                                <input type="radio" :name="'question_' + question.id" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500">
-                              </div>
-                              <div class="ml-3">
-                                <span class="font-medium text-gray-700 text-base md:text-lg">{{ option.option_text }}</span>
-                              </div>
-                            </label>
+                          <!-- Dropdown & Pilihan Ganda -->
+                          <div v-else-if="['Dropdown', 'Pilihan Ganda', 'Pilihan Ganda (Berbobot)'].includes(question.question_type)">
+                            <div class="border-2 border-gray-200 rounded-xl bg-white p-1 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-200">
+                              <CustomSelect 
+                                v-model="answers[question.id]" 
+                                :options="question.options" 
+                                labelKey="option_text" 
+                                valueKey="option_text" 
+                                placeholder="Pilih opsi..."
+                                :searchable="question.options.length > 5"
+                                @change="calculateProgress" 
+                              />
+                            </div>
                           </div>
 
                           <!-- Checkbox -->
@@ -173,21 +176,6 @@
                                 <span class="font-medium text-gray-700 text-base md:text-lg">{{ option.option_text }}</span>
                               </div>
                             </label>
-                          </div>
-
-                          <!-- Select -->
-                          <div v-else-if="question.question_type === 'Dropdown'">
-                            <div class="border-2 border-gray-200 rounded-xl bg-white p-1 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-200">
-                              <CustomSelect 
-                                v-model="answers[question.id]" 
-                                :options="question.options" 
-                                labelKey="option_text" 
-                                valueKey="option_text" 
-                                placeholder="Pilih opsi..."
-                                :searchable="question.options.length > 5"
-                                @change="calculateProgress" 
-                              />
-                            </div>
                           </div>
 
                           <!-- Rating/Scale -->
