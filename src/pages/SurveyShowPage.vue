@@ -214,7 +214,8 @@
               </div>
 
             </form>
-          </div>
+          </div>  <!-- close p-6 md:p-10 -->
+          </div>  <!-- close v-if="!submitted" -->
           
           <div v-else class="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 p-4 sm:p-6 lg:p-8">
             <div class="max-w-lg w-full mx-auto">
@@ -271,7 +272,7 @@
                 </div>
             </div>
           </div>
-        </div>
+        </div>  <!-- close v-else-if="survey" -->
 
         <!-- Error State -->
         <div v-else class="bg-white p-12 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center justify-center text-center">
@@ -283,9 +284,9 @@
           </router-link>
         </div>
 
-      </div>
-    </div>
-  </div>
+      </div>  <!-- close max-w-4xl -->
+    </div>  <!-- close container -->
+  </div>  <!-- close root -->
 </template>
 
 <script setup>
