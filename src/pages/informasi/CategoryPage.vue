@@ -26,28 +26,30 @@
               <!-- Search Input -->
               <div class="flex-1">
                 <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-4">Pencarian Pintar</label>
-                <div class="relative group">
-                  <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-blue-400 group-focus-within:text-blue-600 transition-colors">
-                    <i class="fas fa-search"></i>
-                  </span>
-                  <input type="text" v-model="filters.search" placeholder="Ketik kata kunci..."
-                         class="w-full pl-14 pr-6 py-4 text-sm border-none bg-gray-50/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-gray-300 font-bold text-gray-700" />
+                <div class="bg-gray-50/50 rounded-2xl relative z-50">
+                  <CustomInput 
+                    v-model="filters.search" 
+                    placeholder="Ketik kata kunci..." 
+                    icon="fas fa-search"
+                  />
                 </div>
               </div>
 
               <!-- Grid Controls -->
               <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:w-auto relative z-50">
-                <div class="min-w-[140px]">
+                <div class="min-w-[140px] relative" style="z-index: 100;">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Mulai</label>
-                  <input type="date" v-model="filters.date_from"
-                         class="w-full px-4 py-4 text-xs border-none bg-gray-50/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 font-bold text-gray-600" />
+                  <div class="bg-gray-50/50 rounded-2xl">
+                    <CustomDate v-model="filters.date_from" />
+                  </div>
                 </div>
-                <div class="min-w-[140px]">
+                <div class="min-w-[140px] relative" style="z-index: 100;">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Sampai</label>
-                  <input type="date" v-model="filters.date_to"
-                         class="w-full px-4 py-4 text-xs border-none bg-gray-50/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 font-bold text-gray-600" />
+                  <div class="bg-gray-50/50 rounded-2xl">
+                    <CustomDate v-model="filters.date_to" />
+                  </div>
                 </div>
-                <div class="min-w-[120px] relative z-50">
+                <div class="min-w-[120px] relative" style="z-index: 100;">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Urutan</label>
                   <div class="bg-gray-50/50 rounded-2xl">
                     <CustomSelect 
@@ -63,7 +65,7 @@
                     />
                   </div>
                 </div>
-                <div class="min-w-[100px] relative z-40">
+                <div class="min-w-[100px] relative" style="z-index: 90;">
                   <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Limit</label>
                   <div class="bg-gray-50/50 rounded-2xl">
                     <CustomSelect 
@@ -310,6 +312,8 @@ import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
+import CustomDate from '@/components/CustomDate.vue'
+import CustomInput from '@/components/CustomInput.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
