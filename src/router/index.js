@@ -83,6 +83,7 @@ const routes = [
       { path: 'tracking/:code?', name: 'tracking', component: TrackingPage },
       // Other
       { path: 'laporan/survei', name: 'survei', component: SurveyListPage },
+      { path: 'survei/:slug', name: 'survei.show', component: () => import('@/pages/SurveyShowPage.vue') },
       { path: 'regulasi', name: 'regulasi', component: RegulasiPage },
       { path: 'laporan', name: 'laporan', component: LaporanPage },
       { path: 'laporan/permohonan', name: 'laporan.permohonan', component: () => import('@/pages/LaporanPermohonanPage.vue') },

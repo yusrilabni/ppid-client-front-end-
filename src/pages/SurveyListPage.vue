@@ -49,10 +49,10 @@
                         </div>
                         
                         <div class="flex items-center space-x-4">
-                            <a :href="getAssetUrl('surveys/' + survey.slug)" target="_blank" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:text-lg transition duration-150 ease-in-out">
+                            <router-link :to="'/survei/' + survey.slug" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:text-lg transition duration-150 ease-in-out">
                                 <i class="fas fa-poll-h mr-2"></i>
                                 Isi Survei Sekarang
-                            </a>
+                            </router-link>
                         </div>
                     </div>
                 </template>
