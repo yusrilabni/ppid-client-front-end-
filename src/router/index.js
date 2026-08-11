@@ -42,6 +42,7 @@ import SurveyListPage from '@/pages/SurveyListPage.vue'
 import RegulasiPage from '@/pages/RegulasiPage.vue'
 import LaporanPage from '@/pages/LaporanPage.vue'
 import DipPage from '@/pages/DipPage.vue'
+import DipUnitPage from '@/pages/DipUnitPage.vue'
 import KontakPage from '@/pages/KontakPage.vue'
 import StatistikPage from '@/pages/StatistikPage.vue'
 
@@ -82,6 +83,7 @@ const routes = [
       { path: 'regulasi', name: 'regulasi', component: RegulasiPage },
       { path: 'laporan', name: 'laporan', component: LaporanPage },
       { path: 'dip', name: 'dip', component: DipPage },
+      { path: 'dipunit', name: 'dipunit', component: DipUnitPage },
       { path: 'kontak', name: 'kontak', component: KontakPage },
       { path: 'statistik', name: 'statistik', component: StatistikPage },
     ]
