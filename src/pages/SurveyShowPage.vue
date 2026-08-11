@@ -176,6 +176,16 @@
           </div>
         </div>
 
+        <!-- Error State -->
+        <div v-else class="bg-white p-12 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center justify-center text-center">
+          <i class="fas fa-exclamation-triangle text-red-500 text-5xl mb-4"></i>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Oops!</h2>
+          <p class="text-gray-500 mb-6">{{ submitError || 'Survei tidak ditemukan atau terjadi kesalahan saat memuat data.' }}</p>
+          <router-link to="/laporan/survei" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors">
+            Kembali ke Daftar Survei
+          </router-link>
+        </div>
+
       </div>
     </div>
   </div>
