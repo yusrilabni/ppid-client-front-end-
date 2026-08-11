@@ -27,8 +27,14 @@
           <form @submit.prevent="applyFilters" class="flex flex-col md:flex-row md:flex-wrap gap-3 md:items-end">
             <!-- Search Input -->
             <div class="w-full md:flex-1 md:min-w-[250px]">
-              <label for="search" class="block text-xs font-medium text-gray-600 mb-1">Pencarian</label>
-              <input v-model="filters.search" type="text" id="search" placeholder="Cari nama, rincian..." class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <label class="block text-xs font-medium text-gray-600 mb-1">Pencarian</label>
+              <div class="border border-gray-300 rounded-2xl bg-white">
+                <CustomInput 
+                  v-model="filters.search" 
+                  placeholder="Cari nama, rincian..." 
+                  icon="fas fa-search"
+                />
+              </div>
             </div>
 
             <div class="grid grid-cols-2 md:contents gap-3">
@@ -212,6 +218,7 @@ import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
 import CustomDate from '@/components/CustomDate.vue'
+import CustomInput from '@/components/CustomInput.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 import { useAuthStore } from '@/stores/auth'
 
