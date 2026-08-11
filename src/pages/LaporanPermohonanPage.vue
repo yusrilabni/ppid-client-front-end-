@@ -34,14 +34,18 @@
             <div class="grid grid-cols-2 md:contents gap-3">
               <!-- Date From -->
               <div class="md:flex-1 md:min-w-[130px]">
-                <label for="date_from" class="block text-xs font-medium text-gray-600 mb-1">Tgl Awal</label>
-                <input v-model="filters.date_from" type="date" id="date_from" class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Awal</label>
+                <div class="border border-gray-300 rounded-2xl bg-white">
+                  <CustomDate v-model="filters.date_from" />
+                </div>
               </div>
 
               <!-- Date To -->
               <div class="md:flex-1 md:min-w-[130px]">
-                <label for="date_to" class="block text-xs font-medium text-gray-600 mb-1">Tgl Akhir</label>
-                <input v-model="filters.date_to" type="date" id="date_to" class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Tgl Akhir</label>
+                <div class="border border-gray-300 rounded-2xl bg-white">
+                  <CustomDate v-model="filters.date_to" />
+                </div>
               </div>
 
               <!-- Sort -->
@@ -207,6 +211,7 @@ import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
+import CustomDate from '@/components/CustomDate.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 import { useAuthStore } from '@/stores/auth'
 
