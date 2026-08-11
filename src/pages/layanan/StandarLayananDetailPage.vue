@@ -115,7 +115,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
-import api from '@/services/api'
+import api, { getAssetUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
@@ -125,7 +125,7 @@ const slug = computed(() => route.params.slug)
 
 // Gunakan base API URL dari backend
 const getApiUrl = (path) => {
-  return `${import.meta.env.VITE_API_URL}${path}`
+  return getAssetUrl(path.replace(/^\//, ''))
 }
 
 const fetchStandarLayanan = async ({ queryKey }) => {

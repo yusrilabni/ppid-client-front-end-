@@ -30,6 +30,7 @@ import UnitLokalPage from '@/pages/profil/UnitLokalPage.vue'
 // Layanan
 import StandarLayanan from '@/pages/layanan/StandarLayananPage.vue'
 import StandarLayananDetail from '@/pages/layanan/StandarLayananDetailPage.vue'
+import StandarLayananFileDetail from '@/pages/layanan/StandarLayananFileDetailPage.vue'
 import MaklumatLayanan from '@/pages/layanan/MaklumatLayananPage.vue'
 import SopLayanan from '@/pages/layanan/SopLayananPage.vue'
 
@@ -73,6 +74,7 @@ const routes = [
       { path: 'profil/:slug', name: 'profil.official', component: OfficialProfile },
       // Layanan
       { path: 'standar-layanan', name: 'standar-layanan', component: StandarLayanan },
+      { path: 'standar-layanan/file/:slug', name: 'standar-layanan.file-detail', component: StandarLayananFileDetail },
       { path: 'standar-layanan/:slug', name: 'standar-layanan.detail', component: StandarLayananDetail },
       { path: 'maklumat-layanan', name: 'maklumat-layanan', component: MaklumatLayanan },
       { path: 'sop-layanan', name: 'sop-layanan', component: SopLayanan },
