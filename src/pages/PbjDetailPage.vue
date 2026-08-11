@@ -18,6 +18,11 @@
                         <h1 class="text-2xl md:text-3xl font-extrabold leading-tight">Kuesioner PBJ {{ route.params.year }}</h1>
                         <p class="text-blue-100 mt-2 text-sm opacity-90">Daftar kelengkapan dokumen pengadaan barang dan jasa.</p>
                     </div>
+                    <button type="button" @click="showModal = true" class="inline-flex items-center justify-center px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-md text-white rounded-xl transition-all font-bold text-sm">
+                        <i class="fas fa-book-reader mr-2"></i>
+                        Panduan Upload
+                    </button>
+                </div>
             </div>
 
             <!-- Content Section -->
@@ -67,7 +72,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
@@ -76,6 +81,7 @@ import PbjQuestionItem from '@/components/PbjQuestionItem.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
+const showModal = ref(false)
 
 const { data: pbjResponse, isLoading } = useQuery({
   queryKey: computed(() => ['pbj', route.params.year]),
