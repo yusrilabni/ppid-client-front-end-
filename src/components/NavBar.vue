@@ -81,10 +81,10 @@ const menus = [
     url: '#',
     icon: 'book',
     children: [
-      { title: 'DIP Unit', url: '/dipunit', icon: 'university' },
       { title: `DIP ${currentYear}`, url: `/dip/${currentYear}`, icon: 'file-alt' },
       { title: `DIP ${currentYear - 1}`, url: `/dip/${currentYear - 1}`, icon: 'file-alt' },
-      { title: `DIP ${currentYear - 2}`, url: `/dip/${currentYear - 2}`, icon: 'file-alt' }
+      { title: `DIP ${currentYear - 2}`, url: `/dip/${currentYear - 2}`, icon: 'file-alt' },
+      { title: 'DIP Unit', url: '/dipunit', icon: 'university' }
     ]
   },
   {
@@ -119,7 +119,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
 </script>
 
 <template>
-  <nav class="bg-white shadow-lg sticky top-0 z-50 border-b border-blue-100"
+  <nav class="bg-white shadow-lg sticky top-0 z-[999] border-b border-blue-100"
       style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
       <div class="w-full">
           <!-- Tinggi navbar tetap sama -->
@@ -171,7 +171,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                                           leave-from-class="opacity-100 translate-y-0"
                                           leave-to-class="opacity-0 translate-y-2">
                                           <div v-show="activeSubMenu === index"
-                                              class="absolute z-50 mt-2 w-72 rounded-lg shadow-xl bg-white border border-blue-100 min-w-max">
+                                              class="absolute z-[999] mt-2 w-72 rounded-lg shadow-xl bg-white border border-blue-100 min-w-max">
                                               <div class="py-1">
                                                   <router-link v-for="(child, childIndex) in menu.children" :key="childIndex"
                                                       :to="child.url"
@@ -256,7 +256,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                               leave-from-class="opacity-100 scale-100"
                               leave-to-class="opacity-0 scale-95">
                               <div v-show="activeSubMenu === 'user'"
-                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[999]">
                                   <div class="py-1">
                                       <div class="px-4 py-2 border-b">
                                           <p class="text-sm font-medium text-gray-900">{{ authStore.user?.name }}</p>
