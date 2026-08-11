@@ -7,11 +7,7 @@
         <!-- Main Content (Informasi & Standar Layanan) -->
         <div class="lg:w-2/3 space-y-12">
           
-          <div v-if="loading" class="space-y-4">
-            <LoadingSkeleton v-for="i in 3" :key="i" class="h-32 w-full rounded-2xl" />
-          </div>
-
-          <template v-else-if="!loading && (informasiResults.length || standarLayananResults.length || orgResults.length)">
+          <template v-if="informasiResults.length || standarLayananResults.length || orgResults.length">
             <!-- Informasi Publik Section -->
             <section v-if="informasiResults.length > 0">
               <div class="flex items-center justify-between mb-4">
@@ -145,23 +141,23 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'
-import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
+import { useLoadingStore } from '@/stores/loading'
 
 const route = useRoute()
 const router = useRouter()
+const loadingStore = useLoadingStore()
 const query = ref(route.query.q || '')
 
 const informasiResults = ref([])
 const standarLayananResults = ref([])
 const orgResults = ref([])
 
-const loading = ref(false)
 const searched = ref(false)
 
 const performSearch = async (searchQuery) => {
   if (!searchQuery?.trim()) return
   
-  loading.value = true
+  loadingStore.startLoading()
   searched.value = true
   
   try {
@@ -174,7 +170,7 @@ const performSearch = async (searchQuery) => {
   } catch (error) {
     console.error('Error fetching search results:', error)
   } finally {
-    loading.value = false
+    loadingStore.stopLoading()
   }
 }
 
