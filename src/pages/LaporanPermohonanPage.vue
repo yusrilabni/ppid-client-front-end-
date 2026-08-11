@@ -47,22 +47,25 @@
               <!-- Sort -->
               <div class="md:flex-1 md:min-w-[150px]">
                 <label for="sort" class="block text-xs font-medium text-gray-600 mb-1">Urutkan</label>
-                <select v-model="filters.sort" id="sort" class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
-                  <option value="created_at_desc">Terbaru</option>
-                  <option value="created_at_asc">Terlama</option>
-                  <option value="nama_pemohon_asc">Pemohon (A-Z)</option>
-                  <option value="nama_pemohon_desc">Pemohon (Z-A)</option>
-                </select>
+                <div class="border border-gray-300 rounded-2xl bg-white">
+                  <CustomSelect
+                    v-model="filters.sort"
+                    :options="sortOptions"
+                    :searchable="false"
+                  />
+                </div>
               </div>
 
               <!-- Items Per Page -->
               <div class="md:flex-1 md:min-w-[100px]">
                 <label for="per_page" class="block text-xs font-medium text-gray-600 mb-1">Tampilan</label>
-                <select v-model="filters.per_page" id="per_page" class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
+                <div class="border border-gray-300 rounded-2xl bg-white">
+                  <CustomSelect
+                    v-model="filters.per_page"
+                    :options="perPageOptions"
+                    :searchable="false"
+                  />
+                </div>
               </div>
             </div>
 
@@ -203,18 +206,32 @@ import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import CustomSelect from '@/components/CustomSelect.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const currentPage = ref(1)
 
+const sortOptions = [
+  { value: 'created_at_desc', label: 'Terbaru' },
+  { value: 'created_at_asc', label: 'Terlama' },
+  { value: 'nama_pemohon_asc', label: 'Pemohon (A-Z)' },
+  { value: 'nama_pemohon_desc', label: 'Pemohon (Z-A)' }
+]
+
+const perPageOptions = [
+  { value: '10', label: '10' },
+  { value: '20', label: '20' },
+  { value: '50', label: '50' }
+]
+
 const filters = ref({
   search: '',
   date_from: '',
   date_to: '',
   sort: 'created_at_desc',
-  per_page: 10
+  per_page: '10'
 })
 
 const queryParams = computed(() => {
@@ -253,7 +270,7 @@ const resetFilters = () => {
     date_from: '',
     date_to: '',
     sort: 'created_at_desc',
-    per_page: 10
+    per_page: '10'
   }
   currentPage.value = 1
   refetch()
