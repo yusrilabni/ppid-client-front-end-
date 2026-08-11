@@ -6,9 +6,9 @@
         { title: 'Permohonan Informasi', url: '#', icon: 'fas fa-file-signature' }
       ]" class="mb-4" />
 
-      <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100">
         <!-- Header -->
-        <div class="px-6 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="px-6 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-2xl flex flex-col md:flex-row justify-between items-center gap-4">
           <h2 class="text-xl font-bold text-white flex items-center">
             <i class="fas fa-list-ul mr-3"></i> Daftar Semua Permohonan
           </h2>

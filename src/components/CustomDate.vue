@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full" ref="calendarRef">
+  <div class="relative w-full" ref="calendarRef" :class="isOpen ? 'z-[100]' : 'z-10'">
     <!-- Input Trigger -->
     <div 
       @click="isOpen = !isOpen"
