@@ -75,7 +75,7 @@
 
             <!-- Form -->
             <form @submit.prevent="submitSurvey" class="space-y-10">
-              <div v-for="(section, index) in survey.sections" :key="section.id" class="survey-section">
+              <div v-for="(section, index) in survey.sections" :key="section.id" class="survey-section" v-show="currentStep === index + 1">
                 
                 <!-- Section Header -->
                 <div class="mb-6 md:mb-10 bg-gradient-to-r from-blue-50 to-indigo-50 p-5 md:p-8 rounded-2xl border border-blue-100 shadow-md">
@@ -105,7 +105,7 @@
                 </div>
 
                 <!-- Questions in Section -->
-                <div class="space-y-6 md:space-y-10 pl-0 md:pl-10">
+                <div class="space-y-6 md:space-y-10">
                   <div v-for="(question, qIndex) in getQuestionsBySection(section.id)" :key="question.id" class="question-card bg-white rounded-2xl border border-gray-100 p-5 md:p-8 shadow-md relative">
                     <div class="flex flex-col md:flex-row items-start">
                       
@@ -140,17 +140,17 @@
 
                         <div class="mt-4 md:mt-6">
                           <!-- Text Input -->
-                          <div v-if="question.type === 'text'">
-                            <input type="text" v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban...">
+                          <div v-if="['Isian Singkat', 'Email', 'Numeric', 'Url'].includes(question.question_type)">
+                            <input :type="question.question_type === 'Email' ? 'email' : (question.question_type === 'Numeric' ? 'number' : (question.question_type === 'Url' ? 'url' : 'text'))" v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban...">
                           </div>
 
                           <!-- Textarea -->
-                          <div v-else-if="question.type === 'textarea'">
+                          <div v-else-if="question.question_type === 'Isian Panjang'">
                             <textarea v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" rows="4" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban..."></textarea>
                           </div>
 
                           <!-- Radio -->
-                          <div v-else-if="question.type === 'radio'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div v-else-if="['Pilihan Ganda', 'Pilihan Ganda (Berbobot)'].includes(question.question_type)" class="grid grid-cols-1 gap-3">
                             <label v-for="option in question.options" :key="option.id" class="flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50 ring-2 ring-blue-200': answers[question.id] === option.option_text, 'border-gray-200': answers[question.id] !== option.option_text }">
                               <div class="flex items-center h-6">
                                 <input type="radio" :name="'question_' + question.id" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500">
@@ -162,7 +162,7 @@
                           </div>
 
                           <!-- Checkbox -->
-                          <div v-else-if="question.type === 'checkbox'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div v-else-if="question.question_type === 'Checkbox'" class="grid grid-cols-1 gap-3">
                             <label v-for="option in question.options" :key="option.id" class="flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50 ring-2 ring-blue-200': Array.isArray(answers[question.id]) && answers[question.id].includes(option.option_text), 'border-gray-200': !Array.isArray(answers[question.id]) || !answers[question.id].includes(option.option_text) }">
                               <div class="flex items-center h-6">
                                 <input type="checkbox" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
@@ -174,7 +174,7 @@
                           </div>
 
                           <!-- Select -->
-                          <div v-else-if="question.type === 'select'">
+                          <div v-else-if="question.question_type === 'Dropdown'">
                             <select v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 bg-white">
                               <option value="" disabled>Pilih opsi...</option>
                               <option v-for="option in question.options" :key="option.id" :value="option.option_text">{{ option.option_text }}</option>
@@ -182,7 +182,7 @@
                           </div>
 
                           <!-- Rating/Scale -->
-                          <div v-else-if="question.type === 'scale'" class="flex flex-wrap gap-2 md:gap-4">
+                          <div v-else-if="question.question_type === 'Skala Kepuasan'" class="flex flex-wrap gap-2 md:gap-4 justify-center py-4 bg-gradient-to-r from-red-50 via-yellow-50 to-green-50 rounded-2xl border-2 border-gray-50">
                             <label v-for="n in 5" :key="n" class="cursor-pointer">
                               <input type="radio" :name="'question_' + question.id" :value="n" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="hidden">
                               <div class="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-xl md:text-2xl font-bold transition-all border-2" :class="{ 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-transparent shadow-lg transform scale-110': String(answers[question.id]) === String(n), 'bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:bg-blue-50': String(answers[question.id]) !== String(n) }">
@@ -199,9 +199,18 @@
 
               </div>
 
-              <!-- Submit Button -->
-              <div class="pt-8 border-t border-gray-100 flex justify-end">
-                <button type="submit" :disabled="submitting" class="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all flex items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed">
+              <!-- Navigation & Submit Button -->
+              <div class="pt-8 border-t border-gray-100 flex justify-between items-center">
+                <button type="button" @click="prevStep" v-if="currentStep > 1" class="px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2">
+                  <i class="fas fa-chevron-left"></i> Sebelumnya
+                </button>
+                <div v-else></div> <!-- Spacer -->
+
+                <button type="button" @click="nextStep" v-if="currentStep < survey.sections.length" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md">
+                  Selanjutnya <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <button v-if="currentStep === survey.sections.length" type="submit" :disabled="submitting" class="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 focus:ring-4 focus:ring-green-200 transition-all flex items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-md">
                   <span v-if="submitting"><i class="fas fa-spinner fa-spin"></i> Mengirim...</span>
                   <span v-else><i class="fas fa-paper-plane"></i> Kirim Jawaban</span>
                 </button>
@@ -250,6 +259,21 @@ const submitting = ref(false)
 const submitted = ref(false)
 const submitError = ref('')
 const progress = ref(0)
+const currentStep = ref(1)
+
+const nextStep = () => {
+  if (survey.value && currentStep.value < survey.value.sections.length) {
+    currentStep.value++
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+const prevStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
 
 onMounted(async () => {
   try {
@@ -258,7 +282,7 @@ onMounted(async () => {
     
     // Initialize answers array for checkboxes
     survey.value.questions.forEach(q => {
-      if (q.type === 'checkbox') {
+      if (q.question_type === 'Checkbox') {
         answers.value[q.id] = []
       } else {
         answers.value[q.id] = ''
@@ -290,7 +314,7 @@ const calculateProgress = () => {
   
   survey.value.questions.forEach(q => {
     const ans = answers.value[q.id]
-    if (q.type === 'checkbox') {
+    if (q.question_type === 'Checkbox') {
       if (Array.isArray(ans) && ans.length > 0) answered++
     } else {
       if (ans !== '' && ans !== null && ans !== undefined) answered++
