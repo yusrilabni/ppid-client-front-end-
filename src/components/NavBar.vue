@@ -134,14 +134,12 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                   </router-link>
               </div>
 
-              <!-- Menu & Search Container (Desktop) -->
-              <div class="hidden xl:flex flex-1 justify-center mx-4 min-w-0">
-                  <div class="relative bg-blue-50/50 rounded-2xl border border-blue-100 transition-all duration-500 ease-in-out h-12 flex items-center px-2"
-                       :class="searchOpen ? 'w-full max-w-2xl shadow-inner bg-white border-blue-200' : 'w-auto max-w-full'">
+              <!-- Menu Container (Desktop) -->
+              <div class="hidden xl:flex flex-1 justify-center mx-4 min-w-0" :class="{ 'opacity-0': searchOpen }">
+                  <div class="relative bg-blue-50/50 rounded-2xl border border-blue-100 transition-all duration-500 ease-in-out h-12 flex items-center px-2 w-auto max-w-full">
                       
                       <!-- Menu List Container -->
-                      <div class="flex items-center space-x-1 whitespace-nowrap w-full justify-center opacity-100 scale-100 translate-y-0"
-                           :class="searchOpen ? 'opacity-0 pointer-events-none scale-95 translate-y-[-10px]' : 'opacity-100 scale-100 translate-y-0'">
+                      <div class="flex items-center space-x-1 whitespace-nowrap w-full justify-center">
                           
                           <template v-for="(menu, index) in menus" :key="index">
                               <template v-if="!(menu.title === 'DIP' && (!menu.children || menu.children.length === 0)) && menu.title !== 'Login'">
@@ -186,34 +184,42 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                                   </div>
                               </template>
                           </template>
-
-                          <!-- Desktop Search Trigger (Icon Only) -->
-                          <button @click="openSearch" 
-                              class="flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 w-9 h-9 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-110 ml-2 flex-shrink-0">
-                              <i class="fas fa-search text-base"></i>
-                          </button>
-                      </div>
-
-                      <!-- Search Form Container -->
-                      <div class="absolute inset-0 flex items-center px-2 transition-all duration-500 ease-in-out"
-                           :class="searchOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-[10px] pointer-events-none'">
-                          <form @submit.prevent="handleSearch" class="w-full flex items-center">
-                              <div class="relative w-full">
-                                  <input type="text" v-model="searchQuery" placeholder="Cari informasi, dokumen, atau OPD..." 
-                                      class="w-full bg-transparent border-none py-2 pl-10 pr-10 text-sm focus:outline-none focus:ring-0 transition-all"
-                                      ref="searchInput"
-                                      @keydown.escape="searchOpen = false" />
-                                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <i class="fas fa-search text-blue-500 text-lg"></i>
-                                  </div>
-                                  <button type="button" @click="searchOpen = false" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
-                                      <i class="fas fa-times-circle text-lg"></i>
-                                  </button>
-                              </div>
-                          </form>
                       </div>
                   </div>
               </div>
+
+              <!-- Desktop Search Trigger (Icon Only) - Positioned Outside -->
+              <div class="hidden xl:flex items-center" :class="{ 'opacity-0 pointer-events-none': searchOpen }">
+                  <button @click="openSearch" 
+                      class="flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 w-10 h-10 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-110 mr-4 flex-shrink-0">
+                      <i class="fas fa-search text-base"></i>
+                  </button>
+              </div>
+
+              <!-- Search Overlay (Full Width) -->
+              <transition
+                  enter-active-class="transition-all duration-300 ease-out"
+                  enter-from-class="opacity-0 scale-95 translate-y-[-10px]"
+                  enter-to-class="opacity-100 scale-100 translate-y-0"
+                  leave-active-class="transition-all duration-200 ease-in"
+                  leave-from-class="opacity-100 scale-100 translate-y-0"
+                  leave-to-class="opacity-0 scale-95 translate-y-[-10px]"
+              >
+                  <div v-if="searchOpen" class="absolute inset-0 z-50 flex items-center justify-center px-4 bg-white/95 backdrop-blur-sm">
+                      <div class="w-full max-w-4xl bg-white shadow-xl border border-blue-200 rounded-2xl p-2 flex items-center">
+                          <form @submit.prevent="handleSearch" class="w-full flex items-center">
+                              <i class="fas fa-search text-blue-500 text-xl ml-4"></i>
+                              <input type="text" v-model="searchQuery" placeholder="Ketik kata kunci untuk mencari informasi, dokumen, atau OPD..." 
+                                  class="flex-1 bg-transparent border-none py-3 px-4 text-base md:text-lg focus:outline-none focus:ring-0 text-gray-800 placeholder-gray-400 font-medium"
+                                  ref="searchInput"
+                                  @keydown.escape="searchOpen = false" />
+                              <button type="button" @click="searchOpen = false" class="bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-700 p-2.5 rounded-xl transition-colors flex items-center justify-center mr-2">
+                                  <i class="fas fa-times text-xl"></i>
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </transition>
 
               <!-- Login/User Dropdown & Mobile Menu Button -->
               <div class="flex items-center flex-shrink-0 pr-4 xl:pr-6 space-x-2">
