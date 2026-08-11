@@ -89,6 +89,7 @@ const routes = [
       { path: 'dip/:year?', name: 'dip', component: DipPage },
       { path: 'dipunit', name: 'dipunit', component: DipUnitPage },
       { path: 'dipunit/dip/:slug', name: 'dipunit.detail', component: DipUnitDetailPage },
+      { path: 'lhkpn', name: 'lhkpn', component: () => import('@/pages/LhkpnPage.vue') },
       { path: 'kontak', name: 'kontak', component: KontakPage },
       { path: 'statistik', name: 'statistik', component: StatistikPage },
     ]
