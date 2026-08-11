@@ -16,28 +16,57 @@
                 </h2>
               </div>
               <div class="space-y-6">
-                <div v-for="item in informasiResults" :key="item.id" class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col md:flex-row gap-6 group">
-                  <div class="flex-1">
-                    <div class="flex items-center space-x-2 text-xs font-black text-gray-400 uppercase tracking-widest mb-3">
-                      <span class="text-blue-500"><i class="fas fa-folder-open mr-1"></i> {{ item.category }}</span>
-                      <span>•</span>
-                      <span>{{ new Date(item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
-                    </div>
-                    <h3 class="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors mb-3 line-clamp-2 leading-tight">
-                      {{ item.title }}
-                    </h3>
-                    <p class="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
-                      {{ item.ringkasan || item.deskripsi }}
-                    </p>
-                    <div class="flex items-center justify-between mt-auto">
-                      <div class="flex items-center text-xs font-bold text-gray-400">
-                        <i class="fas fa-building mr-2 text-gray-300"></i>
-                        {{ item.organization ? item.organization.singkatan || item.organization.name : 'PPID' }}
+                <div v-for="(item, index) in informasiResults" :key="item.id" class="relative group">
+                  
+                  <template v-if="index === 0 && item.search_score > 100">
+                      <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                      <div class="absolute -top-3 left-8 bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg z-20">Hasil Paling Sesuai</div>
+                  </template>
+
+                  <div :class="[
+                      'relative bg-white p-6 md:p-8 rounded-[2rem] border hover:border-blue-300 hover:shadow-xl transition-all duration-500 h-full flex flex-col group/card overflow-hidden',
+                      index === 0 && item.search_score > 100 ? 'border-blue-400 shadow-xl' : 'border-gray-100 shadow-sm'
+                  ]">
+                      <!-- Decorative Background -->
+                      <div :class="`absolute -right-8 -top-8 text-${getCatColor(item.category)}-50 group-hover/card:scale-110 transition-transform duration-700 opacity-30 pointer-events-none`">
+                          <i class="fas fa-file-alt fa-9x"></i>
                       </div>
-                      <router-link :to="getInformasiUrl(item)" class="text-blue-600 text-sm font-black flex items-center group-hover:translate-x-2 transition-transform">
-                        BACA SELENGKAPNYA <i class="fas fa-arrow-right ml-2"></i>
-                      </router-link>
-                    </div>
+
+                      <div class="relative z-10">
+                          <div class="flex items-center gap-4 mb-4">
+                              <div :class="`w-10 h-10 rounded-2xl bg-${getCatColor(item.category)}-50 flex items-center justify-center text-${getCatColor(item.category)}-600 border border-${getCatColor(item.category)}-100/50 shadow-sm`">
+                                  <i class="fas fa-building text-sm"></i>
+                              </div>
+                              <div class="flex flex-col min-w-0">
+                                  <span class="text-[11px] font-black text-gray-800 uppercase tracking-tight line-clamp-1 leading-tight">{{ item.organization ? item.organization.singkatan || item.organization.name : (item.user ? item.user.opd_name : 'Unit Tidak Terdaftar') }}</span>
+                                  <span class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Diterbitkan pada {{ new Date(item.tanggal_upload || item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
+                              </div>
+                          </div>
+
+                          <router-link :to="getInformasiUrl(item)" class="block mb-4">
+                              <h3 class="text-lg md:text-xl font-black text-gray-900 leading-tight group-hover/card:text-blue-600 transition-colors">
+                                  {{ item.title }}
+                              </h3>
+                          </router-link>
+                          <p class="text-sm text-gray-500 line-clamp-3 leading-relaxed mb-6">{{ item.deskripsi || item.ringkasan }}</p>
+                      </div>
+
+                      <div class="mt-auto pt-5 border-t border-gray-50 flex items-center justify-between relative z-10">
+                          <div class="flex flex-col gap-2">
+                              <span :class="`inline-flex items-center w-fit text-[9px] font-black px-3 py-1 rounded-full bg-${getCatColor(item.category)}-50 text-${getCatColor(item.category)}-600 border border-${getCatColor(item.category)}-100 uppercase tracking-[0.1em]`">
+                                  {{ item.category }}
+                              </span>
+                              <span class="text-[10px] text-gray-400 font-bold flex items-center">
+                                  <i class="fas fa-eye mr-2 text-blue-500"></i> {{ item.views_count || 0 }} Dilihat
+                              </span>
+                          </div>
+                          
+                          <router-link :to="getInformasiUrl(item)" 
+                              :class="`px-6 py-3 rounded-2xl bg-gray-900 text-white text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:bg-${getCatColor(item.category)}-600 transition-all shadow-lg active:scale-95 group/btn`">
+                              <span>Detail</span>
+                              <i class="fas fa-arrow-right group-hover/btn:translate-x-1 transition-transform"></i>
+                          </router-link>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -163,6 +192,16 @@ const getInformasiUrl = (item) => {
     return `/profil/pimpinan/${item.organization.slug}`
   }
   return `/informasi/detail/${item.slug}`
+}
+
+const getCatColor = (category) => {
+  switch (category) {
+    case 'Informasi Berkala': return 'blue'
+    case 'Informasi Setiap Saat': return 'green'
+    case 'Informasi Serta Merta': return 'yellow'
+    case 'Informasi Dikecualikan': return 'red'
+    default: return 'slate'
+  }
 }
 
 const performSearch = async (searchQuery) => {

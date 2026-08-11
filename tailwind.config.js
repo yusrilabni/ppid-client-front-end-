@@ -17,5 +17,10 @@ export default {
       },
     },
   },
+  safelist: [
+    {
+      pattern: /(bg|text|border|hover:bg)-(blue|green|yellow|red|slate)-(50|100|400|500|600)/,
+    }
+  ],
   plugins: [],
 }
