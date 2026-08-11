@@ -64,14 +64,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import api from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'
 
-const code = ref('')
+const route = useRoute()
+const code = ref(route.params.code || '')
 const loading = ref(false)
 const searched = ref(false)
 const result = ref(null)
+
+onMounted(() => {
+  if (code.value) {
+    checkStatus()
+  }
+})
 
 const checkStatus = async () => {
   if (!code.value.trim()) return

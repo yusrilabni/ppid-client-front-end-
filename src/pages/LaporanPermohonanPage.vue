@@ -13,6 +13,9 @@
             <i class="fas fa-list-ul mr-3"></i> Daftar Semua Permohonan
           </h2>
           <div class="flex flex-wrap items-center justify-center gap-2">
+            <router-link v-if="authStore.isAuthenticated" to="#" class="inline-flex items-center justify-center px-4 py-2 text-xs md:text-sm font-bold rounded-xl bg-yellow-300 text-yellow-900 shadow-md hover:bg-yellow-400 transition-all duration-200">
+              <i class="fas fa-user-check mr-2"></i> Permohonan Saya
+            </router-link>
             <router-link to="/permohonan-informasi" class="inline-flex items-center justify-center px-4 py-2 text-xs md:text-sm font-bold rounded-xl bg-white text-blue-600 shadow-md hover:bg-gray-100 transition-all duration-200">
               <i class="fas fa-plus-circle mr-2"></i> Buat Permohonan
             </router-link>
@@ -91,7 +94,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rincian Informasi</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Sifat</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -111,8 +114,12 @@
                       <i :class="getPrivacyIcon(item.privacy_status)" class="mr-1"></i> {{ item.privacy_status }}
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ formatDate(item.created_at) }}
+                  <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                    <div class="flex items-center space-x-3">
+                      <router-link :to="`/tracking/${item.unique_code}`" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-lg transition-colors">
+                        <i class="fas fa-eye mr-1"></i> Detail
+                      </router-link>
+                    </div>
                   </td>
                 </tr>
                 <tr v-if="!data?.data?.length">
@@ -145,6 +152,11 @@
                   <span class="text-[10px] text-gray-500 flex items-center">
                     <i class="far fa-calendar-alt mr-1"></i> {{ formatDate(item.created_at) }}
                   </span>
+                </div>
+                <div class="flex gap-2">
+                  <router-link :to="`/tracking/${item.unique_code}`" class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-sm">
+                    Detail
+                  </router-link>
                 </div>
               </div>
             </div>
@@ -192,7 +204,9 @@ import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const currentPage = ref(1)
 
 const filters = ref({
