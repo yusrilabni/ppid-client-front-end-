@@ -18,19 +18,6 @@
                         <h1 class="text-2xl md:text-3xl font-extrabold leading-tight">Kuesioner PBJ {{ route.params.year }}</h1>
                         <p class="text-blue-100 mt-2 text-sm opacity-90">Daftar kelengkapan dokumen pengadaan barang dan jasa.</p>
                     </div>
-                    
-                    <!-- Quick Navigation -->
-                    <div class="w-full md:w-48 relative" style="z-index: 100;">
-                        <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-sm">
-                            <CustomSelect 
-                              v-model="selectedYear"
-                              :options="yearOptions"
-                              :searchable="false"
-                              placeholder="Ubah Tahun"
-                            />
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Content Section -->
@@ -80,43 +67,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
 import PbjQuestionItem from '@/components/PbjQuestionItem.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
-const router = useRouter()
-const selectedYear = ref(route.params.year)
-
-const { data: yearsResponse } = useQuery({
-  queryKey: ['pbj-years'],
-  queryFn: async () => {
-    const res = await api.get('/pbj/years')
-    return res.data
-  }
-})
-
-const yearOptions = computed(() => {
-  const years = yearsResponse.value?.data || []
-  return years.map(y => ({ value: String(y), label: `Tahun ${y}` }))
-})
-
-watch(selectedYear, (newYear, oldYear) => {
-    if (newYear && oldYear && newYear !== route.params.year) {
-        router.push(`/pbj/${newYear}`)
-    }
-})
-
-watch(() => route.params.year, (newYear) => {
-    if (newYear && newYear !== selectedYear.value) {
-        selectedYear.value = newYear
-    }
-})
 
 const { data: pbjResponse, isLoading } = useQuery({
   queryKey: computed(() => ['pbj', route.params.year]),
@@ -148,14 +107,3 @@ const getLink = (question) => {
     return '#'
 }
 </script>
-
-<style scoped>
-::v-deep(.bg-white\/10 .custom-select-trigger) {
-    color: #fff !important; 
-    background-color: transparent !important;
-    border: none !important;
-}
-::v-deep(.bg-white\/10 .custom-select-trigger:hover) {
-    background-color: rgba(255,255,255,0.1) !important;
-}
-</style>

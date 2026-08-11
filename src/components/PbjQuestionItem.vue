@@ -5,15 +5,13 @@
             {{ formatIndex(index, level) }}
         </span>
         
-        <div class="flex-1">
-            <a v-if="hasLink(question)" :href="getLink(question)" class="text-sm md:text-base font-bold text-blue-600 hover:text-blue-800 leading-snug block transition-colors">
-                {{ question.question }}
-                <i class="fas fa-external-link-alt ml-2 text-[10px] opacity-50"></i>
-            </a>
-            <p v-else class="text-sm md:text-base font-medium text-gray-700 leading-snug">
-                {{ question.question }}
-            </p>
-        </div>
+        <a v-if="hasLink(question)" :href="getLink(question)" class="text-sm md:text-base font-bold text-blue-600 hover:text-blue-800 leading-snug flex-1 transition-colors">
+            {{ question.question }}
+            <i class="fas fa-external-link-alt ml-2 text-[10px] opacity-50"></i>
+        </a>
+        <p v-else class="text-sm md:text-base font-medium text-gray-700 leading-snug flex-1">
+            {{ question.question }}
+        </p>
     </div>
 
     <div v-if="question.children && question.children.length > 0" class="mt-2">
