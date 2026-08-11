@@ -34,30 +34,32 @@
         </div>
 
         <!-- Survey Content -->
-        <div v-else-if="survey" class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
-          <div class="p-8 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden">
-            <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
-              <i class="fas fa-poll-h text-9xl"></i>
-            </div>
-            
-            <div class="relative z-10">
-              <span v-if="survey.type === 'skm' || !survey.type" class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-white/30">
-                SKM
-              </span>
-              <span v-else-if="survey.type === 'ppid'" class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-white/30">
-                Survei PPID
-              </span>
+        <div v-else-if="survey" class="bg-transparent">
+          <!-- Form Section -->
+          <div v-if="!submitted" class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+            <div class="p-8 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden">
+              <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
+                <i class="fas fa-poll-h text-9xl"></i>
+              </div>
               
-              <h1 class="text-3xl font-black mb-3">{{ survey.title }}</h1>
-              <p class="text-blue-100 max-w-2xl text-sm leading-relaxed">{{ survey.description }}</p>
+              <div class="relative z-10">
+                <span v-if="survey.type === 'skm' || !survey.type" class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-white/30">
+                  SKM
+                </span>
+                <span v-else-if="survey.type === 'ppid'" class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-white/30">
+                  Survei PPID
+                </span>
+                
+                <h1 class="text-3xl font-black mb-3">{{ survey.title }}</h1>
+                <p class="text-blue-100 max-w-2xl text-sm leading-relaxed">{{ survey.description }}</p>
+              </div>
             </div>
-          </div>
 
-          <div v-if="!submitted" class="p-6 md:p-10">
-            <!-- Progress Bar -->
-            <div class="mb-10">
-              <div class="flex justify-between items-end mb-2">
-                <span class="text-sm font-bold text-gray-700">Progres Pengisian</span>
+            <div class="p-6 md:p-10">
+              <!-- Progress Bar -->
+              <div class="mb-10">
+                <div class="flex justify-between items-end mb-2">
+                  <span class="text-sm font-bold text-gray-700">Progres Pengisian</span>
                 <span class="text-sm font-bold text-blue-600">{{ progress }}%</span>
               </div>
               <div class="w-full bg-gray-100 rounded-full h-3">
@@ -219,15 +221,60 @@
             </form>
           </div>
           
-          <div v-else class="p-16 text-center">
-            <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-5xl mx-auto mb-6">
-              <i class="fas fa-check"></i>
+          <div v-else class="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 p-4 sm:p-6 lg:p-8">
+            <div class="max-w-lg w-full mx-auto">
+                <div class="bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
+                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-center">
+                        <div class="relative w-24 h-24 mx-auto mb-4">
+                            <div class="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-check-circle text-white text-5xl transform transition-all duration-500 hover:scale-110"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-2 animate-fade-in-down">Terima Kasih!</h2>
+                        <p class="text-green-100 text-lg font-medium">Partisipasi Anda sangat berharga</p>
+                    </div>
+
+                    <div class="p-8 text-center">
+                        <div class="mb-8">
+                            <p class="text-gray-700 text-lg mb-4 leading-relaxed">
+                                <i class="fas fa-clipboard-check text-green-500 mr-2"></i>
+                                Jawaban Anda telah berhasil kami rekam dan akan kami proses dengan seksama.
+                            </p>
+                            <p class="text-gray-600 mb-6">
+                                Kontribusi Anda membantu kami dalam meningkatkan kualitas layanan dan penelitian kami.
+                            </p>
+
+                            <div class="bg-blue-50 rounded-xl p-4 mb-8 border border-blue-100">
+                                <div class="flex items-center justify-center text-blue-700">
+                                    <i class="fas fa-lock text-xl mr-3"></i>
+                                    <p class="font-medium">Data Anda aman dan rahasia</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                                <i class="fas fa-check text-blue-500 text-2xl mb-2"></i>
+                                <p class="text-sm text-gray-600">Status</p>
+                                <p class="text-lg font-bold text-gray-800">Selesai</p>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                                <i class="fas fa-shield-alt text-green-500 text-2xl mb-2"></i>
+                                <p class="text-sm text-gray-600">Keamanan</p>
+                                <p class="text-lg font-bold text-gray-800">Terjamin</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <router-link to="/laporan/survei" class="w-full inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                                <i class="fas fa-home mr-3"></i>
+                                Kembali ke Daftar Survei
+                            </router-link>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Terima Kasih!</h2>
-            <p class="text-gray-600 mb-8 max-w-lg mx-auto">Jawaban Anda telah berhasil kami simpan. Partisipasi Anda sangat berarti bagi peningkatan kualitas layanan kami.</p>
-            <router-link to="/laporan/survei" class="inline-block px-8 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">
-              Kembali ke Daftar Survei
-            </router-link>
           </div>
         </div>
 
