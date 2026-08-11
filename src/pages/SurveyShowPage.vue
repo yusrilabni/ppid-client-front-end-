@@ -75,38 +75,38 @@
 
             <!-- Form -->
             <form @submit.prevent="submitSurvey" class="space-y-10">
-              <div v-for="(section, index) in survey.sections" :key="section.id" class="survey-section" v-show="currentStep === index + 1">
+              <div v-for="(page, index) in pages" :key="page.id" class="survey-section" v-show="currentStep === index + 1">
                 
                 <!-- Section Header -->
                 <div class="mb-6 md:mb-10 bg-gradient-to-r from-blue-50 to-indigo-50 p-5 md:p-8 rounded-2xl border border-blue-100 shadow-md">
                   <div class="flex items-center mb-4 md:mb-6">
                     <div class="bg-gradient-to-br from-blue-600 to-indigo-700 w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center mr-4 md:mr-6 shadow-lg">
-                      <i class="fas fa-list-alt text-white text-xl md:text-2xl"></i>
+                      <i :class="page.icon + ' text-white text-xl md:text-2xl'"></i>
                     </div>
                     <div>
                       <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-1 leading-tight">
-                        {{ section.title }}
+                        {{ page.id === 'general' ? (survey.title.length > 40 ? survey.title.substring(0,40) + '...' : survey.title) : page.title }}
                       </h2>
                       <div class="flex items-center text-sm md:text-lg text-gray-700 font-medium">
                         <i class="fas fa-layer-group mr-2"></i>
-                        <span>Bagian {{ index + 1 }} / {{ survey.sections.length }}</span>
+                        <span>Bagian {{ index + 1 }} / {{ pages.length }}</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div v-if="section.description" class="mt-4 description-box p-4 md:p-6 rounded-xl">
+                  <div v-if="(page.id === 'general' && survey.description) || (page.id !== 'general' && page.description)" class="mt-4 description-box p-4 md:p-6 rounded-xl border-l-4 border-blue-500 bg-gradient-to-r from-slate-50 to-slate-100">
                     <div class="flex items-start">
                       <i class="fas fa-info-circle text-blue-500 text-lg md:text-2xl mr-3 mt-1"></i>
                       <div>
-                        <p class="text-sm md:text-lg text-gray-700 leading-relaxed">{{ section.description }}</p>
+                        <p class="text-sm md:text-lg text-gray-700 leading-relaxed">{{ page.id === 'general' ? survey.description : page.description }}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Questions in Section -->
-                <div class="space-y-6 md:space-y-10">
-                  <div v-for="(question, qIndex) in getQuestionsBySection(section.id)" :key="question.id" class="question-card bg-white rounded-2xl border border-gray-100 p-5 md:p-8 shadow-md relative">
+                <div class="space-y-6 md:space-y-10 pl-0 md:pl-10">
+                  <div v-for="(question, qIndex) in page.questions" :key="question.id" class="question-card bg-white rounded-2xl border border-gray-100 p-5 md:p-8 shadow-md relative">
                     <div class="flex flex-col md:flex-row items-start">
                       
                       <!-- Question Number Badge -->
@@ -206,11 +206,11 @@
                 </button>
                 <div v-else></div> <!-- Spacer -->
 
-                <button type="button" @click="nextStep" v-if="currentStep < survey.sections.length" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md">
+                <button type="button" @click="nextStep" v-if="currentStep < pages.length" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md">
                   Selanjutnya <i class="fas fa-chevron-right"></i>
                 </button>
                 
-                <button v-if="currentStep === survey.sections.length" type="submit" :disabled="submitting" class="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 focus:ring-4 focus:ring-green-200 transition-all flex items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-md">
+                <button v-if="currentStep === pages.length" type="submit" :disabled="submitting" class="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 focus:ring-4 focus:ring-green-200 transition-all flex items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-md">
                   <span v-if="submitting"><i class="fas fa-spinner fa-spin"></i> Mengirim...</span>
                   <span v-else><i class="fas fa-paper-plane"></i> Kirim Jawaban</span>
                 </button>
@@ -261,8 +261,54 @@ const submitError = ref('')
 const progress = ref(0)
 const currentStep = ref(1)
 
+const pages = computed(() => {
+  if (!survey.value) return []
+  
+  const p = []
+  
+  // 1. General Questions (No Section)
+  const generalQuestions = survey.value.questions.filter(q => q.section_id === null || q.section_id === undefined)
+  if (generalQuestions.length > 0) {
+    p.push({
+      id: 'general',
+      title: 'Umum',
+      description: null,
+      questions: generalQuestions.sort((a, b) => a.order - b.order),
+      icon: 'fas fa-list-alt'
+    })
+  }
+  
+  // 2. Sections
+  if (survey.value.sections) {
+    const sections = [...survey.value.sections].sort((a, b) => a.order - b.order)
+    sections.forEach(section => {
+      const sectionQuestions = survey.value.questions.filter(q => q.section_id === section.id).sort((a, b) => a.order - b.order)
+      p.push({
+        id: 'section_' + section.id,
+        title: section.title,
+        description: section.description,
+        questions: sectionQuestions,
+        icon: 'fas fa-folder'
+      })
+    })
+  }
+  
+  // If empty
+  if (p.length === 0) {
+    p.push({
+      id: 'empty',
+      title: survey.value.title,
+      description: survey.value.description,
+      questions: [],
+      icon: 'fas fa-poll'
+    })
+  }
+  
+  return p
+})
+
 const nextStep = () => {
-  if (survey.value && currentStep.value < survey.value.sections.length) {
+  if (pages.value && currentStep.value < pages.value.length) {
     currentStep.value++
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
