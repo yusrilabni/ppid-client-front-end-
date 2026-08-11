@@ -91,6 +91,7 @@ const routes = [
       { path: 'dipunit/dip/:slug', name: 'dipunit.detail', component: DipUnitDetailPage },
       { path: 'lhkpn', name: 'lhkpn', component: () => import('@/pages/LhkpnPage.vue') },
       { path: 'pbj', name: 'pbj', component: () => import('@/pages/PbjPage.vue') },
+      { path: 'pbj/:year', name: 'pbj.detail', component: () => import('@/pages/PbjDetailPage.vue') },
       { path: 'kontak', name: 'kontak', component: KontakPage },
       { path: 'statistik', name: 'statistik', component: StatistikPage },
     ]

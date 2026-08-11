@@ -15,29 +15,16 @@
             <div class="mb-6 pbj-breadcrumbs">
                 <Breadcrumbs :breadcrumbs="[
                     { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-                    { title: 'Pengadaan Barang & Jasa', url: '/pbj', icon: 'fas fa-shopping-cart' },
+                    { title: 'Kuesioner PBJ', url: '/pbj', icon: 'fas fa-file-signature' },
                 ]" />
             </div>
 
             <div class="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-white">Informasi PBJ</h1>
+                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-white">Kuesioner PBJ</h1>
                     <p class="text-blue-100 text-lg max-w-2xl leading-relaxed">
-                        Transparansi Pengadaan Barang dan Jasa Pemerintah Kabupaten Sinjai.
+                        Daftar Kuesioner Pengadaan Barang dan Jasa Pemerintah Kabupaten Sinjai berdasarkan tahun.
                     </p>
-                </div>
-                
-                <!-- Year Filter -->
-                <div class="w-full md:w-64 relative" style="z-index: 100;">
-                  <label class="block text-[10px] font-black text-blue-200 mb-2 uppercase tracking-[0.2em] ml-2">Tahun PBJ</label>
-                  <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
-                    <CustomSelect 
-                      v-model="selectedYear"
-                      :options="yearOptions"
-                      :searchable="false"
-                      placeholder="Pilih Tahun"
-                    />
-                  </div>
                 </div>
             </div>
         </div>
@@ -46,20 +33,30 @@
     <div class="container mx-auto px-6 -mt-8 relative z-20">
       
       <!-- Loading Skeleton -->
-      <div v-if="isLoading" class="space-y-6">
-        <div v-for="i in 5" :key="i" class="bg-white rounded-3xl h-24 border border-gray-100 shadow-sm animate-pulse"></div>
+      <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-for="i in 3" :key="i" class="bg-white rounded-3xl h-48 border border-gray-100 shadow-sm animate-pulse"></div>
       </div>
       
-      <!-- Data Sections -->
-      <div v-else-if="questions.length > 0" class="bg-white rounded-3xl shadow-xl shadow-blue-900/5 overflow-hidden border border-gray-100">
-        <div class="p-8">
-            <div class="space-y-8">
-                <PbjQuestionItem 
-                    v-for="(question, index) in questions" 
-                    :key="question.id" 
-                    :question="question" 
-                    :index="index + 1"
-                />
+      <!-- Years List -->
+      <div v-else-if="years.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-for="year in years" :key="year" class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-500 pointer-events-none">
+                <i class="fas fa-file-signature text-8xl text-blue-600"></i>
+            </div>
+            
+            <div class="flex-1 relative z-10">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-5 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                    <i class="fas fa-calendar-alt text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 mb-2">Tahun {{ year }}</h3>
+                <p class="text-gray-500 text-sm leading-relaxed mb-6">Kumpulan pertanyaan dan dokumen jawaban untuk evaluasi Pengadaan Barang dan Jasa tahun {{ year }}.</p>
+            </div>
+            
+            <div class="mt-auto relative z-10">
+                <router-link :to="`/pbj/${year}`" class="w-full inline-flex flex-row items-center justify-center px-4 py-3 text-sm font-bold rounded-2xl bg-gray-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 group/btn">
+                    Lihat Kuesioner
+                    <i class="fas fa-arrow-right ml-2 group-hover/btn:translate-x-1 transition-transform"></i>
+                </router-link>
             </div>
         </div>
       </div>
@@ -67,10 +64,10 @@
       <!-- No Data -->
       <div v-else class="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100">
         <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400 text-3xl">
-          <i class="fas fa-search-minus"></i>
+          <i class="fas fa-folder-open"></i>
         </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Data Tidak Ditemukan</h3>
-        <p class="text-gray-500">Belum ada data Pengadaan Barang dan Jasa untuk tahun yang dipilih.</p>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Ada Kuesioner</h3>
+        <p class="text-gray-500">Saat ini belum ada kuesioner PBJ yang tersedia di sistem.</p>
       </div>
       
     </div>
@@ -78,17 +75,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
-import PbjQuestionItem from '@/components/PbjQuestionItem.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
-const selectedYear = ref('')
-
-const { data: yearsResponse } = useQuery({
+const { data: yearsResponse, isLoading } = useQuery({
   queryKey: ['pbj-years'],
   queryFn: async () => {
     const res = await api.get('/pbj/years')
@@ -96,30 +89,9 @@ const { data: yearsResponse } = useQuery({
   }
 })
 
-const yearOptions = computed(() => {
-  const years = yearsResponse.value?.data || []
-  return years.map(y => ({ value: String(y), label: `Tahun ${y}` }))
-})
-
-// Auto-select latest year when years are loaded
-watch(yearOptions, (newOptions) => {
-  if (newOptions.length > 0 && !selectedYear.value) {
-    selectedYear.value = newOptions[0].value
-  }
-}, { immediate: true })
-
-const { data: pbjResponse, isLoading } = useQuery({
-  queryKey: computed(() => ['pbj', selectedYear.value]),
-  queryFn: async () => {
-    const res = await api.get('/pbj', { params: { year: selectedYear.value } })
-    return res.data
-  },
-  enabled: computed(() => !!selectedYear.value) // Only fetch when year is selected
-})
-
 useGlobalLoader(isLoading)
 
-const questions = computed(() => pbjResponse.value?.data?.questions || [])
+const years = computed(() => yearsResponse.value?.data || [])
 </script>
 
 <style scoped>
@@ -130,10 +102,5 @@ const questions = computed(() => pbjResponse.value?.data?.questions || [])
 }
 ::v-deep(.pbj-breadcrumbs .breadcrumb-separator) {
     color: rgba(255, 255, 255, 0.4) !important;
-}
-/* Ensure CustomSelect text is dark inside the white/10 container */
-::v-deep(.bg-white\/10 .custom-select-trigger) {
-    color: #1f2937 !important; 
-    background-color: white !important;
 }
 </style>
