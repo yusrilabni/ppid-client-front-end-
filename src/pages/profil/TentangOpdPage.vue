@@ -92,7 +92,7 @@
                         </div>
 
                         <div class="mt-auto space-y-3 w-full">
-                            <router-link :to="`/profil/organisasi/${org.slug}`" class="inline-flex items-center justify-center w-full bg-blue-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 group-hover:shadow-blue-200">
+                            <router-link :to="`/profil/tentang-opd/${org.slug}`" class="inline-flex items-center justify-center w-full bg-blue-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 group-hover:shadow-blue-200">
                                 <i class="fas fa-sitemap mr-1"></i> Struktur & Website
                             </router-link>
 
@@ -144,7 +144,7 @@
                     </div>
 
                     <div class="mt-auto space-y-3 w-full">
-                        <router-link :to="`/profil/organisasi/${org.slug}`" class="inline-flex items-center justify-center w-full bg-blue-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 group-hover:shadow-blue-200">
+                        <router-link :to="`/profil/tentang-opd/${org.slug}`" class="inline-flex items-center justify-center w-full bg-blue-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 group-hover:shadow-blue-200">
                             <i class="fas fa-sitemap mr-1"></i> Struktur & Website
                         </router-link>
 

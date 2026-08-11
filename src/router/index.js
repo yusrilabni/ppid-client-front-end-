@@ -68,7 +68,7 @@ const routes = [
       // Profil
       { path: 'profil/ppid', name: 'profil.ppid', component: ProfilPpid },
       { path: 'profil/tentang-opd', name: 'profil.opd', component: TentangOpd },
-      { path: 'profil/organisasi/:slug', name: 'profil.opd.detail', component: OpdDetail },
+      { path: 'profil/tentang-opd/:slug', name: 'profil.opd.detail', component: OpdDetail },
       { path: 'profil/pejabat-daerah', name: 'profil.pejabat-daerah', component: PejabatDaerahPage },
       { path: 'profil/unit-lokal', name: 'profil.unit-lokal', component: UnitLokalPage },
       { path: 'profil/:slug', name: 'profil.official', component: OfficialProfile },

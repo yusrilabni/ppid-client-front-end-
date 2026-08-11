@@ -34,7 +34,7 @@
                         <i class="fas fa-building mr-2 text-gray-300"></i>
                         {{ item.organization ? item.organization.singkatan || item.organization.name : 'PPID' }}
                       </div>
-                      <router-link :to="`/informasi/detail/${item.slug}`" class="text-blue-600 text-sm font-black flex items-center group-hover:translate-x-2 transition-transform">
+                      <router-link :to="getInformasiUrl(item)" class="text-blue-600 text-sm font-black flex items-center group-hover:translate-x-2 transition-transform">
                         BACA SELENGKAPNYA <i class="fas fa-arrow-right ml-2"></i>
                       </router-link>
                     </div>
@@ -108,7 +108,7 @@
               </h2>
               <div class="space-y-4">
                   <div v-for="item in orgResults" :key="item.id" class="bg-white p-4 rounded-2xl border border-gray-100 hover:border-purple-300 hover:shadow-xl transition-all duration-500 group/opd shadow-sm">
-                      <router-link :to="`/profil/organisasi/${item.slug}`" class="flex items-center">
+                      <router-link :to="`/profil/tentang-opd/${item.slug}`" class="flex items-center">
                           <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center mr-4 group-hover/opd:bg-purple-600 group-hover/opd:text-white transition-all shadow-inner shrink-0">
                               <i class="fas fa-building text-base"></i>
                           </div>
@@ -153,6 +153,17 @@ const standarLayananResults = ref([])
 const orgResults = ref([])
 
 const searched = ref(false)
+
+const getInformasiUrl = (item) => {
+  if (item.content && item.content.startsWith('struktur_organisasi_') && item.organization) {
+    return `/profil/tentang-opd/${item.organization.slug}`
+  }
+  // Check if it's an official's profile
+  if (item.title && item.title.startsWith('Profil Pimpinan ') && item.organization) {
+    return `/profil/pimpinan/${item.organization.slug}`
+  }
+  return `/informasi/detail/${item.slug}`
+}
 
 const performSearch = async (searchQuery) => {
   if (!searchQuery?.trim()) return
