@@ -36,8 +36,8 @@
         <!-- Survey Content -->
         <div v-else-if="survey" class="bg-transparent">
           <!-- Form Section -->
-          <div v-if="!submitted" class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
-            <div class="p-8 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden">
+          <div v-if="!submitted" class="bg-white shadow-xl rounded-2xl border border-gray-100">
+            <div class="p-8 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative rounded-t-2xl overflow-hidden">
               <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
                 <i class="fas fa-poll-h text-9xl"></i>
               </div>
@@ -108,7 +108,7 @@
 
                 <!-- Questions in Section -->
                 <div class="space-y-6 md:space-y-10 pl-0 md:pl-10">
-                  <div v-for="(question, qIndex) in page.questions" :key="question.id" class="question-card bg-white rounded-2xl border border-gray-100 p-5 md:p-8 shadow-md relative">
+                  <div v-for="(question, qIndex) in page.questions" :key="question.id" class="question-card bg-white rounded-2xl border border-gray-100 p-5 md:p-8 shadow-md relative" :style="{ zIndex: 50 - qIndex }">
                     <div class="flex flex-col md:flex-row items-start">
                       
                       <!-- Question Number Badge -->
