@@ -177,10 +177,17 @@
 
                           <!-- Select -->
                           <div v-else-if="question.question_type === 'Dropdown'">
-                            <select v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 bg-white">
-                              <option value="" disabled>Pilih opsi...</option>
-                              <option v-for="option in question.options" :key="option.id" :value="option.option_text">{{ option.option_text }}</option>
-                            </select>
+                            <div class="border-2 border-gray-200 rounded-xl bg-white p-1 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-200">
+                              <CustomSelect 
+                                v-model="answers[question.id]" 
+                                :options="question.options" 
+                                labelKey="option_text" 
+                                valueKey="option_text" 
+                                placeholder="Pilih opsi..."
+                                :searchable="question.options.length > 5"
+                                @change="calculateProgress" 
+                              />
+                            </div>
                           </div>
 
                           <!-- Rating/Scale -->
@@ -294,8 +301,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import CustomSelect from '@/components/CustomSelect.vue'
 import api from '@/services/api'
 
 const route = useRoute()
