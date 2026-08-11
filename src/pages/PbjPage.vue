@@ -19,7 +19,7 @@
             <div v-for="year in years" :key="year" class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-5 transform hover:-translate-y-1 transition-all duration-300">
               <div class="flex flex-col h-full">
                 <div class="flex-1">
-                  <div class="p-3 rounded-lg bg-white-500 bg-opacity-10 inline-block">
+                  <div class="p-3 rounded-lg bg-blue-500 bg-opacity-10 inline-block">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                   </div>
                   <h3 class="text-xl font-bold text-gray-900 mt-4">Kuesioner Tahun {{ year }}</h3>
