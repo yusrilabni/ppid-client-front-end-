@@ -83,7 +83,7 @@ const routes = [
       { path: 'survei', name: 'survei', component: SurveyListPage },
       { path: 'regulasi', name: 'regulasi', component: RegulasiPage },
       { path: 'laporan', name: 'laporan', component: LaporanPage },
-      { path: 'dip', name: 'dip', component: DipPage },
+      { path: 'dip/:year?', name: 'dip', component: DipPage },
       { path: 'dipunit', name: 'dipunit', component: DipUnitPage },
       { path: 'dipunit/dip/:slug', name: 'dipunit.detail', component: DipUnitDetailPage },
       { path: 'kontak', name: 'kontak', component: KontakPage },
