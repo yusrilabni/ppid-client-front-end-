@@ -1,5 +1,4 @@
 <template>
-  <div class="bg-gray-50 min-h-screen pb-12">
     <div class="container mx-auto py-6 md:py-8 px-4">
       <div class="max-w-7xl mx-auto">
         
@@ -78,7 +77,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>

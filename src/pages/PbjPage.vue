@@ -1,5 +1,4 @@
 <template>
-  <div class="bg-gray-50 min-h-screen pb-12">
     <div class="container mx-auto my-8 px-4 md:px-0">
       <div class="max-w-7xl mx-auto">
         <div class="mb-6">
@@ -44,7 +43,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
