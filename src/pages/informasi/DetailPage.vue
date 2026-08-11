@@ -35,63 +35,20 @@
               <!-- Content Body -->
               <div class="p-6 sm:p-10">
                 
-                <!-- Metadata Mobile (Shows only on small screens) -->
-                <div class="lg:hidden mb-8 space-y-4">
-                  <!-- Unit Kerja -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-100">
-                          <i class="fas fa-building text-sm"></i>
-                      </div>
-                      <div class="min-w-0">
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight break-words">{{ item.organization_name }}</p>
-                      </div>
-                  </div>
-
-                  <!-- Jenis Dokumen -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-orange-100">
-                          <i class="fas fa-file-signature text-sm"></i>
-                      </div>
-                      <div>
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item.jenis_dokumen || 'Informasi Publik' }}</p>
-                      </div>
-                  </div>
-
-                  <!-- Pengunggah -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-100">
-                          <i class="fas fa-user-shield text-sm"></i>
-                      </div>
-                      <div>
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item.uploader_name }}</p>
-                      </div>
-                  </div>
-
-                  <!-- Tanggal -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-purple-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-100">
-                          <i class="fas fa-calendar-day text-sm"></i>
-                      </div>
-                      <div>
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ formatDate(item.tanggal_upload) }}</p>
-                      </div>
-                  </div>
-
-                  <!-- Stats -->
-                  <div class="grid grid-cols-2 gap-4">
-                      <div class="bg-blue-50 p-4 rounded-2xl text-center border border-blue-100">
-                          <p class="text-[10px] font-black text-blue-400 uppercase mb-1">Dilihat</p>
-                          <p class="text-xl font-black text-blue-700">{{ item.views_count || 0 }}</p>
-                      </div>
-                      <div class="bg-blue-50 p-4 rounded-2xl text-center border border-blue-100">
-                          <p class="text-[10px] font-black text-blue-400 uppercase mb-1">Unduh</p>
-                          <p class="text-xl font-black text-blue-700">{{ item.download_count || 0 }}</p>
-                      </div>
-                  </div>
+                <!-- Quick Info Mobile Only Bar -->
+                <div class="lg:hidden flex items-center justify-between p-4 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm mr-3">
+                            <i class="fas fa-building text-blue-600 text-xs"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Unit Kerja</p>
+                            <p class="text-xs font-bold text-gray-700 truncate w-32">{{ item.organization_name }}</p>
+                        </div>
+                    </div>
+                    <button @click="sideMenuOpen = true" class="bg-blue-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-lg shadow-blue-100">
+                        INFO <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
 
                 <!-- Description -->
@@ -257,6 +214,10 @@
                           </div>
                       </div>
                   </div>
+                  
+                  <router-link :to="`/informasi/${getCategorySlug(item.category)}`" class="flex items-center justify-center w-full py-4 bg-slate-900 text-white font-bold rounded-2xl text-xs hover:bg-black transition-all">
+                      <i class="fas fa-arrow-left mr-2"></i> KEMBALI
+                  </router-link>
                 </div>
               </div>
             </div>
@@ -272,6 +233,106 @@
         </button>
       </div>
     </div>
+    
+    <!-- MOBILE FLOATING INFO BUTTON -->
+    <transition enter-active-class="transition duration-200 transform" enter-from-class="scale-0" enter-to-class="scale-100" leave-active-class="transition duration-200 transform" leave-from-class="scale-100" leave-to-class="scale-0">
+      <button 
+          v-show="!sideMenuOpen"
+          @click="sideMenuOpen = true" 
+          class="lg:hidden fixed bottom-6 right-6 w-16 h-16 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center z-40 transition-transform active:scale-90 border-4 border-white"
+      >
+          <i class="fas fa-info-circle text-2xl"></i>
+      </button>
+    </transition>
+
+    <!-- MOBILE DRAWER -->
+    <div v-show="sideMenuOpen" class="fixed inset-0 z-50 lg:hidden overflow-hidden">
+        <!-- Overlay -->
+        <transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300" leave-from-class="opacity-100" leave-to-class="opacity-0">
+          <div v-show="sideMenuOpen" @click="sideMenuOpen = false" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        </transition>
+        
+        <!-- Drawer Panel -->
+        <transition enter-active-class="transition ease-in-out duration-300 transform" enter-from-class="-translate-x-full" enter-to-class="translate-x-0" leave-active-class="transition ease-in-out duration-300 transform" leave-from-class="translate-x-0" leave-to-class="-translate-x-full">
+          <div v-show="sideMenuOpen" class="absolute inset-y-0 left-0 max-w-full w-[80%] max-w-xs bg-white shadow-2xl flex flex-col border-r border-gray-100">
+              <!-- Close Button Header -->
+              <div class="p-6 bg-slate-900 text-white flex items-center justify-between">
+                  <div>
+                      <h2 class="text-lg font-black uppercase tracking-tighter">Widget Info</h2>
+                      <p class="text-[10px] text-slate-400 font-bold">Detail Dokumen PPID</p>
+                  </div>
+                  <button @click="sideMenuOpen = false" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                      <i class="fas fa-times text-white"></i>
+                  </button>
+              </div>
+
+              <div class="flex-1 overflow-y-auto p-6 space-y-8">
+                  <!-- Unit Kerja -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-100">
+                          <i class="fas fa-building text-sm"></i>
+                      </div>
+                      <div class="min-w-0">
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight break-words">{{ item?.organization_name }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Jenis Dokumen -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-orange-100">
+                          <i class="fas fa-file-signature text-sm"></i>
+                      </div>
+                      <div>
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item?.jenis_dokumen || 'Informasi Publik' }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Pengunggah -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-100">
+                          <i class="fas fa-user-shield text-sm"></i>
+                      </div>
+                      <div>
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item?.uploader_name }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Tanggal -->
+                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div class="w-10 h-10 bg-purple-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-100">
+                          <i class="fas fa-calendar-day text-sm"></i>
+                      </div>
+                      <div>
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ formatDate(item?.tanggal_upload) }}</p>
+                      </div>
+                  </div>
+
+                  <!-- Stats -->
+                  <div class="grid grid-cols-2 gap-4">
+                      <div class="bg-blue-50 p-4 rounded-2xl text-center border border-blue-100">
+                          <p class="text-[10px] font-black text-blue-400 uppercase mb-1">Dilihat</p>
+                          <p class="text-xl font-black text-blue-700">{{ item?.views_count || 0 }}</p>
+                      </div>
+                      <div class="bg-emerald-50 p-4 rounded-2xl text-center border border-emerald-100">
+                          <p class="text-[10px] font-black text-emerald-400 uppercase mb-1">Unduhan</p>
+                          <p class="text-xl font-black text-emerald-700">{{ item?.download_count || 0 }}</p>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Footer Action -->
+              <div class="p-6 space-y-3">
+                  <button @click="sideMenuOpen = false" class="w-full py-4 bg-slate-900 text-white font-black rounded-2xl text-[10px] tracking-widest shadow-xl">
+                      KEMBALI KE BACAAN
+                  </button>
+              </div>
+          </div>
+        </transition>
+    </div>
   </div>
 </template>
 
@@ -285,6 +346,7 @@ import { useGlobalLoader } from '@/composables/useGlobalLoader'
 const route = useRoute()
 const item = ref(null)
 const loading = ref(true)
+const sideMenuOpen = ref(false)
 
 useGlobalLoader(loading)
 
