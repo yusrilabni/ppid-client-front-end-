@@ -78,76 +78,122 @@
               <div v-for="(section, index) in survey.sections" :key="section.id" class="survey-section">
                 
                 <!-- Section Header -->
-                <div class="mb-6 border-b pb-4">
-                  <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">{{ index + 1 }}</span>
-                    {{ section.title }}
-                  </h3>
-                  <p v-if="section.description" class="text-gray-500 mt-2 ml-10 text-sm">{{ section.description }}</p>
+                <div class="mb-6 md:mb-10 bg-gradient-to-r from-blue-50 to-indigo-50 p-5 md:p-8 rounded-2xl border border-blue-100 shadow-md">
+                  <div class="flex items-center mb-4 md:mb-6">
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center mr-4 md:mr-6 shadow-lg">
+                      <i class="fas fa-list-alt text-white text-xl md:text-2xl"></i>
+                    </div>
+                    <div>
+                      <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-1 leading-tight">
+                        {{ section.title }}
+                      </h2>
+                      <div class="flex items-center text-sm md:text-lg text-gray-700 font-medium">
+                        <i class="fas fa-layer-group mr-2"></i>
+                        <span>Bagian {{ index + 1 }} / {{ survey.sections.length }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div v-if="section.description" class="mt-4 description-box p-4 md:p-6 rounded-xl">
+                    <div class="flex items-start">
+                      <i class="fas fa-info-circle text-blue-500 text-lg md:text-2xl mr-3 mt-1"></i>
+                      <div>
+                        <p class="text-sm md:text-lg text-gray-700 leading-relaxed">{{ section.description }}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Questions in Section -->
-                <div class="space-y-8 pl-10">
-                  <div v-for="(question, qIndex) in getQuestionsBySection(section.id)" :key="question.id" class="question-item">
-                    <label class="block text-base font-bold text-gray-800 mb-3">
-                      {{ question.question_text }}
-                      <span v-if="question.is_required" class="text-red-500 ml-1">*</span>
-                    </label>
-
-                    <p v-if="question.help_text" class="text-gray-500 text-sm mb-4">{{ question.help_text }}</p>
-
-                    <!-- Text Input -->
-                    <div v-if="question.type === 'text'">
-                      <input type="text" v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
-                    </div>
-
-                    <!-- Textarea -->
-                    <div v-else-if="question.type === 'textarea'">
-                      <textarea v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" rows="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"></textarea>
-                    </div>
-
-                    <!-- Radio -->
-                    <div v-else-if="question.type === 'radio'" class="space-y-3">
-                      <label v-for="option in question.options" :key="option.id" class="flex items-start p-3 border rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50': answers[question.id] === option.option_text, 'border-gray-200': answers[question.id] !== option.option_text }">
-                        <div class="flex items-center h-5">
-                          <input type="radio" :name="'question_' + question.id" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <div class="space-y-6 md:space-y-10 pl-0 md:pl-10">
+                  <div v-for="(question, qIndex) in getQuestionsBySection(section.id)" :key="question.id" class="question-card bg-white rounded-2xl border border-gray-100 p-5 md:p-8 shadow-md relative">
+                    <div class="flex flex-col md:flex-row items-start">
+                      
+                      <!-- Question Number Badge -->
+                      <div class="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+                          <span class="text-white font-bold text-lg md:text-xl">{{ qIndex + 1 }}</span>
                         </div>
-                        <div class="ml-3 text-sm">
-                          <span class="font-medium text-gray-700">{{ option.option_text }}</span>
-                        </div>
-                      </label>
-                    </div>
+                      </div>
 
-                    <!-- Checkbox -->
-                    <div v-else-if="question.type === 'checkbox'" class="space-y-3">
-                      <label v-for="option in question.options" :key="option.id" class="flex items-start p-3 border rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50': Array.isArray(answers[question.id]) && answers[question.id].includes(option.option_text), 'border-gray-200': !Array.isArray(answers[question.id]) || !answers[question.id].includes(option.option_text) }">
-                        <div class="flex items-center h-5">
-                          <input type="checkbox" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                      <div class="flex-grow w-full min-w-0">
+                        <div class="block mb-4 md:mb-6">
+                          <div class="flex flex-col md:flex-row md:items-start justify-between gap-3 mb-3 w-full">
+                            <div class="text-lg md:text-xl font-bold text-gray-900 leading-snug break-words flex-1 min-w-0">
+                              {{ question.question_text }}
+                            </div>
+                            <span v-if="question.is_required" class="bg-red-50 text-red-600 text-xs md:text-sm font-black px-3 py-1 rounded-full border border-red-100 flex items-center justify-center w-max flex-shrink-0">
+                              <i class="fas fa-exclamation-circle mr-1.5"></i>
+                              WAJIB
+                            </span>
+                          </div>
+                          
+                          <div v-if="question.help_text" class="mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                            <div class="flex items-start">
+                              <i class="fas fa-lightbulb text-yellow-500 text-base mr-2 mt-0.5 flex-shrink-0"></i>
+                              <p class="text-xs md:text-sm text-gray-700 italic break-words flex-1 min-w-0">
+                                {{ question.help_text }}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div class="ml-3 text-sm">
-                          <span class="font-medium text-gray-700">{{ option.option_text }}</span>
+
+                        <div class="mt-4 md:mt-6">
+                          <!-- Text Input -->
+                          <div v-if="question.type === 'text'">
+                            <input type="text" v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban...">
+                          </div>
+
+                          <!-- Textarea -->
+                          <div v-else-if="question.type === 'textarea'">
+                            <textarea v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" rows="4" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban..."></textarea>
+                          </div>
+
+                          <!-- Radio -->
+                          <div v-else-if="question.type === 'radio'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label v-for="option in question.options" :key="option.id" class="flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50 ring-2 ring-blue-200': answers[question.id] === option.option_text, 'border-gray-200': answers[question.id] !== option.option_text }">
+                              <div class="flex items-center h-6">
+                                <input type="radio" :name="'question_' + question.id" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500">
+                              </div>
+                              <div class="ml-3">
+                                <span class="font-medium text-gray-700 text-base md:text-lg">{{ option.option_text }}</span>
+                              </div>
+                            </label>
+                          </div>
+
+                          <!-- Checkbox -->
+                          <div v-else-if="question.type === 'checkbox'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label v-for="option in question.options" :key="option.id" class="flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50 ring-2 ring-blue-200': Array.isArray(answers[question.id]) && answers[question.id].includes(option.option_text), 'border-gray-200': !Array.isArray(answers[question.id]) || !answers[question.id].includes(option.option_text) }">
+                              <div class="flex items-center h-6">
+                                <input type="checkbox" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                              </div>
+                              <div class="ml-3">
+                                <span class="font-medium text-gray-700 text-base md:text-lg">{{ option.option_text }}</span>
+                              </div>
+                            </label>
+                          </div>
+
+                          <!-- Select -->
+                          <div v-else-if="question.type === 'select'">
+                            <select v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 bg-white">
+                              <option value="" disabled>Pilih opsi...</option>
+                              <option v-for="option in question.options" :key="option.id" :value="option.option_text">{{ option.option_text }}</option>
+                            </select>
+                          </div>
+
+                          <!-- Rating/Scale -->
+                          <div v-else-if="question.type === 'scale'" class="flex flex-wrap gap-2 md:gap-4">
+                            <label v-for="n in 5" :key="n" class="cursor-pointer">
+                              <input type="radio" :name="'question_' + question.id" :value="n" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="hidden">
+                              <div class="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-xl md:text-2xl font-bold transition-all border-2" :class="{ 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-transparent shadow-lg transform scale-110': String(answers[question.id]) === String(n), 'bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:bg-blue-50': String(answers[question.id]) !== String(n) }">
+                                {{ n }}
+                              </div>
+                            </label>
+                          </div>
                         </div>
-                      </label>
+                        
+                      </div>
                     </div>
-
-                    <!-- Select -->
-                    <div v-else-if="question.type === 'select'">
-                      <select v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
-                        <option value="" disabled>Pilih opsi...</option>
-                        <option v-for="option in question.options" :key="option.id" :value="option.option_text">{{ option.option_text }}</option>
-                      </select>
-                    </div>
-
-                    <!-- Rating/Scale -->
-                    <div v-else-if="question.type === 'scale'" class="flex flex-wrap gap-2">
-                      <label v-for="n in 5" :key="n" class="cursor-pointer">
-                        <input type="radio" :name="'question_' + question.id" :value="n" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="hidden">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold transition-all" :class="{ 'bg-blue-600 text-white shadow-md': String(answers[question.id]) === String(n), 'bg-gray-100 text-gray-500 hover:bg-gray-200': String(answers[question.id]) !== String(n) }">
-                          {{ n }}
-                        </div>
-                      </label>
-                    </div>
-
                   </div>
                 </div>
 
