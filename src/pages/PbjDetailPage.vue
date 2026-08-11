@@ -25,6 +25,95 @@
                 </div>
             </div>
 
+            <!-- Modal Panduan PBJ (Premium Design) -->
+            <Transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+            <div v-show="showModal" class="fixed inset-0 z-[100] bg-slate-900/90 flex items-center justify-center p-2 md:p-6 text-left">
+                <div class="bg-white w-full max-w-5xl max-h-[95vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 font-sans relative">
+                    
+                    <!-- Header Premium -->
+                    <div class="bg-gradient-to-r from-blue-800 to-indigo-900 px-6 py-5 flex-shrink-0 border-b border-white/10 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
+                        <div class="flex items-center justify-between relative z-10">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-white/10 p-2.5 rounded-xl text-white">
+                                    <i class="fas fa-file-contract text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl md:text-2xl font-black text-white leading-none uppercase tracking-tight">Panduan Klasifikasi PBJ</h3>
+                                    <p class="text-blue-200 text-[10px] md:text-xs mt-1 font-medium">Informasi standar pelayanan dan publikasi dokumen</p>
+                                </div>
+                            </div>
+                            <button @click="showModal = false" class="text-white/60 hover:text-white transition-all p-2 rounded-xl hover:bg-white/10">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                <h4 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <i class="fas fa-lightbulb text-yellow-400"></i> PRINSIP UTAMA
+                                </h4>
+                                <ul class="space-y-3 text-xs text-slate-700 font-medium">
+                                    <li class="flex items-start gap-3 p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                                        <i class="fas fa-check-circle text-blue-500 mt-0.5"></i>
+                                        <span>Klasifikasi ditentukan oleh <span class="text-blue-600 font-bold">jenis dokumen</span>, bukan tahun anggaran.</span>
+                                    </li>
+                                    <li class="flex items-start gap-3 p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                                        <i class="fas fa-check-circle text-blue-500 mt-0.5"></i>
+                                        <span><span class="font-bold text-blue-700">Info Berkala</span> tidak pernah berubah menjadi <span class="font-bold text-green-700">Setiap Saat</span>.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- KATEGORI BERKALA -->
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center shadow-md"><i class="fas fa-calendar-alt text-sm"></i></div>
+                                    <h4 class="font-black text-slate-800 text-sm uppercase tracking-tight">A. INFORMASI BERKALA</h4>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm flex-1">
+                                    <p class="text-[10px] font-bold text-blue-600 mb-3 uppercase tracking-widest border-b pb-2 italic">Diumumkan rutin (Menu Berkala)</p>
+                                    <ul class="space-y-2 text-xs text-slate-700">
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-blue-400"></i> Rencana Umum Pengadaan (RUP)</li>
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-blue-400"></i> Link Aplikasi SIRUP LKPP</li>
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-blue-400"></i> Pengumuman / Rekap Paket PBJ</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- KATEGORI SETIAP SAAT -->
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-8 h-8 bg-green-600 text-white rounded-lg flex items-center justify-center shadow-md"><i class="fas fa-clock text-sm"></i></div>
+                                    <h4 class="font-black text-slate-800 text-sm uppercase tracking-tight">B. INFORMASI SETIAP SAAT</h4>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-green-100 shadow-sm flex-1">
+                                    <p class="text-[10px] font-bold text-green-600 mb-3 uppercase tracking-widest border-b pb-2 italic">Via Permohonan (Menu Setiap Saat)</p>
+                                    <ul class="space-y-2 text-xs text-slate-700">
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-green-400"></i> KAK, HPS, Kontrak, & Addendum</li>
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-green-400"></i> Dokumen Pemilihan & Kualifikasi</li>
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-green-400"></i> Laporan Akhir, BAPH, & Jaminan</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </Transition>
+
             <!-- Content Section -->
             <div class="p-4 md:p-8 relative z-10">
                 
