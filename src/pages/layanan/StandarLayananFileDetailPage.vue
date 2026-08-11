@@ -4,7 +4,7 @@
           
           <Breadcrumbs v-if="!isLoading && data" :breadcrumbs="[
               { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-              { title: data.subStandarLayanan?.standar_layanan?.title || 'Kategori', url: '/standar-layanan/' + getSlug(data.subStandarLayanan?.standar_layanan?.title), icon: data.categoryIcon },
+              { title: data.subStandarLayanan?.standarLayanan?.title || 'Kategori', url: '/standar-layanan/' + getSlug(data.subStandarLayanan?.standarLayanan?.title), icon: data.categoryIcon },
               { title: data.subStandarLayanan?.title, url: '#', icon: 'fas fa-file-alt' }
           ]" class="mb-4" />
 
@@ -22,7 +22,7 @@
                               <div class="hidden md:flex flex-wrap items-center space-x-4 mt-4 text-sm text-gray-500">
                                   <span class="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
                                       <i class="fas fa-folder-open mr-2 text-blue-600"></i>
-                                      {{ data.subStandarLayanan?.standar_layanan?.title || 'Tidak Diketahui' }}
+                                      {{ data.subStandarLayanan?.standarLayanan?.title || 'Tidak Diketahui' }}
                                   </span>
                                   <span class="inline-flex items-center bg-gray-100 text-gray-800 px-3 py-1 rounded-full font-medium">
                                       <i class="fas fa-calendar-alt mr-2 text-gray-600"></i>
@@ -47,7 +47,7 @@
                               <div class="flex flex-col">
                                   <span class="text-[8px] uppercase text-gray-400 font-bold leading-none">Tahun</span>
                                   <span class="text-[10px] font-bold text-gray-700 leading-tight">
-                                      {{ data.subStandarLayanan?.tahun_dokumen }}
+                                      {{ formatTahun(data.subStandarLayanan?.tahun_dokumen) }}
                                   </span>
                               </div>
                           </div>
@@ -158,6 +158,19 @@ const slug = computed(() => route.params.slug)
 const formatNumber = (num) => {
   if (!num) return '0'
   return new Intl.NumberFormat('id-ID').format(num)
+}
+
+// Format Tahun (handle full date)
+const formatTahun = (val) => {
+  if (!val) return ''
+  // Cek apakah formatnya YYYY-MM-DD
+  if (val.includes('-')) {
+    const parts = val.split('-')
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}` // dd/mm/yy
+    }
+  }
+  return val
 }
 
 // Transform title to slug
