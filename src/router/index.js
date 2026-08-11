@@ -85,6 +85,7 @@ const routes = [
       { path: 'survei', name: 'survei', component: SurveyListPage },
       { path: 'regulasi', name: 'regulasi', component: RegulasiPage },
       { path: 'laporan', name: 'laporan', component: LaporanPage },
+      { path: 'laporan/permohonan', name: 'laporan.permohonan', component: () => import('@/pages/LaporanPermohonanPage.vue') },
       { path: 'dip/:year?', name: 'dip', component: DipPage },
       { path: 'dipunit', name: 'dipunit', component: DipUnitPage },
       { path: 'dipunit/dip/:slug', name: 'dipunit.detail', component: DipUnitDetailPage },
