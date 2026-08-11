@@ -143,7 +143,7 @@
                         <div class="mt-4 md:mt-6">
                           <!-- Text Input -->
                           <div v-if="['Isian Singkat', 'Email', 'Numeric', 'Url'].includes(question.question_type)">
-                            <input :type="question.question_type === 'Email' ? 'email' : (question.question_type === 'Numeric' ? 'number' : (question.question_type === 'Url' ? 'url' : 'text'))" v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban...">
+                            <input :type="question.question_type === 'Email' ? 'email' : (question.question_type === 'Numeric' ? 'number' : (question.question_type === 'Url' ? 'url' : 'text'))" v-model="answers[question.id]" @input="calculateProgress" :required="question.is_required" class="w-full px-4 py-3 md:px-5 md:py-4 text-base md:text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200" placeholder="Tulis jawaban..." />
                           </div>
 
                           <!-- Textarea -->
@@ -170,7 +170,7 @@
                           <div v-else-if="question.question_type === 'Checkbox'" class="grid grid-cols-1 gap-3">
                             <label v-for="option in question.options" :key="option.id" class="flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-blue-50" :class="{ 'border-blue-500 bg-blue-50 ring-2 ring-blue-200': Array.isArray(answers[question.id]) && answers[question.id].includes(option.option_text), 'border-gray-200': !Array.isArray(answers[question.id]) || !answers[question.id].includes(option.option_text) }">
                               <div class="flex items-center h-6">
-                                <input type="checkbox" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <input type="checkbox" :value="option.option_text" v-model="answers[question.id]" @change="calculateProgress" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
                               </div>
                               <div class="ml-3">
                                 <span class="font-medium text-gray-700 text-base md:text-lg">{{ option.option_text }}</span>
@@ -181,7 +181,7 @@
                           <!-- Rating/Scale -->
                           <div v-else-if="question.question_type === 'Skala Kepuasan'" class="flex flex-wrap gap-2 md:gap-4 justify-center py-4 bg-gradient-to-r from-red-50 via-yellow-50 to-green-50 rounded-2xl border-2 border-gray-50">
                             <label v-for="n in 5" :key="n" class="cursor-pointer">
-                              <input type="radio" :name="'question_' + question.id" :value="n" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="hidden">
+                              <input type="radio" :name="'question_' + question.id" :value="n" v-model="answers[question.id]" @change="calculateProgress" :required="question.is_required" class="hidden" />
                               <div class="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-xl md:text-2xl font-bold transition-all border-2" :class="{ 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-transparent shadow-lg transform scale-110': String(answers[question.id]) === String(n), 'bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:bg-blue-50': String(answers[question.id]) !== String(n) }">
                                 {{ n }}
                               </div>
