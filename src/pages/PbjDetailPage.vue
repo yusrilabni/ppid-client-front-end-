@@ -56,8 +56,13 @@
                         </div>
                     </div>
 
+                    <!-- Progress Bar -->
+                    <div class="w-full h-1 bg-slate-100 flex-shrink-0">
+                        <div class="h-full bg-blue-500 transition-all duration-300 shadow-sm" :style="{ width: `${scrollProgress}%` }"></div>
+                    </div>
+
                     <!-- Content Area -->
-                    <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50">
+                    <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50" @scroll="updateProgress" ref="modalBody">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                                 <h4 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -72,6 +77,22 @@
                                         <i class="fas fa-check-circle text-blue-500 mt-0.5"></i>
                                         <span><span class="font-bold text-blue-700">Info Berkala</span> tidak pernah berubah menjadi <span class="font-bold text-green-700">Setiap Saat</span>.</span>
                                     </li>
+                                    <li class="flex items-start gap-3 p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                                        <i class="fas fa-check-circle text-blue-500 mt-0.5"></i>
+                                        <span>Dokumen lama <span class="text-red-600 font-bold">dilarang dihapus</span>, hanya boleh diarsipkan.</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-red-50 p-6 rounded-2xl border border-red-100 shadow-sm relative overflow-hidden">
+                                <div class="absolute -right-4 -bottom-4 text-red-200/30 rotate-12"><i class="fas fa-exclamation-triangle fa-5x"></i></div>
+                                <h4 class="text-sm font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <i class="fas fa-ban"></i> KESALAHAN FATAL
+                                </h4>
+                                <ul class="space-y-2 text-[11px] text-red-700 font-bold">
+                                    <li class="flex items-center gap-2"><i class="fas fa-times-circle"></i> Salah masuk menu kategori upload</li>
+                                    <li class="flex items-center gap-2"><i class="fas fa-times-circle"></i> Mengubah klasifikasi tanpa dasar hukum</li>
+                                    <li class="flex items-center gap-2"><i class="fas fa-times-circle"></i> Mengunggah file PDF yang korup/tidak terbaca</li>
                                 </ul>
                             </div>
                         </div>
@@ -88,6 +109,7 @@
                                     <ul class="space-y-2 text-xs text-slate-700">
                                         <li class="flex items-center gap-3"><i class="fas fa-caret-right text-blue-400"></i> Rencana Umum Pengadaan (RUP)</li>
                                         <li class="flex items-center gap-3"><i class="fas fa-caret-right text-blue-400"></i> Link Aplikasi SIRUP LKPP</li>
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-blue-400"></i> Rekap RUP Tahunan / Semesteran</li>
                                         <li class="flex items-center gap-3"><i class="fas fa-caret-right text-blue-400"></i> Pengumuman / Rekap Paket PBJ</li>
                                     </ul>
                                 </div>
@@ -104,10 +126,52 @@
                                     <ul class="space-y-2 text-xs text-slate-700">
                                         <li class="flex items-center gap-3"><i class="fas fa-caret-right text-green-400"></i> KAK, HPS, Kontrak, & Addendum</li>
                                         <li class="flex items-center gap-3"><i class="fas fa-caret-right text-green-400"></i> Dokumen Pemilihan & Kualifikasi</li>
+                                        <li class="flex items-center gap-3"><i class="fas fa-caret-right text-green-400"></i> SPPBJ, SPMK, SPM, SP2D Lengkap</li>
                                         <li class="flex items-center gap-3"><i class="fas fa-caret-right text-green-400"></i> Laporan Akhir, BAPH, & Jaminan</li>
                                     </ul>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="mt-8 p-5 bg-blue-50 border border-blue-100 rounded-2xl">
+                            <div class="flex items-start gap-4">
+                                <span class="text-xl">📝</span>
+                                <div>
+                                    <h5 class="text-xs font-black text-blue-900 uppercase mb-1">Catatan Penting: Sinkronisasi DIP</h5>
+                                    <p class="text-[11px] text-blue-800 leading-relaxed italic">
+                                        Pastikan setiap dokumen yang diinput di sini juga tercatat judulnya dalam <strong>Daftar Informasi Publik (DIP)</strong> yang diunggah di menu berkala, guna memudahkan warga mencari referensi dokumen sebelum mengajukan permohonan.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scroll Indicator -->
+                        <div v-show="!hasReadPanduan" class="mt-12 flex flex-col items-center animate-bounce text-slate-300">
+                            <p class="text-[9px] font-black uppercase tracking-[0.3em] mb-1">Scroll Hingga Bawah</p>
+                            <i class="fas fa-chevron-down text-lg"></i>
+                        </div>
+                        
+                        <div class="h-10"></div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="bg-white p-5 border-t border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between flex-shrink-0 relative z-[110]">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl text-xs">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-slate-400 text-[10px] font-bold tracking-widest uppercase leading-tight">Standar Kepatuhan</span>
+                                <span class="text-slate-600 text-[10px] font-medium leading-tight">UU No. 14 Tahun 2008 & Perki 1/2021</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <button @click="showModal = false" 
+                                    class="flex-1 md:flex-none px-12 py-3 bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-700/20 disabled:opacity-30 text-xs transition-all uppercase tracking-widest"
+                                    :disabled="!hasReadPanduan">
+                                <span>{{ hasReadPanduan ? 'SAYA MENGERTI & TUTUP' : `BACA DAHULU (${scrollProgress}%)` }}</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -161,7 +225,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
@@ -171,6 +235,36 @@ import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
 const showModal = ref(false)
+const hasReadPanduan = ref(false)
+const scrollProgress = ref(0)
+const modalBody = ref(null)
+
+const updateProgress = () => {
+    if (!modalBody.value) return;
+    const el = modalBody.value;
+    const scrolled = el.scrollTop;
+    const totalHeight = el.scrollHeight - el.clientHeight;
+    
+    if (totalHeight <= 10) {
+        scrollProgress.value = 100;
+    } else {
+        scrollProgress.value = Math.round((scrolled / totalHeight) * 100);
+    }
+    
+    if (scrollProgress.value >= 95) {
+        hasReadPanduan.value = true;
+    }
+}
+
+watch(showModal, async (isOpen) => {
+    if (isOpen) {
+        await nextTick();
+        if (modalBody.value) {
+            modalBody.value.scrollTop = 0;
+            updateProgress();
+        }
+    }
+})
 
 const { data: pbjResponse, isLoading } = useQuery({
   queryKey: computed(() => ['pbj', route.params.year]),
