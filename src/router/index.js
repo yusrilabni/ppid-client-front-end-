@@ -130,7 +130,7 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-router.afterEach(() => {
+router.afterEach((to) => {
   const loadingStore = useLoadingStore()
   // Berikan sedikit jeda (50ms) untuk memberi kesempatan komponen baru me-mount
   // dan memanggil startLoading() (jika data belum ada di cache),
@@ -138,6 +138,54 @@ router.afterEach(() => {
   setTimeout(() => {
     loadingStore.stopLoading()
   }, 50)
+
+  // Update document title dynamically
+  const titleMap = {
+    'home': 'Beranda',
+    'search': 'Pencarian',
+    'login': 'Login',
+    'register': 'Register',
+    'informasi.category': 'Informasi Publik',
+    'informasi.detail': 'Detail Informasi',
+    'galeri': 'Galeri',
+    'profil.ppid': 'Profil PPID',
+    'profil.opd': 'Tentang OPD',
+    'profil.opd.detail': 'Detail OPD',
+    'profil.pejabat-daerah': 'Pejabat Daerah',
+    'profil.unit-lokal': 'Unit Kerja Lokal',
+    'profil.official': 'Profil Pejabat',
+    'standar-layanan': 'Standar Layanan',
+    'standar-layanan.detail': 'Detail Standar Layanan',
+    'standar-layanan.file-detail': 'Dokumen Layanan',
+    'maklumat-layanan': 'Maklumat Layanan',
+    'sop-layanan': 'SOP Layanan',
+    'permohonan': 'Permohonan Informasi',
+    'tracking': 'Lacak Permohonan',
+    'survei': 'Survei Layanan',
+    'survei.show': 'Isi Survei',
+    'regulasi': 'Regulasi',
+    'laporan': 'Laporan',
+    'laporan.permohonan': 'Laporan Permohonan',
+    'dip': 'Daftar Informasi Publik',
+    'dipunit': 'DIP Unit Kerja',
+    'dipunit.detail': 'Detail DIP Unit',
+    'lhkpn': 'LHKPN',
+    'pbj': 'Pengadaan Barang & Jasa',
+    'pbj.detail': 'Detail PBJ',
+    'kontak': 'Kontak Kami',
+    'statistik': 'Statistik',
+    'admin.dashboard': 'Dashboard Admin'
+  }
+  
+  let pageTitle = to.meta.title || titleMap[to.name]
+  
+  // Jika ini halaman kategori informasi, coba percantik judulnya
+  if (to.name === 'informasi.category' && to.params.category) {
+    const cat = to.params.category.replace(/-/g, ' ')
+    pageTitle = 'Informasi ' + cat.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  }
+
+  document.title = pageTitle ? `${pageTitle} - PPID Kabupaten Sinjai` : 'PPID Kabupaten Sinjai'
 })
 
 export default router
