@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ppidkab.sinjaikab.go.id/sitemap.xml
+Sitemap: https://ppid.sinjaikab.go.id/sitemap.xml

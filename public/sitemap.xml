@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/</loc>
+    <loc>https://ppid.sinjaikab.go.id/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/informasi/berkala</loc>
+    <loc>https://ppid.sinjaikab.go.id/informasi/berkala</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/informasi/setiap-saat</loc>
+    <loc>https://ppid.sinjaikab.go.id/informasi/setiap-saat</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/informasi/serta-merta</loc>
+    <loc>https://ppid.sinjaikab.go.id/informasi/serta-merta</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/informasi/dikecualikan</loc>
+    <loc>https://ppid.sinjaikab.go.id/informasi/dikecualikan</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/profil/ppid</loc>
+    <loc>https://ppid.sinjaikab.go.id/profil/ppid</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/profil/tentang-opd</loc>
+    <loc>https://ppid.sinjaikab.go.id/profil/tentang-opd</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/standar-layanan</loc>
+    <loc>https://ppid.sinjaikab.go.id/standar-layanan</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/maklumat-layanan</loc>
+    <loc>https://ppid.sinjaikab.go.id/maklumat-layanan</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/sop-layanan</loc>
+    <loc>https://ppid.sinjaikab.go.id/sop-layanan</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/permohonan-informasi</loc>
+    <loc>https://ppid.sinjaikab.go.id/permohonan-informasi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/tracking</loc>
+    <loc>https://ppid.sinjaikab.go.id/tracking</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/laporan</loc>
+    <loc>https://ppid.sinjaikab.go.id/laporan</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/regulasi</loc>
+    <loc>https://ppid.sinjaikab.go.id/regulasi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://ppidkab.sinjaikab.go.id/kontak</loc>
+    <loc>https://ppid.sinjaikab.go.id/kontak</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
