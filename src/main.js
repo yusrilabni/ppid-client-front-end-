@@ -12,8 +12,11 @@ app.use(VueQueryPlugin, {
   queryClientConfig: {
     defaultOptions: {
       queries: {
-        staleTime: 60000,
-        refetchOnWindowFocus: true,
+        staleTime: 1000 * 60 * 5, // 5 minutes - data stays fresh longer
+        gcTime: 1000 * 60 * 30,   // 30 minutes - keep inactive data in cache
+        refetchOnWindowFocus: false, // CRITICAL: prevent blank screen on tab switch
+        retry: 2,                    // Auto-retry failed requests
+        keepPreviousData: true,      // Keep showing old data during refetch
       },
     },
   },
