@@ -162,9 +162,7 @@ const { isLoading: loading, data: queryData, isFetching, isError, refetch } = us
   queryFn: async () => {
     const res = await api.get('/home')
     return res.data.data
-  },
-  staleTime: 60000,
-  refetchOnWindowFocus: true,
+  }
 })
 
 useGlobalLoader(loading)
