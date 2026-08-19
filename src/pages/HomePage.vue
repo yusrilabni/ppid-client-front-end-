@@ -328,10 +328,10 @@ const informasiItems = [
             </router-link>
           </div>
         </div>
-        <button v-if="homeData.sliders.length > 1" class="swiper-button-prev-custom absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 md:p-3 rounded-full z-20 border-2 border-white/50 shadow-xl transition-all duration-300 group">
+        <button v-if="homeData.sliders.length > 1" aria-label="Slider Sebelumnya" class="swiper-button-prev-custom absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 md:p-3 rounded-full z-20 border-2 border-white/50 shadow-xl transition-all duration-300 group">
           <i data-lucide="chevron-left" class="w-5 h-5 md:w-6 md:h-6 group-hover:-translate-x-0.5 transition-transform flex justify-center items-center"></i>
         </button>
-        <button v-if="homeData.sliders.length > 1" class="swiper-button-next-custom absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 md:p-3 rounded-full z-20 border-2 border-white/50 shadow-xl transition-all duration-300 group">
+        <button v-if="homeData.sliders.length > 1" aria-label="Slider Selanjutnya" class="swiper-button-next-custom absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 md:p-3 rounded-full z-20 border-2 border-white/50 shadow-xl transition-all duration-300 group">
           <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-0.5 transition-transform flex justify-center items-center"></i>
         </button>
         <div v-if="homeData.sliders.length > 1" class="swiper-pagination !absolute !bottom-4 !left-0 !right-0 !z-30"></div>

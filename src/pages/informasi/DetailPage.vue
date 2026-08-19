@@ -261,7 +261,7 @@
                       <h2 class="text-lg font-black uppercase tracking-tighter">Widget Info</h2>
                       <p class="text-[10px] text-slate-400 font-bold">Detail Dokumen PPID</p>
                   </div>
-                  <button @click="sideMenuOpen = false" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                  <button @click="sideMenuOpen = false" aria-label="Tutup Menu" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
                       <i class="fas fa-times text-white"></i>
                   </button>
               </div>

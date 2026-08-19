@@ -128,7 +128,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                   <router-link to="/" class="flex-shrink-0 flex items-center group relative">
                       <!-- Logo diperbesar dengan transform scale -->
                       <div class="transform origin-left transition-transform duration-300 group-hover:scale-105">
-                          <img class="w-auto h-10 md:h-12 lg:h-14" src="/logo/ppid.webp" alt="PPID" />
+                          <img class="w-auto h-10 md:h-12 lg:h-14" src="/logo/ppid.webp" alt="PPID" width="160" height="40" />
                       </div>
                   </router-link>
               </div>
@@ -233,7 +233,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                               <template v-if="authStore.user?.profile_photo_path">
                                   <img class="h-8 w-8 rounded-full object-cover"
                                       :src="getStorageUrl(authStore.user.profile_photo_path)"
-                                      :alt="authStore.user.name">
+                                      :alt="authStore.user.name" width="32" height="32">
                               </template>
                               <template v-else>
                                   <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
@@ -356,7 +356,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                           <template v-if="authStore.user?.profile_photo_path">
                               <img class="h-10 w-10 rounded-full object-cover"
                                   :src="getStorageUrl(authStore.user.profile_photo_path)"
-                                  :alt="authStore.user.name">
+                                  :alt="authStore.user.name" width="40" height="40">
                           </template>
                           <template v-else>
                               <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
