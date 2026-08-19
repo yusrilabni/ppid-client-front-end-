@@ -11,27 +11,30 @@
 
 
 <!-- Header / Hero Section -->
-<div class="relative bg-gray-900 overflow-hidden rounded-b-[3rem] shadow-xl">
-    <!-- Cool modern background shapes -->
-    <div class="absolute inset-0 z-0 opacity-20">
-        <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-        <div class="absolute top-12 -right-12 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div class="absolute -bottom-24 left-1/2 w-96 h-96 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+<div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 overflow-hidden rounded-b-[3rem] shadow-xl">
+    <!-- Cool modern background shapes / Light patterns -->
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <svg class="absolute w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z" fill="rgba(255,255,255,0.1)"></path>
+            <path d="M0 0 L 100 100 L 100 0 Z" fill="rgba(255,255,255,0.03)"></path>
+        </svg>
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-10"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-300 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
     </div>
     
-    <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 text-center flex flex-col items-center">
-        <div class="inline-flex items-center justify-center p-4 bg-white/10 rounded-2xl mb-8 backdrop-blur-lg border border-white/10 shadow-inner">
-            <i class="fas fa-shield-alt text-5xl text-blue-400"></i>
+    <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center flex flex-col items-center">
+        <div class="inline-flex items-center justify-center p-4 bg-white/10 rounded-full mb-8 backdrop-blur-md border border-white/20 shadow-lg">
+            <i class="fas fa-shield-alt text-5xl text-white"></i>
         </div>
-        <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-md">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-sm">
             Kebijakan Privasi
         </h1>
-        <p class="text-xl text-blue-100 max-w-2xl font-light mb-8">
+        <p class="text-lg md:text-xl text-blue-100 max-w-2xl font-medium mb-8 opacity-90 leading-relaxed">
             Komitmen kami dalam menjaga transparansi dan melindungi data pribadi masyarakat sesuai dengan standar keamanan yang berlaku.
         </p>
-        <div class="inline-flex items-center space-x-2 bg-gray-800/50 px-5 py-2.5 rounded-full backdrop-blur-md border border-gray-700">
-            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-            <span class="text-sm font-semibold text-gray-300">Pembaruan Terakhir: 22 Juli 2026</span>
+        <div class="inline-flex items-center space-x-2 bg-white/20 px-5 py-2.5 rounded-full backdrop-blur-md border border-white/30">
+            <div class="w-2 h-2 rounded-full bg-green-300 animate-pulse"></div>
+            <span class="text-sm font-semibold text-white">Pembaruan Terakhir: 22 Juli 2026</span>
         </div>
     </div>
 </div>
@@ -40,7 +43,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Intro Card -->
-        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 mb-12 -mt-10 relative z-20 mx-4 sm:mx-0">
+        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 mb-12 -mt-16 relative z-20 mx-4 sm:mx-0">
             <div class="flex flex-col md:flex-row gap-8 items-start">
                 <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1">
                     <i class="fas fa-quote-left text-2xl"></i>
