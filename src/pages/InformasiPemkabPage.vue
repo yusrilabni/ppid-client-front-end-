@@ -39,42 +39,61 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-layer-group text-blue-500 mr-1"></i> Kategori
                         </label>
-                        <select v-model="filters.kategori" @change="resetJenis" class="w-full h-[44px] rounded-xl border border-gray-300 px-3 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm font-medium">
-                            <option value="">Semua Kategori</option>
-                            <option v-for="(jenisList, kat) in kategori_jenis" :key="kat" :value="kat">{{ kat }}</option>
-                        </select>
+                        <CustomSelect 
+                            v-model="filters.kategori" 
+                            :options="kategoriOptions" 
+                            labelKey="label" 
+                            valueKey="value" 
+                            placeholder="Semua Kategori"
+                            @change="resetJenis"
+                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200"
+                        />
                     </div>
                     
                     <div class="relative" style="z-index: 49;">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2" :class="{'opacity-50': !filters.kategori}">
                             <i class="fas fa-file-alt text-blue-500 mr-1"></i> Jenis Dokumen
                         </label>
-                        <select v-model="filters.jenis_dokumen" :disabled="!filters.kategori" @change="applyFilters" class="w-full h-[44px] rounded-xl border border-gray-300 px-3 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                            <option value="">Semua Jenis Dokumen</option>
-                            <option v-if="filters.kategori && kategori_jenis[filters.kategori]" v-for="j in kategori_jenis[filters.kategori]" :key="j" :value="j">{{ j }}</option>
-                        </select>
+                        <CustomSelect 
+                            v-model="filters.jenis_dokumen" 
+                            :options="jenisDokumenOptions" 
+                            labelKey="label" 
+                            valueKey="value" 
+                            placeholder="Semua Jenis Dokumen"
+                            @change="applyFilters"
+                            :disabled="!filters.kategori"
+                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200 transition-opacity"
+                            :class="{'opacity-50 pointer-events-none': !filters.kategori}"
+                        />
                     </div>
 
-                    <div class="relative">
+                    <div class="relative" style="z-index: 48;">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-calendar-alt text-blue-500 mr-1"></i> Tahun
                         </label>
-                        <select v-model="filters.tahun" @change="applyFilters" class="w-full h-[44px] rounded-xl border border-gray-300 px-3 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm font-medium">
-                            <option value="">Semua Tahun</option>
-                            <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
-                        </select>
+                        <CustomSelect 
+                            v-model="filters.tahun" 
+                            :options="tahunOptions" 
+                            labelKey="label" 
+                            valueKey="value" 
+                            placeholder="Semua Tahun"
+                            @change="applyFilters"
+                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200"
+                        />
                     </div>
 
-                    <div class="relative">
+                    <div class="relative" style="z-index: 47;">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-list-ol text-blue-500 mr-1"></i> Tampilkan
                         </label>
-                        <select v-model="filters.per_page" @change="applyFilters" class="w-full h-[44px] rounded-xl border border-gray-300 px-3 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm font-medium">
-                            <option value="10">10 Baris</option>
-                            <option value="25">25 Baris</option>
-                            <option value="50">50 Baris</option>
-                            <option value="100">100 Baris</option>
-                        </select>
+                        <CustomSelect 
+                            v-model="filters.per_page" 
+                            :options="perPageOptions" 
+                            labelKey="label" 
+                            valueKey="value" 
+                            @change="applyFilters"
+                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200"
+                        />
                     </div>
 
                     <div class="relative flex flex-col">
@@ -242,6 +261,7 @@ import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl, getAssetUrl } from '@/services/api'
+import CustomSelect from '@/components/CustomSelect.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -263,6 +283,33 @@ const availableYears = computed(() => {
   for (let y = current; y >= 2000; y--) years.push(y)
   return years
 })
+
+const kategoriOptions = computed(() => {
+    const opts = [{ label: 'Semua Kategori', value: '' }]
+    Object.keys(kategori_jenis.value).forEach(k => opts.push({ label: k, value: k }))
+    return opts
+})
+
+const jenisDokumenOptions = computed(() => {
+    const opts = [{ label: 'Semua Jenis Dokumen', value: '' }]
+    if (filters.value.kategori && kategori_jenis.value[filters.value.kategori]) {
+        kategori_jenis.value[filters.value.kategori].forEach(j => opts.push({ label: j, value: j }))
+    }
+    return opts
+})
+
+const tahunOptions = computed(() => {
+    const opts = [{ label: 'Semua Tahun', value: '' }]
+    availableYears.value.forEach(y => opts.push({ label: y.toString(), value: y.toString() }))
+    return opts
+})
+
+const perPageOptions = [
+    { label: '10 Baris', value: '10' },
+    { label: '25 Baris', value: '25' },
+    { label: '50 Baris', value: '50' },
+    { label: '100 Baris', value: '100' },
+]
 
 const fetchInformasiPemkab = async () => {
   const res = await api.get('/informasi-pemkab', { params: filters.value })
