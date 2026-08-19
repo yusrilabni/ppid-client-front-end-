@@ -259,7 +259,7 @@
                                 </div>
                                 <div>
                                     <span class="block text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">Email</span>
-                                    <a href="mailto:{{ profilData?.email || 'ppid@sinjaikab.go.id' }}" class="text-white font-medium hover:text-blue-400 transition-colors">{{ profilData?.email || 'ppid@sinjaikab.go.id' }}</a>
+                                    <a :href="`mailto:${profilData?.email || 'ppid@sinjaikab.go.id'}`" class="text-white font-medium hover:text-blue-400 transition-colors">{{ profilData?.email || 'ppid@sinjaikab.go.id' }}</a>
                                 </div>
                             </li>
                             <li class="flex items-start group">
