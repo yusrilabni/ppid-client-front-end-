@@ -86,6 +86,7 @@ const routes = [
       { path: 'survei/:slug', name: 'survei.show', component: () => import('@/pages/SurveyShowPage.vue') },
       { path: 'regulasi', name: 'regulasi', component: RegulasiPage },
       { path: 'laporan/ppid', name: 'laporan.ppid', component: LaporanPage },
+      { path: 'laporan/ppid/preview/:id', name: 'laporan.ppid.preview', component: () => import('@/pages/LaporanPreviewPage.vue') },
       { path: 'laporan/permohonan', name: 'laporan.permohonan', component: () => import('@/pages/LaporanPermohonanPage.vue') },
       { path: 'dip/:year?', name: 'dip', component: DipPage },
       { path: 'dipunit', name: 'dipunit', component: DipUnitPage },

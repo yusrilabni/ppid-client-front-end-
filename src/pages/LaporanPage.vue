@@ -46,11 +46,11 @@
                   </h3>
               </div>
               <div class="grid grid-cols-1 gap-3">
-                  <a :href="api.defaults.baseURL.replace('/api/v1', '') + '/laporan/ppid/preview/' + item.encoded_id" target="_blank"
+                  <router-link :to="`/laporan/ppid/preview/${item.encoded_id}`" 
                      class="flex items-center justify-center w-full bg-blue-600 text-white font-black text-[10px] py-3.5 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 hover:shadow-blue-200">
                       <i class="fas fa-eye text-xs"></i>
                       Preview Laporan
-                  </a>
+                  </router-link>
                   <a :href="getStorageUrl(item.file)" download
                      class="flex items-center justify-center w-full bg-white text-gray-600 border-2 border-gray-100 hover:border-blue-500 hover:text-blue-600 font-black text-[10px] py-3 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
                       <i class="fas fa-download text-xs"></i>
