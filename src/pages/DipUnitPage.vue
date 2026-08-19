@@ -1,10 +1,7 @@
 <template>
   <div class="dip-unit-page bg-gray-50 min-h-screen pb-24 lg:pb-8">
     <div class="container mx-auto py-12 px-4 max-w-7xl">
-      <Breadcrumbs :breadcrumbs="[
-          { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-          { title: 'DIP Unit', url: '', icon: 'fas fa-university' }
-      ]" />
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.dipUnit()" />
 
       <div class="mb-16 text-center">
           <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">Daftar Informasi Publik Unit</h1>
@@ -116,6 +113,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'

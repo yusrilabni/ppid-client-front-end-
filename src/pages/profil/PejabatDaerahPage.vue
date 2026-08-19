@@ -2,10 +2,7 @@
   <div class="py-8 md:py-12 bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Breadcrumbs -->
-      <Breadcrumbs :breadcrumbs="[
-        { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Pejabat Daerah', url: '', icon: 'fas fa-users' }
-      ]" />
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.pejabatDaerah()" />
 
       <!-- Header Section -->
       <div class="mb-16 text-center mt-8">
@@ -105,6 +102,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'

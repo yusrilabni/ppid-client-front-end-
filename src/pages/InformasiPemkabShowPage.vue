@@ -202,6 +202,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'

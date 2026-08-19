@@ -4,12 +4,7 @@
       <div v-if="data && data.subStandarLayanan">
         <!-- Breadcrumbs -->
         <div class="mb-4">
-          <Breadcrumbs :breadcrumbs="[
-            { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-            { title: 'Standar Layanan', url: '#', icon: 'fas fa-layer-group' },
-            { title: data.subStandarLayanan?.standarLayanan?.title || 'Kategori', url: '/standar-layanan/' + getSlug(data.subStandarLayanan?.standarLayanan?.title), icon: data.categoryIcon || 'fas fa-file-alt' },
-            { title: truncate(data.subStandarLayanan?.title, 25), url: '', icon: 'fas fa-file-alt' }
-          ]" />
+          <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
@@ -309,6 +304,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'

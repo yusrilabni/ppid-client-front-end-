@@ -305,6 +305,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
@@ -346,10 +348,7 @@ const breadcrumbData = computed(() => {
   else if (categoryName.value.includes('Serta Merta')) categoryIcon = 'fas fa-exclamation-triangle';
   else if (categoryName.value.includes('Dikecualikan')) categoryIcon = 'fas fa-ban';
 
-  return [
-    { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-    { title: categoryName.value, url: '', icon: categoryIcon }
-  ]
+  return getBreadcrumbs.kategoriInformasi(categoryName.value, categoryIcon)
 })
 
 const filters = reactive({

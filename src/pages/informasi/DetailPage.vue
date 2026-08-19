@@ -4,11 +4,7 @@
       <div v-if="item">
         <!-- Breadcrumbs -->
         <div class="mb-4">
-          <Breadcrumbs :breadcrumbs="[
-            { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-            { title: item.category, url: `/informasi/${getCategorySlug(item.category)}`, icon: getCategoryIcon(item.category) },
-            { title: truncate(item.title, 25), url: '', icon: 'fas fa-file-alt' }
-          ]" />
+          <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
@@ -337,6 +333,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api, { getStorageUrl } from '@/services/api'

@@ -3,29 +3,7 @@
     <div class="container mx-auto py-6 md:py-8 px-4">
       <div class="max-w-4xl mx-auto">
         <!-- Breadcrumbs -->
-        <nav class="flex mb-8 text-sm text-gray-500 font-medium">
-          <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-              <router-link to="/" class="inline-flex items-center hover:text-blue-600 transition-colors">
-                <i class="fas fa-home mr-2"></i> Beranda
-              </router-link>
-            </li>
-            <li>
-              <div class="flex items-center">
-                <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                <router-link to="/laporan/survei" class="text-gray-400 flex items-center hover:text-blue-600 transition-colors">
-                  <i class="fas fa-poll mr-2"></i> Survei
-                </router-link>
-              </div>
-            </li>
-            <li v-if="survey">
-              <div class="flex items-center">
-                <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                <span class="text-gray-500 font-semibold line-clamp-1 max-w-[200px]">{{ survey.title }}</span>
-              </div>
-            </li>
-          </ol>
-        </nav>
+        <Breadcrumbs :breadcrumbs="getBreadcrumbs.surveyShow(data?.title)" class="mb-8" />
 
         <!-- Loading State -->
         <div v-if="loading" class="bg-white p-12 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center justify-center">
@@ -290,6 +268,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import CustomSelect from '@/components/CustomSelect.vue'

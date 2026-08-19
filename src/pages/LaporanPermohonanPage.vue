@@ -1,10 +1,7 @@
 <template>
   <div class="py-8 bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <Breadcrumbs :breadcrumbs="[
-        { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Permohonan Informasi', url: '#', icon: 'fas fa-file-signature' }
-      ]" class="mb-4" />
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.laporanPermohonan()" class="mb-4" />
 
       <div class="bg-white rounded-2xl shadow-lg border border-gray-100">
         <!-- Header -->
@@ -212,6 +209,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'

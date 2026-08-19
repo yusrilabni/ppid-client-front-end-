@@ -2,10 +2,7 @@
   <div class="py-8 bg-gray-50 min-h-screen">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <Breadcrumbs v-if="!isLoading && data" :breadcrumbs="[
-              { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-              { title: data.standarLayanan?.title || 'Standar Layanan', url: '#', icon: data.categoryIcon }
-          ]" class="mb-4" />
+          <Breadcrumbs v-if="!isLoading && data" :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" class="mb-4" />
 
           <div v-if="!isLoading && data" class="bg-white rounded-xl shadow-lg overflow-hidden">
               <div class="p-6 md:p-8">
@@ -112,6 +109,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'

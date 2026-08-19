@@ -3,24 +3,8 @@
     <div class="container mx-auto py-6 md:py-8 px-4">
       <div class="max-w-7xl mx-auto">
         
-        <!-- Breadcrumbs (Simulation to match design) -->
-        <nav class="flex mb-8 text-sm text-gray-500 font-medium">
-          <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-              <router-link to="/" class="inline-flex items-center hover:text-blue-600 transition-colors">
-                <i class="fas fa-home mr-2"></i> Beranda
-              </router-link>
-            </li>
-            <li>
-              <div class="flex items-center">
-                <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                <span class="text-gray-400 flex items-center">
-                  <i class="fas fa-poll mr-2"></i> Survei
-                </span>
-              </div>
-            </li>
-          </ol>
-        </nav>
+        <!-- Breadcrumbs -->
+        <Breadcrumbs :breadcrumbs="getBreadcrumbs.surveyList()" class="mb-8" />
 
         <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100">
             <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600">
@@ -82,6 +66,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api, { getAssetUrl } from '@/services/api'
 

@@ -3,11 +3,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <div class="mb-8">
-        <Breadcrumbs :breadcrumbs="[
-          { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-          { title: 'Tentang OPD', url: '/profil/tentang-opd', icon: 'fas fa-building' },
-          { title: organization?.name ? (organization.name.length > 30 ? organization.name.substring(0, 30) + '...' : organization.name) : 'Detail', url: '', icon: 'fas fa-info-circle' }
-        ]" />
+        <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
       </div>
 
       <template v-if="!loading">
@@ -98,6 +94,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'

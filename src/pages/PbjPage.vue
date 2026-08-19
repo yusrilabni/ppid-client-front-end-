@@ -2,10 +2,7 @@
     <div class="container mx-auto my-8 px-4 md:px-0">
       <div class="max-w-7xl mx-auto">
         <div class="mb-6">
-          <Breadcrumbs :breadcrumbs="[
-            { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-            { title: 'Kuesioner PBJ', url: '/pbj', icon: 'fas fa-file-signature' }
-          ]" />
+          <Breadcrumbs :breadcrumbs="getBreadcrumbs.pbj()" />
         </div>
 
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-6">
@@ -46,6 +43,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'

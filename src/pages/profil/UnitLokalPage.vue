@@ -3,10 +3,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Breadcrumbs -->
-      <Breadcrumbs :breadcrumbs="[
-        { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Unit Lokal', url: '', icon: 'fas fa-map-marked-alt' }
-      ]" />
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.unitLokal()" />
 
       <!-- Header Section -->
       <div class="mb-16 text-center mt-8">
@@ -104,6 +101,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'

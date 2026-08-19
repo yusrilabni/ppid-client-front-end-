@@ -273,6 +273,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
@@ -318,10 +320,7 @@ const breadcrumbData = computed(() => {
   }
   
   if (error.value || !official.value) {
-    return [
-      { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-      { title: title || 'Profil', url: '', icon: 'fas fa-user-slash' }
-    ]
+    return getBreadcrumbs.officialProfile(official.value?.name)
   }
 
   let middleTitle = 'Pejabat Daerah'

@@ -3,10 +3,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <!-- Breadcrumbs Aligned with Content -->
           <div class="mb-4">
-              <Breadcrumbs :breadcrumbs="[
-                  { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-                  { title: 'DIP Tahun ' + (year || ''), url: '#', icon: 'fas fa-calendar-alt' },
-              ]" />
+              <Breadcrumbs :breadcrumbs="getBreadcrumbs.dip(yearParam)" />
           </div>
 
           <div v-if="!isLoading && data" class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
@@ -63,6 +60,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'

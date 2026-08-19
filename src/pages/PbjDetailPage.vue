@@ -3,11 +3,7 @@
       <div class="max-w-7xl mx-auto">
         
         <div class="mb-6">
-          <Breadcrumbs :breadcrumbs="[
-              { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-              { title: 'Kuesioner PBJ', url: '/pbj', icon: 'fas fa-file-signature' },
-              { title: `Tahun ${route.params.year}`, url: `/pbj/${route.params.year}`, icon: 'fas fa-calendar-alt' }
-          ]" />
+          <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
         </div>
 
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100">
@@ -225,6 +221,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'

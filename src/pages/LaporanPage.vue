@@ -1,10 +1,7 @@
 <template>
   <div class="py-8 md:py-12 bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <Breadcrumbs :breadcrumbs="[
-          { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-          { title: 'Laporan PPID', url: '', icon: 'fas fa-file-invoice' }
-      ]" />
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.laporanPpid()" />
 
       <div class="mb-16 text-center mt-8">
           <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">
@@ -73,6 +70,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'

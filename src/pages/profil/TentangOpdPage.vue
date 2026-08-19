@@ -3,10 +3,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Breadcrumbs -->
-      <Breadcrumbs :breadcrumbs="[
-        { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Tentang OPD', url: '', icon: 'fas fa-building' }
-      ]" class="mt-8" />
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.tentangOpd()" class="mt-8" />
 
       <div class="mb-10 text-center">
         <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">Daftar Organisasi & Wilayah Daerah</h1>
@@ -168,6 +165,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'

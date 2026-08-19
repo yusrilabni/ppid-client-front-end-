@@ -2,11 +2,7 @@
   <div class="py-8 bg-gray-50 min-h-screen pb-24 lg:pb-8">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="mb-6">
-              <Breadcrumbs :breadcrumbs="[
-                  { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-                  { title: 'DIP Unit', url: '/dipunit', icon: 'fas fa-university' },
-                  { title: unitName, url: '#', icon: 'fas fa-file-alt' }
-              ]" />
+              <Breadcrumbs :breadcrumbs="getBreadcrumbs.dipUnitDetail(unitName)" />
           </div>
 
           <div v-if="!isLoading && data" class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 mb-8">
@@ -105,6 +101,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'

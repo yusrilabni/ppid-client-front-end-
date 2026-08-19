@@ -13,10 +13,7 @@
         
         <div class="container mx-auto px-6 relative z-10">
             <div class="mb-6 lhkpn-breadcrumbs">
-                <Breadcrumbs :breadcrumbs="[
-                    { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-                    { title: 'LHKPN', url: '/lhkpn', icon: 'fas fa-file-invoice-dollar' },
-                ]" />
+                <Breadcrumbs :breadcrumbs="getBreadcrumbs.lhkpn()" />
             </div>
 
             <div class="mt-8">
@@ -148,6 +145,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'

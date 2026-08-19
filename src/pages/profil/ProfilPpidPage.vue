@@ -175,6 +175,8 @@
 </template>
 
 <script setup>
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
