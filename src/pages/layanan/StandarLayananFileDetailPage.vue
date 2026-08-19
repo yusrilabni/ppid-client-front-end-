@@ -4,7 +4,7 @@
       <div v-if="data && data.subStandarLayanan">
         <!-- Breadcrumbs -->
         <div class="mb-4">
-          <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
+          <Breadcrumbs :breadcrumbs="getBreadcrumbs.standarLayananFile(data?.standarLayanan?.title, data?.categoryIcon, fileData?.name)" />
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">

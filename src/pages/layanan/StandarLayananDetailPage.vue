@@ -2,7 +2,7 @@
   <div class="py-8 bg-gray-50 min-h-screen">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <Breadcrumbs v-if="!isLoading && data" :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" class="mb-4" />
+          <Breadcrumbs v-if="!isLoading && data" :breadcrumbs="getBreadcrumbs.standarLayananDetail(data?.standarLayanan?.title, data?.categoryIcon)" class="mb-4" />
 
           <div v-if="!isLoading && data" class="bg-white rounded-xl shadow-lg overflow-hidden">
               <div class="p-6 md:p-8">

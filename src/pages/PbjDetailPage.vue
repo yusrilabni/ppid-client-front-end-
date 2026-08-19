@@ -3,7 +3,7 @@
       <div class="max-w-7xl mx-auto">
         
         <div class="mb-6">
-          <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
+          <Breadcrumbs :breadcrumbs="getBreadcrumbs.pbjDetail(route.params.year)" />
         </div>
 
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100">

@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <div class="mb-8">
-        <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
+        <Breadcrumbs :breadcrumbs="getBreadcrumbs.opdDetail(organization?.nama_organisasi)" />
       </div>
 
       <template v-if="!loading">
