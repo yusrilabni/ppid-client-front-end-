@@ -4,12 +4,12 @@ import { computed } from 'vue'
 const currentYear = computed(() => new Date().getFullYear())
 
 const socialMedia = {
-  instagram: '#',
-  facebook: '#',
-  twitter: '#',
-  tiktok: '#',
-  youtube: '#',
-  website: '#'
+  instagram: 'https://www.instagram.com/pemkab_sinjai',
+  facebook: 'https://www.facebook.com/pemkabsinjai',
+  twitter: 'https://twitter.com/pemkabsinjai',
+  tiktok: 'https://www.tiktok.com/@pemkabsinjai',
+  youtube: 'https://www.youtube.com/@pemkabsinjai',
+  website: 'https://sinjaikab.go.id'
 }
 
 const navLinks = [
