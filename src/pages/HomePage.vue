@@ -180,8 +180,22 @@ const fetchRSS = async () => {
         const title = item.querySelector('title')?.textContent || ''
         const link = item.querySelector('link')?.textContent || '#'
         const pubDate = item.querySelector('pubDate')?.textContent || ''
+        let image = ''
         const enclosure = item.querySelector('enclosure')
-        const image = enclosure ? enclosure.getAttribute('url') : ''
+        if (enclosure && enclosure.getAttribute('url')) {
+          image = enclosure.getAttribute('url')
+        } else {
+          // Coba cari tag dengan namespace media:content atau media:thumbnail
+          const mediaContent = item.getElementsByTagName('media:content')[0] || item.getElementsByTagNameNS('*', 'content')[0]
+          if (mediaContent && mediaContent.getAttribute('url')) {
+            image = mediaContent.getAttribute('url')
+          } else {
+            const mediaThumb = item.getElementsByTagName('media:thumbnail')[0] || item.getElementsByTagNameNS('*', 'thumbnail')[0]
+            if (mediaThumb && mediaThumb.getAttribute('url')) {
+              image = mediaThumb.getAttribute('url')
+            }
+          }
+        }
         
         return {
           title,
