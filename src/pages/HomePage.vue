@@ -767,13 +767,9 @@ const informasiItems = [
                     <span class="font-medium">Senin - Kamis:</span>
                     <span class="font-medium text-gray-900">08:00 - 16:00 WITA</span>
                   </p>
-                  <p class="flex justify-between">
-                    <span class="font-medium">Jumat (Pagi):</span>
-                    <span class="font-medium text-gray-900">08:00 - 11:30 WITA</span>
-                  </p>
                   <p class="flex justify-between text-red-600 font-medium">
-                    <span>Jumat (Siang):</span>
-                    <span class="bg-red-100 px-2 rounded">WFH</span>
+                    <span>Jumat:</span>
+                    <span class="bg-red-100 px-2 rounded">Full WFH</span>
                   </p>
                   <p class="flex justify-between text-red-600 font-medium">
                     <span>Sabtu - Minggu:</span>
