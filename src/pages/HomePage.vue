@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUpdated, nextTick, watch } from 'vue'
+import { ref, onMounted, onUpdated, nextTick, watch, computed } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -183,7 +183,8 @@ const { isLoading: loadingRss, data: rssQueryData } = useQuery({
   }
 })
 
-useGlobalLoader(loading)
+const isPageLoading = computed(() => loading.value || loadingRss.value)
+useGlobalLoader(isPageLoading)
 
 let swiperInitialized = false
 
