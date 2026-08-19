@@ -187,10 +187,28 @@ const { isLoading: loadingRss, data: rssQueryData } = useQuery({
   queryKey: ['rss_news'],
   queryFn: async () => {
     try {
-      const res = await api.get('/rss-news')
-      return res.data.success ? (res.data.data || []) : []
+      // Menggunakan AllOrigins sebagai Proxy untuk bypass CORS Browser
+      const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://humas.sinjaikab.go.id/v1/rss')}`)
+      const data = await res.json()
+      
+      const parser = new DOMParser()
+      const xml = parser.parseFromString(data.contents, 'text/xml')
+      const items = Array.from(xml.querySelectorAll('item')).slice(0, 16)
+      
+      return items.map(item => {
+        const title = item.querySelector('title')?.textContent || ''
+        const link = item.querySelector('link')?.textContent || ''
+        const pubDate = item.querySelector('pubDate')?.textContent || ''
+        const description = item.querySelector('description')?.textContent || ''
+        let image = ''
+        const enclosure = item.querySelector('enclosure')
+        if (enclosure && enclosure.getAttribute('url')) {
+          image = enclosure.getAttribute('url')
+        }
+        return { title, link, pubDate, description, image }
+      })
     } catch (e) {
-      console.error('Gagal mengambil berita RSS dari API lokal:', e)
+      console.error('Gagal mengambil RSS via Proxy:', e)
       return []
     }
   }
