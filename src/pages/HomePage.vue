@@ -187,12 +187,12 @@ const { isLoading: loadingRss, data: rssQueryData } = useQuery({
   queryKey: ['rss_news'],
   queryFn: async () => {
     try {
-      // Menggunakan AllOrigins sebagai Proxy untuk bypass CORS Browser
-      const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://humas.sinjaikab.go.id/v1/rss')}`)
-      const data = await res.json()
+      // Menggunakan Vercel Serverless Function Proxy buatan sendiri
+      const res = await fetch('/api/rss')
+      const text = await res.text()
       
       const parser = new DOMParser()
-      const xml = parser.parseFromString(data.contents, 'text/xml')
+      const xml = parser.parseFromString(text, 'text/xml')
       const items = Array.from(xml.querySelectorAll('item')).slice(0, 16)
       
       return items.map(item => {
@@ -208,7 +208,7 @@ const { isLoading: loadingRss, data: rssQueryData } = useQuery({
         return { title, link, pubDate, description, image }
       })
     } catch (e) {
-      console.error('Gagal mengambil RSS via Proxy:', e)
+      console.error('Gagal mengambil RSS via Proxy Internal:', e)
       return []
     }
   }
