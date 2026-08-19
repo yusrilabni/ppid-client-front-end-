@@ -165,7 +165,8 @@ const { isLoading: loading, data: queryData, isFetching, isError, refetch } = us
   }
 })
 
-useGlobalLoader(loading)
+const emptyCheck = computed(() => isFetching.value && (!queryData.value || Object.keys(queryData.value).length === 0))
+useGlobalLoader(loading, emptyCheck)
 
 watch([queryData, loading], ([newData, newLoading]) => {
   if (newData) {
