@@ -11,54 +11,51 @@
 
 
 <!-- Header / Hero Section -->
-<div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 overflow-hidden">
-    <!-- Decorative Shapes -->
-    <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute w-full h-full">
-            <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
-        </svg>
+<div class="relative bg-gray-900 overflow-hidden rounded-b-[3rem] shadow-xl">
+    <!-- Cool modern background shapes -->
+    <div class="absolute inset-0 z-0 opacity-20">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div class="absolute top-12 -right-12 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-24 left-1/2 w-96 h-96 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
     </div>
     
-    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-full mb-6 backdrop-blur-sm border border-white/20 shadow-2xl">
-            <i class="fas fa-user-shield text-4xl text-white"></i>
+    <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 text-center flex flex-col items-center">
+        <div class="inline-flex items-center justify-center p-4 bg-white/10 rounded-2xl mb-8 backdrop-blur-lg border border-white/10 shadow-inner">
+            <i class="fas fa-shield-alt text-5xl text-blue-400"></i>
         </div>
-        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
-            Kebijakan Privasi & <br class="hidden md:block"> Pemberitahuan Pelindungan Data
+        <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-md">
+            Kebijakan Privasi
         </h1>
-        <div class="inline-block bg-white/20 px-6 py-2 rounded-full backdrop-blur-md border border-white/30">
-            <p class="text-white font-semibold text-lg flex items-center justify-center gap-2">
-                <i class="fas fa-university text-yellow-300"></i> PPID Kabupaten Sinjai
-            </p>
-        </div>
-        <p class="text-blue-100 mt-6 text-sm font-medium opacity-90">
-            <i class="far fa-clock mr-1"></i> Diperbarui pada: 22 Juli 2026
+        <p class="text-xl text-blue-100 max-w-2xl font-light mb-8">
+            Komitmen kami dalam menjaga transparansi dan melindungi data pribadi masyarakat sesuai dengan standar keamanan yang berlaku.
         </p>
-    </div>
-    
-    <!-- Wave Bottom -->
-    <div class="absolute bottom-0 w-full leading-none">
-        <svg class="block w-full h-12 md:h-20 text-gray-50" viewBox="0 0 1440 320" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,256L48,245.3C96,235,192,213,288,213.3C384,213,480,235,576,224C672,213,768,171,864,165.3C960,160,1056,192,1152,202.7C1248,213,1344,203,1392,197.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-        </svg>
+        <div class="inline-flex items-center space-x-2 bg-gray-800/50 px-5 py-2.5 rounded-full backdrop-blur-md border border-gray-700">
+            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+            <span class="text-sm font-semibold text-gray-300">Pembaruan Terakhir: 22 Juli 2026</span>
+        </div>
     </div>
 </div>
 
-<div class="py-12 bg-gray-50 pb-24">
+<div class="py-16 bg-gray-50 pb-24">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Intro Card -->
-        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 md:p-10 mb-10 transform -translate-y-12 relative z-10">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                <i class="fas fa-info-circle text-blue-600 text-3xl"></i> Pendahuluan
-            </h2>
-            <div class="text-gray-600 leading-relaxed text-lg space-y-4">
-                <p>
-                    Pemerintah Daerah Kabupaten Sinjai berkomitmen penuh untuk melindungi dan menghormati privasi data pribadi Anda selaku pengguna ("Anda" atau "Pengguna") seluruh layanan digital yang Kami kelola, baik berbasis situs web maupun aplikasi seluler. 
-                </p>
-                <p>
-                    Kebijakan Privasi ini menjelaskan bagaimana Kami mengumpulkan, menggunakan, menyimpan, membagikan, dan melindungi Data Pribadi Anda saat Anda menggunakan Layanan Digital Kami. Dengan mengakses dan/atau menggunakan Layanan Digital Kami, Anda mengakui bahwa Anda telah membaca, memahami, dan menyetujui seluruh ketentuan yang tertuang di dalamnya.
-                </p>
+        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 mb-12 -mt-10 relative z-20 mx-4 sm:mx-0">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="fas fa-quote-left text-2xl"></i>
+                </div>
+                <div class="flex-1 space-y-5">
+                    <h2 class="text-3xl font-bold text-gray-900">Pendahuluan</h2>
+                    <div class="text-gray-600 leading-relaxed text-lg space-y-4">
+                        <p>
+                            Pemerintah Daerah Kabupaten Sinjai melalui PPID (Pejabat Pengelola Informasi dan Dokumentasi) berkomitmen penuh untuk melindungi, menjaga, dan menghormati privasi data pribadi setiap masyarakat yang mengakses layanan digital kami, baik melalui situs web maupun aplikasi seluler. 
+                        </p>
+                        <p>
+                            Kebijakan Privasi ini disusun secara transparan untuk menjelaskan bagaimana kami mengumpulkan, menggunakan, menyimpan, membagikan, dan mengamankan informasi yang Anda berikan saat berinteraksi dengan layanan kami. Dengan mengakses dan menggunakan portal informasi kami, Anda menyetujui seluruh ketentuan dan langkah perlindungan yang tertuang di dalam dokumen ini.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
