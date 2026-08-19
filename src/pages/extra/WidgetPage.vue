@@ -31,46 +31,55 @@
                 <div  >
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         <!--  Controls  -->
-                        <div class="space-y-6">
+                                                <div class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="transition-all duration-200" >
+                                <div class="transition-all duration-200">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Konten</label>
                                     <CustomSelect v-model="type" :options="[{value: 'latest', label: 'Terbaru'}, {value: 'popular', label: 'Terpopuler'}]" placeholder="Pilih..." />
                                 </div>
-                                <div class="transition-all duration-200" >
+                                <div class="transition-all duration-200">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Gaya Dasar</label>
                                     <CustomSelect v-model="display" :options="[{value: 'card', label: 'Kartu (Grid)'}, {value: 'list', label: 'Daftar (List)'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="transition-all duration-200" >
+                                <div class="transition-all duration-200">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Kategori Informasi</label>
                                     <CustomSelect v-model="category" :options="[{value: '', label: 'Semua Kategori'}, {value: 'Informasi Berkala', label: 'Informasi Berkala'}, {value: 'Informasi Serta Merta', label: 'Informasi Serta Merta'}, {value: 'Informasi Setiap Saat', label: 'Informasi Setiap Saat'}, {value: 'Informasi Dikecualikan', label: 'Informasi Dikecualikan'}]" placeholder="Pilih..." />
                                 </div>
-                                <div class="transition-all duration-200" >
+                                <div class="transition-all duration-200">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Jumlah Total Data</label>
+                                    <CustomSelect v-model="limit" :options="[{value: 5, label: '5 Data Terakhir'}, {value: 10, label: '10 Data Terakhir'}, {value: 15, label: '15 Data Terakhir'}, {value: 20, label: '20 Data Terakhir'}, {value: 'all', label: 'Semua Data'}]" placeholder="Pilih..." />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" v-show="display === 'card'">
+                                <div class="transition-all duration-200">
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Mode Layout</label>
+                                    <CustomSelect v-model="mode" :options="[{value: 'slider', label: 'Slider Interaktif'}, {value: 'grid', label: 'Grid Statis'}]" placeholder="Pilih..." />
+                                </div>
+                                <div class="transition-all duration-200">
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Kolom Per Baris</label>
                                     <CustomSelect v-model="columns" :options="[{value: 1, label: '1 Kolom'}, {value: 2, label: '2 Kolom'}, {value: 3, label: '3 Kolom'}, {value: 4, label: '4 Kolom'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div v-show="mode === 'slider' && display === 'card'" class="transition-all duration-200" >
+                                <div v-show="mode === 'slider' && display === 'card'" class="transition-all duration-200">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Autoplay Slider</label>
                                     <CustomSelect v-model="autoplay" :options="[{value: 'true', label: 'Aktif'}, {value: 'false', label: 'Mati'}]" placeholder="Pilih..." />
                                 </div>
+                                <div class="transition-all duration-200">
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter Tahun</label>
+                                    <CustomSelect v-model="year" :options="[{value: '', label: 'Semua Tahun'}, {value: '2024', label: '2024'}, {value: '2023', label: '2023'}, {value: '2022', label: '2022'}]" placeholder="Pilih..." />
+                                </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="transition-all duration-200" >
+                            <div class="grid grid-cols-1 gap-6">
+                                <div class="transition-all duration-200">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter OPD</label>
-                                    
                                     <CustomSelect v-model="unit_id" :options="[{value: '', label: 'Semua Instansi / OPD'}, ...organizations.map(o => ({value: o.unit_id, label: o.name}))]" :shouldShowSearch="true" placeholder="Pilih..." />
-                                </div>
-                                <div class="transition-all duration-200" >
-                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter Tahun</label>
-                                    
-                                    <CustomSelect v-model="year" :options="[{value: '', label: 'Semua Tahun'}, {value: '2024', label: '2024'}, {value: '2023', label: '2023'}, {value: '2022', label: '2022'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
