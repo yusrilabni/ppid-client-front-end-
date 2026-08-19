@@ -74,9 +74,9 @@ export const getBreadcrumbs = {
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
         { title: 'PPID', url: '', icon: 'fas fa-info-circle' }
     ],
-    officialProfile: (name) => [
+    officialProfile: (name, middleTitle, middleUrl, middleIcon) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Pejabat Daerah', url: '/profil/pejabat-daerah', icon: 'fas fa-user-tie' },
+        { title: middleTitle || 'Pejabat Daerah', url: middleUrl || '/profil/pejabat-daerah', icon: middleIcon || 'fas fa-user-tie' },
         { title: truncate(name, 25) || 'Profil Pejabat', url: '', icon: 'fas fa-user' }
     ],
     opdDetail: (unitName) => [

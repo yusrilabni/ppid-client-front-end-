@@ -345,14 +345,10 @@ const breadcrumbData = computed(() => {
   } else if (posSlug === 'sekretaris-daerah' || posSlug === 'sekda') {
     middleTitle = 'Sekretaris Daerah'
     middleUrl = '/profil/sekretaris-daerah'
-    middleIcon = 'fas fa-user-tie'
+    middleIcon = 'fas fa-building'
   }
   
-  return [
-    { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-    { title: middleTitle, url: middleUrl, icon: middleIcon },
-    { title: title.length > 25 ? title.substring(0, 25) + '...' : title, url: '', icon: 'fas fa-user' }
-  ]
+  return getBreadcrumbs.officialProfile(title, middleTitle, middleUrl, middleIcon)
 })
 
 const spouseLabel = computed(() => {
