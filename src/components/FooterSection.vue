@@ -5,12 +5,12 @@ import api, { getStorageUrl } from '@/services/api'
 const currentYear = computed(() => new Date().getFullYear())
 
 const socialMedia = ref({
-  instagram: '#',
-  facebook: '#',
-  twitter: '#',
-  tiktok: '#',
-  youtube: '#',
-  website: '#'
+  instagram: '',
+  facebook: '',
+  twitter: '',
+  tiktok: '',
+  youtube: '',
+  website: ''
 })
 
 const contactInfo = ref({
@@ -31,12 +31,12 @@ const fetchProfilData = async () => {
     if (res.data?.success && res.data?.data) {
       const data = res.data.data
       socialMedia.value = {
-        instagram: data.instagram || '#',
-        facebook: data.facebook || '#',
-        twitter: data.twitter || '#',
-        tiktok: data.tiktok || '#',
-        youtube: data.youtube || '#',
-        website: data.website || '#'
+        instagram: data.instagram || '',
+        facebook: data.facebook || '',
+        twitter: data.twitter || '',
+        tiktok: data.tiktok || '',
+        youtube: data.youtube || '',
+        website: data.website || ''
       }
       contactInfo.value = {
         email: data.email || 'ppid@sinjaikab.go.id',
