@@ -32,7 +32,7 @@
 
     <div class="bg-gray-50 pb-16">
         <div class="container max-w-6xl mx-auto px-4 -mt-8 relative z-20">
-            <div class="bg-white/90 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 mb-10 transition-all duration-300 hover:shadow-2xl">
+            <div class="bg-white/90 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 mb-10 transition-all duration-300 hover:shadow-2xl relative z-50">
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
                     
                     <div class="relative" style="z-index: 50;">
