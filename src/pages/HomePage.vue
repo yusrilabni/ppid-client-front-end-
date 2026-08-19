@@ -725,7 +725,7 @@ const informasiItems = [
                 <!-- Telepon -->
                 <div class="flex items-start">
                   <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-lg bg-blue-100 text-blue-600">
+                    <div class="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-lg bg-green-100 text-green-600">
                       <i data-lucide="phone" class="h-5 w-5 md:h-6 md:w-6"></i>
                     </div>
                   </div>
@@ -738,7 +738,7 @@ const informasiItems = [
                 <!-- Email -->
                 <div class="flex items-start">
                   <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-lg bg-blue-100 text-blue-600">
+                    <div class="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-lg bg-purple-100 text-purple-600">
                       <i data-lucide="mail" class="h-5 w-5 md:h-6 md:w-6"></i>
                     </div>
                   </div>
