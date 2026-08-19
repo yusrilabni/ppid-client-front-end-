@@ -101,8 +101,8 @@ onMounted(async () => {
     loadingText.value = "Mengunduh Dokumen..."
 
     // 2. Fetch the file blob via our Vue API wrapper (bypassing direct URL)
-    // We construct the backend file URL
-    const fileUrl = `${api.defaults.baseURL.replace('/api/v1', '')}/laporan/ppid/file/${encodedId}?t=${new Date().getTime()}`
+    // We construct the backend file URL using the API route so it gets CORS headers
+    const fileUrl = `${api.defaults.baseURL}/laporan/ppid/file/${encodedId}?t=${new Date().getTime()}`
     
     const response = await fetch(fileUrl)
     if (!response.ok) {
