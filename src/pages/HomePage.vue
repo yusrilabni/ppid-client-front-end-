@@ -32,7 +32,17 @@ const fieldErrors = ref({
   message: ''
 })
 
-// Automatically re-render icons when DOM updates
+// Render icons explicitly early and on updates
+onMounted(() => {
+  if (window.lucide) {
+    window.lucide.createIcons()
+  } else {
+    setTimeout(() => {
+      if (window.lucide) window.lucide.createIcons()
+    }, 300)
+  }
+})
+
 onUpdated(() => {
   if (window.lucide) {
     window.lucide.createIcons()
@@ -165,29 +175,30 @@ const { isLoading: loading, data: queryData, isFetching, isError, refetch } = us
   }
 })
 
+const { isLoading: loadingRss, data: rssQueryData } = useQuery({
+  queryKey: ['rss_news'],
+  queryFn: async () => {
+    const res = await api.get('/rss-news')
+    return res.data.success ? (res.data.data || []) : []
+  }
+})
+
 useGlobalLoader(loading)
 
-const fetchRSS = async () => {
-  try {
-    const res = await api.get('/rss-news')
-    if (res.data && res.data.success) {
-      rss_items.value = res.data.data || []
-    }
-  } catch (error) {
-    console.error('Gagal mengambil berita RSS dari API lokal:', error)
-  }
-}
+let swiperInitialized = false
 
-watch([queryData, loading], ([newData, newLoading]) => {
+watch([queryData, rssQueryData, loading, loadingRss], ([newData, newRssData, newLoading, newRssLoading]) => {
   if (newData) {
     homeData.value = newData
   }
+  if (newRssData) {
+    rss_items.value = newRssData
+  }
   
-  if (!newLoading && newData) {
-    fetchRSS().then(() => {
-      nextTick(() => {
-        initSwiper()
-      })
+  if (!newLoading && !newRssLoading && newData && !swiperInitialized) {
+    swiperInitialized = true
+    nextTick(() => {
+      initSwiper()
     })
   }
 }, { immediate: true })
