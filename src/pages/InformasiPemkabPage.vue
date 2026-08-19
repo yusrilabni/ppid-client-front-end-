@@ -115,102 +115,104 @@
                   <p class="text-gray-500">Memuat data...</p>
               </div>
 
-              <div v-else-if="items.length > 0" class="hidden md:block overflow-x-auto relative z-10">
-                  <table class="min-w-full w-full whitespace-nowrap bg-transparent">
-                      <thead>
-                          <tr class="bg-gray-100/60 border-b border-gray-200 text-left backdrop-blur-sm">
-                              <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase">Detail Dokumen</th>
-                              <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Kategori</th>
-                              <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-32 text-center">Tahun</th>
-                              <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Aksi</th>
-                          </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-100/50">
-                          <tr v-for="dokumen in items" :key="dokumen.id" class="transition-colors group hover:bg-blue-50/60">
-                              <td class="py-4 px-6 whitespace-normal align-middle">
-                                  <div class="flex items-center">
-                                      <div class="flex-shrink-0">
-                                          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 border-blue-100 text-blue-600 flex items-center justify-center border shadow-sm">
-                                              <i class="fas fa-file-pdf text-lg"></i>
+              <template v-else-if="items.length > 0">
+                  <div class="hidden md:block overflow-x-auto relative z-10">
+                      <table class="min-w-full w-full whitespace-nowrap bg-transparent">
+                          <thead>
+                              <tr class="bg-gray-100/60 border-b border-gray-200 text-left backdrop-blur-sm">
+                                  <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase">Detail Dokumen</th>
+                                  <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Kategori</th>
+                                  <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-32 text-center">Tahun</th>
+                                  <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Aksi</th>
+                              </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-100/50">
+                              <tr v-for="dokumen in items" :key="dokumen.id" class="transition-colors group hover:bg-blue-50/60">
+                                  <td class="py-4 px-6 whitespace-normal align-middle">
+                                      <div class="flex items-center">
+                                          <div class="flex-shrink-0">
+                                              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 border-blue-100 text-blue-600 flex items-center justify-center border shadow-sm">
+                                                  <i class="fas fa-file-pdf text-lg"></i>
+                                              </div>
+                                          </div>
+                                          <div class="ml-4">
+                                              <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-base font-bold text-gray-800 hover:text-blue-700 transition-colors leading-tight">
+                                                  {{ dokumen.judul }}
+                                              </router-link>
+                                              <p v-if="dokumen.deskripsi" class="text-sm text-gray-500 mt-1 line-clamp-1 group-hover:line-clamp-none transition-all duration-300">
+                                                  {{ dokumen.deskripsi }}
+                                              </p>
                                           </div>
                                       </div>
-                                      <div class="ml-4">
-                                          <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-base font-bold text-gray-800 hover:text-blue-700 transition-colors leading-tight">
-                                              {{ dokumen.judul }}
+                                  </td>
+                                  <td class="py-4 px-6 whitespace-normal align-middle">
+                                      <span class="inline-block px-3 py-1 bg-white/80 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200 mb-1 shadow-sm">
+                                          {{ dokumen.kategori }}
+                                      </span>
+                                      <br>
+                                      <span class="inline-block px-3 py-1 bg-blue-50/80 text-blue-700 text-xs font-semibold rounded-lg border border-blue-100 mt-1 shadow-sm">
+                                          {{ dokumen.jenis_dokumen }}
+                                      </span>
+                                  </td>
+                                  <td class="py-4 px-6 text-center align-middle">
+                                      <span class="inline-block bg-white/80 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-600 border border-gray-200 shadow-sm">
+                                          {{ dokumen.tahun }}
+                                      </span>
+                                  </td>
+                                  <td class="py-4 px-6 text-center align-middle w-48">
+                                      <div class="flex items-center justify-center space-x-2">
+                                          <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Lihat Detail">
+                                              <i class="fas fa-eye"></i>
                                           </router-link>
-                                          <p v-if="dokumen.deskripsi" class="text-sm text-gray-500 mt-1 line-clamp-1 group-hover:line-clamp-none transition-all duration-300">
-                                              {{ dokumen.deskripsi }}
-                                          </p>
+                                          <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Unduh">
+                                              <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i>
+                                          </a>
                                       </div>
-                                  </div>
-                              </td>
-                              <td class="py-4 px-6 whitespace-normal align-middle">
-                                  <span class="inline-block px-3 py-1 bg-white/80 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200 mb-1 shadow-sm">
-                                      {{ dokumen.kategori }}
-                                  </span>
-                                  <br>
-                                  <span class="inline-block px-3 py-1 bg-blue-50/80 text-blue-700 text-xs font-semibold rounded-lg border border-blue-100 mt-1 shadow-sm">
-                                      {{ dokumen.jenis_dokumen }}
-                                  </span>
-                              </td>
-                              <td class="py-4 px-6 text-center align-middle">
-                                  <span class="inline-block bg-white/80 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-600 border border-gray-200 shadow-sm">
-                                      {{ dokumen.tahun }}
-                                  </span>
-                              </td>
-                              <td class="py-4 px-6 text-center align-middle w-48">
-                                  <div class="flex items-center justify-center space-x-2">
-                                      <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Lihat Detail">
-                                          <i class="fas fa-eye"></i>
-                                      </router-link>
-                                      <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Unduh">
-                                          <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i>
-                                      </a>
-                                  </div>
-                              </td>
-                          </tr>
-                      </tbody>
-                  </table>
-              </div>
-
-              <div v-else-if="items.length > 0" class="block md:hidden relative z-10 p-3 sm:p-4 space-y-4 bg-gray-50/50">
-                  <div v-for="dokumen in items" :key="'mob-'+dokumen.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 relative flex flex-col">
-                      <div class="flex items-start">
-                          <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 text-blue-600 border-blue-100 flex items-center justify-center border shadow-sm mt-0.5">
-                              <i class="fas fa-file-pdf text-lg"></i>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+    
+                  <div class="block md:hidden relative z-10 p-3 sm:p-4 space-y-4 bg-gray-50/50">
+                      <div v-for="dokumen in items" :key="'mob-'+dokumen.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 relative flex flex-col">
+                          <div class="flex items-start">
+                              <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 text-blue-600 border-blue-100 flex items-center justify-center border shadow-sm mt-0.5">
+                                  <i class="fas fa-file-pdf text-lg"></i>
+                              </div>
+                              <div class="ml-3 flex-grow min-w-0">
+                                  <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-sm sm:text-base font-bold text-gray-800 hover:text-blue-700 leading-snug">
+                                      {{ dokumen.judul }}
+                                  </router-link>
+                                  <p v-if="dokumen.deskripsi" class="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
+                                      {{ dokumen.deskripsi }}
+                                  </p>
+                              </div>
                           </div>
-                          <div class="ml-3 flex-grow min-w-0">
-                              <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-sm sm:text-base font-bold text-gray-800 hover:text-blue-700 leading-snug">
-                                  {{ dokumen.judul }}
+    
+                          <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-1.5">
+                              <span class="px-2 py-1 bg-gray-100 text-gray-700 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200">
+                                  {{ dokumen.kategori }}
+                              </span>
+                              <span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] sm:text-xs font-semibold rounded-md border border-blue-100">
+                                  {{ dokumen.jenis_dokumen }}
+                              </span>
+                              <span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200">
+                                  <i class="fas fa-calendar mr-1 text-gray-400"></i> {{ dokumen.tahun }}
+                              </span>
+                          </div>
+    
+                          <div class="mt-3 pt-3 border-t border-gray-100 flex justify-end space-x-2">
+                              <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-xs font-bold transition-colors">
+                                  <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i> <span class="hidden sm:inline sm:ml-1.5">Unduh</span>
+                              </a>
+                              <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-colors">
+                                  <i class="fas fa-eye sm:mr-1.5"></i> <span class="hidden sm:inline">Detail</span>
                               </router-link>
-                              <p v-if="dokumen.deskripsi" class="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
-                                  {{ dokumen.deskripsi }}
-                              </p>
                           </div>
-                      </div>
-
-                      <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-1.5">
-                          <span class="px-2 py-1 bg-gray-100 text-gray-700 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200">
-                              {{ dokumen.kategori }}
-                          </span>
-                          <span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] sm:text-xs font-semibold rounded-md border border-blue-100">
-                              {{ dokumen.jenis_dokumen }}
-                          </span>
-                          <span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200">
-                              <i class="fas fa-calendar mr-1 text-gray-400"></i> {{ dokumen.tahun }}
-                          </span>
-                      </div>
-
-                      <div class="mt-3 pt-3 border-t border-gray-100 flex justify-end space-x-2">
-                          <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-xs font-bold transition-colors">
-                              <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i> <span class="hidden sm:inline sm:ml-1.5">Unduh</span>
-                          </a>
-                          <router-link :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-colors">
-                              <i class="fas fa-eye sm:mr-1.5"></i> <span class="hidden sm:inline">Detail</span>
-                          </router-link>
                       </div>
                   </div>
-              </div>
+              </template>
 
               <div v-else class="py-20 text-center relative z-10">
                   <div class="flex flex-col items-center justify-center">
