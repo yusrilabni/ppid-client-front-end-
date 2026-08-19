@@ -13,13 +13,15 @@
 <!-- Header / Hero Section -->
 <div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 overflow-hidden rounded-b-[3rem] shadow-xl">
     <!-- Cool modern background shapes / Light patterns -->
-    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <svg class="absolute w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path d="M0 100 C 20 0 50 0 100 100 Z" fill="rgba(255,255,255,0.1)"></path>
-            <path d="M0 0 L 100 100 L 100 0 Z" fill="rgba(255,255,255,0.03)"></path>
-        </svg>
-        <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-10"></div>
-        <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-300 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+        <!-- Elegant modern grid and light flare -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        <!-- Dot Pattern -->
+        <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <!-- Light flares for depth -->
+        <div class="absolute -top-40 -right-40 w-96 h-96 bg-white rounded-full opacity-[0.03] blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-400 rounded-full opacity-[0.05] blur-3xl"></div>
+        <!-- Subtle diagonal line -->
+        <div class="absolute inset-0 opacity-[0.04]" style="background: repeating-linear-gradient(45deg, transparent, transparent 10px, white 10px, white 11px);"></div>
     </div>
     
     <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 text-center flex flex-col items-center">
