@@ -250,6 +250,15 @@ const formatDate = (dateString) => {
   }
 }
 
+const truncateText = (text, length = 100) => {
+  if (!text) return ''
+  // Hapus tag HTML dengan DOMParser agar lebih aman dari entitas HTML (seperti &amp;)
+  const doc = new DOMParser().parseFromString(text, 'text/html')
+  const stripped = doc.body.textContent || ''
+  if (stripped.length <= length) return stripped
+  return stripped.substring(0, length).trim() + '...'
+}
+
 const getCategoryColor = (category, type) => {
   const map = {
     'Informasi Berkala': { border: 'border-blue-500', text: 'text-blue-50', badge: 'bg-blue-50 text-blue-600', bg50: 'bg-blue-50', text600: 'text-blue-600', border100: 'border-blue-100' },
@@ -485,8 +494,8 @@ const informasiItems = [
                         <i data-lucide="calendar" class="h-3.5 w-3.5 mr-1.5 text-blue-500"></i>
                         {{ formatDate(item.pubDate) }}
                       </div>
-                      <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-2 leading-snug hover:text-blue-600 transition-colors" v-html="item.title"></h3>
-                      <p class="text-xs text-gray-600 line-clamp-3 mb-4 flex-grow" v-html="item.description"></p>
+                      <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-2 leading-snug hover:text-blue-600 transition-colors" v-text="truncateText(item.title, 60)"></h3>
+                      <p class="text-xs text-gray-600 line-clamp-3 mb-4 flex-grow" v-text="truncateText(item.description, 100)"></p>
                       <div class="mt-auto">
                         <a :href="item.link" target="_blank" class="inline-flex items-center justify-center px-4 py-2.5 border border-blue-100 text-sm font-semibold rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white transition-all duration-300 w-full group">
                           Baca Selengkapnya
