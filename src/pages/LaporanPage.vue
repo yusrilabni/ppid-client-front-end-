@@ -46,7 +46,7 @@
                   </h3>
               </div>
               <div class="grid grid-cols-1 gap-3">
-                  <a :href="api.defaults.baseURL.replace('/api/v1', '') + '/laporan/ppid/preview/' + item.encoded_id" 
+                  <a :href="api.defaults.baseURL.replace('/api/v1', '') + '/laporan/ppid/preview/' + item.encoded_id" target="_blank"
                      class="flex items-center justify-center w-full bg-blue-600 text-white font-black text-[10px] py-3.5 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 hover:shadow-blue-200">
                       <i class="fas fa-eye text-xs"></i>
                       Preview Laporan
