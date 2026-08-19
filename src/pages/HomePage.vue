@@ -141,6 +141,10 @@ const initSwiper = () => {
         loop: true,
         observer: true,
         observeParents: true,
+        autoplay: { 
+          delay: 4000, 
+          disableOnInteraction: false 
+        },
         breakpoints: {
           640: { slidesPerView: 2, slidesPerGroup: 2 },
           1024: { slidesPerView: 4, slidesPerGroup: 4 }
@@ -155,6 +159,10 @@ const initSwiper = () => {
         loop: true,
         observer: true,
         observeParents: true,
+        autoplay: { 
+          delay: 4500, 
+          disableOnInteraction: false 
+        },
         breakpoints: {
           640: { slidesPerView: 2, slidesPerGroup: 2 },
           1024: { slidesPerView: 4, slidesPerGroup: 4 }
