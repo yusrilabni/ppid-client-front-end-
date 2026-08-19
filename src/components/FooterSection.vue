@@ -1,16 +1,23 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import api, { getStorageUrl } from '@/services/api'
 
 const currentYear = computed(() => new Date().getFullYear())
 
-const socialMedia = {
-  instagram: 'https://www.instagram.com/pemkab_sinjai',
-  facebook: 'https://www.facebook.com/pemkabsinjai',
-  twitter: 'https://twitter.com/pemkabsinjai',
-  tiktok: 'https://www.tiktok.com/@pemkabsinjai',
-  youtube: 'https://www.youtube.com/@pemkabsinjai',
-  website: 'https://sinjaikab.go.id'
-}
+const socialMedia = ref({
+  instagram: '#',
+  facebook: '#',
+  twitter: '#',
+  tiktok: '#',
+  youtube: '#',
+  website: '#'
+})
+
+const contactInfo = ref({
+  email: 'ppid@sinjaikab.go.id',
+  phone: '(0482) 21111',
+  address: 'Jl. Persatuan Raya No. 1, Sinjai Utara, Kab. Sinjai, Sulawesi Selatan 92611'
+})
 
 const navLinks = [
   { url: '/profil-ppid', title: 'Profil PPID' },
@@ -18,13 +25,34 @@ const navLinks = [
   { url: '/permohonan', title: 'Permohonan Informasi' }
 ]
 
-const contactInfo = {
-  email: 'ppid@sinjaikab.go.id',
-  phone: '(0482) 21111',
-  address: 'Jl. Persatuan Raya No. 1, Sinjai Utara, Kab. Sinjai, Sulawesi Selatan 92611'
+const fetchProfilData = async () => {
+  try {
+    const res = await api.get('/profil')
+    if (res.data?.success && res.data?.data) {
+      const data = res.data.data
+      socialMedia.value = {
+        instagram: data.instagram || '#',
+        facebook: data.facebook || '#',
+        twitter: data.twitter || '#',
+        tiktok: data.tiktok || '#',
+        youtube: data.youtube || '#',
+        website: data.website || '#'
+      }
+      contactInfo.value = {
+        email: data.email || 'ppid@sinjaikab.go.id',
+        phone: data.phone || '(0482) 21111',
+        address: data.address || 'Jl. Persatuan Raya No. 1, Sinjai Utara, Kab. Sinjai'
+      }
+    }
+  } catch (err) {
+    console.error('Gagal mengambil data profil PPID', err)
+  }
 }
 
-import api, { getStorageUrl } from '@/services/api'
+onMounted(() => {
+  fetchProfilData()
+})
+
 </script>
 
 <template>
