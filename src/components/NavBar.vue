@@ -229,7 +229,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                   <template v-else>
                       <!-- Authenticated User Dropdown -->
                       <div class="hidden xl:relative xl:flex items-center" @mouseenter="activeSubMenu = 'user'" @mouseleave="activeSubMenu = null">
-                          <button class="flex items-center space-x-2 bg-blue-50 rounded-full p-1 pr-3 hover:bg-blue-100 transition-colors focus:outline-none">
+                          <button aria-label="Menu Pengguna" class="flex items-center space-x-2 bg-blue-50 rounded-full p-1 pr-3 hover:bg-blue-100 transition-colors focus:outline-none">
                               <template v-if="authStore.user?.profile_photo_path">
                                   <img class="h-8 w-8 rounded-full object-cover"
                                       :src="getStorageUrl(authStore.user.profile_photo_path)"
@@ -282,7 +282,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                   </template>
 
                   <div class="xl:hidden">
-                      <button @click="toggleMobileMenu" class="text-gray-700 hover:text-blue-600 focus:outline-none">
+                      <button @click="toggleMobileMenu" aria-label="Toggle Mobile Menu" class="text-gray-700 hover:text-blue-600 focus:outline-none">
                           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
                                   stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -307,7 +307,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                   <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                       <i class="fas fa-search text-blue-400 text-sm"></i>
                   </div>
-                  <button type="submit" class="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-700">
+                  <button type="submit" aria-label="Mulai Pencarian" class="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-700">
                       <i class="fas fa-arrow-right"></i>
                   </button>
               </form>

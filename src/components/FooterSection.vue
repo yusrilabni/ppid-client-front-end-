@@ -41,22 +41,22 @@ import api, { getStorageUrl } from '@/services/api'
                   </p>
                   <!-- Social Media Icons -->
                   <div class="flex flex-wrap justify-center md:justify-start gap-3">
-                      <a v-if="socialMedia.instagram" :href="socialMedia.instagram" target="_blank" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] transition-all duration-300" title="Instagram">
+                      <a v-if="socialMedia.instagram" :href="socialMedia.instagram" target="_blank" aria-label="Instagram" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] transition-all duration-300" title="Instagram">
                           <i class="fab fa-instagram"></i>
                       </a>
-                      <a v-if="socialMedia.facebook" :href="socialMedia.facebook" target="_blank" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#1877F2] transition-all duration-300" title="Facebook">
+                      <a v-if="socialMedia.facebook" :href="socialMedia.facebook" target="_blank" aria-label="Facebook" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#1877F2] transition-all duration-300" title="Facebook">
                           <i class="fab fa-facebook-f"></i>
                       </a>
-                      <a v-if="socialMedia.twitter" :href="socialMedia.twitter" target="_blank" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#1DA1F2] transition-all duration-300" title="Twitter">
+                      <a v-if="socialMedia.twitter" :href="socialMedia.twitter" target="_blank" aria-label="Twitter" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#1DA1F2] transition-all duration-300" title="Twitter">
                           <i class="fab fa-twitter"></i>
                       </a>
-                      <a v-if="socialMedia.tiktok" :href="socialMedia.tiktok" target="_blank" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-black transition-all duration-300" title="TikTok">
+                      <a v-if="socialMedia.tiktok" :href="socialMedia.tiktok" target="_blank" aria-label="TikTok" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-black transition-all duration-300" title="TikTok">
                           <i class="fab fa-tiktok"></i>
                       </a>
-                      <a v-if="socialMedia.youtube" :href="socialMedia.youtube" target="_blank" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#FF0000] transition-all duration-300" title="YouTube">
+                      <a v-if="socialMedia.youtube" :href="socialMedia.youtube" target="_blank" aria-label="YouTube" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#FF0000] transition-all duration-300" title="YouTube">
                           <i class="fab fa-youtube"></i>
                       </a>
-                      <a v-if="socialMedia.website" :href="socialMedia.website" target="_blank" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-blue-600 transition-all duration-300" title="Website Pemda">
+                      <a v-if="socialMedia.website" :href="socialMedia.website" target="_blank" aria-label="Website" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-blue-600 transition-all duration-300" title="Website Pemda">
                           <i class="fas fa-globe"></i>
                       </a>
                   </div>
@@ -106,8 +106,8 @@ import api, { getStorageUrl } from '@/services/api'
                   <h4 class="font-semibold mb-4">Pengaduan</h4>
                   <a href="https://www.lapor.go.id/" target="_blank"
                       class="group px-[21px] py-5 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-lg flex flex-col items-center space-y-4 border border-gray-700 w-full hover:border-gray-500 transition duration-300 block">
-                      <img src="/logo/lapor.png" alt="Lapor.go.id"
-                          class="h-16 w-auto group-hover:scale-105 transition duration-300" />
+                      <img src="/logo/lapor.png" alt="Lapor.go.id" width="120" height="40"
+                          class="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
                       <p class="text-sm font-semibold text-gray-200 leading-relaxed whitespace-nowrap uppercase italic">
                           <span class="text-yellow-400 font-bold">Sampaikan Laporan</span> & Aspirasi Anda
                       </p>
