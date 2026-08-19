@@ -33,7 +33,7 @@ import api, { getStorageUrl } from '@/services/api'
           <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div class="flex flex-col items-center text-center md:items-start md:text-left">
                   <div class="-mt-8 mb-[-35px]">
-                      <img src="/logo/favicon_io/android-chrome-512x512.png" alt="Logo PPID"
+                      <img src="/logo/favicon_io/android-chrome-512x512.png" alt="Logo PPID" width="160" height="160"
                           class="h-[160px] w-auto" />
                   </div>
                   <p class="text-gray-400 text-sm mb-4">

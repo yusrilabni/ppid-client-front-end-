@@ -23,6 +23,7 @@ const resetAll = () => {
     <!-- Master Sound Toggle -->
     <button 
       @click="toggleMasterSound"
+      aria-label="Toggle Suara Widget"
       class="w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110"
       :class="accStore.masterSound ? 'bg-green-500 text-white' : 'bg-red-500 text-white'"
       :title="accStore.masterSound ? 'Matikan Suara' : 'Nyalakan Suara'"
@@ -46,7 +47,7 @@ const resetAll = () => {
             <i class="fas fa-universal-access text-lg"></i>
             <span>Menu Aksesibilitas</span>
           </div>
-          <button @click="isOpen = false" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors">
+          <button @click="isOpen = false" aria-label="Tutup Widget" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -236,7 +237,8 @@ const resetAll = () => {
     <!-- Main Button -->
     <button 
       @click="toggleWidget"
-      class="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105 group border-2 border-white"
+      aria-label="Buka Widget Aksesibilitas"
+      class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-2xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 ring-4 ring-white focus:outline-none"
     >
       <i class="fas fa-universal-access text-2xl group-hover:rotate-12 transition-transform"></i>
     </button>

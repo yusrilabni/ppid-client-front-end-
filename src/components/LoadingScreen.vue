@@ -13,7 +13,7 @@ const logoUrl = getStorageUrl('logo/Logo PPID With Caption.png')
     <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-white bg-opacity-95 backdrop-blur-sm flex flex-col items-center justify-center">
       <div class="relative flex flex-col items-center">
         <!-- Logo with pulse animation -->
-        <img :src="logoUrl" alt="PPID Logo" class="h-24 md:h-32 w-auto mb-8 animate-pulse drop-shadow-md" />
+        <img :src="logoUrl" alt="PPID Logo" width="160" height="128" class="h-24 md:h-32 w-auto mb-8 animate-pulse drop-shadow-md" />
         
         <!-- Animated loading dots -->
         <div class="flex items-center justify-center space-x-3">

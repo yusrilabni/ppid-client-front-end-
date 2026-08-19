@@ -313,7 +313,7 @@ const informasiItems = [
         <div class="swiper-wrapper">
           <div v-for="slider in homeData.sliders" :key="slider.id" class="swiper-slide relative">
             <router-link :to="slider.link || (slider.informasi ? `/informasi/${slider.informasi.slug}` : '#')" class="block w-full h-full">
-              <img :src="getStorageUrl(slider.image) || '/placeholder.jpg'" :alt="slider.title" class="w-full h-auto block" />
+              <img :src="getStorageUrl(slider.image) || '/placeholder.jpg'" :alt="slider.title" width="1280" height="720" class="w-full h-auto block" />
               <div v-if="slider.show_title || slider.show_description" class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center overlay-content">
                 <div class="text-center text-white max-w-4xl mx-auto px-4">
                   <h2 v-if="slider.show_title" class="text-2xl md:text-5xl font-bold mb-2 md:mb-4">{{ slider.title }}</h2>
@@ -510,7 +510,7 @@ const informasiItems = [
             <div v-for="item in homeData.gallery" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
               <div class="aspect-w-16 aspect-h-12 relative">
                 <router-link :to="`/galeri/${item.id}`" class="block">
-                  <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" width="400" height="225" loading="lazy" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2">
                     <i data-lucide="camera" class="h-3 w-3 md:h-4 md:w-4 text-gray-700 flex justify-center items-center"></i>
                   </div>
