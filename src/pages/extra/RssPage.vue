@@ -207,7 +207,7 @@
                     <button @click="codeTab = 'html'; showPreview = false" :class="codeTab === 'html' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">HTML & JS</button>
                     <button @click="codeTab = 'php'; showPreview = false" :class="codeTab === 'php' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">PHP Native</button>
                     <button @click="codeTab = 'laravel'; showPreview = false" :class="codeTab === 'laravel' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">Laravel Blade</button>
-                    <button @click="codeTab = 'ci'; showPreview = false" :class="codeTab === 'ci' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">CodeIgniter</button>
+                    
                 </div>
 
                 <!--  CODE BOX  -->
@@ -240,7 +240,7 @@
                         <!--  CODE AREA  -->
                         <div v-show="!showPreview" class="p-8 md:p-12 font-mono text-[13px] leading-relaxed text-blue-100/80 overflow-x-auto">
                             <div v-show="motherTab === 'card'">
-                                <template x-if="codeTab === 'html'">
+                                <template v-if="codeTab === 'html'">
                                     <pre class="whitespace-pre-wrap"><code id="code-card-html">&lt;style&gt;
   .ppid-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; font-family: sans-serif; }
   .ppid-card { background: #fff; border-radius: 20px; padding: 25px; border: 1px solid #eee; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
@@ -271,7 +271,7 @@
   });
 &lt;/script&gt;</code></pre>
                                 </template>
-                                <template x-if="codeTab === 'php'"><pre class="whitespace-pre-wrap"><code id="code-card-php">&lt;?php
+                                <template v-if="codeTab === 'php'"><pre class="whitespace-pre-wrap"><code id="code-card-php">&lt;?php
 // Ganti 'category' untuk filter: 'Informasi Berkala', 'Informasi Setiap Saat', dll.
 $url = "https://ppidkab.sinjaikab.go.id/rss/generate?unit_id=730714&limit=6&category=Informasi Berkala";
 $rss = simplexml_load_file($url);
@@ -285,7 +285,7 @@ foreach ($rss->channel->item as $info) {
 }
 echo "&lt;/div&gt;";
 ?&gt;</code></pre></template>
-                                <template x-if="codeTab === 'laravel'"><pre class="whitespace-pre-wrap"><code id="code-card-laravel">// 1. Controller
+                                <template v-if="codeTab === 'laravel'"><pre class="whitespace-pre-wrap"><code id="code-card-laravel">// 1. Controller
 $xml = simplexml_load_file("https://ppidkab.sinjaikab.go.id/rss/generate?limit=6");
 return view('your_view', ['feeds' => $xml->channel->item]);
 
@@ -298,21 +298,11 @@ return view('your_view', ['feeds' => $xml->channel->item]);
         &lt;/div&gt;
     &commat;endforeach
 &lt;/div&gt;</code></pre></template>
-                                <template x-if="codeTab === 'ci'"><pre class="whitespace-pre-wrap"><code id="code-card-ci">// 1. Controller
-$url = "https://ppidkab.sinjaikab.go.id/rss/generate?limit=6";
-$data['feeds'] = simplexml_load_file($url);
-$this->load->view('rss_view', $data);
-
-// 2. View (rss_view.php)
-&lt;?php foreach ($feeds->channel->item as $item): ?&gt;
-    &lt;div class="card"&gt;
-        &lt;h5&gt;&lt;?= $item->title ?&gt;&lt;/h5&gt;
-    &lt;/div&gt;
-&lt;?php endforeach; ?&gt;</code></pre></template>
+                                
                             </div>
 
                             <div v-show="motherTab === 'list'">
-                                <template x-if="codeTab === 'html'">
+                                <template v-if="codeTab === 'html'">
                                     <pre class="whitespace-pre-wrap"><code id="code-list-html">&lt;div id="ppid-list" style="background:#fff; border-radius:15px; border:1px solid #eee; overflow:hidden;"&gt;Memuat...&lt;/div&gt;
 &lt;script&gt;
   fetch('https://ppidkab.sinjaikab.go.id/rss/generate?limit=10').then(res => res.text()).then(xml => {
@@ -329,9 +319,9 @@ $this->load->view('rss_view', $data);
   });
 &lt;/script&gt;</code></pre>
                                 </template>
-                                <template x-if="codeTab === 'php'"><pre class="whitespace-pre-wrap"><code id="code-list-php">// PHP List Code...</code></pre></template>
-                                <template x-if="codeTab === 'laravel'"><pre class="whitespace-pre-wrap"><code id="code-list-laravel">// Laravel List Code...</code></pre></template>
-                                <template x-if="codeTab === 'ci'"><pre class="whitespace-pre-wrap"><code id="code-list-ci">// CI List Code...</code></pre></template>
+                                <template v-if="codeTab === 'php'"><pre class="whitespace-pre-wrap"><code id="code-list-php">// PHP List Code...</code></pre></template>
+                                <template v-if="codeTab === 'laravel'"><pre class="whitespace-pre-wrap"><code id="code-list-laravel">// Laravel List Code...</code></pre></template>
+                                
                             </div>
                         </div>
                     </div>
