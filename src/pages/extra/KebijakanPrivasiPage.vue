@@ -249,7 +249,7 @@
                             </div>
                             <div>
                                 <span class="block text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">Alamat Kantor</span>
-                                <span class="text-white font-medium">{{ profilData?.address || 'Kabupaten Sinjai' }}</span>
+                                <span class="text-white font-medium">{{ profilData?.address || 'Jl. Persatuan Raya No. 101 Kec. Sinjai Utara, Kabupaten Sinjai' }}</span>
                             </div>
                         </li>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
@@ -268,7 +268,7 @@
                                 </div>
                                 <div>
                                     <span class="block text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">Telepon</span>
-                                    <a href="tel:0482-21432" class="text-white font-medium hover:text-blue-400 transition-colors">0482-21432</a>
+                                    <a :href="`tel:${profilData?.phone || '0482-21432'}`" class="text-white font-medium hover:text-blue-400 transition-colors">{{ profilData?.phone || '0482-21432' }}</a>
                                 </div>
                             </li>
                         </div>
@@ -278,8 +278,8 @@
                             </div>
                             <div>
                                 <span class="block text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">WhatsApp Helpdesk</span>
-                                <a href="https://wa.me/6285156878911" target="_blank" class="text-white text-xl font-bold hover:text-green-400 transition-colors flex items-center gap-2">
-                                    0851-5687-8911 <i class="fas fa-external-link-alt text-sm opacity-50"></i>
+                                <a :href="`https://wa.me/62${(profilData?.phone || '085156878911').replace(/[^0-9]/g, '').replace(/^0/, '')}`" target="_blank" class="text-white text-xl font-bold hover:text-green-400 transition-colors flex items-center gap-2">
+                                    {{ profilData?.phone || '0851-5687-8911' }} <i class="fas fa-external-link-alt text-sm opacity-50"></i>
                                 </a>
                             </div>
                         </li>
