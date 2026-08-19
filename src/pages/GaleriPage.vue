@@ -2,6 +2,7 @@
   <div class="galeri-page">
     <PageHeader title="Galeri PPID" />
     <div class="container mx-auto px-4 py-8">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.galeri()" class="mb-6" />
       <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <LoadingSkeleton v-for="i in 8" :key="i" class="h-64 w-full rounded-xl" />
       </div>
@@ -19,6 +20,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

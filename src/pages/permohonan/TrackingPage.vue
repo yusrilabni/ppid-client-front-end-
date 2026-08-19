@@ -2,6 +2,7 @@
   <div class="tracking-page">
     <PageHeader title="Lacak Permohonan" />
     <div class="container mx-auto px-4 py-12 max-w-2xl">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.trackingPage()" class="mb-6" />
       <div class="bg-white rounded-xl shadow-lg p-8 border">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Cek Status Permohonan Anda</h2>
         
@@ -64,6 +65,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/services/api'

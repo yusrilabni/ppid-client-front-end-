@@ -2,6 +2,7 @@
   <div class="kontak-page">
     <PageHeader title="Hubungi Kami" />
     <div class="container mx-auto px-4 py-12 max-w-6xl">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.kontak()" class="mb-6" />
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         
         <!-- Info Kontak -->
@@ -95,6 +96,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

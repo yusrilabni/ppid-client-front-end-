@@ -2,6 +2,7 @@
   <div class="sop-layanan-page">
     <PageHeader title="SOP Layanan Informasi Publik" />
     <div class="container mx-auto px-4 py-12 max-w-5xl">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.sopLayanan()" class="mb-6" />
       <div v-if="loading" class="space-y-4">
         <LoadingSkeleton v-for="i in 4" :key="i" class="h-24 w-full rounded-lg" />
       </div>
@@ -28,6 +29,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

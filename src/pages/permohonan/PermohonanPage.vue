@@ -2,6 +2,7 @@
   <div class="permohonan-page">
     <PageHeader title="Permohonan Informasi Publik" />
     <div class="container mx-auto px-4 py-8 max-w-3xl">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.permohonanPage()" class="mb-6" />
       <div class="bg-white rounded-xl shadow-lg p-6 md:p-10 border border-gray-100">
         
         <div v-if="success" class="bg-green-50 text-green-700 p-6 rounded-lg mb-8 text-center border border-green-200">
@@ -101,6 +102,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref } from 'vue'
 import api from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

@@ -2,6 +2,7 @@
   <div class="statistik-page">
     <PageHeader title="Statistik Layanan Informasi" />
     <div class="container mx-auto px-4 py-12 max-w-6xl">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.statistik()" class="mb-6" />
       <div v-if="loading" class="space-y-8">
         <LoadingSkeleton class="h-32 w-full rounded-xl" />
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -74,6 +75,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

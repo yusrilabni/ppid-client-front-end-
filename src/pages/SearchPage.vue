@@ -2,6 +2,7 @@
   <div class="search-page bg-slate-50 min-h-screen">
     <PageHeader title="Hasil Pencarian" />
     <div class="container mx-auto px-4 py-12">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.search(searchQuery)" class="mb-6" />
       <div class="flex flex-col lg:flex-row gap-8">
         
         <!-- Main Content (Informasi & Standar Layanan) -->
@@ -166,6 +167,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'

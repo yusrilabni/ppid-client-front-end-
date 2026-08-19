@@ -2,6 +2,7 @@
   <div class="standar-layanan-page">
     <PageHeader title="Standar Layanan PPID" />
     <div class="container mx-auto px-4 py-8">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.standarLayanan()" class="mb-6" />
       <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <LoadingSkeleton v-for="i in 6" :key="i" class="h-40 w-full rounded-lg" />
       </div>
@@ -26,6 +27,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

@@ -2,6 +2,7 @@
   <div class="regulasi-page">
     <PageHeader title="Regulasi" />
     <div class="container mx-auto px-4 py-8">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.regulasi()" class="mb-6" />
       <div v-if="loading" class="space-y-4">
         <LoadingSkeleton v-for="i in 5" :key="i" class="h-20 w-full rounded-lg" />
       </div>
@@ -43,6 +44,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

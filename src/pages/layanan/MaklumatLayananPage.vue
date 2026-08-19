@@ -2,6 +2,7 @@
   <div class="maklumat-layanan-page">
     <PageHeader title="Maklumat Layanan" />
     <div class="container mx-auto px-4 py-12 max-w-4xl">
+      <Breadcrumbs :breadcrumbs="getBreadcrumbs.maklumatLayanan()" class="mb-6" />
       <div v-if="loading" class="bg-white rounded-2xl shadow-xl p-8 border">
         <LoadingSkeleton class="h-64 w-full" />
       </div>
@@ -26,6 +27,9 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
+
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'

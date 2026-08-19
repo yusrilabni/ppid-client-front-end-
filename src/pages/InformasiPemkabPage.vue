@@ -3,13 +3,9 @@
     <div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 pt-6 md:pt-10 pb-24 overflow-hidden">
         <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
         <div class="container max-w-6xl mx-auto px-4 relative z-10 text-center">
-            <div class="flex flex-wrap items-center justify-start gap-y-2 space-x-2 md:space-x-3 text-blue-200 text-xs md:text-sm mb-6 font-medium w-full text-left">
-                <router-link to="/" class="hover:text-white transition-colors flex items-center"><i class="fas fa-home mr-1"></i> Beranda</router-link>
-                <i class="fas fa-chevron-right text-[10px] opacity-50"></i>
-                <span class="text-white opacity-80 flex items-center"><i class="fas fa-layer-group mr-1"></i> Transparansi</span>
-                <i class="fas fa-chevron-right text-[10px] opacity-50"></i>
-                <span class="text-white opacity-80 flex items-center"><i class="fas fa-file-pdf mr-1"></i> Informasi Pemkab</span>
-            </div>
+            <!-- Breadcrumbs -->
+            <Breadcrumbs :breadcrumbs="getBreadcrumbs.informasiPemkab()" theme="dark" />
+
 
             <div class="flex justify-center items-center mb-4">
                 <div class="w-full relative">
@@ -257,6 +253,8 @@
 </template>
 
 <script setup>
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
