@@ -105,8 +105,8 @@ const menus = [
     children: [
       { title: 'Permohonan Informasi', url: '/laporan/permohonan', icon: 'file-signature' },
       { title: 'Survei', url: '/laporan/survei', icon: 'poll' },
-      { title: 'Laporan PPID', url: '/laporan/ppid', icon: 'file-invoice' },
-      { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'file-invoice' }
+      { title: 'Laporan PPID', url: '/laporan/ppid', icon: 'chart-line' },
+      { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'file-pdf' }
     ]
   },
   { title: 'LHKPN', url: '/lhkpn', icon: 'file-invoice-dollar', children: [] },
