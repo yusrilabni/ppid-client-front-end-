@@ -387,9 +387,9 @@ const informasiItems = [
                         </span>
                       </div>
                       
-                      <a :href="info.url || getStorageUrl(info.file)" target="_blank" :class="['w-11 h-11 rounded-2xl bg-gray-900 text-white flex items-center justify-center transition-all shadow-lg active:scale-90 group/btn', getCardTheme(info.category).bg600Hover]">
+                      <router-link :to="`/informasi/detail/${info.slug}`" :class="['w-11 h-11 rounded-2xl bg-gray-900 text-white flex items-center justify-center transition-all shadow-lg active:scale-90 group/btn', getCardTheme(info.category).bg600Hover]">
                         <i data-lucide="arrow-up-right" class="w-5 h-5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform"></i>
-                      </a>
+                      </router-link>
                     </div>
                   </div>
                 </div>
