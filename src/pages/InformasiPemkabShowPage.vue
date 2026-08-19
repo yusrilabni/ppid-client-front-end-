@@ -7,6 +7,17 @@
         </div>
     </div>
 
+    <div v-else-if="isError" class="min-h-screen flex items-center justify-center bg-gray-50">
+        <div class="text-center p-8 bg-white rounded-2xl shadow-xl max-w-md mx-4">
+            <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-6"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">Dokumen Tidak Ditemukan</h2>
+            <p class="text-gray-600 mb-8">Maaf, dokumen yang Anda cari tidak tersedia, ditarik, atau terjadi kesalahan pada server.</p>
+            <router-link to="/transparansi/informasi-pemkab" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
+            </router-link>
+        </div>
+    </div>
+
     <div v-else-if="dokumen" class="w-full">
         <div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 pt-6 md:pt-10 pb-24 overflow-hidden">
             <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
@@ -208,9 +219,10 @@ const getDownloadUrl = (dokumen) => {
   return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
 }
 
-const { data: dokumen, isLoading } = useQuery({
+const { data: dokumen, isLoading, isError } = useQuery({
   queryKey: ['informasi-pemkab', slug],
-  queryFn: fetchDokumen
+  queryFn: fetchDokumen,
+  retry: false
 })
 
 const isImage = (path) => {
