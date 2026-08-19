@@ -1,0 +1,437 @@
+<template>
+<div>
+
+
+
+
+
+<div class="bg-gray-50 py-12">
+    <div class="container mx-auto px-4 max-w-6xl">
+        {{-- Header --}}
+        <div class="text-center mb-12">
+            <div class="inline-block p-3 bg-orange-100 rounded-2xl mb-4 text-orange-600 shadow-sm">
+                <i class="fas fa-rss text-3xl"></i>
+            </div>
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight uppercase">RSS FEED & INTEGRASI SISTEM</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Dokumentasi lengkap penggunaan Feed XML untuk sindikasi konten otomatis ke platform lain.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {{-- Main Column (Kiri) --}}
+            <div class="lg:col-span-2 space-y-8 text-gray-800">
+                
+                {{-- 1. Apa itu RSS --}}
+                <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 relative overflow-hidden text-left">
+                    <div class="absolute top-0 right-0 p-4 opacity-5">
+                        <i class="fas fa-rss text-9xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-4 flex items-center text-blue-600">
+                        <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span> Apa itu RSS Feed?
+                    </h2>
+                    <p class="text-gray-600 text-sm leading-relaxed relative z-10">
+                        RSS (Really Simple Syndication) adalah teknologi standar yang memungkinkan Anda berlangganan konten dari website kami secara otomatis. Setiap kali admin PPID melakukan pembaruan informasi, URL RSS ini akan langsung memperbarui datanya sehingga platform Anda selalu mendapatkan konten terkini tanpa perlu pemantauan manual secara terus-menerus. Ini adalah cara tercepat untuk sinkronisasi data antar website pemerintah dan portal publik.
+                    </p>
+                </section>
+
+                {{-- 2. Struktur Data Detail --}}
+                <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-left">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center text-green-600">
+                        <span class="w-2 h-8 bg-green-500 rounded-full mr-3"></span> Struktur Data Detail
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p class="text-blue-600 font-bold font-mono">&lt;title&gt;</p>
+                            <p class="text-gray-500 mt-1">Judul resmi dokumen atau pengumuman yang ditampilkan pada feed.</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p class="text-blue-600 font-bold font-mono">&lt;organization&gt;</p>
+                            <p class="text-gray-500 mt-1">Nama Dinas / Instansi pemilik data yang menerbitkan informasi.</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p class="text-blue-600 font-bold font-mono">&lt;status&gt;</p>
+                            <p class="text-gray-500 mt-1">Kondisi dokumen (BERLAKU / ARSIP) untuk validasi data publik.</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p class="text-blue-600 font-bold font-mono">&lt;category&gt;</p>
+                            <p class="text-gray-500 mt-1">Klasifikasi data informasi berdasarkan standar PPID Kabupaten Sinjai.</p>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- 3. Kustomisasi URL Feed (Filter) --}}
+                <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-left">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center text-orange-600">
+                        <span class="w-2 h-8 bg-orange-500 rounded-full mr-3"></span> Kustomisasi URL Feed (Filter)
+                    </h2>
+                    <p class="text-sm text-gray-600 mb-6">Gunakan parameter di bawah ini untuk mendapatkan data yang spesifik melalui URL:</p>
+                    <div class="bg-gray-900 rounded-2xl p-6 text-[11px] font-mono text-gray-300 space-y-4 border-l-4 border-orange-500 shadow-xl">
+                        <div>
+                            <p class="text-blue-400 font-bold mb-1">// Filter per Instansi (Contoh: Diskominfo)</p>
+                            <code class="break-all text-white">https://ppidkab.sinjaikab.go.id/rss/generate?unit_id=730714</code>
+                        </div>
+                        <div>
+                            <p class="text-blue-400 font-bold mb-1">// Filter per Tahun (Contoh: 2024)</p>
+                            <code class="break-all text-white">https://ppidkab.sinjaikab.go.id/rss/generate?year=2024</code>
+                        </div>
+                        <div>
+                            <p class="text-blue-400 font-bold mb-1">// Filter per Jumlah Data (Contoh: Limit 15 Data)</p>
+                            <code class="break-all text-white">https://ppidkab.sinjaikab.go.id/rss/generate?limit=15</code>
+                        </div>
+                        <div>
+                            <p class="text-blue-400 font-bold mb-1">// Filter per Kategori (Contoh: Informasi Berkala)</p>
+                            <code class="break-all text-white">https://ppidkab.sinjaikab.go.id/rss/generate?category=Informasi Berkala</code>
+                        </div>
+                        <div class="pt-2 border-t border-white/10">
+                            <p class="text-orange-400 font-black mb-1 uppercase tracking-widest text-[10px]">// Gabungan 4 Filter (Contoh: Dinkes, Tahun 2024, Limit 5, Kategori Setiap Saat):</p>
+                            <code class="break-all text-white">https://ppidkab.sinjaikab.go.id/rss/generate?unit_id=730701&year=2024&limit=5&category=Informasi Setiap Saat</code>
+                        </div>
+                    </div>
+
+                    <div x-data="{ open: false }" class="mt-6">
+                        <button @click="open = !open" class="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center">
+                            <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-list-ul'"></i> 
+                            <span class="ml-2" x-text="open ? 'Sembunyikan Daftar ID OPD' : 'Lihat Daftar ID OPD Semua Instansi'"></span>
+                        </button>
+                        <div x-show="open" x-transition class="mt-4 border-t pt-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[10px]">
+                                <template v-for="org in organizations" :key="org.id">
+                                    <div class="flex justify-between p-2 bg-gray-50 rounded-lg hover:bg-blue-50 transition-all">
+                                        <span class="text-gray-700 font-medium truncate pr-4">{{ org.name }}</span>
+                                        <span class="text-blue-600 font-bold font-mono">ID: {{ org.unit_id }}</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            {{-- Sidebar (Kanan) --}}
+            <div class="space-y-8">
+                
+                {{-- A. Panduan WordPress --}}
+                <section class="bg-blue-600 rounded-[2rem] shadow-lg p-7 text-white relative overflow-hidden group text-left">
+                    <i class="fab fa-wordpress absolute -bottom-4 -right-4 text-9xl opacity-10 group-hover:scale-110 transition-transform duration-700"></i>
+                    <h3 class="text-lg font-black mb-5 uppercase tracking-widest flex items-center border-b border-white/20 pb-3">
+                        <i class="fab fa-wordpress mr-3 text-2xl"></i> WordPress
+                    </h3>
+                    <div class="space-y-5 text-[11px] opacity-95 leading-relaxed font-medium">
+                        <div class="flex items-start">
+                            <span class="bg-white text-blue-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">1</span>
+                            <p>Buka Editor Post/Halaman Anda dan aktifkan blok editor terbaru.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-blue-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">2</span>
+                            <p>Klik tombol <strong>(+)</strong> lalu cari blok bernama <strong>"RSS"</strong> di kolom pencarian.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-blue-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">3</span>
+                            <p>Masukkan <strong>URL Feed</strong> yang sudah dikustomisasi ke kolom input RSS WordPress.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-blue-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">4</span>
+                            <p>Klik <strong>"Gunakan URL"</strong> dan tunggu data memuat secara otomatis dari server kami.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-blue-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">5</span>
+                            <p>Atur tata letak pada sidebar pengaturan blok agar sesuai dengan estetika situs Anda.</p>
+                        </div>
+                        
+                        <div class="bg-black/20 p-4 rounded-xl border border-white/10 mt-3">
+                            <p class="font-black mb-2 text-[9px] uppercase tracking-widest text-blue-200">Tips Konfigurasi:</p>
+                            <ul class="space-y-2 text-[10px]">
+                                <li class="flex items-center"><i class="fas fa-check-circle mr-2 text-green-400"></i> Aktifkan opsi "Tampilkan Ringkasan"</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle mr-2 text-green-400"></i> Aktifkan opsi "Tampilkan Tanggal"</li>
+                                <li class="flex items-center"><i class="fas fa-check-circle mr-2 text-green-400"></i> Pilih mode List untuk hemat ruang</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- B. Blogger --}}
+                <section class="bg-orange-600 rounded-[2rem] shadow-lg p-7 text-white relative overflow-hidden group text-left">
+                    <i class="fab fa-google absolute -bottom-4 -right-4 text-9xl opacity-10 group-hover:scale-110 transition-transform duration-700"></i>
+                    <h3 class="text-lg font-black mb-5 uppercase tracking-widest flex items-center border-b border-white/20 pb-3">
+                        <i class="fab fa-google mr-3 text-xl"></i> Blogger
+                    </h3>
+                    <div class="space-y-5 text-[11px] opacity-95 leading-relaxed font-medium">
+                        <div class="flex items-start">
+                            <span class="bg-white text-orange-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">1</span>
+                            <p>Masuk ke dashboard utama dan pilih menu <strong>Tata Letak (Layout)</strong>.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-orange-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">2</span>
+                            <p>Klik link <strong>Tambahkan Gadget</strong> di bagian Sidebar atau Footer blog Anda.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-orange-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">3</span>
+                            <p>Pilih gadget <strong>"Feed"</strong> dari daftar pop-up gadget Blogger yang tersedia.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-orange-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">4</span>
+                            <p>Tempelkan <strong>URL RSS Feed</strong> pilihan Anda, lalu klik "Lanjutkan".</p>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-white text-orange-600 w-5 h-5 rounded-md flex items-center justify-center mr-3 flex-shrink-0 font-black">5</span>
+                            <p>Berikan judul gadget dan simpan untuk melihat hasilnya di halaman publik.</p>
+                        </div>
+                        
+                        <div class="bg-black/20 p-4 rounded-xl border border-white/10 mt-3">
+                            <p class="text-[10px] italic leading-relaxed">Blogger secara otomatis akan memperbarui daftar informasi terbaru setiap kali ada pembaruan di portal PPID, menjaga blog Anda tetap relevan tanpa usaha ekstra.</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        {{-- MOTHER TABS SECTION --}}
+        <div class="mt-12" x-data="rssCodeHandler()">
+            <section class="bg-white rounded-[3.5rem] shadow-2xl border border-gray-100 p-8 md:p-14 overflow-hidden text-gray-800 text-left">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-black flex items-center mb-6 tracking-tight">
+                        <span class="w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-600 text-white rounded-2xl flex items-center justify-center mr-5 shadow-xl">
+                            <i class="fas fa-magic"></i>
+                        </span>
+                        Contoh Kode Siap Pakai
+                    </h2>
+                </div>
+
+                {{-- Tab Selection --}}
+                <div class="flex space-x-6 mb-10 border-b-2 border-gray-100">
+                    <button @click="motherTab = 'card'; showPreview = false" :class="motherTab === 'card' ? 'text-blue-600 border-b-4 border-blue-600 -mb-[2px]' : 'text-gray-400'" class="pb-4 text-xl font-black uppercase tracking-tighter">Kartu (Grid)</button>
+                    <button @click="motherTab = 'list'; showPreview = false" :class="motherTab === 'list' ? 'text-blue-600 border-b-4 border-blue-600 -mb-[2px]' : 'text-gray-400'" class="pb-4 text-xl font-black uppercase tracking-tighter">Daftar (List)</button>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-10 bg-gray-100 p-1.5 rounded-2xl w-fit">
+                    <button @click="codeTab = 'html'; showPreview = false" :class="codeTab === 'html' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">HTML & JS</button>
+                    <button @click="codeTab = 'php'; showPreview = false" :class="codeTab === 'php' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">PHP Native</button>
+                    <button @click="codeTab = 'laravel'; showPreview = false" :class="codeTab === 'laravel' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">Laravel Blade</button>
+                    <button @click="codeTab = 'ci'; showPreview = false" :class="codeTab === 'ci' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">CodeIgniter</button>
+                </div>
+
+                {{-- CODE BOX --}}
+                <div class="bg-gray-900 rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col min-h-[550px] border-8 border-gray-800">
+                    {{-- Header Kotak Kode (Dengan Tombol di Kanan) --}}
+                    <div class="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500/40"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/40"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/40"></div>
+                        </div>
+                        {{-- Tombol Salin dan Preview di Header Kanan --}}
+                        <div class="flex space-x-3">
+                            <button @click="copyCode()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg flex items-center">
+                                <i class="fas fa-copy mr-2"></i> SALIN
+                            </button>
+                            {{-- Logic Toggle: Jika pratinjau aktif, klik tombol akan menutupnya. Jika tidak, akan memuat pratinjau. --}}
+                            <button @click="showPreview ? showPreview = false : runPreview()" class="bg-orange-500 hover:bg-orange-600 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg" :title="showPreview ? 'Lihat Kode' : 'Live Preview'">
+                                <i class="fas text-sm" :class="loading ? 'fa-spinner fa-spin' : (showPreview ? 'fa-code' : 'fa-eye')"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relative flex-grow">
+                        {{-- PREVIEW AREA --}}
+                        <div x-show="showPreview" class="bg-[#fcfcfc] p-8 md:p-14 h-full min-h-[450px] overflow-y-auto text-sans">
+                            <div id="preview-area" class="w-full"></div>
+                        </div>
+
+                        {{-- CODE AREA --}}
+                        <div x-show="!showPreview" class="p-8 md:p-12 font-mono text-[13px] leading-relaxed text-blue-100/80 overflow-x-auto">
+                            <div x-show="motherTab === 'card'">
+                                <template x-if="codeTab === 'html'">
+                                    <pre class="whitespace-pre-wrap"><code id="code-card-html">&lt;style&gt;
+  .ppid-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; font-family: sans-serif; }
+  .ppid-card { background: #fff; border-radius: 20px; padding: 25px; border: 1px solid #eee; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+  .ppid-title { font-weight: 800; color: #1a1a1a; text-decoration: none; font-size: 15px; display: block; margin: 10px 0; }
+  @media (max-width: 768px) { .ppid-grid { grid-template-columns: 1fr; } }
+&lt;/style&gt;
+&lt;div id="ppid-grid" class="ppid-grid"&gt;Memuat data...&lt;/div&gt;
+&lt;script&gt;
+  // TIPS: Ganti nilai 'category' untuk filter spesifik: 
+  // 'Informasi Berkala', 'Informasi Setiap Saat', 'Informasi Serta Merta', 'Informasi Dikecualikan'
+  const RSS_URL = 'https://ppidkab.sinjaikab.go.id/rss/generate?limit=6&category=Informasi Berkala';
+  
+  fetch(RSS_URL).then(res => res.text()).then(xmlString => {
+    const xml = new DOMParser().parseFromString(xmlString, "text/xml");
+    const items = xml.querySelectorAll("item");
+    let html = '';
+    items.forEach(el => {
+      html += `&lt;div class="ppid-card"&gt;
+                 &lt;div style="display:flex; justify-content:space-between;"&gt;
+                   &lt;small style="color:#0052FF; font-weight:bold;"&gt;🏛️ ${el.querySelector("organization").textContent}&lt;/small&gt;
+                   &lt;small style="color:#666; background:#eee; padding:2px 8px; border-radius:5px;"&gt;${el.querySelector("category").textContent}&lt;/small&gt;
+                 &lt;/div&gt;
+                 &lt;a href="${el.querySelector("link").textContent}" target="_blank" class="ppid-title"&gt;${el.querySelector("title").textContent}&lt;/a&gt;
+                 &lt;small style="color:#999"&gt;📅 ${new Date(el.querySelector("pubDate").textContent).toLocaleDateString('id-ID')}&lt;/small&gt;
+               &lt;/div&gt;`;
+    });
+    document.getElementById("ppid-grid").innerHTML = html;
+  });
+&lt;/script&gt;</code></pre>
+                                </template>
+                                <template x-if="codeTab === 'php'"><pre class="whitespace-pre-wrap"><code id="code-card-php">&lt;?php
+// Ganti 'category' untuk filter: 'Informasi Berkala', 'Informasi Setiap Saat', dll.
+$url = "https://ppidkab.sinjaikab.go.id/rss/generate?unit_id=730714&limit=6&category=Informasi Berkala";
+$rss = simplexml_load_file($url);
+echo "&lt;div style='display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;'&gt;";
+foreach ($rss->channel->item as $info) {
+    echo "&lt;div style='background:#fff; padding:20px; border-radius:15px; border:1px solid #eee;'&gt;
+            &lt;div style='color:#0052FF; font-weight:bold; font-size:10px;'&gt;🏛️ {$info->organization}&lt;/div&gt;
+            &lt;div style='background:#eee; padding:2px 8px; border-radius:5px; display:inline-block; font-size:10px;'&gt;📂 {$info->category}&lt;/div&gt;
+            &lt;div style='margin:10px 0;'&gt;&lt;strong&gt;{$info->title}&lt;/strong&gt;&lt;/div&gt;
+          &lt;/div&gt;";
+}
+echo "&lt;/div&gt;";
+?&gt;</code></pre></template>
+                                <template x-if="codeTab === 'laravel'"><pre class="whitespace-pre-wrap"><code id="code-card-laravel">// 1. Controller
+$xml = simplexml_load_file("https://ppidkab.sinjaikab.go.id/rss/generate?limit=6");
+return view('your_view', ['feeds' => $xml->channel->item]);
+
+// 2. View (.blade.php)
+&lt;div class="grid grid-cols-3 gap-6"&gt;
+    &commat;foreach($feeds as $item)
+        &lt;div class="card"&gt;
+            &lt;h4&gt;&lbrace;&lbrace; $item->title &rbrace;&rbrace;&lt;/h4&gt;
+            &lt;p&gt;&lbrace;&lbrace; $item->organization &rbrace;&rbrace;&lt;/p&gt;
+        &lt;/div&gt;
+    &commat;endforeach
+&lt;/div&gt;</code></pre></template>
+                                <template x-if="codeTab === 'ci'"><pre class="whitespace-pre-wrap"><code id="code-card-ci">// 1. Controller
+$url = "https://ppidkab.sinjaikab.go.id/rss/generate?limit=6";
+$data['feeds'] = simplexml_load_file($url);
+$this->load->view('rss_view', $data);
+
+// 2. View (rss_view.php)
+&lt;?php foreach ($feeds->channel->item as $item): ?&gt;
+    &lt;div class="card"&gt;
+        &lt;h5&gt;&lt;?= $item->title ?&gt;&lt;/h5&gt;
+    &lt;/div&gt;
+&lt;?php endforeach; ?&gt;</code></pre></template>
+                            </div>
+
+                            <div x-show="motherTab === 'list'">
+                                <template x-if="codeTab === 'html'">
+                                    <pre class="whitespace-pre-wrap"><code id="code-list-html">&lt;div id="ppid-list" style="background:#fff; border-radius:15px; border:1px solid #eee; overflow:hidden;"&gt;Memuat...&lt;/div&gt;
+&lt;script&gt;
+  fetch('https://ppidkab.sinjaikab.go.id/rss/generate?limit=10').then(res => res.text()).then(xml => {
+    const data = new DOMParser().parseFromString(xml, "text/xml");
+    const items = data.querySelectorAll("item");
+    let html = '';
+    items.forEach((el, index) => {
+      html += `&lt;div style="padding:15px 20px; border-bottom:1px solid #f5f5f5; display:flex; align-items:center; justify-content:space-between; font-family:sans-serif;"&gt;
+                 &lt;a href="${el.querySelector("link").textContent}" target="_blank" style="text-decoration:none; color:#333; font-weight:700;"&gt;${el.querySelector("title").textContent}&lt;/a&gt;
+                 &lt;span style="font-size:9px; font-weight:bold; padding:2px 10px; border-radius:20px; background:#eee;"&gt;${el.querySelector("status").textContent}&lt;/span&gt;
+               &lt;/div&gt;`;
+    });
+    document.getElementById("ppid-list").innerHTML = html;
+  });
+&lt;/script&gt;</code></pre>
+                                </template>
+                                <template x-if="codeTab === 'php'"><pre class="whitespace-pre-wrap"><code id="code-list-php">// PHP List Code...</code></pre></template>
+                                <template x-if="codeTab === 'laravel'"><pre class="whitespace-pre-wrap"><code id="code-list-laravel">// Laravel List Code...</code></pre></template>
+                                <template x-if="codeTab === 'ci'"><pre class="whitespace-pre-wrap"><code id="code-list-ci">// CI List Code...</code></pre></template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script>
+    function rssCodeHandler() {
+        return {
+            motherTab: 'card', codeTab: 'html', showPreview: false, loading: false,
+            get currentUrl() { return 'https://ppidkab.sinjaikab.go.id/rss/generate?unit_id=730714&limit=' + (this.motherTab === 'card' ? '6' : '10'); },
+            copyCode() {
+                const elId = `code-${this.motherTab}-${this.codeTab}`;
+                const el = document.getElementById(elId);
+                navigator.clipboard.writeText(el.innerText).then(() => alert('Kode Berhasil Disalin!'));
+            },
+            runPreview() {
+                this.loading = true; this.showPreview = true;
+                const target = document.getElementById('preview-area');
+                target.innerHTML = '<div style="padding:100px; text-align:center; color:#999; font-family:sans-serif;">Merender Pratinjau...</div>';
+                fetch(this.currentUrl).then(res => res.text()).then(xmlString => {
+                    const xml = new DOMParser().parseFromString(xmlString, "text/xml");
+                    const items = xml.querySelectorAll("item");
+                    let html = '';
+                    if(this.motherTab === 'card') {
+                        html = '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; font-family:sans-serif;">';
+                        items.forEach(el => {
+                            let status = el.querySelector('status').textContent;
+                            if (status === 'AKTIF') status = 'BERLAKU'; // Map AKTIF to BERLAKU
+                            
+                            const category = el.querySelector('category').textContent;
+                            const color = (status === 'BERLAKU') ? '#10b981' : '#ef4444';
+                            html += `<div style="background:#fff; border-radius:20px; padding:25px; border:1px solid #eee; box-shadow:0 10px 15px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                    <span style="font-size:10px; font-weight:900; color:#0052FF; text-transform:uppercase; letter-spacing:1px;">🏛️ ${el.querySelector('organization').textContent}</span>
+                                    <span style="font-size:9px; font-weight:900; padding:4px 12px; border-radius:8px; background:${color}10; color:${color}; border:1.5px solid ${color}20;">${status}</span>
+                                </div>
+                                <h4 style="font-weight:800; color:#111827; margin:0 0 10px 0; line-height:1.4; font-size:16px;">${el.querySelector('title').textContent}</h4>
+                                <div style="margin-bottom:15px;">
+                                    <span style="font-size:9px; font-weight:bold; color:#6b7280; background:#f3f4f6; padding:3px 10px; border-radius:6px; border:1px solid #e5e7eb;">📂 ${category}</span>
+                                </div>
+                                <div style="margin-top:auto; font-size:11px; color:#9ca3af; font-weight:600;">📅 ${new Date(el.querySelector('pubDate').textContent).toLocaleDateString('id-ID')}</div>
+                            </div>`;
+                        });
+                        html += '</div>';
+                    } else {
+                        html = '<div style="background:#fff; border-radius:15px; border:1px solid #eee; overflow:hidden; font-family:sans-serif;">';
+                        items.forEach((el, index) => {
+                            let status = el.querySelector('status').textContent;
+                            if (status === 'AKTIF') status = 'BERLAKU'; // Map AKTIF to BERLAKU
+
+                            const color = (status === 'BERLAKU') ? '#10b981' : '#ef4444';
+                            html += `<div style="padding:20px 30px; border-bottom:${index === items.length-1 ? 'none' : '1px solid #f5f5f5'}; display:flex; align-items:center; justify-content:space-between;">
+                                <div style="max-width:75%;">
+                                    <div style="font-size:10px; font-weight:900; color:#9ca3af; text-transform:uppercase; margin-bottom:6px;">🏛️ ${el.querySelector('organization').textContent}</div>
+                                    <h5 style="margin:0; font-weight:800; color:#333; font-size:14px; line-height:1.4;">${el.querySelector('title').textContent}</h5>
+                                </div>
+                                <span style="font-size:9px; font-weight:800; padding:2px 10px; border-radius:20px; background:${color}10; color:${color}; border:1.5px solid ${color}30;">${status}</span>
+                            </div>`;
+                        });
+                        html += '</div>';
+                    }
+                    target.innerHTML = html; this.loading = false;
+                });
+            }
+        };
+    }
+</script>
+
+
+</div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import api from '@/services/api';
+
+const profilData = ref({});
+const organizations = ref([]);
+
+onMounted(async () => {
+    try {
+        const res = await api.get('/profil');
+        if (res.data && res.data.data) {
+            profilData.value = res.data.data;
+        }
+    } catch (e) {
+        console.error(e);
+    }
+    
+    try {
+        const resUnits = await api.get('/units');
+        if (resUnits.data && resUnits.data.data) {
+            organizations.value = resUnits.data.data;
+        }
+    } catch (e) {
+        console.error(e);
+    }
+});
+</script>

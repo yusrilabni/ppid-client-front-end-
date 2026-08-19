@@ -105,20 +105,20 @@ onMounted(() => {
                           </router-link>
                       </li>
                       <li>
-                          <a href="/rss" target="_blank" class="hover:text-white flex items-center group">
+                          <router-link to="/rss" class="hover:text-white flex items-center group">
                               <div class="bg-orange-500/10 p-1.5 rounded mr-2 group-hover:bg-orange-500 transition-colors">
                                   <i class="fas fa-rss text-orange-500 group-hover:text-white text-[10px]"></i>
                               </div>
                               RSS Feed
-                          </a>
+                          </router-link>
                       </li>
                       <li>
-                          <a href="/widget" target="_blank" class="hover:text-white flex items-center group">
+                          <router-link to="/widget" class="hover:text-white flex items-center group">
                               <div class="bg-blue-500/10 p-1.5 rounded mr-2 group-hover:bg-blue-500 transition-colors">
                                   <i class="fas fa-plug text-blue-500 group-hover:text-white text-[10px]"></i>
                               </div>
                               Widget Informasi
-                          </a>
+                          </router-link>
                       </li>
                   </ul>
               </div>

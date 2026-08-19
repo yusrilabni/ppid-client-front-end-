@@ -51,6 +51,11 @@ import StatistikPage from '@/pages/StatistikPage.vue'
 // Admin Pages
 import AdminDashboard from '@/pages/admin/DashboardPage.vue'
 
+// Extra Pages
+import KebijakanPrivasiPage from '@/pages/extra/KebijakanPrivasiPage.vue'
+import RssPage from '@/pages/extra/RssPage.vue'
+import WidgetPage from '@/pages/extra/WidgetPage.vue'
+
 const routes = [
   {
     path: '/',
@@ -60,6 +65,10 @@ const routes = [
       { path: 'search', name: 'search', component: SearchPage },
       { path: 'login', name: 'login', component: LoginPage },
       { path: 'register', name: 'register', component: RegisterPage },
+      // Extra
+      { path: 'kebijakan-privasi', name: 'kebijakan-privasi', component: KebijakanPrivasiPage },
+      { path: 'rss', name: 'rss', component: RssPage },
+      { path: 'widget', name: 'widget', component: WidgetPage },
       // Information
       { path: 'informasi/:category', name: 'informasi.category', component: InformasiCategory },
       { path: 'informasi/detail/:slug', name: 'informasi.detail', component: InformasiDetail },
@@ -179,7 +188,10 @@ router.afterEach((to) => {
     'pbj.detail': 'Detail PBJ',
     'kontak': 'Kontak Kami',
     'statistik': 'Statistik',
-    'admin.dashboard': 'Dashboard Admin'
+    'admin.dashboard': 'Dashboard Admin',
+    'kebijakan-privasi': 'Kebijakan Privasi',
+    'rss': 'RSS Feed',
+    'widget': 'Widget Informasi'
   }
   
   let pageTitle = to.meta.title || titleMap[to.name]
