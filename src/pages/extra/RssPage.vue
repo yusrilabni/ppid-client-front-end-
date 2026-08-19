@@ -331,68 +331,7 @@ return view('your_view', ['feeds' => $xml->channel->item]);
     </div>
 </div>
 
-<script>
-    function rssCodeHandler() {
-        return {
-            motherTab: 'card', codeTab: 'html', showPreview: false, loading: false,
-            get currentUrl() { return 'https://ppidkab.sinjaikab.go.id/rss/generate?unit_id=730714&limit=' + (this.motherTab === 'card' ? '6' : '10'); },
-            copyCode() {
-                const elId = `code-${this.motherTab}-${this.codeTab}`;
-                const el = document.getElementById(elId);
-                navigator.clipboard.writeText(el.innerText).then(() => alert('Kode Berhasil Disalin!'));
-            },
-            runPreview() {
-                this.loading = true; this.showPreview = true;
-                const target = document.getElementById('preview-area');
-                target.innerHTML = '<div style="padding:100px; text-align:center; color:#999; font-family:sans-serif;">Merender Pratinjau...</div>';
-                fetch(this.currentUrl).then(res => res.text()).then(xmlString => {
-                    const xml = new DOMParser().parseFromString(xmlString, "text/xml");
-                    const items = xml.querySelectorAll("item");
-                    let html = '';
-                    if(this.motherTab === 'card') {
-                        html = '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; font-family:sans-serif;">';
-                        items.forEach(el => {
-                            let status = el.querySelector('status').textContent;
-                            if (status === 'AKTIF') status = 'BERLAKU'; // Map AKTIF to BERLAKU
-                            
-                            const category = el.querySelector('category').textContent;
-                            const color = (status === 'BERLAKU') ? '#10b981' : '#ef4444';
-                            html += `<div style="background:#fff; border-radius:20px; padding:25px; border:1px solid #eee; box-shadow:0 10px 15px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                                    <span style="font-size:10px; font-weight:900; color:#0052FF; text-transform:uppercase; letter-spacing:1px;">🏛️ ${el.querySelector('organization').textContent}</span>
-                                    <span style="font-size:9px; font-weight:900; padding:4px 12px; border-radius:8px; background:${color}10; color:${color}; border:1.5px solid ${color}20;">${status}</span>
-                                </div>
-                                <h4 style="font-weight:800; color:#111827; margin:0 0 10px 0; line-height:1.4; font-size:16px;">${el.querySelector('title').textContent}</h4>
-                                <div style="margin-bottom:15px;">
-                                    <span style="font-size:9px; font-weight:bold; color:#6b7280; background:#f3f4f6; padding:3px 10px; border-radius:6px; border:1px solid #e5e7eb;">📂 ${category}</span>
-                                </div>
-                                <div style="margin-top:auto; font-size:11px; color:#9ca3af; font-weight:600;">📅 ${new Date(el.querySelector('pubDate').textContent).toLocaleDateString('id-ID')}</div>
-                            </div>`;
-                        });
-                        html += '</div>';
-                    } else {
-                        html = '<div style="background:#fff; border-radius:15px; border:1px solid #eee; overflow:hidden; font-family:sans-serif;">';
-                        items.forEach((el, index) => {
-                            let status = el.querySelector('status').textContent;
-                            if (status === 'AKTIF') status = 'BERLAKU'; // Map AKTIF to BERLAKU
 
-                            const color = (status === 'BERLAKU') ? '#10b981' : '#ef4444';
-                            html += `<div style="padding:20px 30px; border-bottom:${index === items.length-1 ? 'none' : '1px solid #f5f5f5'}; display:flex; align-items:center; justify-content:space-between;">
-                                <div style="max-width:75%;">
-                                    <div style="font-size:10px; font-weight:900; color:#9ca3af; text-transform:uppercase; margin-bottom:6px;">🏛️ ${el.querySelector('organization').textContent}</div>
-                                    <h5 style="margin:0; font-weight:800; color:#333; font-size:14px; line-height:1.4;">${el.querySelector('title').textContent}</h5>
-                                </div>
-                                <span style="font-size:9px; font-weight:800; padding:2px 10px; border-radius:20px; background:${color}10; color:${color}; border:1.5px solid ${color}30;">${status}</span>
-                            </div>`;
-                        });
-                        html += '</div>';
-                    }
-                    target.innerHTML = html; this.loading = false;
-                });
-            }
-        };
-    }
-</script>
 
 
 </div>
@@ -414,11 +353,74 @@ const loading = ref(false);
 const currentUrl = ref('https://ppidkab.sinjaikab.go.id/rss/generate');
 
 const copyCode = () => {
-    // Copy code logic can be implemented later or just ignored
-    alert("Kode disalin!");
+    const elId = `code-${motherTab.value}-${codeTab.value}`;
+    const el = document.getElementById(elId);
+    if(el) {
+        navigator.clipboard.writeText(el.innerText).then(() => alert('Kode Berhasil Disalin!'));
+    }
 };
 const runPreview = () => {
+    loading.value = true;
     showPreview.value = true;
+    const target = document.getElementById('preview-area');
+    if(!target) return;
+    target.innerHTML = '<div style="padding:100px; text-align:center; color:#999; font-family:sans-serif;">Merender Pratinjau...</div>';
+    
+    let url = 'https://ppidkab.sinjaikab.go.id/rss/generate?unit_id=730714&limit=' + (motherTab.value === 'card' ? '6' : '10');
+    
+    fetch(url).then(res => res.text()).then(xmlString => {
+        const xml = new DOMParser().parseFromString(xmlString, "text/xml");
+        const items = xml.querySelectorAll("item");
+        let html = '';
+        if(motherTab.value === 'card') {
+            html = '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; font-family:sans-serif;">';
+            items.forEach(el => {
+                let status = el.querySelector('status') ? el.querySelector('status').textContent : '';
+                if (status === 'AKTIF') status = 'BERLAKU'; 
+                
+                const category = el.querySelector('category') ? el.querySelector('category').textContent : '';
+                const color = (status === 'BERLAKU') ? '#10b981' : '#ef4444';
+                
+                const title = el.querySelector('title') ? el.querySelector('title').textContent : '';
+                const org = el.querySelector('organization') ? el.querySelector('organization').textContent : '';
+                const pubDate = el.querySelector('pubDate') ? new Date(el.querySelector('pubDate').textContent).toLocaleDateString('id-ID') : '';
+                
+                html += `<div style="background:#fff; border-radius:20px; padding:25px; border:1px solid #eee; box-shadow:0 10px 15px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <span style="font-size:10px; font-weight:900; color:#0052FF; text-transform:uppercase; letter-spacing:1px;">🏛️ ${org}</span>
+                        <span style="font-size:9px; font-weight:900; padding:4px 12px; border-radius:8px; background:${color}10; color:${color}; border:1.5px solid ${color}20;">${status}</span>
+                    </div>
+                    <h4 style="font-weight:800; color:#111827; margin:0 0 10px 0; line-height:1.4; font-size:16px;">${title}</h4>
+                    <div style="margin-bottom:15px;">
+                        <span style="font-size:9px; font-weight:bold; color:#6b7280; background:#f3f4f6; padding:3px 10px; border-radius:6px; border:1px solid #e5e7eb;">📂 ${category}</span>
+                    </div>
+                    <div style="margin-top:auto; font-size:11px; color:#9ca3af; font-weight:600;">📅 ${pubDate}</div>
+                </div>`;
+            });
+            html += '</div>';
+        } else {
+            html = '<div style="background:#fff; border-radius:15px; border:1px solid #eee; overflow:hidden; font-family:sans-serif;">';
+            items.forEach((el, index) => {
+                let status = el.querySelector('status') ? el.querySelector('status').textContent : '';
+                if (status === 'AKTIF') status = 'BERLAKU'; 
+
+                const color = (status === 'BERLAKU') ? '#10b981' : '#ef4444';
+                const title = el.querySelector('title') ? el.querySelector('title').textContent : '';
+                const org = el.querySelector('organization') ? el.querySelector('organization').textContent : '';
+
+                html += `<div style="padding:20px 30px; border-bottom:${index === items.length-1 ? 'none' : '1px solid #f5f5f5'}; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="max-width:75%;">
+                        <div style="font-size:10px; font-weight:900; color:#9ca3af; text-transform:uppercase; margin-bottom:6px;">🏛️ ${org}</div>
+                        <h5 style="margin:0; font-weight:800; color:#333; font-size:14px; line-height:1.4;">${title}</h5>
+                    </div>
+                    <span style="font-size:9px; font-weight:800; padding:2px 10px; border-radius:20px; background:${color}10; color:${color}; border:1.5px solid ${color}30;">${status}</span>
+                </div>`;
+            });
+            html += '</div>';
+        }
+        target.innerHTML = html; 
+        loading.value = false;
+    });
 };
 
 
