@@ -8,7 +8,7 @@ const truncate = (text, length) => {
 export const getBreadcrumbs = {
     dip: (year) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'DIP Tahun ' + (year || ''), url: '#', icon: 'fas fa-calendar-alt' }
+        { title: 'DIP ' + (year || ''), url: '#', icon: 'fas fa-file-alt' }
     ],
     dipUnit: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
@@ -21,16 +21,16 @@ export const getBreadcrumbs = {
     ],
     kategoriInformasi: (categoryName, categoryIcon) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: categoryName || 'Informasi Publik', url: '', icon: categoryIcon || 'fas fa-info-circle' }
+        { title: categoryName || 'Jenis Informasi', url: '', icon: categoryIcon || 'fas fa-folder' }
     ],
     detailInformasi: (categoryName, categorySlug, categoryIcon, title) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: categoryName || 'Kategori', url: `/informasi/${categorySlug}`, icon: categoryIcon || 'fas fa-folder-open' },
+        { title: categoryName || 'Jenis Informasi', url: `/informasi/${categorySlug}`, icon: categoryIcon || 'fas fa-folder' },
         { title: truncate(title, 25), url: '', icon: 'fas fa-file-alt' }
     ],
     laporanPpid: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Laporan PPID', url: '', icon: 'fas fa-file-invoice' }
+        { title: 'Laporan PPID', url: '', icon: 'fas fa-chart-line' }
     ],
     laporanPermohonan: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
@@ -38,11 +38,11 @@ export const getBreadcrumbs = {
     ],
     standarLayananDetail: (title, categoryIcon) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: title || 'Standar Layanan', url: '#', icon: categoryIcon || 'fas fa-file-alt' }
+        { title: title || 'Standar Layanan', url: '#', icon: categoryIcon || 'fas fa-clipboard-list' }
     ],
     standarLayananFile: (title, categoryIcon, fileTitle) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: title || 'Standar Layanan', url: '#', icon: categoryIcon || 'fas fa-file-alt' },
+        { title: title || 'Standar Layanan', url: '#', icon: categoryIcon || 'fas fa-clipboard-list' },
         { title: truncate(fileTitle, 25), url: '#', icon: 'fas fa-file-pdf' }
     ],
     lhkpn: () => [
@@ -51,16 +51,16 @@ export const getBreadcrumbs = {
     ],
     pbj: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Kuesioner PBJ', url: '/pbj', icon: 'fas fa-file-signature' }
+        { title: 'PBJ', url: '/pbj', icon: 'fas fa-shopping-cart' }
     ],
     pbjDetail: (year) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Kuesioner PBJ', url: '/pbj', icon: 'fas fa-file-signature' },
-        { title: `Tahun ${year}`, url: `/pbj/${year}`, icon: 'fas fa-calendar-alt' }
+        { title: 'PBJ', url: '/pbj', icon: 'fas fa-shopping-cart' },
+        { title: `PBJ ${year}`, url: `/pbj/${year}`, icon: 'fas fa-file-alt' }
     ],
     pejabatDaerah: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Pejabat Daerah', url: '', icon: 'fas fa-users' }
+        { title: 'Pejabat Daerah', url: '', icon: 'fas fa-user-tie' }
     ],
     unitLokal: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
@@ -72,12 +72,12 @@ export const getBreadcrumbs = {
     ],
     profilPpid: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Profil PPID', url: '', icon: 'fas fa-id-card' }
+        { title: 'PPID', url: '', icon: 'fas fa-info-circle' }
     ],
     officialProfile: (name) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Pejabat Daerah', url: '/profil/pejabat-daerah', icon: 'fas fa-users' },
-        { title: truncate(name, 25) || 'Profil Pejabat', url: '', icon: 'fas fa-user-tie' }
+        { title: 'Pejabat Daerah', url: '/profil/pejabat-daerah', icon: 'fas fa-user-tie' },
+        { title: truncate(name, 25) || 'Profil Pejabat', url: '', icon: 'fas fa-user' }
     ],
     opdDetail: (unitName) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
@@ -86,25 +86,25 @@ export const getBreadcrumbs = {
     ],
     informasiPemkab: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Informasi Pemkab', url: '', icon: 'fas fa-building' }
+        { title: 'Informasi Pemkab', url: '', icon: 'fas fa-file-pdf' }
     ],
     informasiPemkabShow: (title) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' },
+        { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-file-pdf' },
         { title: truncate(title, 25) || 'Detail Informasi', url: '', icon: 'fas fa-file-alt' }
     ],
     surveyList: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Survei Kepuasan', url: '', icon: 'fas fa-clipboard-list' }
+        { title: 'Survei', url: '', icon: 'fas fa-poll' }
     ],
     surveyShow: (title) => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Survei Kepuasan', url: '/survey', icon: 'fas fa-clipboard-list' },
+        { title: 'Survei', url: '/survey', icon: 'fas fa-poll' },
         { title: truncate(title, 25) || 'Mulai Survei', url: '', icon: 'fas fa-pen-square' }
     ],
     permohonanCreate: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-        { title: 'Permohonan Informasi', url: '', icon: 'fas fa-paper-plane' }
+        { title: 'Permohonan Informasi', url: '', icon: 'fas fa-file-signature' }
     ],
     keberatanCreate: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
