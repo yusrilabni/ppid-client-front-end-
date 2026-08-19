@@ -412,8 +412,7 @@ const { data: queryData, isFetching, isLoading } = useQuery({
   keepPreviousData: true
 })
 
-const emptyCheck = computed(() => isFetching.value && (!queryData.value || !queryData.value.data || queryData.value.data.data.length === 0))
-useGlobalLoader(isLoading, emptyCheck)
+useGlobalLoader(isLoading)
 
 const items = computed(() => queryData.value?.data?.data || [])
 const pagination = computed(() => ({

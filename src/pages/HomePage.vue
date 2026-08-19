@@ -165,8 +165,7 @@ const { isLoading: loading, data: queryData, isFetching, isError, refetch } = us
   }
 })
 
-const emptyCheck = computed(() => isFetching.value && (!queryData.value || Object.keys(queryData.value).length === 0))
-useGlobalLoader(loading, emptyCheck)
+useGlobalLoader(loading)
 
 watch([queryData, loading], ([newData, newLoading]) => {
   if (newData) {
@@ -309,7 +308,7 @@ const informasiItems = [
       </div>
     </div>
 
-    <div v-else-if="!loading">
+    <div v-else-if="!loading && !isFetching">
       <div v-if="homeData.sliders && homeData.sliders.length > 0" class="swiper hero-slider relative w-full overflow-hidden">
         <div class="swiper-wrapper">
           <div v-for="slider in homeData.sliders" :key="slider.id" class="swiper-slide relative">

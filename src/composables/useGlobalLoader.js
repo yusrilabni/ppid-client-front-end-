@@ -1,18 +1,11 @@
-import { watch, onUnmounted, computed, isRef } from 'vue'
+import { watch, onUnmounted } from 'vue'
 import { useLoadingStore } from '@/stores/loading'
 
-export function useGlobalLoader(loadingRef, emptyCheckRef = null) {
+export function useGlobalLoader(loadingRef) {
   const loadingStore = useLoadingStore()
   let isActive = false
   
-  const shouldLoad = computed(() => {
-    if (emptyCheckRef && isRef(emptyCheckRef)) {
-      return loadingRef.value || emptyCheckRef.value;
-    }
-    return loadingRef.value;
-  })
-  
-  watch(shouldLoad, (newVal) => {
+  watch(loadingRef, (newVal) => {
     if (newVal && !isActive) {
       loadingStore.startLoading()
       isActive = true
