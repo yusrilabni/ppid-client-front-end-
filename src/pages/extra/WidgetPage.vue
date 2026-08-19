@@ -86,8 +86,7 @@
                             <div class="pt-6">
                                 <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Salin Kode Embed (Relevan untuk WordPress/Blogspot)</label>
                                 <div class="relative group">
-                                    <textarea id="embedCodeInput" readonly v-text="'<iframe src=\'' + embedUrl + '&origin=\' + window.location.origin + \'\' width=\'100%\' height=\'' + (limit === 'all' || limit > 10 ? '800' : (display === 'list' ? '450' : '480')) + '\' frameborder=\'0\'></iframe>'" 
-                                        class="w-full bg-gray-900 text-blue-400 font-mono text-[10px] p-4 rounded-2xl h-24 border-0 focus:ring-0 resize-none"></textarea>
+                                    <textarea id="embedCodeInput" readonly v-model="embedCodeString" class="w-full bg-gray-900 text-blue-400 font-mono text-[10px] p-4 rounded-2xl h-24 border-0 focus:ring-0 resize-none"></textarea>
                                     <button type="button" @click="
                                         const code = '<iframe src=\'' + embedUrl + '&origin=\' + window.location.origin + \'\' width=\'100%\' height=\'' + (limit === 'all' || limit > 10 ? '800' : (display === 'list' ? '450' : '480')) + '\' frameborder=\'0\'></iframe>';
                                         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -277,6 +276,7 @@ const unit_id = ref('');
 const activeDropdown = ref('auto');
 const refreshKey = ref(0);
 const embedCode = ref('');
+const embedCodeString = computed(() => { return `<iframe src="${embedUrl.value}" width="100%" height="${(limit.value === 'all' || limit.value > 10) ? '800' : (display.value === 'list' ? '450' : '480')}" frameborder="0"></iframe>`; });
 
 const embedUrl = computed(() => {
     let url = 'https://ppidkab.sinjaikab.go.id/widgets/embed?type=' + type.value + '&display=' + display.value + '&mode=' + mode.value + '&columns=' + columns.value + '&autoplay=' + autoplay.value + '&limit=' + limit.value;
