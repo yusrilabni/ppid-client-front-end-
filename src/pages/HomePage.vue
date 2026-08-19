@@ -817,7 +817,7 @@ const informasiItems = [
 }
 .animate-marquee {
     display: inline-flex;
-    animation: marquee 20s linear infinite;
+    animation: marquee 60s linear infinite;
     white-space: nowrap;
 }
 .animate-marquee:hover {
