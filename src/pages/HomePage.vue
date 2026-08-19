@@ -309,7 +309,7 @@ const informasiItems = [
       </div>
     </div>
 
-    <div v-else-if="!loading && !isFetching">
+    <div v-else-if="!loading">
       <div v-if="homeData.sliders && homeData.sliders.length > 0" class="swiper hero-slider relative w-full overflow-hidden">
         <div class="swiper-wrapper">
           <div v-for="slider in homeData.sliders" :key="slider.id" class="swiper-slide relative">
