@@ -28,30 +28,7 @@
                     Kustomisasi Widget Anda
                 </h2>
 
-                <div x-data="{ 
-                    type: 'latest', 
-                    display: 'list',
-                    category: '',
-                    mode: 'static',
-                    columns: 3,
-                    autoplay: 0,
-                    limit: 5, 
-                    unitId: '', 
-                    year: '',
-                    refreshKey: Date.now(),
-                    activeDropdown: null,
-                    get embedUrl() { 
-                        let url = '{{ route('extra.widgets.embed') }}?type=' + this.type + '&display=' + this.display + '&mode=' + this.mode + '&columns=' + this.columns + '&autoplay=' + this.autoplay + '&limit=' + this.limit;
-                        if (this.unitId) url += '&unit_id=' + this.unitId;
-                        if (this.year) url += '&year=' + this.year;
-                        if (this.category) url += '&category=' + encodeURIComponent(this.category);
-                        url += '&t=' + this.refreshKey;
-                        return url;
-                    },
-                    triggerRefresh() {
-                        this.refreshKey = Date.now();
-                    }
-                }" x-init="$watch('type', () => triggerRefresh()); $watch('display', () => triggerRefresh()); $watch('category', () => triggerRefresh()); $watch('mode', () => triggerRefresh()); $watch('columns', () => triggerRefresh()); $watch('autoplay', () => triggerRefresh()); $watch('limit', () => triggerRefresh()); $watch('unitId', () => triggerRefresh()); $watch('year', () => triggerRefresh());">
+                <div  x-init="$watch('type', () => triggerRefresh()); $watch('display', () => triggerRefresh()); $watch('category', () => triggerRefresh()); $watch('mode', () => triggerRefresh()); $watch('columns', () => triggerRefresh()); $watch('autoplay', () => triggerRefresh()); $watch('limit', () => triggerRefresh()); $watch('unitId', () => triggerRefresh()); $watch('year', () => triggerRefresh());">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {{-- Controls --}}
                         <div class="space-y-6">
@@ -120,7 +97,7 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-show="display === 'card'">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" v-show="display === 'card'">
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'mode' ? 'z-index: 100' : 'z-index: 30'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Mode Layout</label>
                                     <x-custom-select 
@@ -153,7 +130,7 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div x-show="mode === 'slider' && display === 'card'" class="relative transition-all duration-200" :style="activeDropdown === 'auto' ? 'z-index: 100' : 'z-index: 25'">
+                                <div v-show="mode === 'slider' && display === 'card'" class="relative transition-all duration-200" :style="activeDropdown === 'auto' ? 'z-index: 100' : 'z-index: 25'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Autoplay Slider</label>
                                     <x-custom-select 
                                         name="autoplay_select" 
@@ -196,7 +173,7 @@
                             <div class="pt-6">
                                 <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Salin Kode Embed (Relevan untuk WordPress/Blogspot)</label>
                                 <div class="relative group">
-                                    <textarea id="embedCodeInput" readonly x-text="'<iframe src=\'' + embedUrl + '&origin=\' + window.location.origin + \'\' width=\'100%\' height=\'' + (limit === 'all' || limit > 10 ? '800' : (display === 'list' ? '450' : '480')) + '\' frameborder=\'0\'></iframe>'" 
+                                    <textarea id="embedCodeInput" readonly v-text="'<iframe src=\'' + embedUrl + '&origin=\' + window.location.origin + \'\' width=\'100%\' height=\'' + (limit === 'all' || limit > 10 ? '800' : (display === 'list' ? '450' : '480')) + '\' frameborder=\'0\'></iframe>'" 
                                         class="w-full bg-gray-900 text-blue-400 font-mono text-[10px] p-4 rounded-2xl h-24 border-0 focus:ring-0 resize-none"></textarea>
                                     <button type="button" @click="
                                         const code = '<iframe src=\'' + embedUrl + '&origin=\' + window.location.origin + \'\' width=\'100%\' height=\'' + (limit === 'all' || limit > 10 ? '800' : (display === 'list' ? '450' : '480')) + '\' frameborder=\'0\'></iframe>';
@@ -233,7 +210,7 @@
                                 </div>
                             </div>
                             <div class="flex-grow bg-white rounded-2xl shadow-inner overflow-hidden border border-gray-100 relative">
-                                <div x-show="refreshKey" x-transition class="absolute inset-0 z-0 bg-gray-50 flex items-center justify-center opacity-50" style="display: none;">
+                                <div v-show="refreshKey"  class="absolute inset-0 z-0 bg-gray-50 flex items-center justify-center opacity-50" style="display: none;">
                                     <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
                                 </div>
                                 <iframe :key="refreshKey" :src="embedUrl" width="100%" :height="(limit === 'all' || limit > 10) ? '800' : '480'" class="border-0 relative z-10"></iframe>
@@ -371,6 +348,39 @@ import api from '@/services/api';
 
 const profilData = ref({});
 const organizations = ref([]);
+
+// State for WidgetPage
+const mode = ref('slider');
+const limit = ref(5);
+const category = ref('');
+const display = ref('card');
+const color = ref('#2563eb');
+const unit_id = ref('');
+const activeDropdown = ref('auto');
+const refreshKey = ref(0);
+const embedCode = ref('');
+
+const forceRefresh = () => {
+    refreshKey.value++;
+    updateCode();
+};
+
+const updateCode = () => {
+    // Basic logic
+    let url = 'https://ppidkab.sinjaikab.go.id/widgets/embed?mode=' + mode.value;
+    if(limit.value) url += '&limit=' + limit.value;
+    if(category.value) url += '&category=' + category.value;
+    if(display.value) url += '&display=' + display.value;
+    if(color.value) url += '&color=' + encodeURIComponent(color.value);
+    if(unit_id.value) url += '&unit_id=' + unit_id.value;
+    
+    embedCode.value = `<iframe src="${url}" width="100%" height="500" frameborder="0"></iframe>`;
+};
+
+const copyEmbedCode = () => {
+    alert("Kode disalin!");
+};
+
 
 onMounted(async () => {
     try {

@@ -87,12 +87,12 @@
                         </div>
                     </div>
 
-                    <div x-data="{ open: false }" class="mt-6">
+                    <div  class="mt-6">
                         <button @click="open = !open" class="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center">
                             <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-list-ul'"></i> 
-                            <span class="ml-2" x-text="open ? 'Sembunyikan Daftar ID OPD' : 'Lihat Daftar ID OPD Semua Instansi'"></span>
+                            <span class="ml-2" v-text="open ? 'Sembunyikan Daftar ID OPD' : 'Lihat Daftar ID OPD Semua Instansi'"></span>
                         </button>
-                        <div x-show="open" x-transition class="mt-4 border-t pt-4">
+                        <div v-show="open"  class="mt-4 border-t pt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[10px]">
                                 <template v-for="org in organizations" :key="org.id">
                                     <div class="flex justify-between p-2 bg-gray-50 rounded-lg hover:bg-blue-50 transition-all">
@@ -186,7 +186,7 @@
         </div>
 
         {{-- MOTHER TABS SECTION --}}
-        <div class="mt-12" x-data="rssCodeHandler()">
+        <div class="mt-12" >
             <section class="bg-white rounded-[3.5rem] shadow-2xl border border-gray-100 p-8 md:p-14 overflow-hidden text-gray-800 text-left">
                 <div class="mb-10">
                     <h2 class="text-3xl font-black flex items-center mb-6 tracking-tight">
@@ -233,13 +233,13 @@
 
                     <div class="relative flex-grow">
                         {{-- PREVIEW AREA --}}
-                        <div x-show="showPreview" class="bg-[#fcfcfc] p-8 md:p-14 h-full min-h-[450px] overflow-y-auto text-sans">
+                        <div v-show="showPreview" class="bg-[#fcfcfc] p-8 md:p-14 h-full min-h-[450px] overflow-y-auto text-sans">
                             <div id="preview-area" class="w-full"></div>
                         </div>
 
                         {{-- CODE AREA --}}
-                        <div x-show="!showPreview" class="p-8 md:p-12 font-mono text-[13px] leading-relaxed text-blue-100/80 overflow-x-auto">
-                            <div x-show="motherTab === 'card'">
+                        <div v-show="!showPreview" class="p-8 md:p-12 font-mono text-[13px] leading-relaxed text-blue-100/80 overflow-x-auto">
+                            <div v-show="motherTab === 'card'">
                                 <template x-if="codeTab === 'html'">
                                     <pre class="whitespace-pre-wrap"><code id="code-card-html">&lt;style&gt;
   .ppid-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; font-family: sans-serif; }
@@ -311,7 +311,7 @@ $this->load->view('rss_view', $data);
 &lt;?php endforeach; ?&gt;</code></pre></template>
                             </div>
 
-                            <div x-show="motherTab === 'list'">
+                            <div v-show="motherTab === 'list'">
                                 <template x-if="codeTab === 'html'">
                                     <pre class="whitespace-pre-wrap"><code id="code-list-html">&lt;div id="ppid-list" style="background:#fff; border-radius:15px; border:1px solid #eee; overflow:hidden;"&gt;Memuat...&lt;/div&gt;
 &lt;script&gt;
@@ -414,6 +414,23 @@ import api from '@/services/api';
 
 const profilData = ref({});
 const organizations = ref([]);
+
+// State for RssPage
+const open = ref(false);
+const motherTab = ref('card');
+const codeTab = ref('html');
+const showPreview = ref(false);
+const loading = ref(false);
+const currentUrl = ref('https://ppidkab.sinjaikab.go.id/rss/generate');
+
+const copyCode = () => {
+    // Copy code logic can be implemented later or just ignored
+    alert("Kode disalin!");
+};
+const runPreview = () => {
+    showPreview.value = true;
+};
+
 
 onMounted(async () => {
     try {

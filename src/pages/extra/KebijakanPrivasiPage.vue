@@ -4,14 +4,7 @@
 
 
 
-<style>
-    .privacy-section:hover .section-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
-    .section-icon {
-        transition: all 0.3s ease-in-out;
-    }
-</style>
+
 
 
 
@@ -329,3 +322,12 @@ onMounted(async () => {
     }
 });
 </script>
+
+<style>
+    .privacy-section:hover .section-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    .section-icon {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
