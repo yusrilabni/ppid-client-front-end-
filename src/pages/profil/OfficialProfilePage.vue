@@ -292,7 +292,6 @@ const { isLoading: queryLoading, data: queryData, isError: queryError, isFetchin
     return res.data.official || res.data.data
   },
   staleTime: 60000,
-  refetchOnWindowFocus: true,
   enabled: computed(() => !!route.params.slug)
 })
 

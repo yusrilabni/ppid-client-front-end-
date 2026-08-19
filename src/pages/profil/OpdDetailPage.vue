@@ -119,7 +119,6 @@ const { isLoading: queryLoading, data: queryData, isFetching, isError: error } =
     return res.data
   },
   staleTime: 60000,
-  refetchOnWindowFocus: true,
   enabled: computed(() => !!route.params.slug)
 })
 

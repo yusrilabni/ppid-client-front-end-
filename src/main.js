@@ -13,7 +13,8 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 5, // 5 menit - hindari refetch berlebihan
       gcTime: 1000 * 60 * 60 * 24, // 24 jam - simpan cache di memori
       refetchOnWindowFocus: false,
-      retry: 2,
+      retry: 1, // Kurangi retry agar tidak membebani server saat down
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Delay eksponensial maks 30 detik
     },
   },
 })

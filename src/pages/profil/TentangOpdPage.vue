@@ -248,8 +248,7 @@ const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
 
     return data
   },
-  staleTime: 60000,
-  refetchOnWindowFocus: true
+  staleTime: 60000
 })
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))

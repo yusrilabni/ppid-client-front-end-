@@ -118,8 +118,7 @@ const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
     const res = await api.get('/profil/unit-lokal')
     return res.data
   },
-  staleTime: 60000,
-  refetchOnWindowFocus: true
+  staleTime: 60000
 })
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
