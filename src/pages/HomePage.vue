@@ -718,7 +718,7 @@ const informasiItems = [
                   </div>
                   <div class="ml-4">
                     <h4 class="text-sm md:text-base font-semibold text-gray-900">Alamat</h4>
-                    <p class="mt-1 text-sm text-gray-600">Jl. Persatuan Raya No. 101 Kec. Sinjai Utara, Kabupaten Sinjai, Sulawesi Selatan 92611</p>
+                    <p class="mt-1 text-sm text-gray-600" v-text="homeData?.contact?.alamat || 'Jl. Persatuan Raya No. 101 Kec. Sinjai Utara, Kabupaten Sinjai, Sulawesi Selatan 92611'"></p>
                   </div>
                 </div>
 
@@ -731,7 +731,7 @@ const informasiItems = [
                   </div>
                   <div class="ml-4">
                     <h4 class="text-sm md:text-base font-semibold text-gray-900">Telepon</h4>
-                    <p class="mt-1 text-sm text-gray-600">0482-21432</p>
+                    <p class="mt-1 text-sm text-gray-600" v-text="homeData?.contact?.telepon || '0482-21432'"></p>
                   </div>
                 </div>
 
@@ -744,7 +744,7 @@ const informasiItems = [
                   </div>
                   <div class="ml-4">
                     <h4 class="text-sm md:text-base font-semibold text-gray-900">Email</h4>
-                    <p class="mt-1 text-sm text-gray-600">ppidkabsinjai@gmail.com</p>
+                    <p class="mt-1 text-sm text-gray-600" v-text="homeData?.contact?.email || 'ppidkabsinjai@gmail.com'"></p>
                   </div>
                 </div>
               </div>
