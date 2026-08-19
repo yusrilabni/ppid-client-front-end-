@@ -769,7 +769,7 @@ const informasiItems = [
                   </p>
                   <p class="flex justify-between text-red-600 font-medium">
                     <span>Jumat (WFH):</span>
-                    <span class="bg-red-100 px-2 rounded">08:00 - 11:30 WITA</span>
+                    <span class="bg-red-100 px-2 rounded">08:00 - 16:00 WITA</span>
                   </p>
                   <p class="flex justify-between text-red-600 font-medium">
                     <span>Sabtu - Minggu:</span>
