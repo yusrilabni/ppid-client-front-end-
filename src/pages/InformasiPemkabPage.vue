@@ -322,7 +322,7 @@ const getDownloadUrl = (dokumen) => {
 }
 
 const { data, isLoading } = useQuery({
-  queryKey: ['informasi-pemkab', filters.value],
+  queryKey: computed(() => ['informasi-pemkab', filters.value]),
   queryFn: fetchInformasiPemkab,
   keepPreviousData: true
 })
