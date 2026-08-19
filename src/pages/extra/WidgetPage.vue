@@ -33,92 +33,44 @@
                         <!--  Controls  -->
                         <div class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'type' ? 'z-index: 100' : 'z-index: 40'">
+                                <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Konten</label>
-                                    <select v-model="mode" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="latest">Terbaru</option>
-        <option value="popular">Terpopuler</option>
-    </select>
+                                    <CustomSelect v-model="mode" :options="[{value: 'latest', label: 'Terbaru'}, {value: 'popular', label: 'Terpopuler'}]" placeholder="Pilih..." />
                                 </div>
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'display' ? 'z-index: 100' : 'z-index: 40'">
+                                <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Gaya Dasar</label>
-                                    <select v-model="display" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="card">Kartu (Grid)</option>
-        <option value="list">Daftar (List)</option>
-    </select>
+                                    <CustomSelect v-model="display" :options="[{value: 'card', label: 'Kartu (Grid)'}, {value: 'list', label: 'Daftar (List)'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'cat' ? 'z-index: 100' : 'z-index: 35'">
+                                <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Kategori Informasi</label>
-                                    <select v-model="category" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="">Semua Kategori</option>
-        <option value="Informasi Berkala">Informasi Berkala</option>
-        <option value="Informasi Serta Merta">Informasi Serta Merta</option>
-        <option value="Informasi Setiap Saat">Informasi Setiap Saat</option>
-        <option value="Informasi Dikecualikan">Informasi Dikecualikan</option>
-    </select>
+                                    <CustomSelect v-model="category" :options="[{value: '', label: 'Semua Kategori'}, {value: 'Informasi Berkala', label: 'Informasi Berkala'}, {value: 'Informasi Serta Merta', label: 'Informasi Serta Merta'}, {value: 'Informasi Setiap Saat', label: 'Informasi Setiap Saat'}, {value: 'Informasi Dikecualikan', label: 'Informasi Dikecualikan'}]" placeholder="Pilih..." />
                                 </div>
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'limit' ? 'z-index: 100' : 'z-index: 35'">
+                                <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Jumlah Total Data</label>
-                                    <select v-model="limit" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="5">5 Data Terakhir</option>
-        <option value="10">10 Data Terakhir</option>
-        <option value="15">15 Data Terakhir</option>
-        <option value="20">20 Data Terakhir</option>
-        <option value="all">Semua Data</option>
-    </select>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" v-show="display === 'card'">
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'mode' ? 'z-index: 100' : 'z-index: 30'">
-                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Mode Layout</label>
-                                    <select v-model="mode" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="slider">Slider Interaktif</option>
-        <option value="grid">Grid Statis</option>
-    </select>
-                                </div>
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'cols' ? 'z-index: 100' : 'z-index: 30'">
-                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Kolom Per Baris</label>
-                                    <select v-model="limit" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="1">1 Kolom</option>
-        <option value="2">2 Kolom</option>
-        <option value="3">3 Kolom</option>
-        <option value="4">4 Kolom</option>
-    </select>
+                                    <CustomSelect v-model="limit" :options="[{value: 1, label: '1 Kolom'}, {value: 2, label: '2 Kolom'}, {value: 3, label: '3 Kolom'}, {value: 4, label: '4 Kolom'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div v-show="mode === 'slider' && display === 'card'" class="relative transition-all duration-200" :style="activeDropdown === 'auto' ? 'z-index: 100' : 'z-index: 25'">
+                                <div v-show="mode === 'slider' && display === 'card'" class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Autoplay Slider</label>
-                                    <select class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="true">Aktif</option>
-        <option value="false">Mati</option>
-    </select>
+                                    <CustomSelect :modelValue="'true'" :options="[{value: 'true', label: 'Aktif'}, {value: 'false', label: 'Mati'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'unit' ? 'z-index: 100' : 'z-index: 10'">
+                                <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter OPD</label>
                                     
-                                    <select v-model="unit_id" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="">Semua Instansi / OPD</option>
-        <option v-for="org in organizations" :key="org.id" :value="org.unit_id">{{ org.name }}</option>
-    </select>
+                                    <CustomSelect v-model="unit_id" :options="[{value: '', label: 'Semua Instansi / OPD'}, ...organizations.map(o => ({value: o.unit_id, label: o.name}))]" :shouldShowSearch="true" placeholder="Pilih..." />
                                 </div>
-                                <div class="relative transition-all duration-200" :style="activeDropdown === 'year' ? 'z-index: 100' : 'z-index: 10'">
+                                <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter Tahun</label>
                                     
-                                    <select class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
-        <option value="">Semua Tahun</option>
-        <option value="2024">2024</option>
-        <option value="2023">2023</option>
-        <option value="2022">2022</option>
-    </select>
+                                    <CustomSelect :modelValue="''" :options="[{value: '', label: 'Semua Tahun'}, {value: '2024', label: '2024'}, {value: '2023', label: '2023'}, {value: '2022', label: '2022'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
@@ -295,7 +247,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import CustomSelect from '@/components/CustomSelect.vue';
 import api from '@/services/api';
 
 const profilData = ref({});
@@ -311,6 +264,8 @@ const unit_id = ref('');
 const activeDropdown = ref('auto');
 const refreshKey = ref(0);
 const embedCode = ref('');
+
+watch([mode, limit, category, display, color, unit_id], () => { forceRefresh(); }, { deep: true });
 
 const forceRefresh = () => {
     refreshKey.value++;

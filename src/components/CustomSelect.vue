@@ -1,144 +1,161 @@
 <template>
-  <div class="relative" ref="dropdownRef" :class="isOpen ? 'z-[100]' : 'z-10'">
+  <div class="relative custom-select-root" :class="{ 'custom-select-open z-50': open, 'z-10': !open }" ref="rootEl">
     <!-- Trigger Button -->
-    <button 
-      type="button" 
-      @click="isOpen = !isOpen"
-      class="w-full flex items-center justify-between px-4 py-2.5 text-xs bg-transparent focus:outline-none font-bold text-gray-600 rounded-2xl transition-all"
-      :class="isOpen ? 'bg-white shadow-sm ring-2 ring-blue-500/20' : 'hover:bg-gray-50/50'"
-    >
-      <span class="truncate pr-4">{{ selectedLabel }}</span>
-      <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-300" :class="{ 'rotate-180': isOpen }"></i>
+    <button type="button" 
+        @click="toggle" 
+        @keydown.escape="open = false"
+        class="relative w-full bg-white border-2 border-gray-100 rounded-2xl shadow-sm pl-5 pr-12 py-4 text-left cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 sm:text-base transition-all duration-300 group">
+        
+        <span class="flex items-center">
+            <span class="block truncate transition-colors duration-300" 
+                  :class="selectedLabel ? 'text-gray-900 font-bold' : 'text-gray-400 font-medium'">
+                  {{ selectedLabel || placeholder }}
+            </span>
+        </span>
+        
+        <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+            <div class="p-1 rounded-lg bg-gray-50 group-hover:bg-blue-50 transition-colors duration-300">
+                <svg class="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-transform duration-300" 
+                     :class="open ? 'rotate-180' : ''" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </span>
     </button>
 
     <!-- Dropdown Menu -->
     <transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="transform scale-95 opacity-0"
-      enter-to-class="transform scale-100 opacity-100"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="transform scale-100 opacity-100"
-      leave-to-class="transform scale-95 opacity-0"
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0 translate-y-1 scale-95"
+        enter-to-class="opacity-100 translate-y-0 scale-100"
+        leave-active-class="transition ease-in duration-100"
+        leave-from-class="opacity-100 translate-y-0 scale-100"
+        leave-to-class="opacity-0 translate-y-1 scale-95"
     >
-      <div v-if="isOpen" class="absolute z-[100] w-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        <!-- Search Input -->
-        <div v-if="searchable" class="p-2 border-b border-gray-50 bg-gray-50/50">
-          <div class="relative">
-            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              class="w-full pl-8 pr-3 py-2 text-xs border-none bg-white rounded-xl focus:ring-2 focus:ring-blue-500/20 font-medium"
-              :placeholder="searchPlaceholder"
-              @click.stop
-            />
+      <div v-if="open" 
+          class="absolute mt-1 w-full rounded-2xl bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] z-[9999] border border-gray-100 overflow-hidden ring-1 ring-black/5">
+
+          <div v-if="shouldShowSearch" class="p-3 bg-gray-50/50 border-b border-gray-100">
+              <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <i class="fas fa-search text-blue-500 text-xs"></i>
+                  </div>
+                  <input type="text" 
+                      v-model="search" 
+                      @click.stop 
+                      @keydown.enter.prevent
+                      placeholder="Cari opsi..." 
+                      class="w-full pl-10 pr-4 py-2.5 text-sm border-2 border-gray-100 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-0 transition-all bg-white">
+              </div>
           </div>
-        </div>
-        
-        <!-- Options List -->
-        <ul class="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-          <li v-if="filteredOptions.length === 0" class="px-4 py-3 text-xs text-gray-500 text-center italic">
-            Pencarian tidak ditemukan
-          </li>
-          <li 
-            v-for="option in filteredOptions" 
-            :key="option[valueKey]"
-            @click="selectOption(option)"
-            class="px-4 py-2.5 text-xs cursor-pointer transition-colors flex items-center justify-between group"
-            :class="modelValue === option[valueKey] ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 font-medium hover:bg-gray-50'"
-          >
-            <span class="truncate mr-2">{{ option[labelKey] }}</span>
-            <i v-if="modelValue === option[valueKey]" class="fas fa-check text-blue-500 text-[10px]"></i>
-          </li>
-        </ul>
+
+          <ul class="max-h-72 py-2 text-base overflow-auto focus:outline-none sm:text-sm custom-scrollbar" tabindex="-1">
+              <li v-for="item in filteredData" :key="item.value"
+                  @click="select(item)" 
+                  class="mx-2 my-0.5 rounded-xl text-gray-700 cursor-pointer select-none relative py-3 pl-4 pr-10 transition-all duration-200 group/item"
+                  :class="modelValue == item.value ? 'bg-blue-50 text-blue-700 font-bold' : 'hover:bg-blue-600 hover:text-white'">
+                  
+                  <span class="block truncate">{{ item.label }}</span>
+
+                  <span v-if="modelValue == item.value" 
+                        class="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 group-hover/item:text-white">
+                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                  </span>
+              </li>
+              
+              <li v-if="filteredData.length === 0" class="px-4 py-8 text-sm text-gray-400 text-center italic flex flex-col items-center">
+                  <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                      <i class="fas fa-search-minus text-gray-300 text-xl"></i>
+                  </div>
+                  Data tidak ditemukan.
+              </li>
+          </ul>
       </div>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: ''
-  },
-  options: {
-    type: Array,
-    required: true
-  },
-  placeholder: {
-    type: String,
-    default: 'Pilih opsi...'
-  },
-  searchPlaceholder: {
-    type: String,
-    default: 'Cari...'
-  },
-  searchable: {
-    type: Boolean,
-    default: true
-  },
-  labelKey: {
-    type: String,
-    default: 'label'
-  },
-  valueKey: {
-    type: String,
-    default: 'value'
-  }
-})
+    modelValue: {
+        type: [String, Number],
+        default: ''
+    },
+    options: {
+        type: Array,
+        default: () => []
+    },
+    placeholder: {
+        type: String,
+        default: 'Pilih opsi...'
+    },
+    shouldShowSearch: {
+        type: Boolean,
+        default: false
+    }
+});
 
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits(['update:modelValue', 'change']);
 
-const isOpen = ref(false)
-const searchQuery = ref('')
-const dropdownRef = ref(null)
+const open = ref(false);
+const search = ref('');
+const rootEl = ref(null);
 
 const selectedLabel = computed(() => {
-  const selected = props.options.find(opt => opt[props.valueKey] == props.modelValue)
-  return selected ? selected[props.labelKey] : props.placeholder
-})
+    const selected = props.options.find(item => String(item.value) === String(props.modelValue));
+    return selected ? selected.label : null;
+});
 
-const filteredOptions = computed(() => {
-  if (!props.searchable || !searchQuery.value) return props.options
-  
-  const query = searchQuery.value.toLowerCase()
-  return props.options.filter(opt => {
-    const label = String(opt[props.labelKey]).toLowerCase()
-    return label.includes(query)
-  })
-})
+const filteredData = computed(() => {
+    const term = search.value.toLowerCase().trim();
+    if (!term) return props.options;
+    return props.options.filter(item => 
+        item.label && item.label.toLowerCase().includes(term)
+    );
+});
 
-const selectOption = (option) => {
-  emit('update:modelValue', option[props.valueKey])
-  emit('change', option[props.valueKey])
-  isOpen.value = false
-  searchQuery.value = ''
-}
+const toggle = () => {
+    open.value = !open.value;
+};
 
-// Click outside to close
+const select = (item) => {
+    emit('update:modelValue', item.value);
+    emit('change', item.value);
+    open.value = false;
+    search.value = '';
+};
+
 const handleClickOutside = (event) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
-    isOpen.value = false
-  }
-}
+    if (rootEl.value && !rootEl.value.contains(event.target)) {
+        open.value = false;
+    }
+};
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+    document.addEventListener('click', handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
-// Reset search when dropdown closes
-watch(isOpen, (newVal) => {
-  if (!newVal) {
-    setTimeout(() => {
-      searchQuery.value = ''
-    }, 200) // wait for animation
-  }
-})
+    document.removeEventListener('click', handleClickOutside);
+});
 </script>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+}
+</style>
