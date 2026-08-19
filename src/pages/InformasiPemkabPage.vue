@@ -46,7 +46,7 @@
                             valueKey="value" 
                             placeholder="Semua Kategori"
                             @change="resetJenis"
-                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200"
+                            class="w-full"
                         />
                     </div>
                     
@@ -62,7 +62,7 @@
                             placeholder="Semua Jenis Dokumen"
                             @change="applyFilters"
                             :disabled="!filters.kategori"
-                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200 transition-opacity"
+                            class="w-full transition-opacity"
                             :class="{'opacity-50 pointer-events-none': !filters.kategori}"
                         />
                     </div>
@@ -78,7 +78,7 @@
                             valueKey="value" 
                             placeholder="Semua Tahun"
                             @change="applyFilters"
-                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200"
+                            class="w-full"
                         />
                     </div>
 
@@ -92,7 +92,7 @@
                             labelKey="label" 
                             valueKey="value" 
                             @change="applyFilters"
-                            class="w-full bg-white rounded-xl shadow-sm border border-gray-200"
+                            class="w-full"
                         />
                     </div>
 
@@ -106,12 +106,12 @@
                                     <i class="fas fa-search text-gray-400"></i>
                                 </div>
                                 <input type="text" v-model="filters.search" @keyup.enter="applyFilters" placeholder="Judul..." 
-                                    class="w-full pl-10 pr-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all h-[44px] text-sm bg-gray-50 focus:bg-white">
+                                    class="w-full pl-10 pr-4 py-4 rounded-2xl border-2 border-gray-100 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all sm:text-base bg-white">
                             </div>
-                            <button @click="applyFilters" class="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg rounded-xl h-[44px] px-4 transition-all flex items-center justify-center">
+                            <button @click="applyFilters" class="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg rounded-2xl py-4 px-6 font-semibold transition-all flex items-center justify-center">
                                 Cari
                             </button>
-                            <button @click="resetFilters" class="bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm rounded-xl h-[44px] px-3 transition-all flex items-center justify-center border border-gray-200" title="Reset Filter">
+                            <button @click="resetFilters" class="bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm rounded-2xl py-4 px-5 transition-all flex items-center justify-center border-2 border-gray-100" title="Reset Filter">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
