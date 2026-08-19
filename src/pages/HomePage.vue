@@ -167,28 +167,62 @@ const { isLoading: loading, data: queryData, isFetching, isError, refetch } = us
 
 useGlobalLoader(loading)
 
+const fetchRSS = async () => {
+  try {
+    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://humas.sinjaikab.go.id/v1/rss')}`)
+    if (res.ok) {
+      const json = await res.json()
+      const parser = new DOMParser()
+      const xmlDoc = parser.parseFromString(json.contents, 'text/xml')
+      const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 10)
+      
+      rss_items.value = items.map(item => {
+        const title = item.querySelector('title')?.textContent || ''
+        const link = item.querySelector('link')?.textContent || '#'
+        const pubDate = item.querySelector('pubDate')?.textContent || ''
+        const enclosure = item.querySelector('enclosure')
+        const image = enclosure ? enclosure.getAttribute('url') : ''
+        
+        return {
+          title,
+          link,
+          pubDate,
+          image
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Gagal mengambil RSS Humas Sinjai:', error)
+  }
+}
+
 watch([queryData, loading], ([newData, newLoading]) => {
   if (newData) {
     homeData.value = newData
-    rss_items.value = newData.news || []
   }
   
   if (!newLoading && newData) {
-    nextTick(() => {
-      initSwiper()
+    fetchRSS().then(() => {
+      nextTick(() => {
+        initSwiper()
+      })
     })
   }
 }, { immediate: true })
 
 const formatDate = (dateString) => {
-  if (!dateString) return ''
-  // Try to parse RSS date format
-  let date = new Date(dateString)
-  if (isNaN(date)) {
-    // Attempt manual parse or fallback
+  if (!dateString) return 'Terbaru'
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }).format(date)
+  } catch (e) {
     return dateString
   }
-  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 const getCategoryColor = (category, type) => {
