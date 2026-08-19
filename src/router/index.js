@@ -63,6 +63,8 @@ const routes = [
       // Information
       { path: 'informasi/:category', name: 'informasi.category', component: InformasiCategory },
       { path: 'informasi/detail/:slug', name: 'informasi.detail', component: InformasiDetail },
+      { path: 'transparansi/informasi-pemkab', name: 'informasi-pemkab', component: () => import('@/pages/InformasiPemkabPage.vue') },
+      { path: 'transparansi/informasi-pemkab/:slug', name: 'informasi-pemkab.show', component: () => import('@/pages/InformasiPemkabShowPage.vue') },
       // Gallery
       { path: 'galeri', name: 'galeri', component: GaleriPage },
       // Profil
@@ -148,6 +150,8 @@ router.afterEach((to) => {
     'register': 'Register',
     'informasi.category': 'Informasi Publik',
     'informasi.detail': 'Detail Informasi',
+    'informasi-pemkab': 'Informasi Pemkab',
+    'informasi-pemkab.show': 'Detail Informasi Pemkab',
     'galeri': 'Galeri',
     'profil.ppid': 'Profil PPID',
     'profil.opd': 'Tentang OPD',
