@@ -1,9 +1,9 @@
 <template>
   <div class="py-8 md:py-12 bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <PageHeader title="Laporan PPID" :breadcrumbs="[
-          { title: 'Beranda', url: '/' },
-          { title: 'Laporan PPID', url: '/laporan/ppid' }
+      <Breadcrumbs :breadcrumbs="[
+          { title: 'Beranda', url: '/', icon: 'fas fa-home' },
+          { title: 'Laporan PPID', url: '', icon: 'fas fa-file-invoice' }
       ]" />
 
       <div class="mb-16 text-center mt-8">
@@ -46,7 +46,7 @@
                   </h3>
               </div>
               <div class="grid grid-cols-1 gap-3">
-                  <a :href="getStorageUrl(item.file)" target="_blank"
+                  <a :href="api.defaults.baseURL.replace('/api/v1', '') + '/laporan/ppid/preview/' + item.encoded_id" 
                      class="flex items-center justify-center w-full bg-blue-600 text-white font-black text-[10px] py-3.5 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-blue-100 hover:shadow-blue-200">
                       <i class="fas fa-eye text-xs"></i>
                       Preview Laporan
@@ -76,7 +76,7 @@
 import { ref, onMounted } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
-import PageHeader from '@/components/PageHeader.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 
 const fetchLaporan = async () => {
