@@ -750,29 +750,40 @@ const informasiItems = [
               </div>
 
               <!-- Jam Pelayanan -->
-              <div class="mt-6 md:mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
-                <div class="flex items-center justify-between mb-4">
+              <div class="mt-6 md:mt-8 p-5 md:p-6 bg-blue-50 rounded-lg border border-blue-100">
+                <div class="flex items-center justify-between mb-3">
                   <h4 class="text-sm md:text-base font-semibold text-gray-900 flex items-center">
                     <i data-lucide="clock" class="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-600"></i> Jam Pelayanan
                   </h4>
-                  <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">GRATIS</span>
+                  <span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] md:text-xs font-bold rounded-full border border-green-200 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    GRATIS
+                  </span>
                 </div>
-                <ul class="space-y-2 text-sm text-gray-600">
-                  <li class="flex justify-between">
-                    <span>Senin - Kamis:</span>
+                <div class="space-y-2 text-xs md:text-sm text-gray-700">
+                  <p class="flex justify-between">
+                    <span class="font-medium">Senin - Kamis:</span>
                     <span class="font-medium text-gray-900">08:00 - 16:00 WITA</span>
-                  </li>
-                  <li class="flex justify-between">
-                    <span>Jumat:</span>
+                  </p>
+                  <p class="flex justify-between">
+                    <span class="font-medium">Jumat (Pagi):</span>
                     <span class="font-medium text-gray-900">08:00 - 11:30 WITA</span>
-                  </li>
-                  <li class="flex justify-between text-red-600">
+                  </p>
+                  <p class="flex justify-between text-red-600 font-medium">
+                    <span>Jumat (Siang):</span>
+                    <span class="bg-red-100 px-2 rounded">WFH</span>
+                  </p>
+                  <p class="flex justify-between text-red-600 font-medium">
                     <span>Sabtu - Minggu:</span>
-                    <span class="font-medium">Tutup</span>
-                  </li>
-                </ul>
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                  <p class="text-xs text-gray-500 italic">*Seluruh layanan informasi publik tidak dipungut biaya apapun.</p>
+                    <span class="bg-red-100 px-2 rounded">Tutup</span>
+                  </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-blue-200">
+                  <p class="text-[10px] md:text-xs text-blue-600 font-medium italic">
+                    *Seluruh layanan informasi publik tidak dipungut biaya apapun.
+                  </p>
                 </div>
               </div>
             </div>
