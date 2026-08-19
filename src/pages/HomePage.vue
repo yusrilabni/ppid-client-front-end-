@@ -434,7 +434,7 @@ const informasiItems = [
                 <div v-for="(item, idx) in rss_items" :key="idx" class="swiper-slide !h-auto p-1 flex">
                   <div class="w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col border border-gray-100 m-1 group/news">
                     <div class="aspect-w-16 aspect-h-9 overflow-hidden relative">
-                      <img :src="item.image || 'https://via.placeholder.com/400x225.png?text=No+Image'" :alt="item.title" width="400" height="225" loading="lazy" class="w-full h-48 object-cover transform group-hover/news:scale-105 transition-transform duration-500" />
+                      <img :src="item.image || 'https://via.placeholder.com/400x225.png?text=No+Image'" :alt="item.title" class="w-full h-48 object-cover transform group-hover/news:scale-105 transition-transform duration-500" />
                       <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/news:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
@@ -526,7 +526,7 @@ const informasiItems = [
             <div v-for="item in homeData.gallery" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
               <div class="aspect-w-16 aspect-h-12 relative">
                 <router-link :to="`/galeri/${item.id}`" class="block">
-                  <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" width="400" height="225" loading="lazy" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2">
                     <i data-lucide="camera" class="h-3 w-3 md:h-4 md:w-4 text-gray-700 flex justify-center items-center"></i>
                   </div>
