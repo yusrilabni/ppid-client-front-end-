@@ -187,7 +187,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                           </template>
 
                           <!-- Desktop Search Trigger (Icon Only) -->
-                          <button @click="openSearch" 
+                          <button @click="openSearch" aria-label="Buka Pencarian"
                               class="flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 w-9 h-9 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-110 ml-2 flex-shrink-0">
                               <i class="fas fa-search text-base"></i>
                           </button>
@@ -205,7 +205,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                       <i class="fas fa-search text-blue-500 text-lg"></i>
                                   </div>
-                                  <button type="button" @click="searchOpen = false" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
+                                  <button type="button" aria-label="Tutup Pencarian" @click="searchOpen = false" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
                                       <i class="fas fa-times-circle text-lg"></i>
                                   </button>
                               </div>
