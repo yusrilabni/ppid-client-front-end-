@@ -7,7 +7,7 @@
 
 <div class="bg-gray-50 py-12">
     <div class="container mx-auto px-4 max-w-6xl">
-        {{-- Header Section --}}
+        <!--  Header Section  -->
         <div class="text-center mb-12">
             <div class="inline-block p-3 bg-blue-100 rounded-2xl mb-4">
                 <i class="fas fa-plug text-blue-600 text-3xl"></i>
@@ -16,7 +16,7 @@
             <p class="text-lg text-gray-600 max-w-3xl mx-auto">Tampilkan feed data informasi publik secara visual dan interaktif langsung di website Anda.</p>
         </div>
 
-        {{-- Generator Widget --}}
+        <!--  Generator Widget  -->
         <section class="bg-white rounded-[3rem] shadow-xl border border-gray-100 p-8 md:p-12 mb-12 relative">
             <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 opacity-50 pointer-events-none"></div>
             
@@ -28,120 +28,76 @@
                     Kustomisasi Widget Anda
                 </h2>
 
-                <div  x-init="$watch('type', () => triggerRefresh()); $watch('display', () => triggerRefresh()); $watch('category', () => triggerRefresh()); $watch('mode', () => triggerRefresh()); $watch('columns', () => triggerRefresh()); $watch('autoplay', () => triggerRefresh()); $watch('limit', () => triggerRefresh()); $watch('unitId', () => triggerRefresh()); $watch('year', () => triggerRefresh());">
+                <div  >
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        {{-- Controls --}}
+                        <!--  Controls  -->
                         <div class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'type' ? 'z-index: 100' : 'z-index: 40'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Konten</label>
-                                    <x-custom-select 
-                                        name="type_select" 
-                                        :options="[
-                                            ['value' => 'latest', 'label' => 'Terbaru'],
-                                            ['value' => 'popular', 'label' => 'Terpopuler']
-                                        ]" 
-                                        :value="'latest'"
-                                        @change="type = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'type' : (activeDropdown === 'type' && (activeDropdown = null)))"
-                                    />
+                                    <select v-model="mode" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="latest">Terbaru</option>
+        <option value="popular">Terpopuler</option>
+    </select>
                                 </div>
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'display' ? 'z-index: 100' : 'z-index: 40'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Gaya Dasar</label>
-                                    <x-custom-select 
-                                        name="display_select" 
-                                        :options="[
-                                            ['value' => 'list', 'label' => 'Mode Daftar (List)'],
-                                            ['value' => 'card', 'label' => 'Mode Kartu (Card)']
-                                        ]" 
-                                        :value="'list'"
-                                        @change="display = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'display' : (activeDropdown === 'display' && (activeDropdown = null)))"
-                                    />
+                                    <select v-model="display" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="card">Kartu (Grid)</option>
+        <option value="list">Daftar (List)</option>
+    </select>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'cat' ? 'z-index: 100' : 'z-index: 35'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Kategori Informasi</label>
-                                    <x-custom-select 
-                                        name="category_select" 
-                                        :options="[
-                                            ['value' => '', 'label' => 'Semua Kategori'],
-                                            ['value' => 'Informasi Berkala', 'label' => 'Informasi Berkala'],
-                                            ['value' => 'Informasi Setiap Saat', 'label' => 'Informasi Setiap Saat'],
-                                            ['value' => 'Informasi Serta Merta', 'label' => 'Informasi Serta Merta'],
-                                            ['value' => 'Informasi Dikecualikan', 'label' => 'Informasi Dikecualikan']
-                                        ]" 
-                                        :value="''"
-                                        @change="category = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'cat' : (activeDropdown === 'cat' && (activeDropdown = null)))"
-                                    />
+                                    <select v-model="category" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="">Semua Kategori</option>
+        <option value="Informasi Berkala">Informasi Berkala</option>
+        <option value="Informasi Serta Merta">Informasi Serta Merta</option>
+        <option value="Informasi Setiap Saat">Informasi Setiap Saat</option>
+        <option value="Informasi Dikecualikan">Informasi Dikecualikan</option>
+    </select>
                                 </div>
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'limit' ? 'z-index: 100' : 'z-index: 35'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Jumlah Total Data</label>
-                                    <x-custom-select 
-                                        name="limit_select" 
-                                        :options="[
-                                            ['value' => '2', 'label' => '2 Item'],
-                                            ['value' => '5', 'label' => '5 Item'],
-                                            ['value' => '10', 'label' => '10 Item'],
-                                            ['value' => '20', 'label' => '20 Item'],
-                                            ['value' => '50', 'label' => '50 Item'],
-                                            ['value' => 'all', 'label' => 'Semua Data']
-                                        ]" 
-                                        :value="'5'"
-                                        @change="limit = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'limit' : (activeDropdown === 'limit' && (activeDropdown = null)))"
-                                    />
+                                    <select v-model="limit" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="5">5 Data Terakhir</option>
+        <option value="10">10 Data Terakhir</option>
+        <option value="15">15 Data Terakhir</option>
+        <option value="20">20 Data Terakhir</option>
+        <option value="all">Semua Data</option>
+    </select>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" v-show="display === 'card'">
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'mode' ? 'z-index: 100' : 'z-index: 30'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Mode Layout</label>
-                                    <x-custom-select 
-                                        name="mode_select" 
-                                        :options="[
-                                            ['value' => 'static', 'label' => 'Grid Statis (Full)'],
-                                            ['value' => 'slider', 'label' => 'Slider Otomatis']
-                                        ]" 
-                                        :value="'static'"
-                                        @change="mode = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'mode' : (activeDropdown === 'mode' && (activeDropdown = null)))"
-                                    />
+                                    <select v-model="mode" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="slider">Slider Interaktif</option>
+        <option value="grid">Grid Statis</option>
+    </select>
                                 </div>
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'cols' ? 'z-index: 100' : 'z-index: 30'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Kolom Per Baris</label>
-                                    <x-custom-select 
-                                        name="columns_select" 
-                                        :options="[
-                                            ['value' => '1', 'label' => '1 Kolom'],
-                                            ['value' => '2', 'label' => '2 Kolom'],
-                                            ['value' => '3', 'label' => '3 Kolom'],
-                                            ['value' => '4', 'label' => '4 Kolom'],
-                                            ['value' => '5', 'label' => '5 Kolom']
-                                        ]" 
-                                        :value="'3'"
-                                        @change="columns = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'cols' : (activeDropdown === 'cols' && (activeDropdown = null)))"
-                                    />
+                                    <select v-model="limit" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="1">1 Kolom</option>
+        <option value="2">2 Kolom</option>
+        <option value="3">3 Kolom</option>
+        <option value="4">4 Kolom</option>
+    </select>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div v-show="mode === 'slider' && display === 'card'" class="relative transition-all duration-200" :style="activeDropdown === 'auto' ? 'z-index: 100' : 'z-index: 25'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Autoplay Slider</label>
-                                    <x-custom-select 
-                                        name="autoplay_select" 
-                                        :options="[
-                                            ['value' => '0', 'label' => 'Nonaktif'],
-                                            ['value' => '1', 'label' => 'Aktif (3 Detik)']
-                                        ]" 
-                                        :value="'0'"
-                                        @change="autoplay = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'auto' : (activeDropdown === 'auto' && (activeDropdown = null)))"
-                                    />
+                                    <select class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="true">Aktif</option>
+        <option value="false">Mati</option>
+    </select>
                                 </div>
                             </div>
 
@@ -149,24 +105,20 @@
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'unit' ? 'z-index: 100' : 'z-index: 10'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter OPD</label>
                                     
-                                    <x-custom-select 
-                                        name="unit_select" 
-                                        :options="$orgOptions" 
-                                        :value="''"
-                                        @change="unitId = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'unit' : (activeDropdown === 'unit' && (activeDropdown = null)))"
-                                    />
+                                    <select v-model="unit_id" class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="">Semua Instansi / OPD</option>
+        <option v-for="org in organizations" :key="org.id" :value="org.unit_id">{{ org.name }}</option>
+    </select>
                                 </div>
                                 <div class="relative transition-all duration-200" :style="activeDropdown === 'year' ? 'z-index: 100' : 'z-index: 10'">
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter Tahun</label>
                                     
-                                    <x-custom-select 
-                                        name="year_select" 
-                                        :options="$yearOptions" 
-                                        :value="''"
-                                        @change="year = $event.detail.value"
-                                        x-init="$watch('open', v => v ? activeDropdown = 'year' : (activeDropdown === 'year' && (activeDropdown = null)))"
-                                    />
+                                    <select class="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+        <option value="">Semua Tahun</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+    </select>
                                 </div>
                             </div>
 
@@ -196,7 +148,7 @@
                             </div>
                         </div>
 
-                        {{-- Preview --}}
+                        <!--  Preview  -->
                         <div class="bg-gray-50 rounded-[2rem] p-4 border-4 border-dashed border-gray-200 flex flex-col min-h-[500px]">
                             <div class="flex justify-between items-center mb-4 px-2">
                                 <div class="flex items-center space-x-2">
@@ -222,9 +174,9 @@
             </div>
         </section>
 
-        {{-- DETAIL GUIDE SECTION (WordPress & Custom) --}}
+        <!--  DETAIL GUIDE SECTION (WordPress & Custom)  -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-            {{-- WordPress Detailed Steps --}}
+            <!--  WordPress Detailed Steps  -->
             <div class="lg:col-span-2 space-y-8">
                 <section class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-10">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
@@ -255,7 +207,7 @@
                     </div>
                 </section>
 
-                {{-- BLOGSPOT GUIDE --}}
+                <!--  BLOGSPOT GUIDE  -->
                 <section class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-10">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                         <i class="fab fa-google text-orange-500 mr-3 text-3xl"></i>
@@ -293,7 +245,7 @@
                 </section>
             </div>
 
-            {{-- Sidebar Technical Info --}}
+            <!--  Sidebar Technical Info  -->
             <div class="space-y-8">
                 <section class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-[2.5rem] p-8 text-white">
                     <h3 class="text-lg font-bold mb-4 flex items-center text-blue-400">
@@ -320,14 +272,14 @@
                 <section class="bg-blue-50 border border-blue-100 rounded-[2.5rem] p-8">
                     <h3 class="text-lg font-bold text-blue-800 mb-4">Bantuan Teknis</h3>
                     <p class="text-sm text-blue-700 leading-relaxed">Jika Anda mengalami kendala saat pemasangan widget pada CMS tertentu, tim IT kami siap membantu integrasi secara gratis.</p>
-                    <a href="{{ route('home') }}#kontak" class="mt-4 inline-flex items-center text-blue-600 font-bold hover:underline">
+                    <a href="/#kontak" class="mt-4 inline-flex items-center text-blue-600 font-bold hover:underline">
                         Hubungi Admin <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </section>
             </div>
         </div>
 
-        {{-- Footer Call to Action --}}
+        <!--  Footer Call to Action  -->
         <div class="bg-blue-600 rounded-[3rem] p-12 text-white text-center shadow-2xl shadow-blue-200">
             <h2 class="text-3xl font-extrabold mb-4">Sudah Siap Memasang Widget?</h2>
             <p class="text-lg opacity-80 mb-8 max-w-2xl mx-auto">Tingkatkan transparansi informasi di portal Anda sekarang juga dengan widget resmi dari PPID Kabupaten Sinjai.</p>

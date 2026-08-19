@@ -7,7 +7,7 @@
 
 <div class="bg-gray-50 py-12">
     <div class="container mx-auto px-4 max-w-6xl">
-        {{-- Header --}}
+        <!--  Header  -->
         <div class="text-center mb-12">
             <div class="inline-block p-3 bg-orange-100 rounded-2xl mb-4 text-orange-600 shadow-sm">
                 <i class="fas fa-rss text-3xl"></i>
@@ -17,10 +17,10 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {{-- Main Column (Kiri) --}}
+            <!--  Main Column (Kiri)  -->
             <div class="lg:col-span-2 space-y-8 text-gray-800">
                 
-                {{-- 1. Apa itu RSS --}}
+                <!--  1. Apa itu RSS  -->
                 <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 relative overflow-hidden text-left">
                     <div class="absolute top-0 right-0 p-4 opacity-5">
                         <i class="fas fa-rss text-9xl"></i>
@@ -33,7 +33,7 @@
                     </p>
                 </section>
 
-                {{-- 2. Struktur Data Detail --}}
+                <!--  2. Struktur Data Detail  -->
                 <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-left">
                     <h2 class="text-2xl font-bold mb-6 flex items-center text-green-600">
                         <span class="w-2 h-8 bg-green-500 rounded-full mr-3"></span> Struktur Data Detail
@@ -58,7 +58,7 @@
                     </div>
                 </section>
 
-                {{-- 3. Kustomisasi URL Feed (Filter) --}}
+                <!--  3. Kustomisasi URL Feed (Filter)  -->
                 <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-left">
                     <h2 class="text-2xl font-bold mb-6 flex items-center text-orange-600">
                         <span class="w-2 h-8 bg-orange-500 rounded-full mr-3"></span> Kustomisasi URL Feed (Filter)
@@ -106,10 +106,10 @@
                 </section>
             </div>
 
-            {{-- Sidebar (Kanan) --}}
+            <!--  Sidebar (Kanan)  -->
             <div class="space-y-8">
                 
-                {{-- A. Panduan WordPress --}}
+                <!--  A. Panduan WordPress  -->
                 <section class="bg-blue-600 rounded-[2rem] shadow-lg p-7 text-white relative overflow-hidden group text-left">
                     <i class="fab fa-wordpress absolute -bottom-4 -right-4 text-9xl opacity-10 group-hover:scale-110 transition-transform duration-700"></i>
                     <h3 class="text-lg font-black mb-5 uppercase tracking-widest flex items-center border-b border-white/20 pb-3">
@@ -148,7 +148,7 @@
                     </div>
                 </section>
 
-                {{-- B. Blogger --}}
+                <!--  B. Blogger  -->
                 <section class="bg-orange-600 rounded-[2rem] shadow-lg p-7 text-white relative overflow-hidden group text-left">
                     <i class="fab fa-google absolute -bottom-4 -right-4 text-9xl opacity-10 group-hover:scale-110 transition-transform duration-700"></i>
                     <h3 class="text-lg font-black mb-5 uppercase tracking-widest flex items-center border-b border-white/20 pb-3">
@@ -185,7 +185,7 @@
             </div>
         </div>
 
-        {{-- MOTHER TABS SECTION --}}
+        <!--  MOTHER TABS SECTION  -->
         <div class="mt-12" >
             <section class="bg-white rounded-[3.5rem] shadow-2xl border border-gray-100 p-8 md:p-14 overflow-hidden text-gray-800 text-left">
                 <div class="mb-10">
@@ -197,7 +197,7 @@
                     </h2>
                 </div>
 
-                {{-- Tab Selection --}}
+                <!--  Tab Selection  -->
                 <div class="flex space-x-6 mb-10 border-b-2 border-gray-100">
                     <button @click="motherTab = 'card'; showPreview = false" :class="motherTab === 'card' ? 'text-blue-600 border-b-4 border-blue-600 -mb-[2px]' : 'text-gray-400'" class="pb-4 text-xl font-black uppercase tracking-tighter">Kartu (Grid)</button>
                     <button @click="motherTab = 'list'; showPreview = false" :class="motherTab === 'list' ? 'text-blue-600 border-b-4 border-blue-600 -mb-[2px]' : 'text-gray-400'" class="pb-4 text-xl font-black uppercase tracking-tighter">Daftar (List)</button>
@@ -210,21 +210,21 @@
                     <button @click="codeTab = 'ci'; showPreview = false" :class="codeTab === 'ci' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'" class="py-3 px-8 rounded-xl text-xs font-black uppercase tracking-widest transition-all">CodeIgniter</button>
                 </div>
 
-                {{-- CODE BOX --}}
+                <!--  CODE BOX  -->
                 <div class="bg-gray-900 rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col min-h-[550px] border-8 border-gray-800">
-                    {{-- Header Kotak Kode (Dengan Tombol di Kanan) --}}
+                    <!--  Header Kotak Kode (Dengan Tombol di Kanan)  -->
                     <div class="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
                         <div class="flex space-x-2">
                             <div class="w-3 h-3 rounded-full bg-red-500/40"></div>
                             <div class="w-3 h-3 rounded-full bg-yellow-500/40"></div>
                             <div class="w-3 h-3 rounded-full bg-green-500/40"></div>
                         </div>
-                        {{-- Tombol Salin dan Preview di Header Kanan --}}
+                        <!--  Tombol Salin dan Preview di Header Kanan  -->
                         <div class="flex space-x-3">
                             <button @click="copyCode()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg flex items-center">
                                 <i class="fas fa-copy mr-2"></i> SALIN
                             </button>
-                            {{-- Logic Toggle: Jika pratinjau aktif, klik tombol akan menutupnya. Jika tidak, akan memuat pratinjau. --}}
+                            <!--  Logic Toggle: Jika pratinjau aktif, klik tombol akan menutupnya. Jika tidak, akan memuat pratinjau.  -->
                             <button @click="showPreview ? showPreview = false : runPreview()" class="bg-orange-500 hover:bg-orange-600 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg" :title="showPreview ? 'Lihat Kode' : 'Live Preview'">
                                 <i class="fas text-sm" :class="loading ? 'fa-spinner fa-spin' : (showPreview ? 'fa-code' : 'fa-eye')"></i>
                             </button>
@@ -232,12 +232,12 @@
                     </div>
 
                     <div class="relative flex-grow">
-                        {{-- PREVIEW AREA --}}
+                        <!--  PREVIEW AREA  -->
                         <div v-show="showPreview" class="bg-[#fcfcfc] p-8 md:p-14 h-full min-h-[450px] overflow-y-auto text-sans">
                             <div id="preview-area" class="w-full"></div>
                         </div>
 
-                        {{-- CODE AREA --}}
+                        <!--  CODE AREA  -->
                         <div v-show="!showPreview" class="p-8 md:p-12 font-mono text-[13px] leading-relaxed text-blue-100/80 overflow-x-auto">
                             <div v-show="motherTab === 'card'">
                                 <template x-if="codeTab === 'html'">
