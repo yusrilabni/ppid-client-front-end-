@@ -496,24 +496,24 @@ const informasiItems = [
                       <i :data-lucide="item.icon" class="w-40 h-40"></i>
                     </div>
 
-                    <div class="p-6 flex-grow flex flex-col relative z-10">
-                      <div class="flex items-center mb-6">
-                        <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center mr-4 shadow-md flex-shrink-0 group-hover:scale-110 transition-transform duration-500', getColorStyles(item.color, 'bgGradient')]">
-                          <i :data-lucide="item.icon" class="text-white w-6 h-6"></i>
+                    <div class="p-5 flex-grow flex flex-col relative z-10 pb-2">
+                      <div class="flex items-center mb-4">
+                        <div :class="['w-10 h-10 rounded-2xl flex items-center justify-center mr-3 shadow-md flex-shrink-0 group-hover:scale-110 transition-transform duration-500', getColorStyles(item.color, 'bgGradient')]">
+                          <i :data-lucide="item.icon" class="text-white w-5 h-5"></i>
                         </div>
-                        <h3 class="text-lg font-extrabold text-gray-800 leading-tight">{{ item.title }}</h3>
+                        <h3 class="text-base font-extrabold text-gray-800 leading-tight">{{ item.title }}</h3>
                       </div>
-                      <ul class="space-y-4 mb-6">
-                        <li v-for="(point, pIdx) in item.points" :key="pIdx" class="flex items-start text-[13px] text-gray-600 font-medium group-hover:text-gray-900 transition-colors duration-300">
-                          <i data-lucide="check-circle" :class="['mt-0.5 mr-3 flex-shrink-0 w-4 h-4', getColorStyles(item.color, 'text600')]"></i>
+                      <ul class="space-y-2.5">
+                        <li v-for="(point, pIdx) in item.points" :key="pIdx" class="flex items-start text-[12px] text-gray-600 font-medium group-hover:text-gray-900 transition-colors duration-300">
+                          <i data-lucide="check-circle" :class="['mt-0.5 mr-2.5 flex-shrink-0 w-3.5 h-3.5', getColorStyles(item.color, 'text600')]"></i>
                           <span class="leading-relaxed">{{ point }}</span>
                         </li>
                       </ul>
                     </div>
-                    <div class="mt-auto p-5 relative z-10 bg-white">
-                      <router-link :to="item.url" :class="['w-full py-3 px-4 rounded-xl text-white font-bold text-center flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 transform group-hover:-translate-y-1 text-sm', getColorStyles(item.color, 'bgGradient')]">
+                    <div class="mt-auto p-5 pt-3 relative z-10 bg-white rounded-b-3xl">
+                      <router-link :to="item.url" :class="['w-full py-2.5 px-4 rounded-xl text-white font-bold text-center flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 transform group-hover:-translate-y-1 text-sm', getColorStyles(item.color, 'bgGradient')]">
                         Akses Informasi
-                        <i data-lucide="arrow-right" class="ml-2 w-5 h-5 inline-block group-hover:translate-x-1.5 transition-transform"></i>
+                        <i data-lucide="arrow-right" class="ml-2 w-4 h-4 inline-block group-hover:translate-x-1.5 transition-transform"></i>
                       </router-link>
                     </div>
                   </div>
