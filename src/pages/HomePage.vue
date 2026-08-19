@@ -169,44 +169,12 @@ useGlobalLoader(loading)
 
 const fetchRSS = async () => {
   try {
-    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://humas.sinjaikab.go.id/v1/rss')}`)
-    if (res.ok) {
-      const json = await res.json()
-      const parser = new DOMParser()
-      const xmlDoc = parser.parseFromString(json.contents, 'text/xml')
-      const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 10)
-      
-      rss_items.value = items.map(item => {
-        const title = item.querySelector('title')?.textContent || ''
-        const link = item.querySelector('link')?.textContent || '#'
-        const pubDate = item.querySelector('pubDate')?.textContent || ''
-        let image = ''
-        const enclosure = item.querySelector('enclosure')
-        if (enclosure && enclosure.getAttribute('url')) {
-          image = enclosure.getAttribute('url')
-        } else {
-          // Coba cari tag dengan namespace media:content atau media:thumbnail
-          const mediaContent = item.getElementsByTagName('media:content')[0] || item.getElementsByTagNameNS('*', 'content')[0]
-          if (mediaContent && mediaContent.getAttribute('url')) {
-            image = mediaContent.getAttribute('url')
-          } else {
-            const mediaThumb = item.getElementsByTagName('media:thumbnail')[0] || item.getElementsByTagNameNS('*', 'thumbnail')[0]
-            if (mediaThumb && mediaThumb.getAttribute('url')) {
-              image = mediaThumb.getAttribute('url')
-            }
-          }
-        }
-        
-        return {
-          title,
-          link,
-          pubDate,
-          image
-        }
-      })
+    const res = await api.get('/rss-news')
+    if (res.data && res.data.success) {
+      rss_items.value = res.data.data || []
     }
   } catch (error) {
-    console.error('Gagal mengambil RSS Humas Sinjai:', error)
+    console.error('Gagal mengambil berita RSS dari API lokal:', error)
   }
 }
 
