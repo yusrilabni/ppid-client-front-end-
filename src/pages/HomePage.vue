@@ -186,8 +186,29 @@ const { isLoading: loading, data: queryData, isFetching, isError, refetch } = us
 const { isLoading: loadingRss, data: rssQueryData } = useQuery({
   queryKey: ['rss_news'],
   queryFn: async () => {
-    const res = await api.get('/rss-news')
-    return res.data.success ? (res.data.data || []) : []
+    try {
+      const res = await fetch('https://humas.sinjaikab.go.id/v1/rss')
+      const text = await res.text()
+      const parser = new DOMParser()
+      const xml = parser.parseFromString(text, 'text/xml')
+      const items = Array.from(xml.querySelectorAll('item')).slice(0, 16)
+      
+      return items.map(item => {
+        const title = item.querySelector('title')?.textContent || ''
+        const link = item.querySelector('link')?.textContent || ''
+        const pubDate = item.querySelector('pubDate')?.textContent || ''
+        const description = item.querySelector('description')?.textContent || ''
+        let image = ''
+        const enclosure = item.querySelector('enclosure')
+        if (enclosure && enclosure.getAttribute('url')) {
+          image = enclosure.getAttribute('url')
+        }
+        return { title, link, pubDate, description, image }
+      })
+    } catch (e) {
+      console.error('Gagal mengambil RSS Humas secara langsung:', e)
+      return []
+    }
   }
 })
 
