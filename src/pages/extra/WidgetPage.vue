@@ -35,7 +35,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Konten</label>
-                                    <CustomSelect v-model="mode" :options="[{value: 'latest', label: 'Terbaru'}, {value: 'popular', label: 'Terpopuler'}]" placeholder="Pilih..." />
+                                    <CustomSelect v-model="type" :options="[{value: 'latest', label: 'Terbaru'}, {value: 'popular', label: 'Terpopuler'}]" placeholder="Pilih..." />
                                 </div>
                                 <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Gaya Dasar</label>
@@ -50,14 +50,14 @@
                                 </div>
                                 <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Jumlah Total Data</label>
-                                    <CustomSelect v-model="limit" :options="[{value: 1, label: '1 Kolom'}, {value: 2, label: '2 Kolom'}, {value: 3, label: '3 Kolom'}, {value: 4, label: '4 Kolom'}]" placeholder="Pilih..." />
+                                    <CustomSelect v-model="columns" :options="[{value: 1, label: '1 Kolom'}, {value: 2, label: '2 Kolom'}, {value: 3, label: '3 Kolom'}, {value: 4, label: '4 Kolom'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div v-show="mode === 'slider' && display === 'card'" class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Autoplay Slider</label>
-                                    <CustomSelect :modelValue="'true'" :options="[{value: 'true', label: 'Aktif'}, {value: 'false', label: 'Mati'}]" placeholder="Pilih..." />
+                                    <CustomSelect v-model="autoplay" :options="[{value: 'true', label: 'Aktif'}, {value: 'false', label: 'Mati'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
@@ -70,7 +70,7 @@
                                 <div class="transition-all duration-200" >
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Filter Tahun</label>
                                     
-                                    <CustomSelect :modelValue="''" :options="[{value: '', label: 'Semua Tahun'}, {value: '2024', label: '2024'}, {value: '2023', label: '2023'}, {value: '2022', label: '2022'}]" placeholder="Pilih..." />
+                                    <CustomSelect v-model="year" :options="[{value: '', label: 'Semua Tahun'}, {value: '2024', label: '2024'}, {value: '2023', label: '2023'}, {value: '2022', label: '2022'}]" placeholder="Pilih..." />
                                 </div>
                             </div>
 
@@ -247,7 +247,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import CustomSelect from '@/components/CustomSelect.vue';
 import api from '@/services/api';
 
@@ -255,6 +255,10 @@ const profilData = ref({});
 const organizations = ref([]);
 
 // State for WidgetPage
+const type = ref('latest');
+const columns = ref(2);
+const autoplay = ref('true');
+const year = ref('');
 const mode = ref('slider');
 const limit = ref(5);
 const category = ref('');
@@ -265,7 +269,16 @@ const activeDropdown = ref('auto');
 const refreshKey = ref(0);
 const embedCode = ref('');
 
-watch([mode, limit, category, display, color, unit_id], () => { forceRefresh(); }, { deep: true });
+const embedUrl = computed(() => {
+    let url = 'https://ppidkab.sinjaikab.go.id/widgets/embed?type=' + type.value + '&display=' + display.value + '&mode=' + mode.value + '&columns=' + columns.value + '&autoplay=' + autoplay.value + '&limit=' + limit.value;
+    if (unit_id.value) url += '&unit_id=' + unit_id.value;
+    if (year.value) url += '&year=' + year.value;
+    if (category.value) url += '&category=' + encodeURIComponent(category.value);
+    url += '&t=' + refreshKey.value;
+    return url;
+});
+
+watch([type, display, category, mode, columns, autoplay, limit, unit_id, year], () => { forceRefresh(); }, { deep: true });
 
 const forceRefresh = () => {
     refreshKey.value++;
