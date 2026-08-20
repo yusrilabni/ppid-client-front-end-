@@ -2,10 +2,10 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
     <div class="w-full max-w-md">
       
-      <!-- Back to Login -->
-      <router-link to="/login" class="absolute top-4 left-4 sm:top-8 sm:left-8 text-gray-400 hover:text-blue-600 transition-colors flex items-center text-xs font-bold uppercase tracking-widest">
-        <i class="fas fa-arrow-left w-3 h-3 mr-2"></i> Kembali
-      </router-link>
+      <!-- Breadcrumbs -->
+      <div class="absolute top-4 left-4 sm:top-8 sm:left-8">
+        <Breadcrumbs :breadcrumbs="breadcrumbItems" />
+      </div>
 
       <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 relative">
         
@@ -99,13 +99,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getAssetUrl } from '@/services/api'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+const breadcrumbItems = computed(() => getBreadcrumbs.registerPage())
 
 const form = ref({ name: '', email: '', password: '', password_confirmation: '' })
 const showPassword = ref(false)

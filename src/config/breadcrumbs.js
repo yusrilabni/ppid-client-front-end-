@@ -179,5 +179,15 @@ export const getBreadcrumbs = {
     profilePage: () => [
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
         { title: 'Profile', url: '', icon: 'fas fa-user' }
+    ],
+    loginPage: () => [
+        { title: 'Beranda', url: '/', icon: 'fas fa-home' },
+        { title: 'Otentikasi', url: '', icon: 'fas fa-lock' },
+        { title: 'Login', url: '', icon: 'fas fa-sign-in-alt' }
+    ],
+    registerPage: () => [
+        { title: 'Beranda', url: '/', icon: 'fas fa-home' },
+        { title: 'Otentikasi', url: '', icon: 'fas fa-lock' },
+        { title: 'Daftar', url: '', icon: 'fas fa-user-plus' }
     ]
 };
