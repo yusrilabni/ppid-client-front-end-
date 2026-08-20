@@ -172,7 +172,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                                   <div v-else class="relative flex-shrink-0" @mouseenter="activeSubMenu = index" @mouseleave="activeSubMenu = null">
                                       <button 
                                           class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
-                                          :class="(hasActiveChild(menu.children) || activeSubMenu === index) ? 'bg-white text-blue-600 shadow-sm border border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 hover:shadow-sm'">
+                                          :class="hasActiveChild(menu.children) ? 'bg-white text-blue-600 shadow-sm border border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 hover:shadow-sm'">
                                           <i :class="['fas', 'fa-' + (menu.icon || 'folder'), 'mr-2', hasActiveChild(menu.children) ? 'text-blue-600' : 'text-blue-500']"></i>
                                           {{ wordLimit(menu.title) }}
                                           <i class="fas fa-chevron-down h-3 w-3 ml-2 transition-transform duration-300 flex-shrink-0"
