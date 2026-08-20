@@ -65,6 +65,22 @@
           
         </form>
         
+        <div class="mt-6">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-200"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-2 bg-white text-gray-500">Atau lanjutkan dengan</span>
+            </div>
+          </div>
+
+          <button @click="handleGoogleLogin" type="button" :disabled="loading" class="mt-6 w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5" />
+            <span>Login dengan Google</span>
+          </button>
+        </div>
+        
         <div class="mt-8 text-center">
           <p class="text-sm text-gray-600 mb-3">Belum punya akun?</p>
           <router-link to="/register" class="block w-full py-3 border-2 border-blue-600 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-colors">
@@ -83,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getAssetUrl } from '@/services/api'
@@ -100,6 +116,22 @@ const form = ref({ email: '', password: '' })
 const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
+
+onMounted(() => {
+  if (route.query.error === 'not_registered') {
+    error.value = 'Email Anda belum terdaftar di sistem. Silakan buat akun terlebih dahulu.'
+  } else if (route.query.error === 'auth_failed') {
+    error.value = 'Gagal masuk dengan Google. Silakan coba lagi.'
+  } else if (route.query.error === 'invalid_action') {
+    error.value = 'Terjadi kesalahan sistem, aksi tidak valid.'
+  }
+})
+
+const handleGoogleLogin = () => {
+  loading.value = true
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://ppid.sinjaikab.go.id'
+  window.location.href = `${apiUrl}/api/auth/google/redirect?action=login`
+}
 
 const handleLogin = async () => {
   loading.value = true

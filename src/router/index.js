@@ -11,6 +11,7 @@ import HomePage from '@/pages/HomePage.vue'
 import SearchPage from '@/pages/SearchPage.vue'
 import LoginPage from '@/pages/auth/LoginPage.vue'
 import RegisterPage from '@/pages/auth/RegisterPage.vue'
+import AuthCallback from '@/pages/auth/AuthCallback.vue'
 
 // Information pages
 import InformasiCategory from '@/pages/informasi/CategoryPage.vue'
@@ -66,6 +67,7 @@ const routes = [
       { path: 'search', name: 'search', component: SearchPage },
       { path: 'login', name: 'login', component: LoginPage },
       { path: 'register', name: 'register', component: RegisterPage },
+      { path: 'auth/callback', name: 'auth.callback', component: AuthCallback },
       // Extra
       { path: 'kebijakan-privasi', name: 'kebijakan-privasi', component: KebijakanPrivasiPage },
       { path: 'rss', name: 'rss', component: RssPage },

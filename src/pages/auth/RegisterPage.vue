@@ -83,6 +83,22 @@
           
         </form>
         
+        <div class="mt-6">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-200"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-2 bg-white text-gray-500">Atau daftar dengan</span>
+            </div>
+          </div>
+
+          <button @click="handleGoogleRegister" type="button" :disabled="loading" class="mt-6 w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5" />
+            <span>Daftar dengan Google</span>
+          </button>
+        </div>
+        
         <div class="mt-8 text-center">
           <p class="text-sm text-gray-600 mb-3">Sudah punya akun?</p>
           <router-link to="/login" class="block w-full py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 hover:text-gray-900 transition-colors">
@@ -101,14 +117,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getAssetUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const breadcrumbItems = computed(() => getBreadcrumbs.registerPage())
@@ -118,6 +135,20 @@ const showPassword = ref(false)
 const showConfirm = ref(false)
 const loading = ref(false)
 const error = ref('')
+
+onMounted(() => {
+  if (route.query.error === 'already_registered') {
+    error.value = 'Email Anda sudah terdaftar di sistem. Silakan login ke akun Anda.'
+  } else if (route.query.error === 'auth_failed') {
+    error.value = 'Gagal mendaftar dengan Google. Silakan coba lagi.'
+  }
+})
+
+const handleGoogleRegister = () => {
+  loading.value = true
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://ppid.sinjaikab.go.id'
+  window.location.href = `${apiUrl}/api/auth/google/redirect?action=register`
+}
 
 const handleRegister = async () => {
   if (form.value.password !== form.value.password_confirmation) {
