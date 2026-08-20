@@ -175,5 +175,9 @@ export const getBreadcrumbs = {
         { title: 'Beranda', url: '/', icon: 'fas fa-home' },
         { title: 'Transparansi', url: '#', icon: 'fas fa-chart-bar' },
         { title: 'Cek Status', url: '', icon: 'fas fa-search-location' }
+    ],
+    profilePage: () => [
+        { title: 'Beranda', url: '/', icon: 'fas fa-home' },
+        { title: 'Profile', url: '', icon: 'fas fa-user' }
     ]
 };

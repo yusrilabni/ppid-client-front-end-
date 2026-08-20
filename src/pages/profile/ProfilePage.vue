@@ -5,7 +5,7 @@
       <!-- Breadcrumbs -->
       <Breadcrumbs :breadcrumbs="breadcrumbItems" class="px-4 sm:px-0" />
 
-      <div v-if="!loading" class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+      <div v-if="!loading && profileData" class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
         <section>
           <header>
             <h2 class="text-lg font-medium text-gray-900">
@@ -189,25 +189,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import api, { getStorageUrl } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
-import { useRoute } from 'vue-router'
+import breadcrumbs from '@/config/breadcrumbs'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 const authStore = useAuthStore()
-const route = useRoute()
+const queryClient = useQueryClient()
 
-const loading = ref(true)
+const { data: profileData, isLoading: queryLoading, isFetching } = useQuery({
+  queryKey: ['user_profile'],
+  queryFn: async () => {
+    const response = await api.get('/profile')
+    return response.data.data
+  },
+  staleTime: 5 * 60 * 1000 // 5 menit
+})
+
+const loading = computed(() => queryLoading.value)
 useGlobalLoader(loading)
 
-const breadcrumbItems = computed(() => [
-  { title: 'Beranda', url: '/', icon: 'fas fa-home' },
-  { title: 'Profile', url: route.path, icon: 'fas fa-user' }
-])
+const breadcrumbItems = computed(() => breadcrumbs.profilePage())
 const saving = ref(false)
-const profileData = ref({})
 const errors = ref({})
 const successMessage = ref('')
 
@@ -226,40 +232,27 @@ const form = ref({
 const photoPreview = ref(null)
 const photoInput = ref(null)
 
+watch(profileData, (data) => {
+  if (data) {
+    form.value.nip = data.user?.nip || ''
+    form.value.name = data.user?.name || ''
+    form.value.email = data.user?.email || ''
+    form.value.facebook = data.user?.facebook || ''
+    form.value.instagram = data.user?.instagram || ''
+    form.value.tiktok = data.user?.tiktok || ''
+    form.value.linkedin = data.user?.linkedin || ''
+    form.value.email_can_update = !data.is_asn || !data.user?.email || data.user?.email === '-'
+  }
+}, { immediate: true })
+
 const userInitials = computed(() => {
-  const name = form.value.name || profileData.value.user?.name || 'User'
+  const name = form.value.name || profileData.value?.user?.name || 'User'
   const names = name.split(' ')
   if (names.length >= 2) {
     return (names[0].charAt(0) + names[1].charAt(0)).toUpperCase()
   }
   return name.substring(0, 2).toUpperCase()
 })
-
-const fetchProfile = async () => {
-  try {
-    loading.value = true
-    const response = await api.get('/profile')
-    if (response.data.success) {
-      const data = response.data.data
-      profileData.value = data
-      
-      form.value.nip = data.user.nip || ''
-      form.value.name = data.user.name || ''
-      form.value.email = data.user.email || ''
-      form.value.facebook = data.user.facebook || ''
-      form.value.instagram = data.user.instagram || ''
-      form.value.tiktok = data.user.tiktok || ''
-      form.value.linkedin = data.user.linkedin || ''
-      
-      // Determine if email can be updated (if it was empty initially, or we allow it)
-      form.value.email_can_update = !data.is_asn || !data.user.email || data.user.email === '-'
-    }
-  } catch (error) {
-    console.error('Error fetching profile:', error)
-  } finally {
-    loading.value = false
-  }
-}
 
 const handlePhotoChange = (e) => {
   const file = e.target.files[0]
@@ -281,11 +274,9 @@ const updateProfile = async () => {
     
     const formData = new FormData()
     formData.append('nip', form.value.nip)
-    // we only allow updating email if email_can_update is true
     if (form.value.email_can_update) {
       formData.append('email', form.value.email)
     }
-    // we don't send name if they are ASN because API handles it, but let's just send it
     formData.append('name', form.value.name)
     formData.append('facebook', form.value.facebook)
     formData.append('instagram', form.value.instagram)
@@ -308,12 +299,19 @@ const updateProfile = async () => {
         successMessage.value = ''
       }, 3000)
       
+      // Update cache manually
+      queryClient.setQueryData(['user_profile'], (old) => {
+         if (!old) return old;
+         return {
+            ...old,
+            user: response.data.data.user,
+            profile_photo_url: response.data.data.profile_photo_url
+         }
+      })
+      
       // Update auth store user and localStorage
       authStore.user = response.data.data.user
       localStorage.setItem('ppid_user', JSON.stringify(authStore.user))
-      
-      // Update profile data photo url
-      profileData.value.profile_photo_url = response.data.data.profile_photo_url
     }
   } catch (error) {
     if (error.response?.status === 422) {
@@ -325,8 +323,4 @@ const updateProfile = async () => {
     saving.value = false
   }
 }
-
-onMounted(() => {
-  fetchProfile()
-})
 </script>
