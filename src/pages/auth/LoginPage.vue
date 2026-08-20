@@ -1,13 +1,14 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-    <div class="w-full max-w-md">
-      
-      <!-- Breadcrumbs -->
-      <div class="mb-4">
-        <Breadcrumbs :breadcrumbs="breadcrumbItems" />
-      </div>
+  <div class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Breadcrumbs at the top -->
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+      <Breadcrumbs :breadcrumbs="breadcrumbItems" />
+    </div>
 
-      <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 relative">
+    <!-- Centered Form -->
+    <div class="flex-1 flex items-center justify-center px-4 pb-12">
+      <div class="w-full max-w-md">
+        <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 relative">
         
         <!-- Header -->
         <div class="text-center mb-8">
@@ -76,6 +77,7 @@
       <p class="text-center text-xs text-gray-500 mt-8">
         &copy; 2026 PPID - Kabupaten Sinjai
       </p>
+    </div>
     </div>
   </div>
 </template>
