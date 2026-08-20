@@ -24,6 +24,7 @@ import ProfilPpid from '@/pages/profil/ProfilPpidPage.vue'
 import TentangOpd from '@/pages/profil/TentangOpdPage.vue'
 import OpdDetail from '@/pages/profil/OpdDetailPage.vue'
 import OfficialProfile from '@/pages/profil/OfficialProfilePage.vue'
+import ProfilePage from '@/pages/profile/ProfilePage.vue'
 import PejabatDaerahPage from '@/pages/profil/PejabatDaerahPage.vue'
 import UnitLokalPage from '@/pages/profil/UnitLokalPage.vue'
 
@@ -77,6 +78,7 @@ const routes = [
       // Gallery
       { path: 'galeri', name: 'galeri', component: GaleriPage },
       // Profil
+      { path: 'profile', name: 'profile', component: ProfilePage, meta: { requiresAuth: true } },
       { path: 'profil/ppid', name: 'profil.ppid', component: ProfilPpid },
       { path: 'profil/tentang-opd', name: 'profil.opd', component: TentangOpd },
       { path: 'profil/tentang-opd/:slug', name: 'profil.opd.detail', component: OpdDetail },
@@ -162,6 +164,7 @@ router.afterEach((to) => {
     'informasi-pemkab': 'Informasi Pemkab',
     'informasi-pemkab.show': 'Detail Informasi Pemkab',
     'galeri': 'Galeri',
+    'profile': 'Profil',
     'profil.ppid': 'Profil PPID',
     'profil.opd': 'Tentang OPD',
     'profil.opd.detail': 'Detail OPD',
