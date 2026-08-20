@@ -289,7 +289,7 @@ onUnmounted(() => {
                               <div v-show="activeSubMenu === 'user'"
                                   class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white z-[999]">
                                   <div class="py-1">
-                                      <div class="px-4 py-2 border-b">
+                                      <div class="px-4 py-2 border-b border-gray-100">
                                           <p class="text-sm font-medium text-gray-900">{{ authStore.user?.name }}</p>
                                           <p class="text-xs text-gray-500">{{ authStore.isAdmin ? authStore.user?.nip : authStore.user?.email }}</p>
                                       </div>
