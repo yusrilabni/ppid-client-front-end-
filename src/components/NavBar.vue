@@ -2,10 +2,12 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useLoadingStore } from '@/stores/loading'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const loadingStore = useLoadingStore()
 
 const open = ref(false)
 const searchOpen = ref(false)
@@ -35,8 +37,13 @@ const handleSearch = () => {
 }
 
 const handleLogout = async () => {
-  await authStore.logout()
-  router.push({ name: 'home' })
+  loadingStore.startLoading()
+  try {
+    await authStore.logout()
+    router.push({ name: 'home' })
+  } finally {
+    loadingStore.stopLoading()
+  }
 }
 
 import api, { getStorageUrl } from '@/services/api'
