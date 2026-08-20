@@ -178,16 +178,16 @@ onUnmounted(() => {
                               <template v-if="!(menu.title === 'DIP' && (!menu.children || menu.children.length === 0)) && menu.title !== 'Login'">
                                   <router-link v-if="!menu.children || menu.children.length === 0" 
                                       :to="menu.url"
-                                      class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border"
-                                      :class="isActive(menu.url) ? 'bg-white text-blue-600 shadow-sm border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 border-transparent hover:border-blue-200 hover:shadow-sm'">
+                                      class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+                                      :class="isActive(menu.url) ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-700 hover:bg-white hover:text-blue-600 hover:shadow-sm'">
                                       <i :class="['fas', 'fa-' + (menu.icon || 'circle'), 'mr-2', isActive(menu.url) ? 'text-blue-600' : 'text-blue-500']"></i>
                                       {{ menu.title }}
                                   </router-link>
                                   
                                   <div v-else class="relative flex-shrink-0">
                                       <button @click.stop="activeSubMenu = activeSubMenu === index ? null : index"
-                                          class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border"
-                                          :class="(hasActiveChild(menu.children) || activeSubMenu === index) ? 'bg-white text-blue-600 shadow-sm border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 border-transparent hover:border-blue-200 hover:shadow-sm'">
+                                          class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+                                          :class="(hasActiveChild(menu.children) || activeSubMenu === index) ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-700 hover:bg-white hover:text-blue-600 hover:shadow-sm'">
                                           <i :class="['fas', 'fa-' + (menu.icon || 'folder'), 'mr-2', hasActiveChild(menu.children) ? 'text-blue-600' : 'text-blue-500']"></i>
                                           {{ wordLimit(menu.title) }}
                                           <i class="fas fa-chevron-down h-3 w-3 ml-2 transition-transform duration-300 flex-shrink-0"
@@ -287,7 +287,7 @@ onUnmounted(() => {
                               leave-from-class="opacity-100 scale-100"
                               leave-to-class="opacity-0 scale-95">
                               <div v-show="activeSubMenu === 'user'"
-                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[999]">
+                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white z-[999]">
                                   <div class="py-1">
                                       <div class="px-4 py-2 border-b">
                                           <p class="text-sm font-medium text-gray-900">{{ authStore.user?.name }}</p>
