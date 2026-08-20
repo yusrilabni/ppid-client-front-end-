@@ -41,9 +41,17 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const response = await api.post('/register', data)
-      return { success: true, data: response.data }
+      const responseData = response.data
+      if (responseData.success && responseData.data?.token) {
+        token.value = responseData.data.token
+        user.value = responseData.data.user
+        localStorage.setItem('ppid_token', responseData.data.token)
+        localStorage.setItem('ppid_user', JSON.stringify(responseData.data.user))
+        return { success: true }
+      }
+      throw new Error(responseData.message || 'Registrasi gagal')
     } catch (err) {
-      error.value = err.response?.data?.message || err.message
+      error.value = err.response?.data?.message || err.message || 'Registrasi gagal'
       return { success: false, message: error.value }
     } finally {
       loading.value = false
