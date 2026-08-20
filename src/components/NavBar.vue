@@ -47,6 +47,23 @@ const wordLimit = (str, limit = 3) => {
   return words.slice(0, limit).join(' ') + (words.length > limit ? '...' : '')
 }
 
+import { computed } from 'vue'
+
+const displayableName = computed(() => {
+  if (!authStore.user?.name) return ''
+  const words = authStore.user.name.split(' ').slice(0, 3)
+  let name = words.join(' ')
+  return name.replace(/[^\p{L}\p{N}\s]+$/gu, '')
+})
+
+const userInitials = computed(() => {
+  if (!authStore.user?.name) return 'U'
+  const words = authStore.user.name.split(' ')
+  let limit = words.length === 4 ? 3 : words.length
+  if (limit > 3) limit = 3 // Ensure it doesn't get too long
+  return words.slice(0, limit).map(w => w.charAt(0).toUpperCase()).join('')
+})
+
 const currentYear = new Date().getFullYear()
 
 const menus = [
@@ -236,12 +253,12 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                                       :alt="authStore.user.name" width="32" height="32">
                               </template>
                               <template v-else>
-                                  <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                                      {{ authStore.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+                                  <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs font-bold">
+                                      {{ userInitials }}
                                   </div>
                               </template>
                               <div class="flex flex-col items-start">
-                                  <span class="text-gray-700 text-sm font-medium">{{ wordLimit(authStore.user?.name, 3) }}</span>
+                                  <span class="text-gray-700 text-sm font-medium">{{ displayableName }}</span>
                                   <span class="text-gray-500 text-xs">{{ authStore.isAdmin ? authStore.user?.nip : authStore.user?.email }}</span>
                               </div>
                               <i class="fas fa-chevron-down text-xs text-gray-500"></i>
@@ -357,14 +374,14 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                                   :alt="authStore.user.name" width="40" height="40">
                           </template>
                           <template v-else>
-                              <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
-                                  {{ authStore.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+                              <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold text-lg">
+                                  {{ userInitials }}
                               </div>
                           </template>
                       </div>
 
                       <div class="ml-3">
-                          <div class="text-base font-medium text-gray-800">{{ wordLimit(authStore.user?.name, 3) }}</div>
+                          <div class="text-base font-medium text-gray-800">{{ displayableName || authStore.user?.name }}</div>
                           <div class="text-sm font-medium text-gray-500">{{ authStore.isAdmin ? authStore.user?.nip : authStore.user?.email }}</div>
                       </div>
                   </div>
