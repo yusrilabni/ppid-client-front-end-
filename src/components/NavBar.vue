@@ -242,7 +242,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                               </template>
                               <div class="flex flex-col items-start">
                                   <span class="text-gray-700 text-sm font-medium">{{ wordLimit(authStore.user?.name, 3) }}</span>
-                                  <span class="text-gray-500 text-xs">{{ authStore.user?.email }}</span>
+                                  <span class="text-gray-500 text-xs">{{ authStore.isAdmin ? authStore.user?.nip : authStore.user?.email }}</span>
                               </div>
                               <i class="fas fa-chevron-down text-xs text-gray-500"></i>
                           </button>
@@ -259,7 +259,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                                   <div class="py-1">
                                       <div class="px-4 py-2 border-b">
                                           <p class="text-sm font-medium text-gray-900">{{ authStore.user?.name }}</p>
-                                          <p class="text-xs text-gray-500">{{ authStore.user?.email }}</p>
+                                          <p class="text-xs text-gray-500">{{ authStore.isAdmin ? authStore.user?.nip : authStore.user?.email }}</p>
                                       </div>
                                       <router-link v-if="authStore.isAdmin" to="/admin/dashboard"
                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -365,7 +365,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
 
                       <div class="ml-3">
                           <div class="text-base font-medium text-gray-800">{{ wordLimit(authStore.user?.name, 3) }}</div>
-                          <div class="text-sm font-medium text-gray-500">{{ authStore.user?.email }}</div>
+                          <div class="text-sm font-medium text-gray-500">{{ authStore.isAdmin ? authStore.user?.nip : authStore.user?.email }}</div>
                       </div>
                   </div>
                   <div class="mt-3 space-y-1">
