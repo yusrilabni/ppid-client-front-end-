@@ -194,7 +194,7 @@ import api, { getStorageUrl } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
-import breadcrumbs from '@/config/breadcrumbs'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 const authStore = useAuthStore()
@@ -212,7 +212,7 @@ const { data: profileData, isLoading: queryLoading, isFetching } = useQuery({
 const loading = computed(() => queryLoading.value)
 useGlobalLoader(loading)
 
-const breadcrumbItems = computed(() => breadcrumbs.profilePage())
+const breadcrumbItems = computed(() => getBreadcrumbs.profilePage())
 const saving = ref(false)
 const errors = ref({})
 const successMessage = ref('')
