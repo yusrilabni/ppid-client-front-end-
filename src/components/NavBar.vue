@@ -132,6 +132,21 @@ const menus = [
 ]
 const isActive = (url) => route.path === url || route.path.startsWith(url + '/')
 const hasActiveChild = (children) => children.some(child => isActive(child.url))
+const handleClickOutside = (e) => {
+  if (activeSubMenu.value !== null) {
+    if (!e.target.closest('.relative') && !e.target.closest('.absolute')) {
+      activeSubMenu.value = null
+    }
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
@@ -163,16 +178,16 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                               <template v-if="!(menu.title === 'DIP' && (!menu.children || menu.children.length === 0)) && menu.title !== 'Login'">
                                   <router-link v-if="!menu.children || menu.children.length === 0" 
                                       :to="menu.url"
-                                      class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
-                                      :class="isActive(menu.url) ? 'bg-white text-blue-600 shadow-sm border border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 hover:shadow-sm'">
+                                      class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border"
+                                      :class="isActive(menu.url) ? 'bg-white text-blue-600 shadow-sm border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 border-transparent hover:border-blue-200 hover:shadow-sm'">
                                       <i :class="['fas', 'fa-' + (menu.icon || 'circle'), 'mr-2', isActive(menu.url) ? 'text-blue-600' : 'text-blue-500']"></i>
                                       {{ menu.title }}
                                   </router-link>
                                   
-                                  <div v-else class="relative flex-shrink-0" @mouseenter="activeSubMenu = index" @mouseleave="activeSubMenu = null">
-                                      <button 
-                                          class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
-                                          :class="hasActiveChild(menu.children) ? 'bg-white text-blue-600 shadow-sm border border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 hover:shadow-sm'">
+                                  <div v-else class="relative flex-shrink-0">
+                                      <button @click.stop="activeSubMenu = activeSubMenu === index ? null : index"
+                                          class="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border"
+                                          :class="(hasActiveChild(menu.children) || activeSubMenu === index) ? 'bg-white text-blue-600 shadow-sm border-blue-200' : 'text-gray-700 hover:bg-white hover:text-blue-600 border-transparent hover:border-blue-200 hover:shadow-sm'">
                                           <i :class="['fas', 'fa-' + (menu.icon || 'folder'), 'mr-2', hasActiveChild(menu.children) ? 'text-blue-600' : 'text-blue-500']"></i>
                                           {{ wordLimit(menu.title) }}
                                           <i class="fas fa-chevron-down h-3 w-3 ml-2 transition-transform duration-300 flex-shrink-0"
@@ -245,8 +260,8 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
 
                   <template v-else>
                       <!-- Authenticated User Dropdown -->
-                      <div class="hidden xl:relative xl:flex items-center" @mouseenter="activeSubMenu = 'user'" @mouseleave="activeSubMenu = null">
-                          <button aria-label="Menu Pengguna" class="flex items-center space-x-2 bg-blue-50 rounded-full p-1 pr-3 hover:bg-blue-100 transition-colors focus:outline-none">
+                      <div class="hidden xl:relative xl:flex items-center">
+                          <button @click.stop="activeSubMenu = activeSubMenu === 'user' ? null : 'user'" aria-label="Menu Pengguna" class="flex items-center space-x-2 bg-blue-50 rounded-full p-1 pr-3 hover:bg-blue-100 transition-colors focus:outline-none">
                               <template v-if="authStore.user?.profile_photo_path">
                                   <img class="h-8 w-8 rounded-full object-cover"
                                       :src="getStorageUrl(authStore.user.profile_photo_path)"
@@ -272,13 +287,13 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                               leave-from-class="opacity-100 scale-100"
                               leave-to-class="opacity-0 scale-95">
                               <div v-show="activeSubMenu === 'user'"
-                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white z-[999]">
+                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[999]">
                                   <div class="py-1">
                                       <div class="px-4 py-2 border-b">
                                           <p class="text-sm font-medium text-gray-900">{{ authStore.user?.name }}</p>
                                           <p class="text-xs text-gray-500">{{ authStore.isAdmin ? authStore.user?.nip : authStore.user?.email }}</p>
                                       </div>
-                                      <router-link v-if="authStore.isAdmin" to="/admin/dashboard"
+                                      <router-link v-if="authStore.user?.role === 'superadmin'" to="/admin/dashboard"
                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                           <i class="fas fa-tachometer-alt w-5 mr-3 text-gray-400"></i>
                                           Admin Dashboard
