@@ -3,23 +3,9 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
       
       <!-- Breadcrumbs -->
-      <nav class="flex mb-6 px-4 sm:px-0" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-          <li class="inline-flex items-center">
-            <router-link to="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-              <i class="fas fa-home mr-2"></i> Beranda
-            </router-link>
-          </li>
-          <li>
-            <div class="flex items-center">
-              <i class="fas fa-chevron-right text-gray-400 text-xs mx-1"></i>
-              <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Profile</span>
-            </div>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumbs :breadcrumbs="breadcrumbItems" class="px-4 sm:px-0" />
 
-      <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+      <div v-if="!loading" class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
         <section>
           <header>
             <h2 class="text-lg font-medium text-gray-900">
@@ -27,12 +13,7 @@
             </h2>
           </header>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="mt-6 flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-
-          <form v-else @submit.prevent="updateProfile" class="mt-6 space-y-6">
+          <form @submit.prevent="updateProfile" class="mt-6 space-y-6">
             
             <!-- Profile Photo Section -->
             <div class="col-span-12 flex flex-col items-center text-center">
@@ -211,10 +192,20 @@
 import { ref, onMounted, computed } from 'vue';
 import api, { getStorageUrl } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
+const route = useRoute()
 
 const loading = ref(true)
+useGlobalLoader(loading)
+
+const breadcrumbItems = computed(() => [
+  { title: 'Beranda', url: '/', icon: 'fas fa-home' },
+  { title: 'Profile', url: route.path, icon: 'fas fa-user' }
+])
 const saving = ref(false)
 const profileData = ref({})
 const errors = ref({})
