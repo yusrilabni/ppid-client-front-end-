@@ -19,15 +19,15 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const response = await api.post('/login', credentials)
-      const data = response.data
-      if (data.token) {
-        token.value = data.token
-        user.value = data.user
-        localStorage.setItem('ppid_token', data.token)
-        localStorage.setItem('ppid_user', JSON.stringify(data.user))
+      const responseData = response.data
+      if (responseData.success && responseData.data?.token) {
+        token.value = responseData.data.token
+        user.value = responseData.data.user
+        localStorage.setItem('ppid_token', responseData.data.token)
+        localStorage.setItem('ppid_user', JSON.stringify(responseData.data.user))
         return { success: true }
       }
-      throw new Error(data.message || 'Login gagal')
+      throw new Error(responseData.message || 'Login gagal')
     } catch (err) {
       error.value = err.response?.data?.message || err.message || 'Login gagal'
       return { success: false, message: error.value }
