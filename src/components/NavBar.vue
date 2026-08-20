@@ -272,7 +272,7 @@ const hasActiveChild = (children) => children.some(child => isActive(child.url))
                               leave-from-class="opacity-100 scale-100"
                               leave-to-class="opacity-0 scale-95">
                               <div v-show="activeSubMenu === 'user'"
-                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[999]">
+                                  class="absolute top-full right-0 mt-2 w-60 rounded-md shadow-lg bg-white z-[999]">
                                   <div class="py-1">
                                       <div class="px-4 py-2 border-b">
                                           <p class="text-sm font-medium text-gray-900">{{ authStore.user?.name }}</p>
