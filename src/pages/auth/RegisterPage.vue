@@ -123,7 +123,7 @@ const handleRegister = async () => {
   try {
     const res = await authStore.register(form.value)
     if (!res.success) throw new Error(res.message)
-    router.push('/admin')
+    router.push('/')
   } catch (err) {
     error.value = err.message || 'Registrasi gagal. Silakan coba lagi.'
   } finally {

@@ -101,7 +101,7 @@ const handleLogin = async () => {
   try {
     const res = await authStore.login(form.value)
     if (!res.success) throw new Error(res.message)
-    router.push(route.query.redirect || '/admin')
+    router.push(route.query.redirect || '/')
   } catch (err) {
     error.value = err.message || 'Login gagal. Silakan periksa kembali kredensial Anda.'
   } finally {
