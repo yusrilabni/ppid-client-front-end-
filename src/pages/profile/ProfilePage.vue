@@ -341,7 +341,10 @@ const updateProfile = async () => {
     saving.value = false
   }
 }
-const linkGoogleAccount = () => { window.location.href = import.meta.env.VITE_API_URL + "/api/v1/auth/google/redirect?action=link" }
+const linkGoogleAccount = () => { 
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'
+  window.location.href = baseUrl + "/api/v1/auth/google/redirect?action=link" 
+}
 </script>
 
 
