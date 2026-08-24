@@ -5,6 +5,16 @@
       <!-- Breadcrumbs -->
       <Breadcrumbs :breadcrumbs="breadcrumbItems" class="px-4 sm:px-0" />
 
+      <!-- Alerts for Linking Account -->
+      <div v-if="linkedStatus === 'success'" class="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 shadow-sm mx-4 sm:mx-0">
+        <i class="fas fa-check-circle text-emerald-600 mt-0.5"></i>
+        <p class="text-sm text-emerald-700">Akun berhasil ditautkan dengan Google! Email profil Anda juga telah diperbarui otomatis. Mulai sekarang Anda bisa Login menggunakan Google.</p>
+      </div>
+      <div v-if="linkedStatus === 'failed'" class="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 shadow-sm mx-4 sm:mx-0">
+        <i class="fas fa-exclamation-circle text-red-600 mt-0.5"></i>
+        <p class="text-sm text-red-700">{{ linkedMessage }}</p>
+      </div>
+
       <!-- Banner Tautkan Akun -->
       <div v-if="profileData" class="mb-8 p-5 bg-blue-50 border border-blue-100 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
         <div class="flex items-start gap-4">
@@ -208,6 +218,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router'
 import api, { getStorageUrl } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
@@ -217,6 +228,10 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 const authStore = useAuthStore()
 const queryClient = useQueryClient()
+const route = useRoute()
+
+const linkedStatus = computed(() => route.query.linked)
+const linkedMessage = computed(() => route.query.msg ? decodeURIComponent(route.query.msg) : 'Gagal menautkan akun.')
 
 const { data: profileData, isLoading: queryLoading, isFetching } = useQuery({
   queryKey: ['user_profile'],
