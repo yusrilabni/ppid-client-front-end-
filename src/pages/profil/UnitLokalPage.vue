@@ -85,6 +85,12 @@
                   </div>
 
                   <div class="space-y-3 w-full">
+                    <template v-if="authStore.user && (authStore.user.role === 'superadmin' || authStore.user.unit_id == official.organization?.remote_id)">
+                      <a :href="`https://ppidkab.sinjaikab.go.id/profil/pimpinan/${official.id}/edit`" class="inline-flex items-center justify-center w-full bg-amber-500 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-amber-100 hover:bg-amber-600">
+                        <i class="fas fa-edit text-sm"></i>
+                        Edit
+                      </a>
+                    </template>
                     <router-link :to="`/profil/${official.slug}`" class="inline-flex items-center justify-center w-full bg-indigo-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-indigo-100">
                       Profil Lengkap <i class="fas fa-arrow-right text-sm"></i>
                     </router-link>
@@ -108,7 +114,9 @@ import { useQuery } from '@tanstack/vue-query'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import api, { getStorageUrl } from '@/services/api'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const groupedData = ref({})
 
 const { isLoading: queryLoading, data: queryData, isFetching } = useQuery({
