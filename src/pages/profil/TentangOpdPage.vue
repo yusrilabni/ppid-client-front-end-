@@ -93,7 +93,7 @@
                                 <i class="fas fa-sitemap mr-1"></i> Struktur & Website
                             </router-link>
 
-                            <template v-if="authStore.user && (authStore.user.role === 'superadmin' || authStore.user.unit_id == org.remote_id)">
+                            <template v-if="authStore.user && authStore.user.unit_id == org.remote_id">
                                 <div class="pt-2">
                                     <a :href="`http://ppidkab.sinjaikab.go.id/profil/tentang-opd/${org.id}/manage`" target="_blank" class="inline-flex items-center justify-center w-full bg-white text-blue-600 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
                                         <i class="fas fa-edit"></i> Kelola Profil Unit
@@ -145,7 +145,7 @@
                             <i class="fas fa-sitemap mr-1"></i> Struktur & Website
                         </router-link>
 
-                        <template v-if="authStore.user && (authStore.user.role === 'superadmin' || authStore.user.unit_id == org.remote_id)">
+                        <template v-if="authStore.user && authStore.user.unit_id == org.remote_id">
                             <div class="pt-2">
                                 <a :href="`http://ppidkab.sinjaikab.go.id/profil/tentang-opd/${org.id}/manage`" target="_blank" class="inline-flex items-center justify-center w-full bg-white text-blue-600 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
                                     <i class="fas fa-edit"></i> Kelola Profil Unit

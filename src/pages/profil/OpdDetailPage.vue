@@ -67,7 +67,7 @@
                     <h3 class="text-2xl font-black text-gray-900 mb-4">Struktur Belum Tersedia</h3>
                     <p class="text-gray-500 max-w-sm mx-auto leading-relaxed">Saat ini belum ada gambar struktur organisasi yang diunggah untuk unit kerja ini.</p>
                     
-                    <div v-if="authStore.user && (authStore.user.role === 'superadmin' || authStore.user.unit_id == organization.remote_id)" class="mt-10">
+                    <div v-if="authStore.user && authStore.user.unit_id == organization.remote_id" class="mt-10">
                         <a :href="`http://ppidkab.sinjaikab.go.id/profil/tentang-opd/${organization.id}/manage`" target="_blank" class="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100">
                             <i class="fas fa-upload"></i> Unggah Struktur Sekarang
                         </a>
