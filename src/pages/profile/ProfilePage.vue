@@ -206,51 +206,42 @@
     </div>
 
     <!-- Merge Account Modal -->
-    <div v-if="showMergeModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showMergeModal = false" aria-hidden="true"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                <i class="fas fa-link text-blue-600"></i>
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                  Tautkan Akun
-                </h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500 mb-4">
-                    Masukkan kredensial (Email/NIP dan Katasandi) dari akun lama/target Anda untuk menggabungkannya.
-                  </p>
-                  
-                  <div v-if="mergeError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-lg border border-red-100">
-                    {{ mergeError }}
-                  </div>
-
-                  <form @submit.prevent="submitMerge">
-                    <div class="mb-4">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Email / NIP Akun Lama</label>
-                      <input v-model="mergeForm.identifier" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    </div>
-                    <div class="mb-4">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Katasandi Akun Lama</label>
-                      <input v-model="mergeForm.password" type="password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
+    <div v-if="showMergeModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-75 p-4">
+      <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden" @click.stop>
+        <div class="px-6 py-6 sm:p-8">
+          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-blue-100 rounded-full mb-4">
+            <i class="fas fa-link text-blue-600 text-xl"></i>
           </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button @click="submitMerge" :disabled="merging" type="button" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
-              <i v-if="merging" class="fas fa-spinner fa-spin mr-2"></i>
-              Tautkan Sekarang
-            </button>
-            <button @click="showMergeModal = false" type="button" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-              Batal
-            </button>
+          <div class="text-center w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Tautkan Akun</h3>
+            <p class="text-sm text-gray-500 mb-6">
+              Masukkan Email/NIP dan Katasandi dari akun lama Anda untuk menggabungkannya.
+            </p>
+            
+            <div v-if="mergeError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs text-left rounded-lg border border-red-100">
+              {{ mergeError }}
+            </div>
+
+            <form @submit.prevent="submitMerge" class="text-left">
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Email / NIP Target</label>
+                <input v-model="mergeForm.identifier" type="text" required placeholder="Masukkan Email atau NIP" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-shadow">
+              </div>
+              <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Katasandi Target</label>
+                <input v-model="mergeForm.password" type="password" required placeholder="Masukkan Katasandi" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-shadow">
+              </div>
+              
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button type="button" @click="showMergeModal = false" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                  Batal
+                </button>
+                <button type="submit" :disabled="merging" class="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center">
+                  <i v-if="merging" class="fas fa-spinner fa-spin mr-2"></i>
+                  Tautkan
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
