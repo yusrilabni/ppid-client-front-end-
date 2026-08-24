@@ -16,7 +16,7 @@
       </div>
 
       <!-- Banner Tautkan Akun -->
-      <div v-if="profileData" class="mb-8 p-5 bg-blue-50 border border-blue-100 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+      <div v-if="profileData && !profileData.user?.google_id" class="mb-8 p-5 bg-blue-50 border border-blue-100 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
         <div class="flex items-start gap-4">
           <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
             <i class="fas fa-link"></i>
