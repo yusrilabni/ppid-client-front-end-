@@ -68,6 +68,7 @@ const routes = [
       { path: 'login', name: 'login', component: LoginPage },
       { path: 'register', name: 'register', component: RegisterPage },
       { path: 'auth/callback', name: 'auth.callback', component: AuthCallback },
+      { path: 'google-callback', name: 'google.callback', component: () => import('@/pages/auth/GoogleCallback.vue') },
       // Extra
       { path: 'kebijakan-privasi', name: 'kebijakan-privasi', component: KebijakanPrivasiPage },
       { path: 'rss', name: 'rss', component: RssPage },
