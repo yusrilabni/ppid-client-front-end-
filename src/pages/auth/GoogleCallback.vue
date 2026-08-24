@@ -30,24 +30,43 @@ onMounted(async () => {
         state: state
       })
 
-      if (response.data.success && response.data.token) {
-        localStorage.setItem('ppid_token', response.data.token)
-        authStore.token = response.data.token
-        authStore.user = response.data.user
-        router.push('/')
+      if (response.data.success) {
+        if (response.data.require_otp) {
+          // Redirect to profile with otp required flag
+          router.push('/profile?linked=otp_required&email=' + encodeURIComponent(response.data.email))
+          return
+        }
+
+        if (response.data.token) {
+          localStorage.setItem('ppid_token', response.data.token)
+          authStore.token = response.data.token
+          authStore.user = response.data.user
+          
+          if (state === 'link') {
+            router.push('/profile?linked=success')
+          } else {
+            router.push('/')
+          }
+        }
       } else {
         router.push('/login?error=auth_failed&msg=' + encodeURIComponent(response.data.message || 'Unknown error'))
       }
     } catch (error) {
       console.error('Failed to verify Google code:', error)
       const errorData = error.response?.data
-      if (errorData?.error_type === 'not_registered') {
-        router.push('/register?error=not_registered')
-      } else if (errorData?.error_type === 'already_registered') {
-        router.push('/register?error=already_registered')
+      
+      if (state === 'link') {
+        const msg = errorData?.message || error.message || 'Gagal menautkan akun.'
+        router.push('/profile?linked=failed&msg=' + encodeURIComponent(msg))
       } else {
-        const msg = errorData?.message || error.message || 'Server error'
-        router.push('/login?error=auth_failed&msg=' + encodeURIComponent(msg))
+        if (errorData?.error_type === 'not_registered') {
+          router.push('/register?error=not_registered')
+        } else if (errorData?.error_type === 'already_registered') {
+          router.push('/register?error=already_registered')
+        } else {
+          const msg = errorData?.message || error.message || 'Server error'
+          router.push('/login?error=auth_failed&msg=' + encodeURIComponent(msg))
+        }
       }
     }
   } else {
