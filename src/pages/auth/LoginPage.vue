@@ -130,7 +130,7 @@ onMounted(() => {
 const handleGoogleLogin = () => {
   loading.value = true
   const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'
-  window.location.href = `${apiUrl}/api/auth/google/redirect?action=login`
+  window.location.href = `${apiUrl}/api/v1/auth/google/redirect?action=login`
 }
 
 const handleLogin = async () => {
