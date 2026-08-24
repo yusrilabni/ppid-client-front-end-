@@ -12,7 +12,7 @@
 import { onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import api from '@/config/api'
+import api from '@/services/api'
 
 const router = useRouter()
 const route = useRoute()
