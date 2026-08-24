@@ -213,6 +213,7 @@ onUnmounted(() => {
                                               <div class="py-1">
                                                   <router-link v-for="(child, childIndex) in menu.children" :key="childIndex"
                                                       :to="child.url"
+                                                      @click="activeSubMenu = null"
                                                       class="flex items-center px-4 py-3 text-sm transition-all duration-200 whitespace-nowrap"
                                                       :class="isActive(child.url) ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'">
                                                       <i :class="['fas', 'fa-' + (child.icon || 'angle-right'), 'mr-3', 'text-xs', isActive(child.url) ? 'text-blue-600' : 'text-blue-400']"></i>
@@ -362,7 +363,7 @@ onUnmounted(() => {
                       </router-link>
                       
                       <div v-else>
-                          <button @click="activeSubMenu === index ? activeSubMenu = null : activeSubMenu = index"
+                          <button @click.stop="activeSubMenu = activeSubMenu === index ? null : index"
                               class="w-full flex justify-between items-center py-2 px-3 text-base font-medium rounded-md"
                               :class="hasActiveChild(menu.children) ? 'text-blue-600 bg-blue-50 font-bold' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'">
                               <span class="flex items-center">
@@ -372,7 +373,7 @@ onUnmounted(() => {
                               <i class="fas fa-chevron-down h-3 w-3 ml-2 transition-transform duration-300"
                                   :class="{ 'rotate-180': activeSubMenu === index }"></i>
                           </button>
-                          <div v-show="activeSubMenu === index || hasActiveChild(menu.children)" class="pl-4">
+                          <div v-show="activeSubMenu === index" class="pl-4">
                               <router-link v-for="(child, childIndex) in menu.children" :key="childIndex"
                                   :to="child.url"
                                   @click="open = false"
