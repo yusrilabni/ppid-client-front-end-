@@ -556,6 +556,10 @@ const verifyLinkOtp = async () => {
     })
     
     if (response.data.success) {
+      if (response.data.token) {
+        authStore.token = response.data.token
+        localStorage.setItem('ppid_token', response.data.token)
+      }
       authStore.user = response.data.user
       localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
       

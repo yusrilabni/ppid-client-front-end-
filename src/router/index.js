@@ -65,8 +65,8 @@ const routes = [
     children: [
       { path: '', name: 'home', component: HomePage },
       { path: 'search', name: 'search', component: SearchPage },
-      { path: 'login', name: 'login', component: LoginPage },
-      { path: 'register', name: 'register', component: RegisterPage },
+      { path: 'login', name: 'login', component: LoginPage, meta: { requiresGuest: true } },
+      { path: 'register', name: 'register', component: RegisterPage, meta: { requiresGuest: true } },
       { path: 'auth/callback', name: 'auth.callback', component: AuthCallback },
       { path: 'google-callback', name: 'google.callback', component: () => import('@/pages/auth/GoogleCallback.vue') },
       // Extra
@@ -140,6 +140,8 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
+  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    next({ name: 'home' })
   } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
     next({ name: 'home' })
   } else {
