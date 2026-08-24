@@ -293,6 +293,44 @@
         </div>
       </div>
     </div>
+
+    <!-- OTP Link Modal -->
+    <div v-if="showLinkOtpModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-75 p-4">
+      <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden" @click.stop>
+        <div class="px-6 py-6 sm:p-8">
+          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-blue-100 rounded-full mb-4">
+            <i class="fas fa-shield-alt text-blue-600 text-xl"></i>
+          </div>
+          <div class="text-center w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Verifikasi Email Anda</h3>
+            
+            <p class="text-sm text-gray-500 mb-4">
+              Kode verifikasi 6-digit telah dikirim ke email <strong>{{ linkEmailTarget }}</strong>. Silakan masukkan kode tersebut di bawah ini untuk menautkan akun.
+            </p>
+            
+            <div v-if="linkOtpError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs text-left rounded-lg border border-red-100">
+              {{ linkOtpError }}
+            </div>
+
+            <form @submit.prevent="verifyLinkOtp" class="text-left mt-4">
+              <div class="mb-6 flex justify-center">
+                <input v-model="linkOtpCode" type="text" maxlength="6" required placeholder="123456" class="w-32 px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow">
+              </div>
+              
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button type="button" @click="showLinkOtpModal = false" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                  Batal
+                </button>
+                <button type="submit" :disabled="isVerifyingLinkOtp || linkOtpCode.length !== 6" class="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center">
+                  <i v-if="isVerifyingLinkOtp" class="fas fa-spinner fa-spin mr-2"></i>
+                  Verifikasi & Tautkan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -478,11 +516,9 @@ const verifyOtp = async () => {
     })
     
     if (response.data.success) {
-      // Update local storage and pinia
       authStore.user = response.data.user
       localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
       
-      // Update query cache directly
       queryClient.setQueryData(['user_profile'], (old) => {
          if (!old) return old;
          return { ...old, user: response.data.user }
@@ -492,12 +528,46 @@ const verifyOtp = async () => {
       otpStep.value = 'request'
       otpCode.value = ''
       alert('Tautan Google berhasil diputuskan secara permanen.')
-      window.location.href = '/profile' // Reload so the banners update nicely
+      window.location.href = '/profile'
     }
   } catch (error) {
     otpError.value = error.response?.data?.message || 'Kode OTP salah atau kadaluarsa.'
   } finally {
     isVerifyingOtp.value = false
+  }
+}
+
+// Link OTP Logic
+const showLinkOtpModal = ref(route.query.linked === 'otp_required')
+const linkEmailTarget = ref(route.query.email || '')
+const linkOtpCode = ref('')
+const linkOtpError = ref('')
+const isVerifyingLinkOtp = ref(false)
+
+const verifyLinkOtp = async () => {
+  if (linkOtpCode.value.length !== 6) return
+  
+  try {
+    isVerifyingLinkOtp.value = true
+    linkOtpError.value = ''
+    
+    const response = await api.post('/auth/google/link/verify-otp', {
+      otp: linkOtpCode.value
+    })
+    
+    if (response.data.success) {
+      authStore.user = response.data.user
+      localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
+      
+      showLinkOtpModal.value = false
+      linkOtpCode.value = ''
+      alert('Akun berhasil ditautkan dengan Google!')
+      window.location.href = '/profile'
+    }
+  } catch (error) {
+    linkOtpError.value = error.response?.data?.message || 'Kode OTP salah atau kadaluarsa.'
+  } finally {
+    isVerifyingLinkOtp.value = false
   }
 }
 </script>
