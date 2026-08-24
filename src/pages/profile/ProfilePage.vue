@@ -5,6 +5,25 @@
       <!-- Breadcrumbs -->
       <Breadcrumbs :breadcrumbs="breadcrumbItems" class="px-4 sm:px-0" />
 
+      <!-- Banner Tautkan Akun -->
+      <div v-if="profileData" class="mb-8 p-5 bg-blue-50 border border-blue-100 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+            <i class="fas fa-link"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-blue-900 mb-1">Kaitkan Akun (Merge Account)</h3>
+            <p class="text-xs text-blue-700 leading-relaxed max-w-2xl">
+              Apakah Anda memiliki akun lama (Admin/Superadmin) atau akun NIP yang terpisah? 
+              Tautkan akun lama Anda dengan akun ini agar Anda bisa masuk sebagai Admin menggunakan Login Google.
+            </p>
+          </div>
+        </div>
+        <button @click="showMergeModal = true" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
+          Tautkan Akun
+        </button>
+      </div>
+
       <div v-if="!loading && profileData" class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
         <section>
           <header>
@@ -185,6 +204,57 @@
         </section>
       </div>
     </div>
+
+    <!-- Merge Account Modal -->
+    <div v-if="showMergeModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showMergeModal = false" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                <i class="fas fa-link text-blue-600"></i>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                  Tautkan Akun
+                </h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500 mb-4">
+                    Masukkan kredensial (Email/NIP dan Katasandi) dari akun lama/target Anda untuk menggabungkannya.
+                  </p>
+                  
+                  <div v-if="mergeError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-lg border border-red-100">
+                    {{ mergeError }}
+                  </div>
+
+                  <form @submit.prevent="submitMerge">
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-gray-700 mb-1">Email / NIP Akun Lama</label>
+                      <input v-model="mergeForm.identifier" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    </div>
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-gray-700 mb-1">Katasandi Akun Lama</label>
+                      <input v-model="mergeForm.password" type="password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button @click="submitMerge" :disabled="merging" type="button" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+              <i v-if="merging" class="fas fa-spinner fa-spin mr-2"></i>
+              Tautkan Sekarang
+            </button>
+            <button @click="showMergeModal = false" type="button" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -321,6 +391,46 @@ const updateProfile = async () => {
     }
   } finally {
     saving.value = false
+  }
+}
+const showMergeModal = ref(false)
+const merging = ref(false)
+const mergeError = ref('')
+const mergeForm = ref({
+  identifier: '',
+  password: ''
+})
+
+const submitMerge = async () => {
+  if (!mergeForm.value.identifier || !mergeForm.value.password) {
+    mergeError.value = 'Silakan isi kolom Email/NIP dan Katasandi.'
+    return
+  }
+
+  try {
+    merging.value = true
+    mergeError.value = ''
+
+    const response = await api.post('/profile/merge', {
+      identifier: mergeForm.value.identifier,
+      password: mergeForm.value.password
+    })
+
+    if (response.data.success) {
+      // Save new token and user
+      localStorage.setItem('ppid_token', response.data.token)
+      localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
+      authStore.token = response.data.token
+      authStore.user = response.data.user
+      
+      showMergeModal.value = false
+      alert('Akun berhasil ditautkan! Halaman akan dimuat ulang.')
+      window.location.reload()
+    }
+  } catch (error) {
+    mergeError.value = error.response?.data?.message || 'Gagal menautkan akun.'
+  } finally {
+    merging.value = false
   }
 }
 </script>
