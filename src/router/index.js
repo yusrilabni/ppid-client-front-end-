@@ -139,10 +139,13 @@ router.beforeEach((to, from, next) => {
 
   const authStore = useAuthStore()
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    loadingStore.stopLoading()
     next({ name: 'login', query: { redirect: to.fullPath } })
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    loadingStore.stopLoading()
     next({ name: 'home' })
   } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    loadingStore.stopLoading()
     next({ name: 'home' })
   } else {
     next()
