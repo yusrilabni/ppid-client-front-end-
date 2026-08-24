@@ -14,22 +14,20 @@
           <div>
             <h3 class="text-sm font-bold text-blue-900 mb-1">Kaitkan Akun (Merge Account)</h3>
             <p class="text-xs text-blue-700 leading-relaxed max-w-2xl">
-              Apakah Anda memiliki akun lama (Admin/Superadmin) atau akun NIP yang terpisah? 
-              Tautkan akun lama Anda dengan akun ini agar Anda bisa masuk sebagai Admin menggunakan Login Google.
+              Tautkan akun ini dengan Akun Google Anda agar Anda bisa masuk dengan cepat menggunakan Login Google di masa depan.
             </p>
           </div>
         </div>
-        <button @click="showMergeModal = true" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
-          Tautkan Akun
+        <button @click="linkGoogleAccount" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
+          Tautkan ke Google
         </button>
       </div>
 
       <div v-if="!loading && profileData" class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
         <section>
           <header>
-            <h2 class="text-lg font-medium text-gray-900">
-              Informasi Profil
-            </h2>
+            <h2 class="text-lg font-medium text-gray-900">Informasi Profil</h2>
+            <p class="mt-1 text-sm text-gray-600">Perbarui informasi profil dan alamat email Anda.</p>
           </header>
 
           <form @submit.prevent="updateProfile" class="mt-6 space-y-6">
@@ -205,48 +203,7 @@
       </div>
     </div>
 
-    <!-- Merge Account Modal -->
-    <div v-if="showMergeModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-75 p-4">
-      <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden" @click.stop>
-        <div class="px-6 py-6 sm:p-8">
-          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-blue-100 rounded-full mb-4">
-            <i class="fas fa-link text-blue-600 text-xl"></i>
-          </div>
-          <div class="text-center w-full">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Tautkan Akun</h3>
-            <p class="text-sm text-gray-500 mb-6">
-              Masukkan Email/NIP dan Katasandi dari akun lama Anda untuk menggabungkannya.
-            </p>
-            
-            <div v-if="mergeError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs text-left rounded-lg border border-red-100">
-              {{ mergeError }}
-            </div>
-
-            <form @submit.prevent="submitMerge" class="text-left">
-              <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Email / NIP Target</label>
-                <input v-model="mergeForm.identifier" type="text" required placeholder="Masukkan Email atau NIP" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-shadow">
-              </div>
-              <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Katasandi Target</label>
-                <input v-model="mergeForm.password" type="password" required placeholder="Masukkan Katasandi" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-shadow">
-              </div>
-              
-              <div class="flex flex-col sm:flex-row gap-3">
-                <button type="button" @click="showMergeModal = false" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
-                  Batal
-                </button>
-                <button type="submit" :disabled="merging" class="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center">
-                  <i v-if="merging" class="fas fa-spinner fa-spin mr-2"></i>
-                  Tautkan
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -384,44 +341,7 @@ const updateProfile = async () => {
     saving.value = false
   }
 }
-const showMergeModal = ref(false)
-const merging = ref(false)
-const mergeError = ref('')
-const mergeForm = ref({
-  identifier: '',
-  password: ''
-})
-
-const submitMerge = async () => {
-  if (!mergeForm.value.identifier || !mergeForm.value.password) {
-    mergeError.value = 'Silakan isi kolom Email/NIP dan Katasandi.'
-    return
-  }
-
-  try {
-    merging.value = true
-    mergeError.value = ''
-
-    const response = await api.post('/profile/merge', {
-      identifier: mergeForm.value.identifier,
-      password: mergeForm.value.password
-    })
-
-    if (response.data.success) {
-      // Save new token and user
-      localStorage.setItem('ppid_token', response.data.token)
-      localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
-      authStore.token = response.data.token
-      authStore.user = response.data.user
-      
-      showMergeModal.value = false
-      alert('Akun berhasil ditautkan! Halaman akan dimuat ulang.')
-      window.location.reload()
-    }
-  } catch (error) {
-    mergeError.value = error.response?.data?.message || 'Gagal menautkan akun.'
-  } finally {
-    merging.value = false
-  }
-}
+const linkGoogleAccount = () => { window.location.href = import.meta.env.VITE_API_URL + "/api/v1/auth/google/redirect?action=link" }
 </script>
+
+
