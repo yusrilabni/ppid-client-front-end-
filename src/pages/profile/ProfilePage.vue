@@ -22,7 +22,7 @@
             <i class="fas fa-link"></i>
           </div>
           <div>
-            <h3 class="text-sm font-bold text-blue-900 mb-1">Kaitkan Akun (Merge Account)</h3>
+            <h3 class="text-sm font-bold text-blue-900 mb-1">Kaitkan Akun Google</h3>
             <p class="text-xs text-blue-700 leading-relaxed max-w-2xl">
               Tautkan akun ini dengan Akun Google Anda agar Anda bisa masuk dengan cepat menggunakan Login Google di masa depan.
             </p>
@@ -30,6 +30,24 @@
         </div>
         <button @click="linkGoogleAccount" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
           Tautkan ke Google
+        </button>
+      </div>
+
+      <!-- Banner Putuskan Tautan -->
+      <div v-if="profileData && profileData.user?.google_id" class="mb-8 p-5 bg-red-50 border border-red-100 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+            <i class="fab fa-google"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-red-900 mb-1">Terhubung dengan Google</h3>
+            <p class="text-xs text-red-700 leading-relaxed max-w-2xl">
+              Akun Anda saat ini terhubung dengan Google. Anda dapat masuk menggunakan tombol Login Google.
+            </p>
+          </div>
+        </div>
+        <button @click="showOtpModal = true" class="px-4 py-2 bg-white text-red-600 border border-red-200 text-xs font-semibold rounded-xl hover:bg-red-50 transition-colors whitespace-nowrap shadow-sm">
+          Putuskan Tautan
         </button>
       </div>
 
@@ -213,7 +231,69 @@
       </div>
     </div>
 
+    <!-- OTP Unlink Modal -->
+    <div v-if="showOtpModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-75 p-4">
+      <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden" @click.stop>
+        <div class="px-6 py-6 sm:p-8">
+          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+            <i class="fas fa-shield-alt text-red-600 text-xl"></i>
+          </div>
+          <div class="text-center w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Verifikasi Keamanan</h3>
+            
+            <div v-if="otpStep === 'request'">
+              <p class="text-sm text-gray-500 mb-6">
+                Untuk memutuskan tautan Google, kami perlu mengirimkan kode OTP 6-digit ke email Anda <strong>{{ profileData?.user?.email }}</strong> sebagai verifikasi keamanan.
+              </p>
+              
+              <div v-if="otpError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs text-left rounded-lg border border-red-100">
+                {{ otpError }}
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button type="button" @click="showOtpModal = false" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                  Batal
+                </button>
+                <button @click="requestOtp" :disabled="isRequestingOtp" class="w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center">
+                  <i v-if="isRequestingOtp" class="fas fa-spinner fa-spin mr-2"></i>
+                  Kirim Kode OTP
+                </button>
+              </div>
+            </div>
+
+            <div v-if="otpStep === 'verify'">
+              <p class="text-sm text-gray-500 mb-2">
+                Masukkan 6-digit kode OTP yang telah dikirimkan ke email Anda.
+              </p>
+              
+              <div v-if="otpError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs text-left rounded-lg border border-red-100">
+                {{ otpError }}
+              </div>
+              <div v-if="otpSuccess" class="mb-4 p-3 bg-emerald-50 text-emerald-700 text-xs text-left rounded-lg border border-emerald-100">
+                {{ otpSuccess }}
+              </div>
+
+              <form @submit.prevent="verifyOtp" class="text-left mt-4">
+                <div class="mb-6 flex justify-center">
+                  <input v-model="otpCode" type="text" maxlength="6" required placeholder="123456" class="w-32 px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow">
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <button type="button" @click="showOtpModal = false; otpStep = 'request'" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                    Batal
+                  </button>
+                  <button type="submit" :disabled="isVerifyingOtp || otpCode.length !== 6" class="w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center">
+                    <i v-if="isVerifyingOtp" class="fas fa-spinner fa-spin mr-2"></i>
+                    Verifikasi & Putuskan
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -359,6 +439,66 @@ const updateProfile = async () => {
 const linkGoogleAccount = () => { 
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'
   window.location.href = baseUrl + "/api/v1/auth/google/redirect?action=link" 
+}
+const showOtpModal = ref(false)
+const otpStep = ref('request') // 'request' | 'verify'
+const isRequestingOtp = ref(false)
+const isVerifyingOtp = ref(false)
+const otpCode = ref('')
+const otpError = ref('')
+const otpSuccess = ref('')
+
+const requestOtp = async () => {
+  try {
+    isRequestingOtp.value = true
+    otpError.value = ''
+    otpSuccess.value = ''
+    
+    const response = await api.post('/auth/google/unlink/request-otp')
+    if (response.data.success) {
+      otpSuccess.value = response.data.message || 'Kode OTP telah dikirim.'
+      otpStep.value = 'verify'
+    }
+  } catch (error) {
+    otpError.value = error.response?.data?.message || 'Gagal mengirim OTP. Pastikan konfigurasi email server valid.'
+  } finally {
+    isRequestingOtp.value = false
+  }
+}
+
+const verifyOtp = async () => {
+  if (otpCode.value.length !== 6) return
+  
+  try {
+    isVerifyingOtp.value = true
+    otpError.value = ''
+    
+    const response = await api.post('/auth/google/unlink/verify', {
+      otp: otpCode.value
+    })
+    
+    if (response.data.success) {
+      // Update local storage and pinia
+      authStore.user = response.data.user
+      localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
+      
+      // Update query cache directly
+      queryClient.setQueryData(['user_profile'], (old) => {
+         if (!old) return old;
+         return { ...old, user: response.data.user }
+      })
+
+      showOtpModal.value = false
+      otpStep.value = 'request'
+      otpCode.value = ''
+      alert('Tautan Google berhasil diputuskan secara permanen.')
+      window.location.href = '/profile' // Reload so the banners update nicely
+    }
+  } catch (error) {
+    otpError.value = error.response?.data?.message || 'Kode OTP salah atau kadaluarsa.'
+  } finally {
+    isVerifyingOtp.value = false
+  }
 }
 </script>
 
