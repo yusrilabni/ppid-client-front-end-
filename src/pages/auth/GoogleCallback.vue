@@ -40,11 +40,18 @@ onMounted(async () => {
       }
     } catch (error) {
       console.error('Failed to verify Google code:', error)
-      const msg = error.response?.data?.message || error.message || 'Server error'
-      router.push('/login?error=auth_failed&msg=' + encodeURIComponent(msg))
+      const errorData = error.response?.data
+      if (errorData?.error_type === 'not_registered') {
+        router.push('/login?error=not_registered')
+      } else if (errorData?.error_type === 'already_registered') {
+        router.push('/register?error=already_registered')
+      } else {
+        const msg = errorData?.message || error.message || 'Server error'
+        router.push('/login?error=auth_failed&msg=' + encodeURIComponent(msg))
+      }
     }
   } else {
-    router.push('/login?error=auth_failed&msg=No_Code_From_Google')
+    router.push('/login?error=auth_failed')
   }
 })
 </script>

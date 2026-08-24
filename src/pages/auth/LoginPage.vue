@@ -121,7 +121,7 @@ onMounted(() => {
   if (route.query.error === 'not_registered') {
     error.value = 'Email Anda belum terdaftar di sistem. Silakan buat akun terlebih dahulu.'
   } else if (route.query.error === 'auth_failed') {
-    error.value = 'Gagal masuk dengan Google. Silakan coba lagi.'
+    error.value = route.query.msg ? decodeURIComponent(route.query.msg) : 'Gagal masuk dengan Google. Silakan coba lagi.'
   } else if (route.query.error === 'invalid_action') {
     error.value = 'Terjadi kesalahan sistem, aksi tidak valid.'
   }
