@@ -139,6 +139,8 @@ const error = ref('')
 onMounted(() => {
   if (route.query.error === 'already_registered') {
     error.value = 'Email Anda sudah terdaftar di sistem. Silakan login ke akun Anda.'
+  } else if (route.query.error === 'not_registered') {
+    error.value = 'Email Anda belum terdaftar di sistem. Silakan buat akun terlebih dahulu.'
   } else if (route.query.error === 'auth_failed') {
     error.value = 'Gagal mendaftar dengan Google. Silakan coba lagi.'
   }

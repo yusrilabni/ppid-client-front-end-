@@ -42,7 +42,7 @@ onMounted(async () => {
       console.error('Failed to verify Google code:', error)
       const errorData = error.response?.data
       if (errorData?.error_type === 'not_registered') {
-        router.push('/login?error=not_registered')
+        router.push('/register?error=not_registered')
       } else if (errorData?.error_type === 'already_registered') {
         router.push('/register?error=already_registered')
       } else {
