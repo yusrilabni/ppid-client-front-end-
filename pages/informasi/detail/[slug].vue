@@ -336,41 +336,27 @@
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 import { ref, onMounted, computed, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 
 import api, { getStorageUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 
 const route = useRoute()
-const item = ref(null)
-const loading = ref(true)
 const sideMenuOpen = ref(false)
 
-useGlobalLoader(loading)
-
 const fetchDetail = async () => {
-  loading.value = true
-  try {
-    const res = await api.get('/informasi/' + route.params.slug)
-    item.value = res.data.data
-  } catch (error) {
-    console.error('Error fetching detail:', error)
-  } finally {
-    loading.value = false
-  }
+  const res = await api.get('/informasi/' + route.params.slug)
+  return res.data.data
 }
 
-onMounted(() => {
-  fetchDetail()
+const { data: item, isLoading, isError } = useQuery({
+  queryKey: computed(() => ['informasi-detail', route.params.slug]),
+  queryFn: fetchDetail,
 })
 
-// Watch slug to refetch when clicking related links
-watch(() => route.params.slug, () => {
-  if (route.params.slug) {
-    fetchDetail()
-    window.scrollTo(0, 0)
-  }
-})
+const loading = computed(() => isLoading.value)
+useGlobalLoader(loading)
 
 const fileUrl = computed(() => {
   if (!item.value) return null

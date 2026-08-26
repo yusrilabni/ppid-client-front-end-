@@ -1,10 +1,10 @@
 <template>
   <div class="detail-page bg-gray-50 min-h-screen pb-24 lg:pb-8">
     <div class="container mx-auto py-4 px-4 max-w-7xl">
-      <div v-if="data && data.subStandarLayanan">
+      <div v-if="data && data?.subStandarLayanan">
         <!-- Breadcrumbs -->
         <div class="mb-4">
-          <Breadcrumbs :breadcrumbs="getBreadcrumbs.standarLayananFile(data?.standarLayanan?.title, data?.categoryIcon, fileData?.name)" />
+          <Breadcrumbs :breadcrumbs="getBreadcrumbs.standarLayananFile(data?.standarLayanan?.title, data?.categoryIcon, data?.subStandarLayanan?.title)" />
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
@@ -17,13 +17,13 @@
                 <div class="relative z-10">
                   <div class="flex items-center gap-2 mb-4">
                     <span class="bg-white/20 backdrop-blur-sm text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest border border-white/20">
-                      {{ data.subStandarLayanan?.category || 'Dokumen' }}
+                      {{ data?.subStandarLayanan?.category || 'Dokumen' }}
                     </span>
-                    <span v-if="data.subStandarLayanan?.status_tampil?.toUpperCase() === 'ARSIP'" class="bg-red-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest">
+                    <span v-if="data?.subStandarLayanan?.status_tampil?.toUpperCase() === 'ARSIP'" class="bg-red-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest">
                       ARSIP
                     </span>
                   </div>
-                  <h1 class="text-2xl sm:text-4xl font-black leading-tight">{{ data.subStandarLayanan?.title }}</h1>
+                  <h1 class="text-2xl sm:text-4xl font-black leading-tight">{{ data?.subStandarLayanan?.title }}</h1>
                 </div>
                 <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-3xl text-blue-500"></div>
               </div>
@@ -39,7 +39,7 @@
                         </div>
                         <div class="min-w-0">
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Unit Kerja</p>
-                            <p class="text-xs font-bold text-gray-700 truncate w-32">{{ data.subStandarLayanan?.informasi?.organization?.name || 'PPID Kabupaten Sinjai' }}</p>
+                            <p class="text-xs font-bold text-gray-700 truncate w-32">{{ data?.subStandarLayanan?.informasi?.organization?.name || 'PPID Kabupaten Sinjai' }}</p>
                         </div>
                     </div>
                     <button @click="sideMenuOpen = true" class="bg-blue-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-lg shadow-blue-100">
@@ -48,14 +48,14 @@
                 </div>
 
                 <!-- Description -->
-                <div class="mb-12" v-if="data.subStandarLayanan?.informasi?.ringkasan">
+                <div class="mb-12" v-if="data?.subStandarLayanan?.informasi?.ringkasan">
                   <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-gray-900 flex items-center">
                       <span class="w-1 h-6 bg-blue-600 rounded-full mr-3"></span>
                       Ringkasan
                     </h2>
                   </div>
-                  <div class="text-gray-600 leading-relaxed text-base sm:text-lg bg-slate-50 p-6 rounded-3xl border border-slate-100 italic" v-html="stripTags(data.subStandarLayanan?.informasi?.ringkasan)">
+                  <div class="text-gray-600 leading-relaxed text-base sm:text-lg bg-slate-50 p-6 rounded-3xl border border-slate-100 italic" v-html="stripTags(data?.subStandarLayanan?.informasi?.ringkasan)">
                   </div>
                 </div>
 
@@ -95,7 +95,7 @@
                     </div>
 
                     <div class="mt-8 flex flex-col sm:flex-row gap-4">
-                      <a v-if="data.subStandarLayanan?.file_type === 'url'" :href="downloadActionUrl" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-blue-200 transition-all active:scale-95">
+                      <a v-if="data?.subStandarLayanan?.file_type === 'url'" :href="downloadActionUrl" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-blue-200 transition-all active:scale-95">
                         BUKA TAUTAN <i class="fas fa-external-link-alt ml-2"></i>
                       </a>
                       <a v-else :href="downloadActionUrl" target="_blank" download class="flex-1 bg-green-600 hover:bg-green-700 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-green-200 transition-all active:scale-95">
@@ -127,7 +127,7 @@
                         </div>
                         <div class="min-w-0">
                             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ data.subStandarLayanan?.informasi?.organization?.name || 'PPID Kabupaten Sinjai' }}</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ data?.subStandarLayanan?.informasi?.organization?.name || 'PPID Kabupaten Sinjai' }}</p>
                         </div>
                     </div>
                   </div>
@@ -139,7 +139,7 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ data.subStandarLayanan?.jenis_dokumen || 'Informasi Publik' }}</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ data?.subStandarLayanan?.jenis_dokumen || 'Informasi Publik' }}</p>
                         </div>
                     </div>
                   </div>
@@ -151,7 +151,7 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ data.subStandarLayanan?.informasi?.user?.name || 'Admin PPID' }}</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ data?.subStandarLayanan?.informasi?.user?.name || 'Admin PPID' }}</p>
                         </div>
                     </div>
                   </div>
@@ -163,7 +163,7 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ formatDate(data.subStandarLayanan?.tahun_dokumen) }}</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ formatDate(data?.subStandarLayanan?.tahun_dokumen) }}</p>
                         </div>
                     </div>
                   </div>
@@ -172,11 +172,11 @@
                       <div class="grid grid-cols-2 gap-4">
                           <div class="bg-gray-50 rounded-2xl p-4 text-center">
                               <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Dilihat</p>
-                              <p class="text-xl font-black text-slate-800">{{ formatNumber(data.subStandarLayanan?.views_count) }}</p>
+                              <p class="text-xl font-black text-slate-800">{{ formatNumber(data?.subStandarLayanan?.views_count) }}</p>
                           </div>
                           <div class="bg-gray-50 rounded-2xl p-4 text-center">
                               <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Unduh</p>
-                              <p class="text-xl font-black text-slate-800">{{ formatNumber(data.subStandarLayanan?.download_count) }}</p>
+                              <p class="text-xl font-black text-slate-800">{{ formatNumber(data?.subStandarLayanan?.download_count) }}</p>
                           </div>
                       </div>
                   </div>
@@ -191,7 +191,7 @@
         </div>
       </div>
       
-      <div v-else-if="!isLoading && (!data || !data.subStandarLayanan)" class="py-20 text-center">
+      <div v-else-if="!isLoading && (!data || !data?.subStandarLayanan)" class="py-20 text-center">
         <i class="fas fa-exclamation-triangle text-4xl text-yellow-400 mb-4"></i>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Dokumen Tidak Ditemukan</h2>
         <p class="text-gray-500">Dokumen standar layanan yang Anda cari tidak tersedia atau telah dihapus.</p>
@@ -241,7 +241,7 @@
                       </div>
                       <div class="min-w-0">
                           <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight break-words">{{ data.subStandarLayanan?.informasi?.organization?.name || 'PPID Kabupaten Sinjai' }}</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight break-words">{{ data?.subStandarLayanan?.informasi?.organization?.name || 'PPID Kabupaten Sinjai' }}</p>
                       </div>
                   </div>
 
@@ -252,7 +252,7 @@
                       </div>
                       <div>
                           <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ data.subStandarLayanan?.jenis_dokumen || 'Informasi Publik' }}</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ data?.subStandarLayanan?.jenis_dokumen || 'Informasi Publik' }}</p>
                       </div>
                   </div>
 
@@ -263,7 +263,7 @@
                       </div>
                       <div>
                           <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ data.subStandarLayanan?.informasi?.user?.name || 'Admin PPID' }}</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ data?.subStandarLayanan?.informasi?.user?.name || 'Admin PPID' }}</p>
                       </div>
                   </div>
 
@@ -274,7 +274,7 @@
                       </div>
                       <div>
                           <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ formatDate(data.subStandarLayanan?.tahun_dokumen) }}</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ formatDate(data?.subStandarLayanan?.tahun_dokumen) }}</p>
                       </div>
                   </div>
 
@@ -282,11 +282,11 @@
                   <div class="grid grid-cols-2 gap-4">
                       <div class="bg-blue-50 p-4 rounded-2xl text-center border border-blue-100">
                           <p class="text-[10px] font-black text-blue-400 uppercase mb-1">Dilihat</p>
-                          <p class="text-xl font-black text-blue-700">{{ formatNumber(data.subStandarLayanan?.views_count) }}</p>
+                          <p class="text-xl font-black text-blue-700">{{ formatNumber(data?.subStandarLayanan?.views_count) }}</p>
                       </div>
                       <div class="bg-emerald-50 p-4 rounded-2xl text-center border border-emerald-100">
                           <p class="text-[10px] font-black text-emerald-400 uppercase mb-1">Unduhan</p>
-                          <p class="text-xl font-black text-emerald-700">{{ formatNumber(data.subStandarLayanan?.download_count) }}</p>
+                          <p class="text-xl font-black text-emerald-700">{{ formatNumber(data?.subStandarLayanan?.download_count) }}</p>
                       </div>
                   </div>
               </div>

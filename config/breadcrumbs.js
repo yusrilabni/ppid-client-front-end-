@@ -1,4 +1,4 @@
-﻿const home = { title: 'Beranda', url: '/', icon: 'fas fa-home' };
+const home = { title: 'Beranda', url: '/', icon: 'fas fa-home' };
 
 export const getBreadcrumbs = {
   dip: (year) => [home, { title: 'Daftar Informasi Publik (DIP) ' + (year || ''), url: '/dip/' + (year || ''), icon: 'fas fa-book' }],
@@ -45,5 +45,6 @@ export const getBreadcrumbs = {
   statistik: () => [home, { title: 'Statistik', url: '/statistik', icon: 'fas fa-chart-pie' }],
   surveyShow: (title) => [home, { title: 'Survei Kepuasan', url: '/laporan/survei', icon: 'fas fa-poll' }, { title: title || 'Isi Survei', icon: 'fas fa-edit' }],
   trackingPage: () => [home, { title: 'Lacak Permohonan', url: '/tracking', icon: 'fas fa-search-location' }],
-  informasiPemkab: () => [home, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }]
+  informasiPemkab: () => [home, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }],
+  informasiPemkabDetail: (title) => [home, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }, { title: title || 'Detail Informasi', icon: 'fas fa-eye' }]
 };

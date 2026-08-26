@@ -5,6 +5,8 @@ import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useQuery } from '@tanstack/vue-query'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { createIcons, icons } from 'lucide'
+import Swiper from 'swiper/bundle'
 
 const authStore = useAuthStore()
 const homeData = ref({
@@ -34,19 +36,11 @@ const fieldErrors = ref({
 
 // Render icons explicitly early and on updates
 onMounted(() => {
-  if (window.lucide) {
-    window.lucide.createIcons()
-  } else {
-    setTimeout(() => {
-      if (window.lucide) window.lucide.createIcons()
-    }, 300)
-  }
+  createIcons({ icons })
 })
 
 onUpdated(() => {
-  if (window.lucide) {
-    window.lucide.createIcons()
-  }
+  createIcons({ icons })
 })
 
 const clearFieldError = (field) => {
@@ -117,60 +111,57 @@ const rss_items = ref([])
 
 const initSwiper = () => {
   nextTick(() => {
-    if (window.lucide) {
-      window.lucide.createIcons()
-    }
-    if (window.Swiper) {
-      const isMultiple = homeData.value.sliders?.length > 1;
-      new window.Swiper('.hero-slider', {
-        loop: isMultiple,
-        watchOverflow: true,
-        observer: true,
-        observeParents: true,
-        autoplay: isMultiple ? { 
-          delay: 5000, 
-          disableOnInteraction: false 
-        } : false,
-        pagination: { el: '.swiper-pagination', clickable: true },
-        navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' }
-      })
-      new window.Swiper('.latest-info-carousel', {
-        slidesPerView: 1,
-        slidesPerGroup: 1,
-        spaceBetween: 20,
-        loop: true,
-        observer: true,
-        observeParents: true,
-        autoplay: { 
-          delay: 4000, 
-          disableOnInteraction: false 
-        },
-        breakpoints: {
-          640: { slidesPerView: 2, slidesPerGroup: 2 },
-          1024: { slidesPerView: 4, slidesPerGroup: 4 }
-        },
-        navigation: { nextEl: '.latest-info-next', prevEl: '.latest-info-prev' },
-        pagination: { el: '.latest-info-pagination', clickable: true }
-      })
-      new window.Swiper('.news-carousel', {
-        slidesPerView: 1,
-        slidesPerGroup: 1,
-        spaceBetween: 20,
-        loop: true,
-        observer: true,
-        observeParents: true,
-        autoplay: { 
-          delay: 4500, 
-          disableOnInteraction: false 
-        },
-        breakpoints: {
-          640: { slidesPerView: 2, slidesPerGroup: 2 },
-          1024: { slidesPerView: 4, slidesPerGroup: 4 }
-        },
-        navigation: { nextEl: '.news-button-next', prevEl: '.news-button-prev' },
-        pagination: { el: '.swiper-pagination', clickable: true }
-      })
-    }
+    createIcons({ icons })
+    
+    const isMultiple = homeData.value.sliders?.length > 1;
+    new Swiper('.hero-slider', {
+      loop: isMultiple,
+      watchOverflow: true,
+      observer: true,
+      observeParents: true,
+      autoplay: isMultiple ? { 
+        delay: 5000, 
+        disableOnInteraction: false 
+      } : false,
+      pagination: { el: '.swiper-pagination', clickable: true },
+      navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' }
+    })
+    new Swiper('.latest-info-carousel', {
+      slidesPerView: 1,
+      slidesPerGroup: 1,
+      spaceBetween: 20,
+      loop: true,
+      observer: true,
+      observeParents: true,
+      autoplay: { 
+        delay: 4000, 
+        disableOnInteraction: false 
+      },
+      breakpoints: {
+        640: { slidesPerView: 2, slidesPerGroup: 2 },
+        1024: { slidesPerView: 4, slidesPerGroup: 4 }
+      },
+      navigation: { nextEl: '.latest-info-next', prevEl: '.latest-info-prev' },
+      pagination: { el: '.latest-info-pagination', clickable: true }
+    })
+    new Swiper('.news-carousel', {
+      slidesPerView: 1,
+      slidesPerGroup: 1,
+      spaceBetween: 20,
+      loop: true,
+      observer: true,
+      observeParents: true,
+      autoplay: { 
+        delay: 4500, 
+        disableOnInteraction: false 
+      },
+      breakpoints: {
+        640: { slidesPerView: 2, slidesPerGroup: 2 },
+        1024: { slidesPerView: 4, slidesPerGroup: 4 }
+      },
+      navigation: { nextEl: '.news-button-next', prevEl: '.news-button-prev' },
+      pagination: { el: '.swiper-pagination', clickable: true }
+    })
   })
 }
 

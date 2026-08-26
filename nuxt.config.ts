@@ -1,8 +1,12 @@
-﻿export default defineNuxtConfig({
+export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
   ],
-  css: ['~/assets/css/index.css'],
+  css: [
+    '~/assets/css/index.css',
+    '@fortawesome/fontawesome-free/css/all.min.css',
+    'swiper/css/bundle'
+  ],
   postcss: {
     plugins: {
       '@tailwindcss/postcss': {},
@@ -14,15 +18,11 @@
       title: 'PPID Kabupaten Sinjai',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' }
-      ],
-      link: [
-        { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css' },
-        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css' }
-      ],
-      script: [
-        { src: 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js' },
-        { src: 'https://unpkg.com/lucide@latest' }
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { property: 'og:image', content: 'https://ppidkab.sinjaikab.go.id/logo/Logo%20PPID%20With%20Caption.png' },
+        { property: 'og:type', content: 'website' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:image', content: 'https://ppidkab.sinjaikab.go.id/logo/Logo%20PPID%20With%20Caption.png' }
       ]
     }
   },

@@ -9,7 +9,7 @@ const sidebarOpen = ref(true)
 const mobileSidebarOpen = ref(false)
 
 const menuItems = [
-  { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin.dashboard' },
+  { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin' },
 ]
 
 async function handleLogout() {

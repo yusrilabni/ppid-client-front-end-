@@ -22,14 +22,8 @@
         <div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 pt-6 md:pt-10 pb-24 overflow-hidden">
             <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
             <div class="container max-w-5xl mx-auto px-4 relative z-10">
-                <div class="flex flex-wrap items-center justify-start gap-y-2 space-x-2 md:space-x-3 text-blue-200 text-xs md:text-sm mb-6 font-medium w-full text-left">
-                    <NuxtLink to="/" class="hover:text-white transition-colors flex items-center"><i class="fas fa-home mr-1"></i> Beranda</NuxtLink>
-                    <i class="fas fa-chevron-right text-[10px] opacity-50"></i>
-                    <span class="text-white opacity-80 flex items-center"><i class="fas fa-layer-group mr-1"></i> Transparansi</span>
-                    <i class="fas fa-chevron-right text-[10px] opacity-50"></i>
-                    <NuxtLink to="/transparansi/informasi-pemkab" class="hover:text-white transition-colors flex items-center"><i class="fas fa-file-pdf mr-1"></i> Informasi Pemkab</NuxtLink>
-                    <i class="fas fa-chevron-right text-[10px] opacity-50"></i>
-                    <span class="text-white opacity-90 truncate max-w-[150px] sm:max-w-[200px] md:max-w-md flex items-center"><i class="fas fa-eye mr-1"></i> {{ dokumen.judul }}</span>
+                <div class="mb-6">
+                    <Breadcrumbs :breadcrumbs="getBreadcrumbs.informasiPemkabDetail(dokumen.judul)" theme="dark" />
                 </div>
                 
                 <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight drop-shadow-lg leading-tight max-w-4xl">
@@ -269,27 +263,26 @@ const copyShareLink = (dokumen) => {
   });
 }
 
-watch(dokumen, (newDoc) => {
-  if (newDoc && newDoc.judul) {
-    const title = newDoc.judul + ' - PPID Kabupaten Sinjai'
-    document.title = title
-    
-    let ogTitle = document.querySelector('meta[property="og:title"]')
-    if (ogTitle) ogTitle.content = title
+useHead(() => {
+  if (!dokumen.value) return {}
+  
+  const title = dokumen.value.judul ? `${dokumen.value.judul} - PPID Kabupaten Sinjai` : 'Detail Informasi Pemkab'
+  const desc = dokumen.value.deskripsi || 'Detail Transparansi Dokumen Pemerintah Kabupaten Sinjai'
+  const imageUrl = 'https://ppidkab.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai.png'
 
-    let ogDesc = document.querySelector('meta[property="og:description"]')
-    if (ogDesc && newDoc.deskripsi) ogDesc.content = newDoc.deskripsi
-    
-    let imageUrl = 'https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai_OG.jpg'
-
-    let ogImage = document.querySelector('meta[property="og:image"]')
-    if (!ogImage) {
-        ogImage = document.createElement('meta')
-        ogImage.setAttribute('property', 'og:image')
-        document.head.appendChild(ogImage)
-    }
-    ogImage.content = imageUrl
+  return {
+    title: title,
+    meta: [
+      { property: 'og:title', content: title },
+      { property: 'og:description', content: desc },
+      { property: 'og:image', content: imageUrl },
+      { property: 'og:type', content: 'article' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: title },
+      { name: 'twitter:description', content: desc },
+      { name: 'twitter:image', content: imageUrl },
+    ]
   }
-}, { immediate: true })
+})
 </script>
 
