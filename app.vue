@@ -15,15 +15,12 @@ const capitalize = (str) => {
   return str.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 }
 
-const pageTitle = computed(() => {
-  if (route.path === '/') return 'Pejabat Pengelola Informasi dan Dokumentasi'
-  
+const rawPageName = computed(() => {
+  if (route.path === '/') return ''
   const paths = route.path.split('/').filter(Boolean)
-  if (paths.length === 0) return 'Pejabat Pengelola Informasi dan Dokumentasi'
+  if (paths.length === 0) return ''
   
   const titleParts = paths.map(p => capitalize(p))
-  
-  // Custom replacements for abbreviations
   const formattedParts = titleParts.map(part => {
     if (part.toLowerCase() === 'ppid') return 'PPID'
     if (part.toLowerCase() === 'pbj') return 'PBJ'
@@ -33,18 +30,28 @@ const pageTitle = computed(() => {
     if (part.toLowerCase() === 'dipunit') return 'DIP Unit'
     return part
   })
+  return formattedParts.join(' - ')
+})
 
-  return 'PPID - ' + formattedParts.join(' - ')
+const pageTitle = computed(() => {
+  if (!rawPageName.value) return 'Pejabat Pengelola Informasi dan Dokumentasi'
+  return 'PPID - ' + rawPageName.value
+})
+
+const pageDescription = computed(() => {
+  const baseDesc = 'Pejabat Pengelola Informasi dan Dokumentasi Kabupaten Sinjai - Transparansi Informasi Publik'
+  if (!rawPageName.value) return baseDesc
+  return `${rawPageName.value} - ${baseDesc}`
 })
 
 useHead(() => ({
   title: pageTitle.value,
   meta: [
-    { name: 'description', content: 'Transparansi Informasi Publik' },
+    { name: 'description', content: pageDescription.value },
     { property: 'og:title', content: pageTitle.value },
-    { property: 'og:description', content: 'Transparansi Informasi Publik' },
+    { property: 'og:description', content: pageDescription.value },
     { name: 'twitter:title', content: pageTitle.value },
-    { name: 'twitter:description', content: 'Transparansi Informasi Publik' }
+    { name: 'twitter:description', content: pageDescription.value }
   ]
 }))
 </script>

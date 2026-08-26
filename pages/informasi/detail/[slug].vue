@@ -358,13 +358,22 @@ const { data: item, isLoading, isError } = useQuery({
 const loading = computed(() => isLoading.value)
 useGlobalLoader(loading)
 
-useHead(() => ({
-  title: item.value?.title ? `${item.value.title} - PPID Kabupaten Sinjai` : 'Detail Informasi - PPID',
-  meta: [
-    { property: 'og:title', content: item.value?.title ? `${item.value.title} - PPID Kabupaten Sinjai` : 'Detail Informasi - PPID' },
-    { name: 'twitter:title', content: item.value?.title ? `${item.value.title} - PPID Kabupaten Sinjai` : 'Detail Informasi - PPID' }
-  ]
-}))
+useHead(() => {
+  const itemTitle = item.value?.title || 'Detail Informasi'
+  const baseDesc = 'Pejabat Pengelola Informasi dan Dokumentasi Kabupaten Sinjai - Transparansi Informasi Publik'
+  const pageDesc = `${itemTitle} - ${baseDesc}`
+  
+  return {
+    title: `${itemTitle} - PPID Kabupaten Sinjai`,
+    meta: [
+      { name: 'description', content: pageDesc },
+      { property: 'og:title', content: `${itemTitle} - PPID Kabupaten Sinjai` },
+      { property: 'og:description', content: pageDesc },
+      { name: 'twitter:title', content: `${itemTitle} - PPID Kabupaten Sinjai` },
+      { name: 'twitter:description', content: pageDesc }
+    ]
+  }
+})
 
 const fileUrl = computed(() => {
   if (!item.value) return null
