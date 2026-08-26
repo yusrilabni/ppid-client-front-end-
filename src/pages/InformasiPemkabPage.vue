@@ -379,10 +379,7 @@ const updateTitle = (query) => {
     title += ' - ' + query.jenis_dokumen
   }
   
-  let imageUrl = 'https://placehold.co/1200x630/2563eb/ffffff.png?text=Informasi+Pemkab'
-  if (query.kategori) {
-    imageUrl = `https://placehold.co/1200x630/2563eb/ffffff.png?text=${encodeURIComponent(query.kategori)}`
-  }
+  let imageUrl = 'https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai.png'
 
   document.title = title
   

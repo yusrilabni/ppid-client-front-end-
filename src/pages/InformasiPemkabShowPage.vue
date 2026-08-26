@@ -280,10 +280,7 @@ watch(dokumen, (newDoc) => {
     let ogDesc = document.querySelector('meta[property="og:description"]')
     if (ogDesc && newDoc.deskripsi) ogDesc.content = newDoc.deskripsi
     
-    let imageUrl = 'https://placehold.co/1200x630/2563eb/ffffff.png?text=Informasi+Pemkab'
-    if (newDoc.kategori) {
-      imageUrl = `https://placehold.co/1200x630/2563eb/ffffff.png?text=${encodeURIComponent(newDoc.kategori)}`
-    }
+    let imageUrl = 'https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai.png'
 
     let ogImage = document.querySelector('meta[property="og:image"]')
     if (!ogImage) {
