@@ -82,7 +82,7 @@
                             </div>
                             <div class="p-0 h-[600px] w-full bg-gray-100">
                                 <template v-if="dokumen.file_path">
-                                    <div v-if="dokumen.file_path.startsWith('http')" class="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-8 text-center">
+                                    <div v-if="dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')" class="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-8 text-center">
                                         <i class="fas fa-external-link-alt text-6xl text-gray-300 mb-4"></i>
                                         <h3 class="text-xl font-bold text-gray-700 mb-2">Dokumen Berupa Tautan Eksternal</h3>
                                         <p class="text-gray-500 mb-6">Tautan ini mengarah ke sumber eksternal dan tidak dapat dipratinjau langsung di sini.</p>
