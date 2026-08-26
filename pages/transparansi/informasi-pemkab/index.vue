@@ -6,6 +6,14 @@
             <!-- Breadcrumbs -->
             <Breadcrumbs :breadcrumbs="getBreadcrumbs.informasiPemkab()" theme="dark" />
 
+            <!-- Logo Sinjai Besar -->
+            <div class="flex justify-center mb-6 mt-2">
+                <img
+                    src="https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai.png"
+                    alt="Logo Kabupaten Sinjai"
+                    class="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-2xl"
+                />
+            </div>
 
             <div class="flex justify-center items-center mb-4">
                 <div class="w-full relative">
@@ -258,6 +266,29 @@ import CustomSelect from '@/components/CustomSelect.vue'
 const route = useRoute()
 const router = useRouter()
 
+// OG meta dinamis berbasis filter aktif
+const pageTitle = computed(() => {
+  let title = 'PPID - Informasi Pemkab'
+  if (route.query.kategori) title += ' - ' + route.query.kategori
+  if (route.query.jenis_dokumen) title += ' - ' + route.query.jenis_dokumen
+  return title
+})
+
+const ogImageUrl = 'https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai_OG.jpg'
+
+useHead(computed(() => ({
+  title: pageTitle.value,
+  meta: [
+    { property: 'og:title', content: pageTitle.value },
+    { property: 'og:image', content: ogImageUrl },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:description', content: 'Transparansi Dokumen Pemerintah Kabupaten Sinjai' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: pageTitle.value },
+    { name: 'twitter:image', content: ogImageUrl },
+  ]
+})))
+
 const filters = ref({
   kategori: route.query.kategori || '',
   jenis_dokumen: route.query.jenis_dokumen || '',
@@ -370,30 +401,7 @@ const updateRoute = () => {
   router.push({ query: { ...filters.value } })
 }
 
-const updateTitle = (query) => {
-  let title = 'PPID - Informasi Pemkab'
-  if (query.kategori) {
-    title += ' - ' + query.kategori
-  }
-  if (query.jenis_dokumen) {
-    title += ' - ' + query.jenis_dokumen
-  }
-  
-  let imageUrl = 'https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai_OG.jpg'
 
-  document.title = title
-  
-  const ogTitle = document.querySelector('meta[property="og:title"]')
-  if (ogTitle) ogTitle.content = title
-  
-  let ogImage = document.querySelector('meta[property="og:image"]')
-  if (!ogImage) {
-      ogImage = document.createElement('meta')
-      ogImage.setAttribute('property', 'og:image')
-      document.head.appendChild(ogImage)
-  }
-  ogImage.content = imageUrl
-}
 
 const copyShareLink = () => {
   const queryObj = { ...filters.value };
@@ -417,7 +425,15 @@ const copyShareLink = () => {
 import { onMounted } from 'vue'
 
 onMounted(() => {
-  updateTitle(route.query)
+  // sync filter dari URL query saat pertama load
+  filters.value = {
+    kategori: route.query.kategori || '',
+    jenis_dokumen: route.query.jenis_dokumen || '',
+    tahun: route.query.tahun || '',
+    search: route.query.search || '',
+    per_page: route.query.per_page || '10',
+    page: route.query.page || 1
+  }
 })
 
 watch(
@@ -431,7 +447,7 @@ watch(
       per_page: newQuery.per_page || '10',
       page: newQuery.page || 1
     }
-    updateTitle(newQuery)
+    // OG meta otomatis reaktif via useHead computed, tidak perlu updateTitle
   },
   { deep: true }
 )
