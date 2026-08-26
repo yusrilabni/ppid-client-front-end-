@@ -358,6 +358,14 @@ const { data: item, isLoading, isError } = useQuery({
 const loading = computed(() => isLoading.value)
 useGlobalLoader(loading)
 
+useHead(() => ({
+  title: item.value?.title ? `${item.value.title} - PPID Kabupaten Sinjai` : 'Detail Informasi - PPID',
+  meta: [
+    { property: 'og:title', content: item.value?.title ? `${item.value.title} - PPID Kabupaten Sinjai` : 'Detail Informasi - PPID' },
+    { name: 'twitter:title', content: item.value?.title ? `${item.value.title} - PPID Kabupaten Sinjai` : 'Detail Informasi - PPID' }
+  ]
+}))
+
 const fileUrl = computed(() => {
   if (!item.value) return null
   return item.value.url || (item.value.file ? getStorageUrl(item.value.file) : null)
