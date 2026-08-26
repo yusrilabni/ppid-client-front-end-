@@ -268,7 +268,7 @@ useHead(() => {
   
   const title = dokumen.value.judul ? `${dokumen.value.judul} - PPID Kabupaten Sinjai` : 'Detail Informasi Pemkab'
   const desc = dokumen.value.deskripsi || 'Detail Transparansi Dokumen Pemerintah Kabupaten Sinjai'
-  const imageUrl = 'https://ppidkab.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai.png'
+  const imageUrl = 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai.png'
 
   return {
     title: title,

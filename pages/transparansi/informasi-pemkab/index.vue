@@ -274,7 +274,7 @@ const pageTitle = computed(() => {
   return title
 })
 
-const ogImageUrl = 'https://ppidkab.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai.png'
+const ogImageUrl = 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai.png'
 
 useHead(computed(() => ({
   title: pageTitle.value,
