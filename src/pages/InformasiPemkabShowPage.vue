@@ -117,9 +117,9 @@
                                     <template v-if="dokumen.file_path">
                                         <a :href="getDownloadUrl(dokumen)" target="_blank" 
                                            class="w-full md:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                                           :class="dokumen.file_path.startsWith('http') ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
-                                            <i :class="[dokumen.file_path.startsWith('http') ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
-                                            {{ dokumen.file_path.startsWith('http') ? 'Buka Tautan Eksternal' : 'Unduh Dokumen' }}
+                                           :class="(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
+                                            <i :class="[(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
+                                            {{ (dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')) ? 'Buka Tautan Eksternal' : 'Unduh Dokumen' }}
                                         </a>
                                     </template>
                                     <span v-else class="flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed">
