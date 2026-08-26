@@ -138,7 +138,7 @@
                                 <tr class="bg-gray-100/60 border-b border-gray-200 text-left backdrop-blur-sm">
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase">Detail Dokumen</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Kategori</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-32 text-center">Tahun</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Tanggal</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -171,8 +171,8 @@
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 text-center align-middle">
-                                        <span class="inline-block bg-white/80 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-600 border border-gray-200 shadow-sm">
-                                            {{ dokumen.tahun }}
+                                        <span class="inline-block bg-white/80 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-600 border border-gray-200 shadow-sm whitespace-nowrap">
+                                            {{ formatDate(dokumen.published_at || dokumen.created_at) }}
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 text-center align-middle w-48">
@@ -214,7 +214,7 @@
                                     {{ dokumen.jenis_dokumen }}
                                 </span>
                                 <span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200">
-                                    <i class="fas fa-calendar mr-1 text-gray-400"></i> {{ dokumen.tahun }}
+                                    <i class="fas fa-calendar mr-1 text-gray-400"></i> {{ formatDate(dokumen.published_at || dokumen.created_at) }}
                                 </span>
                             </div>
       
@@ -316,7 +316,14 @@ const fetchInformasiPemkab = async () => {
 }
 
 const getDownloadUrl = (dokumen) => {
+  if (!dokumen) return '#'
   return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 const { data, isLoading } = useQuery({

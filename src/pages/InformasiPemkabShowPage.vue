@@ -93,7 +93,7 @@
                                     <div v-else-if="isImage(dokumen.file_path)" class="w-full h-full flex items-center justify-center p-4 bg-gray-100 overflow-hidden">
                                         <img :src="getStorageUrl(dokumen.file_path)" :alt="dokumen.judul" class="max-w-full max-h-full object-contain rounded-lg shadow-sm">
                                     </div>
-                                    <iframe v-else :src="getStorageUrl(dokumen.file_path) + '#toolbar=0'" class="w-full h-full border-0"></iframe>
+                                    <iframe v-else :src="getEmbedUrl(dokumen.file_path)" class="w-full h-full border-0"></iframe>
                                 </template>
                                 <div v-else class="w-full h-full flex items-center justify-center text-gray-400 flex-col">
                                     <i class="fas fa-ban text-4xl mb-3"></i>
@@ -185,9 +185,9 @@
                                         </span>
                                     </li>
                                     <li class="pt-4 border-t border-gray-100 flex flex-col">
-                                        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tanggal Diunggah</span>
+                                        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tanggal Dokumen</span>
                                         <span class="text-sm font-semibold text-gray-700 flex items-center">
-                                            <i class="fas fa-clock mr-1.5 text-blue-400"></i> {{ formatDate(dokumen.created_at) }}
+                                            <i class="fas fa-clock mr-1.5 text-blue-400"></i> {{ formatDate(dokumen.published_at || dokumen.created_at) }}
                                         </span>
                                     </li>
                                 </ul>
@@ -220,6 +220,17 @@ const fetchDokumen = async () => {
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
   return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
+}
+
+const getEmbedUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http')) {
+      if (path.includes('drive.google.com')) {
+          return path.replace(/\/view\?.*$/, '/preview');
+      }
+      return path;
+  }
+  return getStorageUrl(path) + '#toolbar=0';
 }
 
 const { data: dokumen, isLoading, isError } = useQuery({
