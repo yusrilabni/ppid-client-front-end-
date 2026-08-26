@@ -92,12 +92,15 @@
                         </div>
                     </div>
 
-                    <div class="w-full lg:w-32 flex-none pt-2 lg:pt-0 flex gap-2">
+                    <div class="w-full lg:w-48 flex-none pt-2 lg:pt-0 flex gap-2">
                         <button @click="applyFilters" class="flex-1 lg:flex-none w-full lg:w-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 rounded-xl h-[44px] transition-all flex items-center justify-center font-bold" title="Terapkan Filter">
                             <i class="fas fa-search lg:mr-0"></i> <span class="inline lg:hidden ml-2">Cari</span>
                         </button>
                         <button @click="resetFilters" class="flex-1 lg:flex-none w-full lg:w-14 bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm rounded-xl h-[44px] transition-all flex items-center justify-center border border-gray-200" title="Reset Filter">
                             <i class="fas fa-undo-alt lg:mr-0"></i> <span class="inline lg:hidden ml-2 font-semibold">Reset</span>
+                        </button>
+                        <button @click="copyShareLink" class="flex-1 lg:flex-none w-full lg:w-14 bg-white border-2 border-blue-500 hover:bg-blue-50 text-blue-600 shadow-sm rounded-xl h-[44px] transition-all flex items-center justify-center" title="Bagikan Hasil Filter">
+                            <i class="fas fa-share-alt lg:mr-0"></i> <span class="inline lg:hidden ml-2 font-semibold">Bagikan</span>
                         </button>
                     </div>
             </div>
@@ -375,7 +378,43 @@ const updateTitle = (query) => {
   if (query.jenis_dokumen) {
     title += ' - ' + query.jenis_dokumen
   }
+  
+  let imageUrl = 'https://placehold.co/1200x630/2563eb/ffffff.png?text=Informasi+Pemkab'
+  if (query.kategori) {
+    imageUrl = `https://placehold.co/1200x630/2563eb/ffffff.png?text=${encodeURIComponent(query.kategori)}`
+  }
+
   document.title = title
+  
+  const ogTitle = document.querySelector('meta[property="og:title"]')
+  if (ogTitle) ogTitle.content = title
+  
+  let ogImage = document.querySelector('meta[property="og:image"]')
+  if (!ogImage) {
+      ogImage = document.createElement('meta')
+      ogImage.setAttribute('property', 'og:image')
+      document.head.appendChild(ogImage)
+  }
+  ogImage.content = imageUrl
+}
+
+const copyShareLink = () => {
+  const queryObj = { ...filters.value };
+  // Remove empty parameters to make URL cleaner
+  Object.keys(queryObj).forEach(key => {
+    if (!queryObj[key] || queryObj[key] === '') {
+      delete queryObj[key];
+    }
+  });
+  const queryString = new URLSearchParams(queryObj).toString();
+  const url = `https://ppidkab.sinjaikab.go.id/share/informasi-pemkab${queryString ? '?' + queryString : ''}`;
+  
+  navigator.clipboard.writeText(url).then(() => {
+    alert('Tautan khusus untuk filter ini berhasil disalin!\nSilakan tempel (paste) di WhatsApp atau Facebook Anda.');
+  }).catch(err => {
+    console.error('Gagal menyalin:', err);
+    prompt('Salin tautan berikut secara manual:', url);
+  });
 }
 
 import { onMounted } from 'vue'
