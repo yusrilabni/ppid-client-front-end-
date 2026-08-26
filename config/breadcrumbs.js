@@ -1,17 +1,19 @@
 const home = { title: 'Beranda', url: '/', icon: 'fas fa-home' };
 
 export const getBreadcrumbs = {
-  dip: (year) => [home, { title: 'Daftar Informasi Publik (DIP) ' + (year || ''), url: '/dip/' + (year || ''), icon: 'fas fa-book' }],
-  dipUnitDetail: (unitName) => [home, { title: 'DIP Unit', url: '/dipunit', icon: 'fas fa-university' }, { title: unitName || 'Detail Unit', icon: 'fas fa-building' }],
-  dipUnit: () => [home, { title: 'Daftar Informasi Publik (DIP) Unit', url: '/dipunit', icon: 'fas fa-university' }],
+  dip: (year) => [home, { title: 'DIP', icon: 'fas fa-book' }, { title: 'Daftar Informasi Publik (DIP) ' + (year || ''), url: '/dip/' + (year || ''), icon: 'fas fa-book' }],
+  dipUnitDetail: (unitName) => [home, { title: 'DIP', icon: 'fas fa-book' }, { title: 'DIP Unit', url: '/dipunit', icon: 'fas fa-university' }, { title: unitName || 'Detail Unit', icon: 'fas fa-building' }],
+  dipUnit: () => [home, { title: 'DIP', icon: 'fas fa-book' }, { title: 'Daftar Informasi Publik (DIP) Unit', url: '/dipunit', icon: 'fas fa-university' }],
   galeri: () => [home, { title: 'Galeri', url: '/galeri', icon: 'fas fa-images' }],
   detailInformasi: (category, categorySlug, categoryIcon, title) => [
     home,
+    { title: 'Jenis Informasi', icon: 'fas fa-folder' },
     { title: category, url: '/informasi/' + categorySlug, icon: categoryIcon || 'fas fa-folder' },
     { title: title || 'Detail Informasi', icon: 'fas fa-file-alt' }
   ],
   kategoriInformasi: (categoryName, categoryIcon) => [
     home,
+    { title: 'Jenis Informasi', icon: 'fas fa-folder' },
     { title: categoryName || 'Kategori Informasi', icon: categoryIcon || 'fas fa-folder' }
   ],
   kontak: () => [home, { title: 'Kontak', url: '/kontak', icon: 'fas fa-envelope' }],
@@ -45,6 +47,6 @@ export const getBreadcrumbs = {
   statistik: () => [home, { title: 'Statistik', url: '/statistik', icon: 'fas fa-chart-pie' }],
   surveyShow: (title) => [home, { title: 'Survei Kepuasan', url: '/laporan/survei', icon: 'fas fa-poll' }, { title: title || 'Isi Survei', icon: 'fas fa-edit' }],
   trackingPage: () => [home, { title: 'Lacak Permohonan', url: '/tracking', icon: 'fas fa-search-location' }],
-  informasiPemkab: () => [home, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }],
-  informasiPemkabDetail: (title) => [home, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }, { title: title || 'Detail Informasi', icon: 'fas fa-eye' }]
+  informasiPemkab: () => [home, { title: 'Transparansi', icon: 'fas fa-layer-group' }, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }],
+  informasiPemkabDetail: (title) => [home, { title: 'Transparansi', icon: 'fas fa-layer-group' }, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }, { title: title || 'Detail Informasi', icon: 'fas fa-eye' }]
 };
