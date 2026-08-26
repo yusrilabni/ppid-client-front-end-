@@ -367,6 +367,23 @@ const updateRoute = () => {
   router.push({ query: { ...filters.value } })
 }
 
+const updateTitle = (query) => {
+  let title = 'PPID - Informasi Pemkab'
+  if (query.kategori) {
+    title += ' - ' + query.kategori
+  }
+  if (query.jenis_dokumen) {
+    title += ' - ' + query.jenis_dokumen
+  }
+  document.title = title
+}
+
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  updateTitle(route.query)
+})
+
 watch(
   () => route.query,
   (newQuery) => {
@@ -378,6 +395,7 @@ watch(
       per_page: newQuery.per_page || '10',
       page: newQuery.page || 1
     }
+    updateTitle(newQuery)
   },
   { deep: true }
 )
