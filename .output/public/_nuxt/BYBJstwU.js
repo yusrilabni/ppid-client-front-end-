@@ -1,1 +1,0 @@
-import{u as s}from"./De-jHt16.js";import{q as i,at as u,m as l}from"./0F7I1BEx.js";function f(t){const e=s(),a=l(!1);i(t,o=>{o&&!a.value?(e.startLoading(),a.value=!0):!o&&a.value&&(e.stopLoading(),a.value=!1)},{immediate:!0}),u(()=>{a.value&&(e.stopLoading(),a.value=!1)})}export{f as u};

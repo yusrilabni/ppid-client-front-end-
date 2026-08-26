@@ -1,1 +1,0 @@
-import{a5 as t}from"./0F7I1BEx.js";const n=t("loading",{state:()=>({loadingCount:0}),getters:{isLoading:o=>o.loadingCount>0},actions:{startLoading(){this.loadingCount++},stopLoading(){this.loadingCount>0&&this.loadingCount--},forceStop(){this.loadingCount=0}}});export{n as u};

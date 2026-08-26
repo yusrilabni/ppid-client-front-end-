@@ -1,9 +1,0 @@
-{
-  "pid": 7396,
-  "startedAt": 1787755085193,
-  "command": "dev",
-  "cwd": "C:/laragon/www/PPID/ppid-laravel/production_deployment/ppid_client",
-  "port": 3000,
-  "hostname": "::1",
-  "url": "http://[::1]:3000"
-}
