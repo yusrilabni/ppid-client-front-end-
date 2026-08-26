@@ -1,4 +1,7 @@
 export default defineNuxtConfig({
+  features: {
+    inlineStyles: false
+  },
   modules: [
     '@pinia/nuxt',
   ],
