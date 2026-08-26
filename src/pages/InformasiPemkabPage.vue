@@ -28,11 +28,9 @@
 
     <div class="bg-gray-50 pb-16">
         <div class="container max-w-6xl mx-auto px-4 -mt-8 relative z-20">
-            <div class="bg-white/90 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 mb-10 transition-all duration-300 hover:shadow-2xl relative z-50">
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
-                    
-                    <div class="relative" style="z-index: 50;">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl shadow-blue-500/5 border border-white mb-6 relative z-50">
+                    <div class="flex-1 relative" style="z-index: 50;">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 ml-2">
                             <i class="fas fa-layer-group text-blue-500 mr-1"></i> Kategori
                         </label>
                         <CustomSelect 
@@ -46,8 +44,8 @@
                         />
                     </div>
                     
-                    <div class="relative" style="z-index: 49;">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2" :class="{'opacity-50': !filters.kategori}">
+                    <div class="flex-1 relative" style="z-index: 49;">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 ml-2">
                             <i class="fas fa-file-alt text-blue-500 mr-1"></i> Jenis Dokumen
                         </label>
                         <CustomSelect 
@@ -57,14 +55,12 @@
                             valueKey="value" 
                             placeholder="Semua Jenis Dokumen"
                             @change="applyFilters"
-                            :disabled="!filters.kategori"
                             class="w-full transition-opacity"
-                            :class="{'opacity-50 pointer-events-none': !filters.kategori}"
                         />
                     </div>
 
-                    <div class="relative" style="z-index: 48;">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <div class="flex-1 relative" style="z-index: 48;">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 ml-2">
                             <i class="fas fa-calendar-alt text-blue-500 mr-1"></i> Tahun
                         </label>
                         <CustomSelect 
@@ -78,41 +74,32 @@
                         />
                     </div>
 
-                    <div class="relative" style="z-index: 47;">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-list-ol text-blue-500 mr-1"></i> Tampilkan
+                    <div class="flex-1 relative" style="z-index: 47;">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 ml-2">
+                            <i class="fas fa-search text-blue-500 mr-1"></i> Pencarian
                         </label>
-                        <CustomSelect 
-                            v-model="filters.per_page" 
-                            :options="perPageOptions" 
-                            labelKey="label" 
-                            valueKey="value" 
-                            @change="applyFilters"
-                            class="w-full"
-                        />
-                    </div>
-
-                    <div class="relative flex flex-col">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-search text-blue-500 mr-1"></i> Cari
-                        </label>
-                        <div class="flex items-center space-x-2">
-                            <div class="relative flex-grow">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-search text-gray-400"></i>
-                                </div>
-                                <input type="text" v-model="filters.search" @keyup.enter="applyFilters" placeholder="Judul..." 
-                                    class="w-full pl-10 pr-4 py-4 rounded-2xl border-2 border-gray-100 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all sm:text-base bg-white">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                v-model="filters.search" 
+                                @keyup.enter="applyFilters"
+                                placeholder="Cari judul..." 
+                                class="w-full h-[44px] pl-10 pr-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm bg-gray-50 focus:bg-white"
+                            >
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                <i class="fas fa-search"></i>
                             </div>
-                            <button @click="applyFilters" class="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg rounded-2xl py-4 px-6 font-semibold transition-all flex items-center justify-center">
-                                Cari
-                            </button>
-                            <button @click="resetFilters" class="bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm rounded-2xl py-4 px-5 transition-all flex items-center justify-center border-2 border-gray-100" title="Reset Filter">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
                         </div>
                     </div>
-                </div>
+
+                    <div class="w-full lg:w-32 flex-none pt-2 lg:pt-0 flex gap-2">
+                        <button @click="applyFilters" class="flex-1 lg:flex-none w-full lg:w-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 rounded-xl h-[44px] transition-all flex items-center justify-center font-bold" title="Terapkan Filter">
+                            <i class="fas fa-search lg:mr-0"></i> <span class="inline lg:hidden ml-2">Cari</span>
+                        </button>
+                        <button @click="resetFilters" class="flex-1 lg:flex-none w-full lg:w-14 bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm rounded-xl h-[44px] transition-all flex items-center justify-center border border-gray-200" title="Reset Filter">
+                            <i class="fas fa-undo-alt lg:mr-0"></i> <span class="inline lg:hidden ml-2 font-semibold">Reset</span>
+                        </button>
+                    </div>
             </div>
 
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-4 relative z-10">
@@ -136,6 +123,7 @@
                         <table class="min-w-full w-full whitespace-nowrap bg-transparent">
                             <thead>
                                 <tr class="bg-gray-100/60 border-b border-gray-200 text-left backdrop-blur-sm">
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-16 text-center">No</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase">Detail Dokumen</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Kategori</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Tanggal</th>
@@ -143,7 +131,10 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100/50">
-                                <tr v-for="dokumen in items" :key="dokumen.id" class="transition-colors group hover:bg-blue-50/60">
+                                <tr v-for="(dokumen, index) in items" :key="dokumen.id" class="transition-colors group hover:bg-blue-50/60">
+                                    <td class="py-4 px-4 text-center align-middle font-medium text-gray-500">
+                                        {{ (currentPage - 1) * Number(filters.per_page) + index + 1 }}
+                                    </td>
                                     <td class="py-4 px-6 whitespace-normal align-middle">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0">
@@ -292,6 +283,13 @@ const jenisDokumenOptions = computed(() => {
     const opts = [{ label: 'Semua Jenis Dokumen', value: '' }]
     if (filters.value.kategori && kategori_jenis.value[filters.value.kategori]) {
         kategori_jenis.value[filters.value.kategori].forEach(j => opts.push({ label: j, value: j }))
+    } else if (kategori_jenis.value) {
+        let allTypesSet = new Set()
+        for (let cat in kategori_jenis.value) {
+            kategori_jenis.value[cat].forEach(t => allTypesSet.add(t))
+        }
+        const allTypes = Array.from(allTypesSet).sort()
+        allTypes.forEach(j => opts.push({ label: j, value: j }))
     }
     return opts
 })
