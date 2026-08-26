@@ -113,6 +113,47 @@
       </p>
     </div>
     </div>
+
+    <!-- OTP Verification Modal -->
+    <div v-if="showOtpModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-envelope-open-text text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">Verifikasi Email Anda</h3>
+          <p class="text-sm text-gray-500 mt-2">
+            Kami telah mengirimkan 6 digit kode OTP ke email Google Anda.
+          </p>
+          <p class="text-sm font-semibold text-gray-700 mt-1">{{ otpEmail }}</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div v-if="otpError" class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-100 flex items-start gap-2">
+          <i class="fas fa-exclamation-circle text-rose-600 mt-0.5"></i>
+          <p class="text-xs text-rose-600">{{ otpError }}</p>
+        </div>
+
+        <form @submit.prevent="handleVerifyOtp" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Kode OTP</label>
+            <input v-model="otpCode" type="text" maxlength="6" required
+                   class="w-full text-center text-2xl tracking-[0.5em] py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/15 transition-all outline-none font-mono"
+                   placeholder="------">
+          </div>
+
+          <div class="flex gap-3 pt-2">
+            <button type="button" @click="closeOtpModal" class="flex-1 px-4 py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+              Batal
+            </button>
+            <button type="submit" :disabled="loadingOtp" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center">
+              <span v-if="loadingOtp" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
+              Verifikasi
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -120,7 +161,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { getAssetUrl } from '@/services/api'
+import api, { getAssetUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
@@ -136,8 +177,20 @@ const showConfirm = ref(false)
 const loading = ref(false)
 const error = ref('')
 
+// OTP State
+const showOtpModal = ref(false)
+const otpEmail = ref('')
+const otpCode = ref('')
+const otpError = ref('')
+const loadingOtp = ref(false)
+
 onMounted(() => {
-  if (route.query.error === 'already_registered') {
+  if (route.query.otp_required === 'true' && route.query.email) {
+    showOtpModal.value = true
+    otpEmail.value = decodeURIComponent(route.query.email)
+    // Clean up URL
+    router.replace('/register')
+  } else if (route.query.error === 'already_registered') {
     error.value = 'Email Anda sudah terdaftar di sistem. Silakan login ke akun Anda.'
   } else if (route.query.error === 'not_registered') {
     error.value = 'Email Anda belum terdaftar di sistem. Silakan buat akun terlebih dahulu.'
@@ -167,6 +220,45 @@ const handleRegister = async () => {
     error.value = err.message || 'Registrasi gagal. Silakan coba lagi.'
   } finally {
     loading.value = false
+  }
+}
+
+const closeOtpModal = () => {
+  showOtpModal.value = false
+  otpCode.value = ''
+  otpError.value = ''
+}
+
+const handleVerifyOtp = async () => {
+  if (otpCode.value.length < 6) {
+    otpError.value = 'Kode OTP harus 6 digit'
+    return
+  }
+
+  loadingOtp.value = true
+  otpError.value = ''
+  
+  try {
+    const response = await api.post('/auth/google/register/verify-otp', {
+      email: otpEmail.value,
+      otp: otpCode.value
+    })
+
+    if (response.data.success && response.data.token) {
+      localStorage.setItem('ppid_token', response.data.token)
+      authStore.token = response.data.token
+      authStore.user = response.data.user
+      
+      closeOtpModal()
+      router.push('/')
+    } else {
+      throw new Error(response.data.message || 'Verifikasi gagal.')
+    }
+  } catch (err) {
+    const errorMsg = err.response?.data?.message || err.message || 'Terjadi kesalahan saat memverifikasi OTP.'
+    otpError.value = errorMsg
+  } finally {
+    loadingOtp.value = false
   }
 }
 </script>

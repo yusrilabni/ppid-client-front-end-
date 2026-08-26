@@ -32,8 +32,12 @@ onMounted(async () => {
 
       if (response.data.success) {
         if (response.data.require_otp) {
-          // Redirect to profile with otp required flag
-          router.push('/profile?linked=otp_required&email=' + encodeURIComponent(response.data.email))
+          if (state === 'register' || response.data.action === 'register') {
+            router.push('/register?otp_required=true&email=' + encodeURIComponent(response.data.email))
+          } else {
+            // Redirect to profile with otp required flag (for linking)
+            router.push('/profile?linked=otp_required&email=' + encodeURIComponent(response.data.email))
+          }
           return
         }
 
