@@ -15,11 +15,9 @@ const authStore = useAuthStore()
   <div id="acc-main-wrapper" :class="accStore.wrapperClasses" class="min-h-screen flex flex-col bg-gray-50">
     <NavBar />
     <main id="main-content" class="flex-1">
-      <router-view v-slot="{ Component }">
-        <transition name="page" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <transition name="page" mode="out-in">
+        <slot />
+      </transition>
     </main>
     <FooterSection />
   </div>
