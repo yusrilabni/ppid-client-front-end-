@@ -19,7 +19,7 @@ const authStore = useAuthStore()
         <transition name="page" mode="out-in">
           <component :is="Component" />
         </transition>
-      
+      </router-view>
     </main>
     <FooterSection />
   </div>
