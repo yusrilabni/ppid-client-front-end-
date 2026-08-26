@@ -1,0 +1,9 @@
+{
+  "_hash": "2Qb1V01TQYA16mh4MnKbbzU-0l8UIKaWfIRyvNzWFGQ",
+  "project": {
+    "rootDir": "C:/laragon/www/PPID/ppid-laravel/production_deployment/ppid_client"
+  },
+  "versions": {
+    "nuxt": "3.21.11"
+  }
+}

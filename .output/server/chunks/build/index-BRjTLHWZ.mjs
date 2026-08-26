@@ -1,0 +1,310 @@
+import { _ as __nuxt_component_0 } from './nuxt-link-vc3u7b4I.mjs';
+import { ref, computed, watch, unref, withCtx, createTextVNode, toDisplayString, createVNode, useSSRContext } from 'vue';
+import { ssrRenderAttrs, ssrRenderComponent, ssrRenderStyle, ssrRenderAttr, ssrRenderList, ssrInterpolate, ssrRenderClass, ssrIncludeBooleanAttr } from 'vue/server-renderer';
+import { _ as _sfc_main$1 } from './Breadcrumbs-CqGmUqmz.mjs';
+import { g as getBreadcrumbs } from './breadcrumbs-CLzVyNhY.mjs';
+import { useQuery } from '@tanstack/vue-query';
+import { b as getAssetUrl, a as api } from './api-k33KGvo_.mjs';
+import { C as CustomSelect } from './CustomSelect-YbAR9Oty.mjs';
+import { a as useRoute, u as useRouter } from './server.mjs';
+import '../_/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
+import 'axios';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+import 'unhead/plugins';
+import 'vue-router';
+
+const _sfc_main = {
+  __name: "index",
+  __ssrInlineRender: true,
+  setup(__props) {
+    const route = useRoute();
+    const router = useRouter();
+    const filters = ref({
+      kategori: route.query.kategori || "",
+      jenis_dokumen: route.query.jenis_dokumen || "",
+      tahun: route.query.tahun || "",
+      search: route.query.search || "",
+      per_page: route.query.per_page || "10",
+      page: route.query.page || 1
+    });
+    const kategori_jenis = ref({});
+    const availableYears = computed(() => {
+      const years = [];
+      const current = (/* @__PURE__ */ new Date()).getFullYear();
+      for (let y = current; y >= 2e3; y--) years.push(y);
+      return years;
+    });
+    const kategoriOptions = computed(() => {
+      const opts = [{ label: "Semua Kategori", value: "" }];
+      Object.keys(kategori_jenis.value).forEach((k) => opts.push({ label: k, value: k }));
+      return opts;
+    });
+    const jenisDokumenOptions = computed(() => {
+      const opts = [{ label: "Semua Jenis Dokumen", value: "" }];
+      if (filters.value.kategori && kategori_jenis.value[filters.value.kategori]) {
+        kategori_jenis.value[filters.value.kategori].forEach((j) => opts.push({ label: j, value: j }));
+      } else if (kategori_jenis.value) {
+        let allTypesSet = /* @__PURE__ */ new Set();
+        for (let cat in kategori_jenis.value) {
+          kategori_jenis.value[cat].forEach((t) => allTypesSet.add(t));
+        }
+        const allTypes = Array.from(allTypesSet).sort();
+        allTypes.forEach((j) => opts.push({ label: j, value: j }));
+      }
+      return opts;
+    });
+    const tahunOptions = computed(() => {
+      const opts = [{ label: "Semua Tahun", value: "" }];
+      availableYears.value.forEach((y) => opts.push({ label: y.toString(), value: y.toString() }));
+      return opts;
+    });
+    const fetchInformasiPemkab = async () => {
+      const res = await api.get("/informasi-pemkab", { params: filters.value });
+      kategori_jenis.value = res.data.kategori_jenis;
+      return res.data.data;
+    };
+    const getDownloadUrl = (dokumen) => {
+      if (!dokumen) return "#";
+      return `${api.defaults.baseURL.replace("/api/v1", "")}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`;
+    };
+    const formatDate = (dateStr) => {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+    };
+    const { data, isLoading } = useQuery({
+      queryKey: computed(() => ["informasi-pemkab", filters.value]),
+      queryFn: fetchInformasiPemkab,
+      keepPreviousData: true
+    });
+    const items = computed(() => {
+      var _a;
+      return ((_a = data.value) == null ? void 0 : _a.data) || [];
+    });
+    const currentPage = computed(() => {
+      var _a;
+      return ((_a = data.value) == null ? void 0 : _a.current_page) || 1;
+    });
+    const lastPage = computed(() => {
+      var _a;
+      return ((_a = data.value) == null ? void 0 : _a.last_page) || 1;
+    });
+    const resetJenis = () => {
+      filters.value.jenis_dokumen = "";
+      applyFilters();
+    };
+    const applyFilters = () => {
+      filters.value.page = 1;
+      updateRoute();
+    };
+    const updateRoute = () => {
+      router.push({ query: { ...filters.value } });
+    };
+    const updateTitle = (query) => {
+      let title = "PPID - Informasi Pemkab";
+      if (query.kategori) {
+        title += " - " + query.kategori;
+      }
+      if (query.jenis_dokumen) {
+        title += " - " + query.jenis_dokumen;
+      }
+      let imageUrl = "https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai_OG.jpg";
+      (void 0).title = title;
+      const ogTitle = (void 0).querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.content = title;
+      let ogImage = (void 0).querySelector('meta[property="og:image"]');
+      if (!ogImage) {
+        ogImage = (void 0).createElement("meta");
+        ogImage.setAttribute("property", "og:image");
+        (void 0).head.appendChild(ogImage);
+      }
+      ogImage.content = imageUrl;
+    };
+    watch(
+      () => route.query,
+      (newQuery) => {
+        filters.value = {
+          kategori: newQuery.kategori || "",
+          jenis_dokumen: newQuery.jenis_dokumen || "",
+          tahun: newQuery.tahun || "",
+          search: newQuery.search || "",
+          per_page: newQuery.per_page || "10",
+          page: newQuery.page || 1
+        };
+        updateTitle(newQuery);
+      },
+      { deep: true }
+    );
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_NuxtLink = __nuxt_component_0;
+      _push(`<div${ssrRenderAttrs(_attrs)}><div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 pt-6 md:pt-10 pb-24 overflow-hidden"><div class="absolute inset-0 opacity-20 bg-[url(&#39;https://www.transparenttextures.com/patterns/cubes.png&#39;)] mix-blend-overlay"></div><div class="container max-w-6xl mx-auto px-4 relative z-10 text-center">`);
+      _push(ssrRenderComponent(_sfc_main$1, {
+        breadcrumbs: unref(getBreadcrumbs).informasiPemkab(),
+        theme: "dark"
+      }, null, _parent));
+      _push(`<div class="flex justify-center items-center mb-4"><div class="w-full relative"><h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-lg"> Informasi Pemkab </h1></div></div><p class="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto font-light mt-4"> Transparansi Dokumen Pemerintah Kabupaten yang dapat Anda akses, telusuri, dan unduh dengan mudah. </p></div><div class="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none transform translate-y-1"><svg class="relative block w-full h-[50px] md:h-[80px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118,130.83,121.22,201.2,110.53Z" class="fill-gray-50"></path></svg></div></div><div class="bg-gray-50 pb-16"><div class="container max-w-6xl mx-auto px-4 -mt-8 relative z-20"><div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl shadow-blue-500/5 border border-white mb-6 relative z-50"><div class="flex-1 relative" style="${ssrRenderStyle({ "z-index": "50" })}"><label class="block text-sm font-semibold text-gray-700 mb-2 ml-2"><i class="fas fa-layer-group text-blue-500 mr-1"></i> Kategori </label>`);
+      _push(ssrRenderComponent(CustomSelect, {
+        modelValue: filters.value.kategori,
+        "onUpdate:modelValue": ($event) => filters.value.kategori = $event,
+        options: kategoriOptions.value,
+        labelKey: "label",
+        valueKey: "value",
+        placeholder: "Semua Kategori",
+        onChange: resetJenis,
+        class: "w-full"
+      }, null, _parent));
+      _push(`</div><div class="flex-1 relative" style="${ssrRenderStyle({ "z-index": "49" })}"><label class="block text-sm font-semibold text-gray-700 mb-2 ml-2"><i class="fas fa-file-alt text-blue-500 mr-1"></i> Jenis Dokumen </label>`);
+      _push(ssrRenderComponent(CustomSelect, {
+        modelValue: filters.value.jenis_dokumen,
+        "onUpdate:modelValue": ($event) => filters.value.jenis_dokumen = $event,
+        options: jenisDokumenOptions.value,
+        labelKey: "label",
+        valueKey: "value",
+        placeholder: "Semua Jenis Dokumen",
+        onChange: applyFilters,
+        class: "w-full transition-opacity"
+      }, null, _parent));
+      _push(`</div><div class="flex-1 relative" style="${ssrRenderStyle({ "z-index": "48" })}"><label class="block text-sm font-semibold text-gray-700 mb-2 ml-2"><i class="fas fa-calendar-alt text-blue-500 mr-1"></i> Tahun </label>`);
+      _push(ssrRenderComponent(CustomSelect, {
+        modelValue: filters.value.tahun,
+        "onUpdate:modelValue": ($event) => filters.value.tahun = $event,
+        options: tahunOptions.value,
+        labelKey: "label",
+        valueKey: "value",
+        placeholder: "Semua Tahun",
+        onChange: applyFilters,
+        class: "w-full"
+      }, null, _parent));
+      _push(`</div><div class="flex-1 relative" style="${ssrRenderStyle({ "z-index": "47" })}"><label class="block text-sm font-semibold text-gray-700 mb-2 ml-2"><i class="fas fa-search text-blue-500 mr-1"></i> Pencarian </label><div class="relative"><input type="text"${ssrRenderAttr("value", filters.value.search)} placeholder="Cari judul..." class="w-full h-[44px] pl-10 pr-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm bg-gray-50 focus:bg-white"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400"><i class="fas fa-search"></i></div></div></div><div class="w-full lg:w-48 flex-none pt-2 lg:pt-0 flex gap-2"><button class="flex-1 lg:flex-none w-full lg:w-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 rounded-xl h-[44px] transition-all flex items-center justify-center font-bold" title="Terapkan Filter"><i class="fas fa-search lg:mr-0"></i> <span class="inline lg:hidden ml-2">Cari</span></button><button class="flex-1 lg:flex-none w-full lg:w-14 bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm rounded-xl h-[44px] transition-all flex items-center justify-center border border-gray-200" title="Reset Filter"><i class="fas fa-undo-alt lg:mr-0"></i> <span class="inline lg:hidden ml-2 font-semibold">Reset</span></button><button class="flex-1 lg:flex-none w-full lg:w-14 bg-white border-2 border-blue-500 hover:bg-blue-50 text-blue-600 shadow-sm rounded-xl h-[44px] transition-all flex items-center justify-center" title="Bagikan Hasil Filter"><i class="fas fa-share-alt lg:mr-0"></i> <span class="inline lg:hidden ml-2 font-semibold">Bagikan</span></button></div></div><div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-4 relative z-10"><h2 class="text-xl font-bold text-gray-800">Daftar Dokumen</h2></div><div class="bg-white/80 rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative min-h-[400px]" style="${ssrRenderStyle({ "z-index": "10" })}"><div class="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden" style="${ssrRenderStyle({ "opacity": "0.03" })}"><div class="w-full h-full" style="${ssrRenderStyle({ backgroundImage: `url(${unref(getAssetUrl)("storage/logo/Lambang_Kabupaten_Sinjai.png")})`, backgroundRepeat: "repeat-y", backgroundPosition: "center top", backgroundSize: "contain", minHeight: "800px", filter: "grayscale(100%)" })}"></div></div>`);
+      if (unref(isLoading)) {
+        _push(`<div class="p-12 text-center relative z-10"><i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i><p class="text-gray-500">Memuat data...</p></div>`);
+      } else if (items.value.length > 0) {
+        _push(`<!--[--><div class="hidden md:block overflow-x-auto relative z-10"><table class="min-w-full w-full whitespace-nowrap bg-transparent"><thead><tr class="bg-gray-100/60 border-b border-gray-200 text-left backdrop-blur-sm"><th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-16 text-center">No</th><th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase">Detail Dokumen</th><th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Kategori</th><th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Tanggal</th><th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Aksi</th></tr></thead><tbody class="divide-y divide-gray-100/50"><!--[-->`);
+        ssrRenderList(items.value, (dokumen, index) => {
+          _push(`<tr class="transition-colors group hover:bg-blue-50/60"><td class="py-4 px-4 text-center align-middle font-medium text-gray-500">${ssrInterpolate((currentPage.value - 1) * Number(filters.value.per_page) + index + 1)}</td><td class="py-4 px-6 whitespace-normal align-middle"><div class="flex items-center"><div class="flex-shrink-0"><div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 border-blue-100 text-blue-600 flex items-center justify-center border shadow-sm"><i class="fas fa-file-pdf text-lg"></i></div></div><div class="ml-4">`);
+          _push(ssrRenderComponent(_component_NuxtLink, {
+            to: `/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`,
+            class: "block text-base font-bold text-gray-800 hover:text-blue-700 transition-colors leading-tight"
+          }, {
+            default: withCtx((_, _push2, _parent2, _scopeId) => {
+              if (_push2) {
+                _push2(`${ssrInterpolate(dokumen.judul)}`);
+              } else {
+                return [
+                  createTextVNode(toDisplayString(dokumen.judul), 1)
+                ];
+              }
+            }),
+            _: 2
+          }, _parent));
+          if (dokumen.deskripsi) {
+            _push(`<p class="text-sm text-gray-500 mt-1 line-clamp-1 group-hover:line-clamp-none transition-all duration-300">${ssrInterpolate(dokumen.deskripsi)}</p>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div></div></td><td class="py-4 px-6 whitespace-normal align-middle"><span class="inline-block px-3 py-1 bg-white/80 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200 mb-1 shadow-sm">${ssrInterpolate(dokumen.kategori)}</span><br><span class="inline-block px-3 py-1 bg-blue-50/80 text-blue-700 text-xs font-semibold rounded-lg border border-blue-100 mt-1 shadow-sm">${ssrInterpolate(dokumen.jenis_dokumen)}</span></td><td class="py-4 px-6 text-center align-middle"><span class="inline-block bg-white/80 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-600 border border-gray-200 shadow-sm whitespace-nowrap">${ssrInterpolate(formatDate(dokumen.published_at || dokumen.created_at))}</span></td><td class="py-4 px-6 text-center align-middle w-48"><div class="flex items-center justify-center space-x-2">`);
+          _push(ssrRenderComponent(_component_NuxtLink, {
+            to: `/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`,
+            class: "inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300",
+            title: "Lihat Detail"
+          }, {
+            default: withCtx((_, _push2, _parent2, _scopeId) => {
+              if (_push2) {
+                _push2(`<i class="fas fa-eye"${_scopeId}></i>`);
+              } else {
+                return [
+                  createVNode("i", { class: "fas fa-eye" })
+                ];
+              }
+            }),
+            _: 2
+          }, _parent));
+          if (dokumen.file_path) {
+            _push(`<a${ssrRenderAttr("href", getDownloadUrl(dokumen))} target="_blank" class="inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Unduh"><i class="${ssrRenderClass(dokumen.file_path.startsWith("http") ? "fas fa-external-link-alt" : "fas fa-cloud-download-alt")}"></i></a>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div></td></tr>`);
+        });
+        _push(`<!--]--></tbody></table></div><div class="block md:hidden relative z-10 p-3 sm:p-4 space-y-4 bg-gray-50/50"><!--[-->`);
+        ssrRenderList(items.value, (dokumen) => {
+          _push(`<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 relative flex flex-col"><div class="flex items-start"><div class="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 text-blue-600 border-blue-100 flex items-center justify-center border shadow-sm mt-0.5"><i class="fas fa-file-pdf text-lg"></i></div><div class="ml-3 flex-grow min-w-0">`);
+          _push(ssrRenderComponent(_component_NuxtLink, {
+            to: `/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`,
+            class: "block text-sm sm:text-base font-bold text-gray-800 hover:text-blue-700 leading-snug"
+          }, {
+            default: withCtx((_, _push2, _parent2, _scopeId) => {
+              if (_push2) {
+                _push2(`${ssrInterpolate(dokumen.judul)}`);
+              } else {
+                return [
+                  createTextVNode(toDisplayString(dokumen.judul), 1)
+                ];
+              }
+            }),
+            _: 2
+          }, _parent));
+          if (dokumen.deskripsi) {
+            _push(`<p class="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">${ssrInterpolate(dokumen.deskripsi)}</p>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div></div><div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-1.5"><span class="px-2 py-1 bg-gray-100 text-gray-700 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200">${ssrInterpolate(dokumen.kategori)}</span><span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] sm:text-xs font-semibold rounded-md border border-blue-100">${ssrInterpolate(dokumen.jenis_dokumen)}</span><span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200"><i class="fas fa-calendar mr-1 text-gray-400"></i> ${ssrInterpolate(formatDate(dokumen.published_at || dokumen.created_at))}</span></div><div class="mt-3 pt-3 border-t border-gray-100 flex justify-end space-x-2">`);
+          if (dokumen.file_path) {
+            _push(`<a${ssrRenderAttr("href", getDownloadUrl(dokumen))} target="_blank" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-xs font-bold transition-colors"><i class="${ssrRenderClass(dokumen.file_path.startsWith("http") ? "fas fa-external-link-alt" : "fas fa-cloud-download-alt")}"></i> <span class="hidden sm:inline sm:ml-1.5">Unduh</span></a>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(ssrRenderComponent(_component_NuxtLink, {
+            to: `/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`,
+            class: "inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-colors"
+          }, {
+            default: withCtx((_, _push2, _parent2, _scopeId) => {
+              if (_push2) {
+                _push2(`<i class="fas fa-eye sm:mr-1.5"${_scopeId}></i> <span class="hidden sm:inline"${_scopeId}>Detail</span>`);
+              } else {
+                return [
+                  createVNode("i", { class: "fas fa-eye sm:mr-1.5" }),
+                  createTextVNode(),
+                  createVNode("span", { class: "hidden sm:inline" }, "Detail")
+                ];
+              }
+            }),
+            _: 2
+          }, _parent));
+          _push(`</div></div>`);
+        });
+        _push(`<!--]--></div><!--]-->`);
+      } else {
+        _push(`<div class="py-20 text-center relative z-10"><div class="flex flex-col items-center justify-center"><div class="w-24 h-24 bg-white/80 shadow-sm rounded-full flex items-center justify-center mb-4"><i class="fas fa-folder-open text-4xl text-gray-300"></i></div><h3 class="text-xl font-bold text-gray-700 mb-2">Belum Ada Dokumen</h3><p class="text-gray-500 font-medium">Silakan sesuaikan filter pencarian Anda.</p></div></div>`);
+      }
+      if (lastPage.value > 1) {
+        _push(`<div class="relative z-10 px-6 py-4 border-t border-gray-100 bg-white/50 backdrop-blur-sm flex justify-center space-x-2"><button${ssrIncludeBooleanAttr(currentPage.value === 1) ? " disabled" : ""} class="px-4 py-2 border rounded-md disabled:opacity-50">\xAB Prev</button><span class="px-4 py-2 border rounded-md bg-blue-50 text-blue-600 font-bold">${ssrInterpolate(currentPage.value)} / ${ssrInterpolate(lastPage.value)}</span><button${ssrIncludeBooleanAttr(currentPage.value === lastPage.value) ? " disabled" : ""} class="px-4 py-2 border rounded-md disabled:opacity-50">Next \xBB</button></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div></div></div></div>`);
+    };
+  }
+};
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/transparansi/informasi-pemkab/index.vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+
+export { _sfc_main as default };
+//# sourceMappingURL=index-BRjTLHWZ.mjs.map

@@ -35,3 +35,4 @@ export { useAccessibilityStore } from '../stores/accessibility';
 export { useAuthStore } from '../stores/auth';
 export { useLoadingStore } from '../stores/loading';
 export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/@pinia/nuxt/dist/runtime/composables';
+export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';

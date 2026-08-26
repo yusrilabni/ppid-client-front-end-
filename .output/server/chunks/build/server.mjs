@@ -600,220 +600,220 @@ const _routes = [
   {
     name: "rss",
     path: "/rss",
-    component: () => import('./rss-DRopFDg5.mjs')
+    component: () => import('./rss-BPfbqZ0v.mjs')
   },
   {
     name: "index",
     path: "/",
-    component: () => import('./index-BSMh15rJ.mjs')
+    component: () => import('./index-Ds3zkqfr.mjs')
   },
   {
     name: "lhkpn",
     path: "/lhkpn",
-    component: () => import('./lhkpn-DbjbAoEz.mjs')
+    component: () => import('./lhkpn-Dltjq9oz.mjs')
   },
   {
     name: "login",
     path: "/login",
-    component: () => import('./login-DDOqdTZn.mjs')
+    component: () => import('./login-D7U8RHMr.mjs')
   },
   {
     name: "galeri",
     path: "/galeri",
-    component: () => import('./galeri-DVZGLyyH.mjs')
+    component: () => import('./galeri-2CCA7nmn.mjs')
   },
   {
     name: "kontak",
     path: "/kontak",
-    component: () => import('./kontak-VeB2Rvee.mjs')
+    component: () => import('./kontak-DQNZiGXX.mjs')
   },
   {
     name: "search",
     path: "/search",
-    component: () => import('./search-CTLs1QkQ.mjs')
+    component: () => import('./search-BN6oqxSJ.mjs')
   },
   {
     name: "widget",
     path: "/widget",
-    component: () => import('./widget-D5U5d50S.mjs')
+    component: () => import('./widget-BXKKXwq9.mjs')
   },
   {
     name: "profile",
     path: "/profile",
-    component: () => import('./profile-BYFFBVhJ.mjs')
+    component: () => import('./profile-mnqLVMUD.mjs')
   },
   {
     name: "register",
     path: "/register",
-    component: () => import('./register-DMog1UHs.mjs')
+    component: () => import('./register-Bct-VFEY.mjs')
   },
   {
     name: "regulasi",
     path: "/regulasi",
-    component: () => import('./regulasi-Bq0QaIcU.mjs')
+    component: () => import('./regulasi-CLpqb3v9.mjs')
   },
   {
     name: "pbj",
     path: "/pbj",
-    component: () => import('./index-DwvTCyto.mjs')
+    component: () => import('./index-CjVG8PSm.mjs')
   },
   {
     name: "statistik",
     path: "/statistik",
-    component: () => import('./statistik-oQiFTcR9.mjs')
+    component: () => import('./statistik-DJWTO3DM.mjs')
   },
   {
     name: "pbj-year",
     path: "/pbj/:year()",
-    component: () => import('./_year_-DxhgWBrW.mjs')
+    component: () => import('./_year_-DhemQmCh.mjs')
   },
   {
     name: "admin",
     path: "/admin",
     meta: __nuxt_page_meta || {},
-    component: () => import('./index-DNBPBz13.mjs')
+    component: () => import('./index-99j_-S4S.mjs')
   },
   {
     name: "profil-ppid",
     path: "/profil/ppid",
-    component: () => import('./ppid-CXm8myuV.mjs')
+    component: () => import('./ppid-BUVCZUi6.mjs')
   },
   {
     name: "sop-layanan",
     path: "/sop-layanan",
-    component: () => import('./sop-layanan-C9maUWzK.mjs')
+    component: () => import('./sop-layanan-BWyhDnf3.mjs')
   },
   {
     name: "dip-year",
     path: "/dip/:year?",
-    component: () => import('./_year_-DwTsWCHb.mjs')
+    component: () => import('./_year_-CW6W8uSN.mjs')
   },
   {
     name: "laporan-ppid",
     path: "/laporan/ppid",
-    component: () => import('./ppid-CMpUQXgP.mjs'),
+    component: () => import('./ppid-CG6Xl2Kr.mjs'),
     children: [
       {
         name: "laporan-ppid-preview-id",
         path: "preview/:id()",
-        component: () => import('./_id_-5h9hi4Bb.mjs')
+        component: () => import('./_id_-LYpCcpJU.mjs')
       }
     ]
   },
   {
     name: "auth-callback",
     path: "/auth/callback",
-    component: () => import('./callback-DeGake2a.mjs')
+    component: () => import('./callback-BjDuZTmM.mjs')
   },
   {
     name: "dipunit",
     path: "/dipunit",
-    component: () => import('./index-C_o_fWwW.mjs')
+    component: () => import('./index-ChroWxqT.mjs')
   },
   {
     name: "profil-slug",
     path: "/profil/:slug()",
-    component: () => import('./_slug_-BHfZ7VUq.mjs')
+    component: () => import('./_slug_-z0CdIZ_J.mjs')
   },
   {
     name: "survei-slug",
     path: "/survei/:slug()",
-    component: () => import('./_slug_-D4cvNks6.mjs')
+    component: () => import('./_slug_-BKusj915.mjs')
   },
   {
     name: "laporan-survei",
     path: "/laporan/survei",
-    component: () => import('./survei-CS1TkCkP.mjs')
+    component: () => import('./survei-Dj5RFEvY.mjs')
   },
   {
     name: "google-callback",
     path: "/google-callback",
-    component: () => import('./google-callback-BpSWNpO1.mjs')
+    component: () => import('./google-callback-DHDf7Ye2.mjs')
   },
   {
     name: "maklumat-layanan",
     path: "/maklumat-layanan",
-    component: () => import('./maklumat-layanan-Cv4lAWtO.mjs')
+    component: () => import('./maklumat-layanan-CxF-uYbm.mjs')
   },
   {
     name: "kebijakan-privasi",
     path: "/kebijakan-privasi",
-    component: () => import('./kebijakan-privasi-90gZSKYN.mjs')
+    component: () => import('./kebijakan-privasi-B2b9xfHD.mjs')
   },
   {
     name: "profil-unit-lokal",
     path: "/profil/unit-lokal",
-    component: () => import('./unit-lokal-cM4UI_wC.mjs')
+    component: () => import('./unit-lokal-Deeko1x6.mjs')
   },
   {
     name: "tracking-code",
     path: "/tracking/:code?",
-    component: () => import('./_code_-Du8L4JPJ.mjs')
+    component: () => import('./_code_-Cs6NKoJd.mjs')
   },
   {
     name: "dipunit-dip-slug",
     path: "/dipunit/dip/:slug()",
-    component: () => import('./_slug_-Cdk3Lks1.mjs')
+    component: () => import('./_slug_-DspVHcwS.mjs')
   },
   {
     name: "laporan-permohonan",
     path: "/laporan/permohonan",
-    component: () => import('./permohonan-BzWzYwOo.mjs')
+    component: () => import('./permohonan-sb2kXTIh.mjs')
   },
   {
     name: "informasi-category",
     path: "/informasi/:category()",
-    component: () => import('./_category_-DNUVnLsd.mjs')
+    component: () => import('./_category_-BSUCBNWe.mjs')
   },
   {
     name: "permohonan-informasi",
     path: "/permohonan-informasi",
-    component: () => import('./permohonan-informasi-BsWKS915.mjs')
+    component: () => import('./permohonan-informasi-B8intjJY.mjs')
   },
   {
     name: "profil-pejabat-daerah",
     path: "/profil/pejabat-daerah",
-    component: () => import('./pejabat-daerah-Xzd99_0l.mjs')
+    component: () => import('./pejabat-daerah-6QmE04Rl.mjs')
   },
   {
     name: "standar-layanan",
     path: "/standar-layanan",
-    component: () => import('./index-Cp7xDn61.mjs')
+    component: () => import('./index-Cd8eNkdL.mjs')
   },
   {
     name: "standar-layanan-slug",
     path: "/standar-layanan/:slug()",
-    component: () => import('./_slug_-9yn7JCVq.mjs')
+    component: () => import('./_slug_-_RtAqW-5.mjs')
   },
   {
     name: "informasi-detail-slug",
     path: "/informasi/detail/:slug()",
-    component: () => import('./_slug_-DrDTnjdP.mjs')
+    component: () => import('./_slug_-Hu4OEOwc.mjs')
   },
   {
     name: "profil-tentang-opd",
     path: "/profil/tentang-opd",
-    component: () => import('./index-BOxFFRlV.mjs')
+    component: () => import('./index-Be8z2789.mjs')
   },
   {
     name: "profil-tentang-opd-slug",
     path: "/profil/tentang-opd/:slug()",
-    component: () => import('./_slug_-CShu-hTk.mjs')
+    component: () => import('./_slug_-B9VX1IlK.mjs')
   },
   {
     name: "standar-layanan-file-slug",
     path: "/standar-layanan/file/:slug()",
-    component: () => import('./_slug_-Dh7rO9QS.mjs')
+    component: () => import('./_slug_-NY55TafM.mjs')
   },
   {
     name: "transparansi-informasi-pemkab",
     path: "/transparansi/informasi-pemkab",
-    component: () => import('./index-W5nONRNr.mjs')
+    component: () => import('./index-BRjTLHWZ.mjs')
   },
   {
     name: "transparansi-informasi-pemkab-slug",
     path: "/transparansi/informasi-pemkab/:slug()",
-    component: () => import('./_slug_-COlF5kCU.mjs')
+    component: () => import('./_slug_-BB5fY_p0.mjs')
   }
 ];
 const validate = /* @__PURE__ */ defineNuxtRouteMiddleware(async (to) => {
@@ -1515,8 +1515,8 @@ const plugins = [
   components_plugin_z4hgvsiddfKkfXTP6M8M4zG5Cb7sGnDhcryKVM45Di4
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-CKCaOT5d.mjs').then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import('./default-B2WgPsIm.mjs').then((m) => m.default || m))
+  admin: defineAsyncComponent(() => import('./admin-D56YKM89.mjs').then((m) => m.default || m)),
+  default: defineAsyncComponent(() => import('./default-MlGBjgkR.mjs').then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({

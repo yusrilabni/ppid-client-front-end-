@@ -2,19 +2,26 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useAccessibilityStore = defineStore('accessibility', () => {
+  const getLocal = (key, defaultVal) => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(key) || defaultVal;
+    }
+    return defaultVal;
+  };
+
   const isOpen = ref(false)
-  const fontLevel = ref(localStorage.getItem('acc_font_level') || 'normal')
-  const contrast = ref(localStorage.getItem('acc_contrast') || 'default')
-  const links = ref(localStorage.getItem('acc_links') === 'true')
-  const headings = ref(localStorage.getItem('acc_headings') === 'true')
-  const focus = ref(localStorage.getItem('acc_focus') || 'default')
-  const keyboard = ref(localStorage.getItem('acc_keyboard') === 'true')
-  const textSpacing = ref(localStorage.getItem('acc_text_spacing') === 'true')
-  const hideImages = ref(localStorage.getItem('acc_hide_images') === 'true')
-  const dyslexic = ref(localStorage.getItem('acc_dyslexic') || 'default')
-  const lineHeight = ref(localStorage.getItem('acc_line_height') === 'true')
-  const alignment = ref(localStorage.getItem('acc_alignment') || 'default')
-  const saturation = ref(localStorage.getItem('acc_saturation') || 'default')
+  const fontLevel = ref(getLocal('acc_font_level', 'normal'))
+  const contrast = ref(getLocal('acc_contrast', 'default'))
+  const links = ref(getLocal('acc_links', 'false') === 'true')
+  const headings = ref(getLocal('acc_headings', 'false') === 'true')
+  const focus = ref(getLocal('acc_focus', 'default'))
+  const keyboard = ref(getLocal('acc_keyboard', 'false') === 'true')
+  const textSpacing = ref(getLocal('acc_text_spacing', 'false') === 'true')
+  const hideImages = ref(getLocal('acc_hide_images', 'false') === 'true')
+  const dyslexic = ref(getLocal('acc_dyslexic', 'default'))
+  const lineHeight = ref(getLocal('acc_line_height', 'false') === 'true')
+  const alignment = ref(getLocal('acc_alignment', 'default'))
+  const saturation = ref(getLocal('acc_saturation', 'default'))
 
   const fontMap = { 'kecil': 12, 'normal': 16, 'sedang': 20, 'besar': 24 }
   const fontSize = computed(() => fontMap[fontLevel.value] || 16)

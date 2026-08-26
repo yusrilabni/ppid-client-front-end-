@@ -3,8 +3,15 @@ import { ref, computed } from 'vue'
 import api from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(JSON.parse(localStorage.getItem('ppid_user') || 'null'))
-  const token = ref(localStorage.getItem('ppid_token') || null)
+  const getLocal = (key, defaultVal) => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(key) || defaultVal;
+    }
+    return defaultVal;
+  };
+
+  const user = ref(JSON.parse(getLocal('ppid_user', 'null')))
+  const token = ref(getLocal('ppid_token', null))
   const loading = ref(false)
   const error = ref(null)
 
