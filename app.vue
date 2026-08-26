@@ -16,10 +16,10 @@ const capitalize = (str) => {
 }
 
 const pageTitle = computed(() => {
-  if (route.path === '/') return 'PPID Kabupaten Sinjai'
+  if (route.path === '/') return 'Pejabat Pengelola Informasi dan Dokumentasi'
   
   const paths = route.path.split('/').filter(Boolean)
-  if (paths.length === 0) return 'PPID Kabupaten Sinjai'
+  if (paths.length === 0) return 'Pejabat Pengelola Informasi dan Dokumentasi'
   
   const titleParts = paths.map(p => capitalize(p))
   
@@ -40,8 +40,11 @@ const pageTitle = computed(() => {
 useHead(() => ({
   title: pageTitle.value,
   meta: [
+    { name: 'description', content: 'Transparansi Informasi Publik' },
     { property: 'og:title', content: pageTitle.value },
-    { name: 'twitter:title', content: pageTitle.value }
+    { property: 'og:description', content: 'Transparansi Informasi Publik' },
+    { name: 'twitter:title', content: pageTitle.value },
+    { name: 'twitter:description', content: 'Transparansi Informasi Publik' }
   ]
 }))
 </script>
