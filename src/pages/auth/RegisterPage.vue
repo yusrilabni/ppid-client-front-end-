@@ -151,6 +151,17 @@
               Verifikasi
             </button>
           </div>
+
+          <div class="text-center mt-4 border-t pt-4">
+            <p class="text-sm text-gray-600 mb-2">Belum menerima kode OTP?</p>
+            <button type="button" 
+                    @click="handleResendOtp" 
+                    :disabled="cooldownTimer > 0 || loadingResend"
+                    class="text-blue-600 hover:text-blue-800 font-medium text-sm disabled:text-gray-400 disabled:cursor-not-allowed">
+              <span v-if="loadingResend" class="animate-spin h-3 w-3 border-2 border-blue-600 border-t-transparent rounded-full inline-block mr-1"></span>
+              {{ cooldownTimer > 0 ? `Kirim Ulang OTP dalam ${cooldownTimer}s` : 'Kirim Ulang OTP' }}
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -184,10 +195,27 @@ const otpCode = ref('')
 const otpError = ref('')
 const loadingOtp = ref(false)
 
+const loadingResend = ref(false)
+const cooldownTimer = ref(60)
+let timerInterval = null
+
+const startCooldown = () => {
+  cooldownTimer.value = 60
+  clearInterval(timerInterval)
+  timerInterval = setInterval(() => {
+    if (cooldownTimer.value > 0) {
+      cooldownTimer.value--
+    } else {
+      clearInterval(timerInterval)
+    }
+  }, 1000)
+}
+
 onMounted(() => {
   if (route.query.otp_required === 'true' && route.query.email) {
     showOtpModal.value = true
     otpEmail.value = decodeURIComponent(route.query.email)
+    startCooldown() // Start cooldown when modal opens
     // Clean up URL
     router.replace('/register')
   } else if (route.query.error === 'already_registered') {
@@ -227,6 +255,32 @@ const closeOtpModal = () => {
   showOtpModal.value = false
   otpCode.value = ''
   otpError.value = ''
+  clearInterval(timerInterval)
+}
+
+const handleResendOtp = async () => {
+  if (cooldownTimer.value > 0) return
+  
+  loadingResend.value = true
+  otpError.value = ''
+  
+  try {
+    const response = await api.post('/auth/google/resend-otp', {
+      action: 'register',
+      email: otpEmail.value
+    })
+    
+    if (response.data.success) {
+      startCooldown()
+      // Optional: show a success toast here if you have a toast system
+    } else {
+      throw new Error(response.data.message || 'Gagal mengirim ulang OTP.')
+    }
+  } catch (err) {
+    otpError.value = err.response?.data?.message || err.message || 'Terjadi kesalahan saat mengirim ulang OTP.'
+  } finally {
+    loadingResend.value = false
+  }
 }
 
 const handleVerifyOtp = async () => {

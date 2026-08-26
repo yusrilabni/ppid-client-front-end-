@@ -279,12 +279,22 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-3">
-                  <button type="button" @click="showOtpModal = false; otpStep = 'request'" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                  <button type="button" @click="showOtpModal = false; otpStep = 'request'; clearInterval(unlinkTimerInterval)" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
                     Batal
                   </button>
                   <button type="submit" :disabled="isVerifyingOtp || otpCode.length !== 6" class="w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center">
                     <i v-if="isVerifyingOtp" class="fas fa-spinner fa-spin mr-2"></i>
                     Verifikasi & Putuskan
+                  </button>
+                </div>
+
+                <div class="text-center mt-4 border-t pt-4">
+                  <button type="button" 
+                          @click="resendUnlinkOtp" 
+                          :disabled="unlinkCooldown > 0 || isRequestingOtp"
+                          class="text-red-600 hover:text-red-800 font-medium text-sm disabled:text-gray-400 disabled:cursor-not-allowed">
+                    <span v-if="isRequestingOtp" class="animate-spin h-3 w-3 border-2 border-red-600 border-t-transparent rounded-full inline-block mr-1"></span>
+                    {{ unlinkCooldown > 0 ? `Kirim Ulang OTP dalam ${unlinkCooldown}s` : 'Kirim Ulang OTP' }}
                   </button>
                 </div>
               </form>
@@ -318,12 +328,23 @@
               </div>
               
               <div class="flex flex-col sm:flex-row gap-3">
-                <button type="button" @click="showLinkOtpModal = false" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                <button type="button" @click="showLinkOtpModal = false; clearInterval(linkTimerInterval)" class="w-full px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
                   Batal
                 </button>
                 <button type="submit" :disabled="isVerifyingLinkOtp || linkOtpCode.length !== 6" class="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center">
                   <i v-if="isVerifyingLinkOtp" class="fas fa-spinner fa-spin mr-2"></i>
                   Verifikasi & Tautkan
+                </button>
+              </div>
+
+              <div class="text-center mt-4 border-t pt-4">
+                <p class="text-sm text-gray-600 mb-2">Belum menerima kode OTP?</p>
+                <button type="button" 
+                        @click="resendLinkOtp" 
+                        :disabled="linkCooldown > 0 || isResendingLink"
+                        class="text-blue-600 hover:text-blue-800 font-medium text-sm disabled:text-gray-400 disabled:cursor-not-allowed">
+                  <span v-if="isResendingLink" class="animate-spin h-3 w-3 border-2 border-blue-600 border-t-transparent rounded-full inline-block mr-1"></span>
+                  {{ linkCooldown > 0 ? `Kirim Ulang OTP dalam ${linkCooldown}s` : 'Kirim Ulang OTP' }}
                 </button>
               </div>
             </form>
@@ -486,6 +507,36 @@ const otpCode = ref('')
 const otpError = ref('')
 const otpSuccess = ref('')
 
+const unlinkCooldown = ref(0)
+let unlinkTimerInterval = null
+
+const startUnlinkCooldown = () => {
+  unlinkCooldown.value = 60
+  clearInterval(unlinkTimerInterval)
+  unlinkTimerInterval = setInterval(() => {
+    if (unlinkCooldown.value > 0) unlinkCooldown.value--
+    else clearInterval(unlinkTimerInterval)
+  }, 1000)
+}
+
+const resendUnlinkOtp = async () => {
+  if (unlinkCooldown.value > 0) return
+  isRequestingOtp.value = true
+  otpError.value = ''
+  
+  try {
+    const response = await api.post('/auth/google/resend-otp', { action: 'unlink' })
+    if (response.data.success) {
+      otpSuccess.value = response.data.message || 'Kode OTP baru telah dikirim.'
+      startUnlinkCooldown()
+    }
+  } catch (error) {
+    otpError.value = error.response?.data?.message || 'Gagal mengirim ulang OTP.'
+  } finally {
+    isRequestingOtp.value = false
+  }
+}
+
 const requestOtp = async () => {
   try {
     isRequestingOtp.value = true
@@ -496,6 +547,7 @@ const requestOtp = async () => {
     if (response.data.success) {
       otpSuccess.value = response.data.message || 'Kode OTP telah dikirim.'
       otpStep.value = 'verify'
+      startUnlinkCooldown()
     }
   } catch (error) {
     otpError.value = error.response?.data?.message || 'Gagal mengirim OTP. Pastikan konfigurasi email server valid.'
@@ -543,6 +595,41 @@ const linkEmailTarget = ref(route.query.email || '')
 const linkOtpCode = ref('')
 const linkOtpError = ref('')
 const isVerifyingLinkOtp = ref(false)
+const isResendingLink = ref(false)
+
+const linkCooldown = ref(0)
+let linkTimerInterval = null
+
+const startLinkCooldown = () => {
+  linkCooldown.value = 60
+  clearInterval(linkTimerInterval)
+  linkTimerInterval = setInterval(() => {
+    if (linkCooldown.value > 0) linkCooldown.value--
+    else clearInterval(linkTimerInterval)
+  }, 1000)
+}
+
+if (showLinkOtpModal.value) {
+  startLinkCooldown()
+}
+
+const resendLinkOtp = async () => {
+  if (linkCooldown.value > 0) return
+  isResendingLink.value = true
+  linkOtpError.value = ''
+  
+  try {
+    const response = await api.post('/auth/google/resend-otp', { action: 'link' })
+    if (response.data.success) {
+      startLinkCooldown()
+      alert('Kode OTP baru telah dikirim.')
+    }
+  } catch (error) {
+    linkOtpError.value = error.response?.data?.message || 'Gagal mengirim ulang OTP.'
+  } finally {
+    isResendingLink.value = false
+  }
+}
 
 const verifyLinkOtp = async () => {
   if (linkOtpCode.value.length !== 6) return
