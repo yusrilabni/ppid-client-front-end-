@@ -404,7 +404,7 @@ const copyShareLink = () => {
     }
   });
   const queryString = new URLSearchParams(queryObj).toString();
-  const url = `https://ppidkab.sinjaikab.go.id/share/informasi-pemkab${queryString ? '?' + queryString : ''}`;
+  const url = `https://ppid.sinjaikab.go.id/share/informasi-pemkab${queryString ? '?' + queryString : ''}`;
   
   navigator.clipboard.writeText(url).then(() => {
     alert('Tautan khusus untuk filter ini berhasil disalin!\nSilakan tempel (paste) di WhatsApp atau Facebook Anda.');

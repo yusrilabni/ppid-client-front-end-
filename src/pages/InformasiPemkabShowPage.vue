@@ -259,7 +259,7 @@ const formatDate = (dateStr) => {
 const copyShareLink = (dokumen) => {
   if (!dokumen) return;
   const slug = dokumen.slug || dokumen.id;
-  const url = `https://ppidkab.sinjaikab.go.id/share/informasi-pemkab/${slug}`;
+  const url = `https://ppid.sinjaikab.go.id/share/informasi-pemkab/${slug}`;
   
   navigator.clipboard.writeText(url).then(() => {
     alert('Tautan khusus untuk dibagikan (WhatsApp/Facebook) berhasil disalin!\nSilakan tempel (paste) di media sosial Anda.');
