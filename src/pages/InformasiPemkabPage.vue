@@ -379,7 +379,7 @@ const updateTitle = (query) => {
     title += ' - ' + query.jenis_dokumen
   }
   
-  let imageUrl = 'https://ppidkab.sinjaikab.go.id/storage/logo/Lambang_Kabupaten_Sinjai.png'
+  let imageUrl = 'https://ppidkab.sinjaikab.go.id/share/og-image/logo'
 
   document.title = title
   
