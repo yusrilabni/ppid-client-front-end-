@@ -1,15 +1,14 @@
-import tailwindcss from '@tailwindcss/vite';
-
 export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
   ],
-  vite: {
-    plugins: [
-      tailwindcss(),
-    ],
-  },
   css: ['~/assets/css/index.css'],
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+      autoprefixer: {},
+    },
+  },
   app: {
     head: {
       title: 'PPID Kabupaten Sinjai',
