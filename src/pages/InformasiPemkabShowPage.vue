@@ -250,4 +250,30 @@ const formatDate = (dateStr) => {
   const date = new Date(dateStr)
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
 }
+
+watch(dokumen, (newDoc) => {
+  if (newDoc && newDoc.judul) {
+    const title = newDoc.judul + ' - PPID Kabupaten Sinjai'
+    document.title = title
+    
+    let ogTitle = document.querySelector('meta[property="og:title"]')
+    if (ogTitle) ogTitle.content = title
+
+    let ogDesc = document.querySelector('meta[property="og:description"]')
+    if (ogDesc && newDoc.deskripsi) ogDesc.content = newDoc.deskripsi
+    
+    let imageUrl = 'https://placehold.co/1200x630/2563eb/ffffff.png?text=Informasi+Pemkab'
+    if (newDoc.kategori) {
+      imageUrl = `https://placehold.co/1200x630/2563eb/ffffff.png?text=${encodeURIComponent(newDoc.kategori)}`
+    }
+
+    let ogImage = document.querySelector('meta[property="og:image"]')
+    if (!ogImage) {
+        ogImage = document.createElement('meta')
+        ogImage.setAttribute('property', 'og:image')
+        document.head.appendChild(ogImage)
+    }
+    ogImage.content = imageUrl
+  }
+}, { immediate: true })
 </script>
