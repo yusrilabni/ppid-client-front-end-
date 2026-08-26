@@ -16,9 +16,9 @@ const capitalize = (str) => {
 }
 
 const rawPageName = computed(() => {
-  if (route.path === '/') return ''
+  if (route.path === '/') return 'Beranda'
   const paths = route.path.split('/').filter(Boolean)
-  if (paths.length === 0) return ''
+  if (paths.length === 0) return 'Beranda'
   
   const titleParts = paths.map(p => capitalize(p))
   const formattedParts = titleParts.map(part => {
@@ -34,13 +34,11 @@ const rawPageName = computed(() => {
 })
 
 const pageTitle = computed(() => {
-  if (!rawPageName.value) return 'Pejabat Pengelola Informasi dan Dokumentasi'
   return 'PPID - ' + rawPageName.value
 })
 
 const pageDescription = computed(() => {
   const baseDesc = 'Pejabat Pengelola Informasi dan Dokumentasi Kabupaten Sinjai - Transparansi Informasi Publik'
-  if (!rawPageName.value) return baseDesc
   return `${rawPageName.value} - ${baseDesc}`
 })
 
