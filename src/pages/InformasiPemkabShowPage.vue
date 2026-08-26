@@ -113,20 +113,25 @@
                                     <p class="text-sm text-gray-600">Klik tombol di samping untuk melihat atau mengunduh dokumen secara lengkap.</p>
                                 </div>
                                 
-                                <div class="flex-shrink-0 w-full md:w-auto text-center md:text-right">
+                                <div class="flex-shrink-0 w-full md:w-auto text-center md:text-right flex flex-col sm:flex-row gap-3">
                                     <template v-if="dokumen.file_path">
                                         <a :href="getDownloadUrl(dokumen)" target="_blank" 
                                            class="w-full md:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1"
                                            :class="dokumen.file_path.startsWith('http') ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
                                             <i :class="[dokumen.file_path.startsWith('http') ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
-                                            {{ dokumen.file_path.startsWith('http') ? 'Buka Tautan Eksternal' : 'Unduh File Dokumen' }}
+                                            {{ dokumen.file_path.startsWith('http') ? 'Buka Tautan Eksternal' : 'Unduh Dokumen' }}
                                         </a>
-                                        <p class="mt-3 text-xs text-gray-500 font-semibold"><i class="fas fa-download mr-1"></i> Telah diunduh/dibuka {{ dokumen.downloads_count || 0 }} kali</p>
                                     </template>
                                     <span v-else class="flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed">
                                         <i class="fas fa-ban mr-2"></i> File Tidak Tersedia
                                     </span>
+                                    
+                                    <button @click="copyShareLink(dokumen)" 
+                                       class="w-full md:w-auto inline-flex items-center justify-center px-6 py-3.5 bg-white border-2 border-blue-500 text-blue-600 font-bold rounded-xl shadow-md transition-all duration-300 transform hover:-translate-y-1 hover:bg-blue-50">
+                                        <i class="fas fa-share-alt mr-2 text-xl"></i> Bagikan
+                                    </button>
                                 </div>
+                                <p class="mt-4 text-xs text-gray-500 font-semibold md:text-right"><i class="fas fa-eye mr-1"></i> Telah dilihat {{ dokumen.views_count || 0 }} kali</p>
                             </div>
                         </div>
                     </div>
@@ -249,6 +254,19 @@ const formatDate = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+const copyShareLink = (dokumen) => {
+  if (!dokumen) return;
+  const slug = dokumen.slug || dokumen.id;
+  const url = `https://ppidkab.sinjaikab.go.id/share/informasi-pemkab/${slug}`;
+  
+  navigator.clipboard.writeText(url).then(() => {
+    alert('Tautan khusus untuk dibagikan (WhatsApp/Facebook) berhasil disalin!\nSilakan tempel (paste) di media sosial Anda.');
+  }).catch(err => {
+    console.error('Gagal menyalin:', err);
+    prompt('Salin tautan berikut secara manual:', url);
+  });
 }
 
 watch(dokumen, (newDoc) => {
