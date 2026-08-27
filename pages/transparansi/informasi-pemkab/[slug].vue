@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isMounted || isLoading" class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div v-if="isLoading" class="min-h-screen flex items-center justify-center bg-gray-50">
         <div class="text-center">
             <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
             <p class="text-gray-500 font-medium">Memuat dokumen...</p>
@@ -218,16 +218,18 @@ import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 
-import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
 const slug = route.params.slug
 
-const fetchDokumen = async () => {
-  const res = await api.get(`/informasi-pemkab/${slug}`)
-  return res.data
-}
+const { data: dokumen, pending: isLoading, error: isError } = await useAsyncData(
+  'informasi-pemkab-' + slug,
+  async () => {
+    const res = await api.get(`/informasi-pemkab/${slug}`)
+    return res.data
+  }
+)
 
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
@@ -244,17 +246,6 @@ const getEmbedUrl = (path) => {
   }
   return getStorageUrl(path) + '#toolbar=0';
 }
-
-const { data: dokumen, isLoading, isError } = useQuery({
-  queryKey: ['informasi-pemkab', slug],
-  queryFn: fetchDokumen,
-  retry: false
-})
-
-const isMounted = ref(false)
-onMounted(() => {
-  isMounted.value = true
-})
 
 const isImage = (path) => {
   if (!path) return false
