@@ -137,7 +137,8 @@
                                     <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-16 text-center">No</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase">Detail Dokumen</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Kategori</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Tanggal</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Sumber</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-32 text-center">Tanggal</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -171,6 +172,21 @@
                                         <span class="inline-block px-3 py-1 bg-blue-50/80 text-blue-700 text-xs font-semibold rounded-lg border border-blue-100 mt-1 shadow-sm">
                                             {{ dokumen.jenis_dokumen }}
                                         </span>
+                                    </td>
+                                    <td class="py-4 px-6 whitespace-normal align-middle">
+                                        <div v-if="dokumen.user" class="mb-1.5 text-xs text-gray-600 font-medium whitespace-nowrap">
+                                            <i class="fas fa-user-circle mr-1 text-gray-400"></i>
+                                            <template v-if="dokumen.user.role === 'superadmin' || (dokumen.user.admin_kabupaten && dokumen.user.admin_kabupaten == 1)">
+                                                Admin Kabupaten ({{ dokumen.user.name }})
+                                            </template>
+                                            <template v-else>
+                                                {{ dokumen.user.name }}
+                                            </template>
+                                        </div>
+                                        <span v-if="dokumen.organization" class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <i class="fas fa-building mr-1.5"></i> {{ dokumen.organization.name }}
+                                        </span>
+                                        <span v-else class="text-xs text-gray-400 italic">Pemerintah Kabupaten</span>
                                     </td>
                                     <td class="py-4 px-6 text-center align-middle">
                                         <span class="inline-block bg-white/80 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-600 border border-gray-200 shadow-sm whitespace-nowrap">
@@ -214,6 +230,18 @@
                                 </span>
                                 <span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] sm:text-xs font-semibold rounded-md border border-blue-100">
                                     {{ dokumen.jenis_dokumen }}
+                                </span>
+                                <span v-if="dokumen.user" class="px-2 py-1 bg-purple-50 text-purple-700 text-[10px] sm:text-xs font-semibold rounded-md border border-purple-200">
+                                    <i class="fas fa-user-circle mr-1"></i> 
+                                    <template v-if="dokumen.user.role === 'superadmin' || (dokumen.user.admin_kabupaten && dokumen.user.admin_kabupaten == 1)">
+                                        Admin Kabupaten ({{ dokumen.user.name }})
+                                    </template>
+                                    <template v-else>
+                                        {{ dokumen.user.name }}
+                                    </template>
+                                </span>
+                                <span v-if="dokumen.organization" class="px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] sm:text-xs font-semibold rounded-md border border-emerald-200">
+                                    <i class="fas fa-building mr-1"></i> {{ dokumen.organization.name }}
                                 </span>
                                 <span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-semibold rounded-md border border-gray-200">
                                     <i class="fas fa-calendar mr-1 text-gray-400"></i> {{ formatDate(dokumen.published_at || dokumen.created_at) }}
