@@ -1,3 +1,5 @@
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   features: {
     inlineStyles: false
@@ -10,12 +12,23 @@ export default defineNuxtConfig({
     '@fortawesome/fontawesome-free/css/all.min.css',
     'swiper/css/bundle'
   ],
-  postcss: {
-    plugins: {
-      '@tailwindcss/postcss': {},
-      autoprefixer: {},
-    },
+  // Gunakan @tailwindcss/vite langsung (jauh lebih cepat dari PostCSS)
+  vite: {
+    plugins: [tailwindcss()],
+    build: {
+      sourcemap: false, // nonaktifkan sourcemap production (hemat ~1-2 detik)
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-vue': ['vue', 'pinia'],
+            'vendor-query': ['@tanstack/vue-query'],
+            'vendor-swiper': ['swiper'],
+          }
+        }
+      }
+    }
   },
+  // Hapus postcss (sudah digantikan vite plugin di atas)
   app: {
     head: {
       title: 'PPID Kabupaten Sinjai',
@@ -32,4 +45,7 @@ export default defineNuxtConfig({
     }
   },
   ssr: true,
+  nitro: {
+    sourceMap: false, // nonaktifkan sourcemap Nitro server (hemat waktu tambahan)
+  }
 })
