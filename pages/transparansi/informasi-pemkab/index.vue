@@ -337,7 +337,29 @@ const filters = ref({
   page: route.query.page || 1
 })
 
-const kategori_jenis = ref({})
+const fetchInformasiPemkab = async () => {
+  const res = await api.get('/informasi-pemkab', { params: filters.value })
+  
+  return res.data
+}
+
+const getDownloadUrl = (dokumen) => {
+  if (!dokumen) return '#'
+  return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+const { data, isLoading } = useQuery({
+  queryKey: computed(() => ['informasi-pemkab', filters.value]),
+  queryFn: fetchInformasiPemkab,
+  keepPreviousData: true
+})
+const kategori_jenis = computed(() => data.value?.kategori_jenis || {})
 
 const availableYears = computed(() => {
   const years = []
@@ -380,32 +402,10 @@ const perPageOptions = [
     { label: '100 Baris', value: '100' },
 ]
 
-const fetchInformasiPemkab = async () => {
-  const res = await api.get('/informasi-pemkab', { params: filters.value })
-  kategori_jenis.value = res.data.kategori_jenis
-  return res.data.data
-}
 
-const getDownloadUrl = (dokumen) => {
-  if (!dokumen) return '#'
-  return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
-}
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
-}
-
-const { data, isLoading } = useQuery({
-  queryKey: computed(() => ['informasi-pemkab', filters.value]),
-  queryFn: fetchInformasiPemkab,
-  keepPreviousData: true
-})
-
-const items = computed(() => data.value?.data || [])
-const currentPage = computed(() => data.value?.current_page || 1)
-const lastPage = computed(() => data.value?.last_page || 1)
+const items = computed(() => data.value?.data?.data || [])
+const currentPage = computed(() => data.value?.data?.current_page || 1)
+const lastPage = computed(() => data.value?.data?.last_page || 1)
 
 const visiblePages = computed(() => {
   const current = currentPage.value
