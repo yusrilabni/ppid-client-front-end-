@@ -1,11 +1,8 @@
 <template>
   <div class="w-full min-h-screen bg-gray-50">
-    <ClientOnly fallback-tag="div" fallback="Memuat halaman...">
-        <div v-if="isLoading" class="flex items-center justify-center min-h-[60vh]">
-            <div class="text-center">
-                <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
-                <p class="text-gray-500 font-medium">Memuat dokumen...</p>
-            </div>
+    <ClientOnly>
+        <div v-if="isLoading" class="min-h-[60vh]">
+            <!-- Spacer while global loading screen is active -->
         </div>
 
         <div v-else-if="isError" class="flex items-center justify-center min-h-[60vh]">
