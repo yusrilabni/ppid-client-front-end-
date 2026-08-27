@@ -134,12 +134,12 @@
                         <table class="min-w-full w-full whitespace-nowrap bg-transparent">
                             <thead>
                                 <tr class="bg-gray-100/60 border-b border-gray-200 text-left backdrop-blur-sm">
-                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-16 text-center">No</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase">Detail Dokumen</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Kategori</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Sumber</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-32 text-center">Tanggal</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-48 text-center">Aksi</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-12 text-center">No</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase min-w-[350px] w-[45%]">Detail Dokumen</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-40">Kategori</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-40">Sumber</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-28 text-center">Tanggal</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-32 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100/50">
@@ -155,10 +155,10 @@
                                                 </div>
                                             </div>
                                             <div class="ml-4">
-                                                <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-base font-bold text-gray-800 hover:text-blue-700 transition-colors leading-tight">
+                                                <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-base font-bold text-gray-800 hover:text-blue-700 transition-all duration-300 leading-tight line-clamp-1 group-hover:line-clamp-none">
                                                     {{ dokumen.judul }}
                                                 </NuxtLink>
-                                                <p v-if="dokumen.deskripsi" :title="dokumen.deskripsi" class="text-sm text-gray-500 mt-1 line-clamp-2">
+                                                <p v-if="dokumen.deskripsi" class="text-sm text-gray-500 mt-1 transition-all duration-300 line-clamp-1 group-hover:line-clamp-none">
                                                     {{ dokumen.deskripsi }}
                                                 </p>
                                             </div>
@@ -209,16 +209,16 @@
                     </div>
       
                     <div class="block md:hidden relative z-10 p-3 sm:p-4 space-y-4 bg-gray-50/50">
-                        <div v-for="dokumen in items" :key="'mob-'+dokumen.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 relative flex flex-col">
-                            <div class="flex items-start">
-                                <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 text-blue-600 border-blue-100 flex items-center justify-center border shadow-sm mt-0.5">
-                                    <i class="fas fa-file-pdf text-lg"></i>
-                                </div>
-                                <div class="ml-3 flex-grow min-w-0">
-                                    <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-sm sm:text-base font-bold text-gray-800 hover:text-blue-700 leading-snug">
-                                        {{ dokumen.judul }}
-                                    </NuxtLink>
-                                    <p v-if="dokumen.deskripsi" :title="dokumen.deskripsi" class="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
+                          <div v-for="dokumen in items" :key="'mob-'+dokumen.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 relative flex flex-col group transition-all duration-300">
+                              <div class="flex items-start">
+                                  <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 text-blue-600 border-blue-100 flex items-center justify-center border shadow-sm mt-0.5">
+                                      <i class="fas fa-file-pdf text-lg"></i>
+                                  </div>
+                                  <div class="ml-3 flex-grow min-w-0">
+                                      <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-sm sm:text-base font-bold text-gray-800 hover:text-blue-700 transition-all duration-300 leading-snug line-clamp-1 group-hover:line-clamp-none">
+                                          {{ dokumen.judul }}
+                                      </NuxtLink>
+                                      <p v-if="dokumen.deskripsi" class="text-xs text-gray-500 mt-1.5 transition-all duration-300 line-clamp-1 group-hover:line-clamp-none leading-relaxed">
                                         {{ dokumen.deskripsi }}
                                     </p>
                                 </div>
