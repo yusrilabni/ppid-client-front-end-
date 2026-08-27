@@ -222,6 +222,8 @@ import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
+import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { computed } from 'vue'
 
 const route = useRoute()
 const slug = route.params.slug
@@ -236,6 +238,9 @@ const { data: dokumen, isLoading, isError } = useQuery({
   queryFn: fetchDokumen,
   retry: false
 })
+
+const loading = computed(() => isLoading.value)
+useGlobalLoader(loading)
 
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
