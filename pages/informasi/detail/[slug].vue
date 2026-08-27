@@ -89,11 +89,21 @@
                       <div v-else-if="isImage" class="rounded-3xl overflow-hidden border border-gray-100 p-2 sm:p-4 bg-gray-50 flex justify-center shadow-inner">
                         <img :src="fileUrl" alt="Preview" class="max-w-full h-auto rounded-2xl shadow-2xl border-4 border-white">
                       </div>
-                      <div v-else-if="isGoogleDrive" class="rounded-3xl overflow-hidden border border-gray-100 shadow-2xl bg-gray-100 h-[500px] sm:h-[800px] relative">
+                      <div v-else-if="isGoogleDriveFile" class="rounded-3xl overflow-hidden border border-gray-100 shadow-2xl bg-gray-100 h-[500px] sm:h-[800px] relative">
                         <iframe :src="previewUrl" class="w-full h-full border-0" allow="autoplay"></iframe>
                       </div>
                       <div v-else-if="isOffice" class="rounded-3xl overflow-hidden border border-gray-100 shadow-2xl bg-gray-100 h-[500px] sm:h-[800px] relative">
                         <iframe :src="'https://docs.google.com/viewer?url=' + encodeURIComponent(fileUrl) + '&embedded=true'" class="w-full h-full border-0"></iframe>
+                      </div>
+                      <div v-else-if="isGoogleDriveFolder || isExternalWebpage" class="p-10 sm:p-16 bg-gradient-to-br from-gray-50 to-slate-100 border-2 border-dashed border-gray-200 rounded-[2.5rem] text-center">
+                        <div class="w-20 h-20 bg-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                          <i class="fas fa-external-link-alt text-3xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-3">Dokumen Berupa Tautan Eksternal</h3>
+                        <p class="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed mb-6">Tautan ini mengarah ke sumber eksternal (seperti Folder Google Drive atau halaman web lain) dan tidak dapat dipratinjau langsung di sini.</p>
+                        <a :href="fileUrl" target="_blank" class="inline-flex px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5 items-center">
+                            Kunjungi Tautan Eksternal <i class="fas fa-arrow-right ml-3"></i>
+                        </a>
                       </div>
                       <div v-else class="p-10 sm:p-16 bg-gradient-to-br from-gray-50 to-slate-100 border-2 border-dashed border-gray-200 rounded-[2.5rem] text-center">
                         <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-slate-200">
@@ -390,10 +400,26 @@ const fileExtension = computed(() => {
 const isPdf = computed(() => fileExtension.value === 'pdf')
 const isImage = computed(() => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(fileExtension.value))
 const isOffice = computed(() => ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(fileExtension.value))
-const isGoogleDrive = computed(() => fileUrl.value && fileUrl.value.includes('drive.google.com'))
+
+const isGoogleDriveFolder = computed(() => {
+  if (!fileUrl.value) return false;
+  const path = fileUrl.value;
+  return path.includes('drive.google.com/drive/folders') || (path.includes('drive.google.com') && !path.includes('/file/d/'));
+})
+
+const isExternalWebpage = computed(() => {
+  if (!fileUrl.value) return false;
+  const path = fileUrl.value;
+  return path.startsWith('http') && !isGoogleDriveFolder.value && !path.includes('drive.google.com/file/d/') && !isPdf.value && !isImage.value && !isOffice.value;
+})
+
+const isGoogleDriveFile = computed(() => {
+  if (!fileUrl.value) return false;
+  return fileUrl.value.includes('drive.google.com/file/d/');
+})
 
 const previewUrl = computed(() => {
-  if (!isGoogleDrive.value) return fileUrl.value
+  if (!isGoogleDriveFile.value) return fileUrl.value
   return fileUrl.value.replace('/view', '/preview')
 })
 
