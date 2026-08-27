@@ -1,4 +1,5 @@
 <template>
+  <LoadingScreen />
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
@@ -7,6 +8,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 const route = useRoute()
 
