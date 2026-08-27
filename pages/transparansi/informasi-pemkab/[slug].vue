@@ -76,7 +76,7 @@
                             </div>
                             <div class="p-0 h-[600px] w-full bg-gray-100">
                                 <template v-if="dokumen.file_path">
-                                    <div v-if="dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')" class="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-8 text-center">
+                                    <div v-if="dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')" class="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-8 text-center">
                                         <i class="fas fa-external-link-alt text-6xl text-gray-300 mb-4"></i>
                                         <h3 class="text-xl font-bold text-gray-700 mb-2">Dokumen Berupa Tautan Eksternal</h3>
                                         <p class="text-gray-500 mb-6">Tautan ini mengarah ke sumber eksternal dan tidak dapat dipratinjau langsung di sini.</p>
@@ -111,9 +111,9 @@
                                     <template v-if="dokumen.file_path">
                                         <a :href="getDownloadUrl(dokumen)" target="_blank" 
                                            class="w-full md:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                                           :class="(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
-                                            <i :class="[(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
-                                            {{ (dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com')) ? 'Buka Tautan Eksternal' : 'Unduh Dokumen' }}
+                                           :class="(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
+                                            <i :class="[(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
+                                            {{ (dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'Buka Tautan Eksternal' : 'Unduh File Dokumen' }}
                                         </a>
                                     </template>
                                     <span v-else class="flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed">
@@ -233,7 +233,7 @@ const getDownloadUrl = (dokumen) => {
 const getEmbedUrl = (path) => {
   if (!path) return '';
   if (path.startsWith('http')) {
-      if (path.includes('drive.google.com')) {
+      if (path.includes('drive.google.com/file/d/')) {
           return path.replace(/\/view\?.*$/, '/preview');
       }
       return path;
