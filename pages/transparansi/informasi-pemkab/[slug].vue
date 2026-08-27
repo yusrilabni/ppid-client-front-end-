@@ -76,11 +76,11 @@
                             </div>
                             <div class="p-0 h-[600px] w-full bg-gray-100">
                                 <template v-if="dokumen.file_path">
-                                    <div v-if="dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')" class="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-8 text-center">
+                                    <div v-if="isGoogleDriveFolder(dokumen.file_path) || isExternalWebpage(dokumen.file_path)" class="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-8 text-center">
                                         <i class="fas fa-external-link-alt text-6xl text-gray-300 mb-4"></i>
                                         <h3 class="text-xl font-bold text-gray-700 mb-2">Dokumen Berupa Tautan Eksternal</h3>
                                         <p class="text-gray-500 mb-6">Tautan ini mengarah ke sumber eksternal dan tidak dapat dipratinjau langsung di sini.</p>
-                                        <a :href="getDownloadUrl(dokumen)" target="_blank" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow hover:bg-blue-700 transition">
+                                        <a :href="dokumen.file_path.startsWith('http') ? dokumen.file_path : getDownloadUrl(dokumen)" target="_blank" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow hover:bg-blue-700 transition">
                                             Kunjungi Tautan <i class="fas fa-arrow-right ml-2"></i>
                                         </a>
                                     </div>
@@ -113,9 +113,9 @@
                                             <template v-if="dokumen.file_path">
                                                 <a :href="getDownloadUrl(dokumen)" target="_blank" 
                                                    class="w-full md:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                                                   :class="(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
-                                                    <i :class="[(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
-                                                    {{ (dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'Buka Tautan Eksternal' : 'Unduh File Dokumen' }}
+                                                   :class="(isGoogleDriveFolder(dokumen.file_path) || isExternalWebpage(dokumen.file_path)) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
+                                                    <i :class="[(isGoogleDriveFolder(dokumen.file_path) || isExternalWebpage(dokumen.file_path)) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
+                                                    {{ (isGoogleDriveFolder(dokumen.file_path) || isExternalWebpage(dokumen.file_path)) ? 'Kunjungi Tautan' : 'Unduh File Dokumen' }}
                                                 </a>
                                             </template>
                                             <span v-else class="flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed">
@@ -218,18 +218,22 @@ import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 
+import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
 const slug = route.params.slug
 
-const { data: dokumen, pending: isLoading, error: isError } = await useAsyncData(
-  'informasi-pemkab-' + slug,
-  async () => {
-    const res = await api.get(`/informasi-pemkab/${slug}`)
-    return res.data
-  }
-)
+const fetchDokumen = async () => {
+  const res = await api.get(`/informasi-pemkab/${slug}`)
+  return res.data
+}
+
+const { data: dokumen, isLoading, isError } = useQuery({
+  queryKey: ['informasi-pemkab', slug],
+  queryFn: fetchDokumen,
+  retry: false
+})
 
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
@@ -245,6 +249,16 @@ const getEmbedUrl = (path) => {
       return path;
   }
   return getStorageUrl(path) + '#toolbar=0';
+}
+
+const isGoogleDriveFolder = (path) => {
+  if (!path) return false;
+  return path.includes('drive.google.com/drive/folders') || (path.includes('drive.google.com') && !path.includes('/file/d/'));
+}
+
+const isExternalWebpage = (path) => {
+  if (!path) return false;
+  return path.startsWith('http') && !isGoogleDriveFolder(path) && !path.includes('drive.google.com/file/d/');
 }
 
 const isImage = (path) => {
