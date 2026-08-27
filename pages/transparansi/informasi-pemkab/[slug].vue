@@ -60,7 +60,7 @@
                             </div>
                             <div class="p-6 md:p-8">
                                 <div class="prose prose-blue max-w-none text-gray-700 leading-relaxed text-lg">
-                                    <p>{{ dokumen.deskripsi }}</p>
+                                    <div v-html="dokumen.deskripsi"></div>
                                 </div>
                             </div>
                         </div>
@@ -108,24 +108,28 @@
                                 </div>
                                 
                                 <div class="flex-shrink-0 w-full md:w-auto text-center md:text-right flex flex-col sm:flex-row gap-3">
-                                    <template v-if="dokumen.file_path">
-                                        <a :href="getDownloadUrl(dokumen)" target="_blank" 
-                                           class="w-full md:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                                           :class="(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
-                                            <i :class="[(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
-                                            {{ (dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'Buka Tautan Eksternal' : 'Unduh File Dokumen' }}
-                                        </a>
-                                    </template>
-                                    <span v-else class="flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed">
-                                        <i class="fas fa-ban mr-2"></i> File Tidak Tersedia
-                                    </span>
-                                    
-                                    <button @click="copyShareLink(dokumen)" 
-                                       class="w-full md:w-auto inline-flex items-center justify-center px-6 py-3.5 bg-white border-2 border-blue-500 text-blue-600 font-bold rounded-xl shadow-md transition-all duration-300 transform hover:-translate-y-1 hover:bg-blue-50">
-                                        <i class="fas fa-share-alt mr-2 text-xl"></i> Bagikan
-                                    </button>
+                                    <div class="flex flex-col items-end w-full">
+                                        <div class="flex flex-col sm:flex-row gap-3 w-full">
+                                            <template v-if="dokumen.file_path">
+                                                <a :href="getDownloadUrl(dokumen)" target="_blank" 
+                                                   class="w-full md:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                                                   :class="(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
+                                                    <i :class="[(dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
+                                                    {{ (dokumen.file_path.startsWith('http') && !dokumen.file_path.includes('drive.google.com/file/d/')) ? 'Buka Tautan Eksternal' : 'Unduh File Dokumen' }}
+                                                </a>
+                                            </template>
+                                            <span v-else class="flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed">
+                                                <i class="fas fa-ban mr-2"></i> File Tidak Tersedia
+                                            </span>
+                                            
+                                            <button @click="copyShareLink(dokumen)" 
+                                               class="w-full md:w-auto inline-flex items-center justify-center px-6 py-3.5 bg-white border-2 border-blue-500 text-blue-600 font-bold rounded-xl shadow-md transition-all duration-300 transform hover:-translate-y-1 hover:bg-blue-50">
+                                                <i class="fas fa-share-alt mr-2 text-xl"></i> Bagikan
+                                            </button>
+                                        </div>
+                                        <p class="mt-4 text-xs text-gray-500 font-semibold w-full text-center sm:text-right"><i class="fas fa-eye mr-1"></i> Telah dilihat {{ dokumen.views_count || 0 }} kali</p>
+                                    </div>
                                 </div>
-                                <p class="mt-4 text-xs text-gray-500 font-semibold md:text-right"><i class="fas fa-eye mr-1"></i> Telah dilihat {{ dokumen.views_count || 0 }} kali</p>
                             </div>
                         </div>
                     </div>
