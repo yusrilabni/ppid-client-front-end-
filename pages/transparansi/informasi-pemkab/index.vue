@@ -308,9 +308,21 @@ const router = useRouter()
 // OG meta dinamis berbasis filter aktif
 const pageTitle = computed(() => {
   let title = 'PPID - Informasi Pemkab'
-  if (route.query.kategori) title += ' - ' + route.query.kategori
-  if (route.query.jenis_dokumen) title += ' - ' + route.query.jenis_dokumen
+  const kat = route.query.kategori
+  const jenis = route.query.jenis_dokumen
+
+  if (kat && jenis) {
+    title += ` - Kategori ${kat} Dokumen ${jenis}`
+  } else if (kat) {
+    title += ` - Kategori ${kat}`
+  } else if (jenis) {
+    title += ` - Dokumen ${jenis}`
+  }
   return title
+})
+
+const pageDescription = computed(() => {
+  return 'Pejabat Pengelola Informasi dan Dokumentasi Kabupaten Sinjai - Transparansi dokumen Pemerintah Kabupaten Sinjai'
 })
 
 const ogImageUrl = 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai.png'
@@ -321,7 +333,9 @@ useHead(computed(() => ({
     { property: 'og:title', content: pageTitle.value },
     { property: 'og:image', content: ogImageUrl },
     { property: 'og:type', content: 'website' },
-    { property: 'og:description', content: 'Transparansi Dokumen Pemerintah Kabupaten Sinjai' },
+    { name: 'description', content: pageDescription.value },
+    { property: 'og:description', content: pageDescription.value },
+    { name: 'twitter:description', content: pageDescription.value },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: pageTitle.value },
     { name: 'twitter:image', content: ogImageUrl },
