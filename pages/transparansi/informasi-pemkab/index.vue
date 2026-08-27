@@ -158,7 +158,7 @@
                                                 <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-base font-bold text-gray-800 hover:text-blue-700 transition-colors leading-tight">
                                                     {{ dokumen.judul }}
                                                 </NuxtLink>
-                                                <p v-if="dokumen.deskripsi" class="text-sm text-gray-500 mt-1 line-clamp-1 group-hover:line-clamp-none transition-all duration-300">
+                                                <p v-if="dokumen.deskripsi" :title="dokumen.deskripsi" class="text-sm text-gray-500 mt-1 line-clamp-2">
                                                     {{ dokumen.deskripsi }}
                                                 </p>
                                             </div>
@@ -218,7 +218,7 @@
                                     <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-sm sm:text-base font-bold text-gray-800 hover:text-blue-700 leading-snug">
                                         {{ dokumen.judul }}
                                     </NuxtLink>
-                                    <p v-if="dokumen.deskripsi" class="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
+                                    <p v-if="dokumen.deskripsi" :title="dokumen.deskripsi" class="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
                                         {{ dokumen.deskripsi }}
                                     </p>
                                 </div>
