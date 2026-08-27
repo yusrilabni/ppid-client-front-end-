@@ -124,7 +124,7 @@
                     <div class="w-full h-full" :style="{ backgroundImage: `url(${getAssetUrl('storage/logo/Lambang_Kabupaten_Sinjai.png')})`, backgroundRepeat: 'repeat-y', backgroundPosition: 'center top', backgroundSize: 'contain', minHeight: '800px', filter: 'grayscale(100%)' }"></div>
                 </div>
 
-                <div v-if="isLoading" class="p-12 text-center relative z-10">
+                <div v-if="!isMounted || isLoading" class="p-12 text-center relative z-10">
                     <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
                     <p class="text-gray-500">Memuat data...</p>
                 </div>
@@ -450,9 +450,12 @@ const copyShareLink = () => {
   });
 }
 
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+
+const isMounted = ref(false)
 
 onMounted(() => {
+  isMounted.value = true
   // sync filter dari URL query saat pertama load
   filters.value = {
     kategori: route.query.kategori || '',

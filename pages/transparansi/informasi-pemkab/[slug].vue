@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div v-if="!isMounted || isLoading" class="min-h-screen flex items-center justify-center bg-gray-50">
         <div class="text-center">
             <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
             <p class="text-gray-500 font-medium">Memuat dokumen...</p>
@@ -249,6 +249,11 @@ const { data: dokumen, isLoading, isError } = useQuery({
   queryKey: ['informasi-pemkab', slug],
   queryFn: fetchDokumen,
   retry: false
+})
+
+const isMounted = ref(false)
+onMounted(() => {
+  isMounted.value = true
 })
 
 const isImage = (path) => {
