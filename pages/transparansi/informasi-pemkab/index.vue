@@ -271,10 +271,21 @@
                 </div>
                 
                 <!-- Pagination -->
-                <div v-if="lastPage > 1" class="relative z-10 px-6 py-4 border-t border-gray-100 bg-white/50 backdrop-blur-sm flex justify-center space-x-2">
-                    <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="px-4 py-2 border rounded-md disabled:opacity-50">&laquo; Prev</button>
-                    <span class="px-4 py-2 border rounded-md bg-blue-50 text-blue-600 font-bold">{{ currentPage }} / {{ lastPage }}</span>
-                    <button @click="changePage(currentPage + 1)" :disabled="currentPage === lastPage" class="px-4 py-2 border rounded-md disabled:opacity-50">Next &raquo;</button>
+                <div v-if="lastPage > 1" class="relative z-10 px-6 py-4 border-t border-gray-100 bg-white/50 backdrop-blur-sm flex justify-center mt-4">
+                    <nav class="inline-flex rounded-xl shadow-sm border border-gray-100 bg-white p-1">
+                        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="px-4 py-2 text-sm font-bold text-gray-500 rounded-lg hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-gray-500 transition-colors">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <template v-for="page in visiblePages" :key="page">
+                            <span v-if="page === '...'" class="px-4 py-2 text-sm font-bold text-gray-400">...</span>
+                            <button v-else @click="changePage(page)" :class="['px-4 py-2 text-sm font-bold rounded-lg transition-colors', page === currentPage ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600']">
+                                {{ page }}
+                            </button>
+                        </template>
+                        <button @click="changePage(currentPage + 1)" :disabled="currentPage === lastPage" class="px-4 py-2 text-sm font-bold text-gray-500 rounded-lg hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-gray-500 transition-colors">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -395,6 +406,21 @@ const { data, isLoading } = useQuery({
 const items = computed(() => data.value?.data || [])
 const currentPage = computed(() => data.value?.current_page || 1)
 const lastPage = computed(() => data.value?.last_page || 1)
+
+const visiblePages = computed(() => {
+  const current = currentPage.value
+  const last = lastPage.value
+  if (last <= 7) {
+    return Array.from({ length: last }, (_, i) => i + 1)
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', last]
+  }
+  if (current >= last - 3) {
+    return [1, '...', last - 4, last - 3, last - 2, last - 1, last]
+  }
+  return [1, '...', current - 1, current, current + 1, '...', last]
+})
 
 const resetJenis = () => {
   filters.value.jenis_dokumen = ''
