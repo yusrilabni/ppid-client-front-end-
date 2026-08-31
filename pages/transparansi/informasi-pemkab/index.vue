@@ -325,7 +325,7 @@ const pageDescription = computed(() => {
   return 'Pejabat Pengelola Informasi dan Dokumentasi Kabupaten Sinjai - Transparansi dokumen Pemerintah Kabupaten Sinjai'
 })
 
-const ogImageUrl = 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai.png'
+const ogImageUrl = 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai_OG.jpg'
 
 useHead(computed(() => ({
   title: pageTitle.value,
