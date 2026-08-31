@@ -9,6 +9,11 @@ import SurveyModal from '@/components/SurveyModal.vue'
 
 const accStore = useAccessibilityStore()
 const authStore = useAuthStore()
+
+const linkGoogleAccount = () => { 
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'
+  window.location.href = baseUrl + "/api/v1/auth/google/redirect?action=link" 
+}
 </script>
 
 <template>
@@ -20,9 +25,9 @@ const authStore = useAuthStore()
           <i class="fas fa-exclamation-triangle text-red-200 text-lg"></i>
           <span>Peringatan: Akun Anda belum tertaut dengan Email Google!</span>
         </div>
-        <NuxtLink to="/profile" class="bg-white text-red-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-red-50 transition-colors whitespace-nowrap shadow-sm">
+        <button @click="linkGoogleAccount" class="bg-white text-red-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-red-50 transition-colors whitespace-nowrap shadow-sm">
           Tautkan Sekarang
-        </NuxtLink>
+        </button>
       </div>
     </ClientOnly>
     <NavBar />
