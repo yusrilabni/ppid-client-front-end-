@@ -54,5 +54,17 @@ export const getBreadcrumbs = {
   surveyShow: (title) => [home, { title: 'Survei Kepuasan', url: '/laporan/survei', icon: 'fas fa-poll' }, { title: title || 'Isi Survei', icon: 'fas fa-edit' }],
   trackingPage: () => [home, { title: 'Lacak Permohonan', url: '/tracking', icon: 'fas fa-search-location' }],
   informasiPemkab: () => [home, { title: 'Transparansi', icon: 'fas fa-layer-group' }, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }],
-  informasiPemkabDetail: (title) => [home, { title: 'Transparansi', icon: 'fas fa-layer-group' }, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }, { title: title || 'Detail Informasi', icon: 'fas fa-eye' }]
+  informasiPemkabDetail: (title) => [home, { title: 'Transparansi', icon: 'fas fa-layer-group' }, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }, { title: title || 'Detail Informasi', icon: 'fas fa-eye' }],
+  manageTentangOpd: (options) => {
+    const org = options?.organization;
+    const name = org?.name || 'OPD';
+    const slug = org?.slug || '';
+    return [
+      home,
+      { title: 'Profil', icon: 'fas fa-user' },
+      { title: 'Tentang OPD', url: '/profil/tentang-opd', icon: 'fas fa-building' },
+      { title: name, url: slug ? `/profil/tentang-opd/${slug}` : '/profil/tentang-opd', icon: 'fas fa-sitemap' },
+      { title: 'Kelola', icon: 'fas fa-edit' }
+    ];
+  }
 };
