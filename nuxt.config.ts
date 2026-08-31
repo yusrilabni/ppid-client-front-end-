@@ -43,7 +43,10 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai_OG.jpg' }
       ],
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
+        { rel: 'icon', type: 'image/x-icon', href: '/logo/favicon_io/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/logo/favicon_io/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/logo/favicon_io/favicon-16x16.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/logo/favicon_io/apple-touch-icon.png' }
       ]
     }
   },
