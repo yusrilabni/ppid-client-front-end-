@@ -568,19 +568,15 @@ const verifyOtp = async () => {
     })
     
     if (response.data.success) {
-      authStore.user = response.data.user
-      localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
-      
-      queryClient.setQueryData(['user_profile'], (old) => {
-         if (!old) return old;
-         return { ...old, user: response.data.user }
-      })
-
       showOtpModal.value = false
       otpStep.value = 'request'
       otpCode.value = ''
-      alert('Tautan Google berhasil diputuskan secara permanen.')
-      window.location.href = '/profile'
+      
+      // Logout secara otomatis setelah memutus tautan akun
+      await authStore.logout()
+      
+      // Redirect ke login dengan pesan sukses
+      window.location.href = '/login?success=unlinked&msg=' + encodeURIComponent('Tautan akun Google Anda telah berhasil diputuskan. Silakan login kembali menggunakan NIP dan Password Anda.')
     }
   } catch (error) {
     otpError.value = error.response?.data?.message || 'Kode OTP salah atau kadaluarsa.'

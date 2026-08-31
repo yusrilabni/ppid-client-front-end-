@@ -130,8 +130,8 @@ const error = ref('')
 const successMsg = ref('')
 
 onMounted(() => {
-  if (route.query.success === 'linked') {
-    successMsg.value = route.query.msg ? decodeURIComponent(route.query.msg) : 'Akun berhasil ditautkan. Silakan login kembali.'
+  if (route.query.success === 'linked' || route.query.success === 'unlinked') {
+    successMsg.value = route.query.msg ? decodeURIComponent(route.query.msg) : 'Aksi berhasil. Silakan login kembali.'
   } else if (route.query.error === 'not_registered') {
     error.value = 'Email Anda belum terdaftar di sistem. Silakan buat akun terlebih dahulu.'
   } else if (route.query.error === 'auth_failed') {
