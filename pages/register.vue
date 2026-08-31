@@ -300,6 +300,7 @@ const handleVerifyOtp = async () => {
 
     if (response.data.success && response.data.token) {
       localStorage.setItem('ppid_token', response.data.token)
+      localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
       authStore.token = response.data.token
       authStore.user = response.data.user
       
