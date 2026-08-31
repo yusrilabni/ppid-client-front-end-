@@ -1,247 +1,467 @@
-<script setup>
-import { ref } from 'vue'
-import { useAccessibilityStore } from '@/stores/accessibility'
-
-const accStore = useAccessibilityStore()
-const isOpen = ref(false)
-
-const toggleWidget = () => {
-  isOpen.value = !isOpen.value
-}
-
-const toggleMasterSound = () => {
-  accStore.masterSound = !accStore.masterSound
-}
-
-const resetAll = () => {
-  accStore.reset()
-}
-</script>
-
 <template>
-  <div class="fixed bottom-6 left-6 z-[99999] flex flex-col items-start gap-4">
-    <!-- Master Sound Toggle -->
-    <button 
-      @click="toggleMasterSound"
-      aria-label="Toggle Suara Widget"
-      class="w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110"
-      :class="accStore.masterSound ? 'bg-green-500 text-white' : 'bg-red-500 text-white'"
-      :title="accStore.masterSound ? 'Matikan Suara' : 'Nyalakan Suara'"
-    >
-      <i class="fas" :class="accStore.masterSound ? 'fa-volume-up' : 'fa-volume-mute'"></i>
+  <div class="fixed z-[99999] acc-widget-container flex flex-col items-center" style="bottom: 24px; left: 24px;">
+    
+    <!-- MASTER SOUND TOGGLE -->
+    <button @click.stop="toggleMasterSound()" 
+            class="flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg text-white mb-2" 
+            :class="isSoundEnabled ? 'bg-green-500' : 'bg-red-500'"
+            style="width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer;">
+      <i v-show="isSoundEnabled" class="fas fa-volume-up" style="font-size: 14px;"></i>
+      <i v-show="!isSoundEnabled" class="fas fa-volume-mute" style="font-size: 14px;"></i>
     </button>
 
-    <!-- Expandable Panel -->
-    <transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0 translate-y-8 scale-95"
-      enter-to-class="opacity-100 translate-y-0 scale-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100 translate-y-0 scale-100"
-      leave-to-class="opacity-0 translate-y-8 scale-95"
-    >
-      <div v-if="isOpen" class="bg-white rounded-2xl shadow-2xl w-80 max-h-[70vh] flex flex-col overflow-hidden border border-gray-100">
-        <!-- Header -->
-        <div class="bg-blue-600 px-4 py-3 flex items-center justify-between text-white">
-          <div class="flex items-center gap-2 font-semibold">
-            <i class="fas fa-universal-access text-lg"></i>
-            <span>Menu Aksesibilitas</span>
-          </div>
-          <button @click="isOpen = false" aria-label="Tutup Widget" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors">
-            <i class="fas fa-times"></i>
-          </button>
+    <button @click.stop="accConfig.toggleMenu()" class="bg-[#0052FF] hover:bg-[#0041CC] text-white flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-lg" style="width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;">
+      <i class="fas fa-universal-access" style="font-size: 30px;" v-show="!accConfig.isOpen"></i>
+      <i class="fas fa-times" style="font-size: 28px;" v-show="accConfig.isOpen"></i>
+    </button>
+
+    <transition name="fade">
+      <div v-show="accConfig.isOpen" @click.stop
+           class="absolute bg-white overflow-hidden acc-menu-panel" style="bottom: 110px; left: 0; width: 360px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid #E5E7EB;">
+        <div class="bg-[#0052FF] text-white shrink-0 relative" style="padding: 24px 20px;">
+          <h3 style="font-size: 18px; font-weight: 700;">Menu Aksesibilitas</h3>
+          <p style="font-size: 12px; opacity: 0.9;">Optimalkan tampilan sesuai kebutuhan Anda</p>
         </div>
 
-        <!-- Scrollable Content -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300">
-          
-          <!-- TTS Controls -->
-          <div class="grid grid-cols-2 gap-2">
-            <button 
-              @click="accStore.clickToRead = !accStore.clickToRead"
-              class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all text-xs text-center font-medium"
-              :class="accStore.clickToRead ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-blue-300 text-gray-600'"
-            >
-              <i class="fas fa-hand-pointer text-lg"></i>
-              <span>Klik untuk Baca</span>
-              <i v-if="accStore.clickToRead" class="fas fa-check-circle absolute top-2 right-2 text-blue-500"></i>
+        <div class="overflow-y-auto" style="padding: 20px; max-height: 540px; background: #F9FAFB;">
+          <div style="margin-bottom: 20px; background: #fff; padding: 16px; border-radius: 16px; border: 1px solid #E5E7EB;">
+            <p style="font-size: 12px; font-weight: 700; color: #6B7280; margin-bottom: 12px; text-transform: uppercase;">Kontrol Suara (TTS)</p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+              <button @click="toggleReader()" :class="(isReaderActive && isSoundEnabled) ? 'border-[#0052FF] border-2' : 'border-[#E5E7EB] border'" class="bg-white text-[#374151] flex items-center justify-center" style="padding: 12px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 700; border-style: solid;">
+                <i class="fas fa-volume-up" style="margin-right: 8px;"></i> Klik Baca
+              </button>
+              <button @click="toggleHoverReader()" :class="(isHoverActive && isSoundEnabled) ? 'border-[#0052FF] border-2' : 'border-[#E5E7EB] border'" class="bg-white text-[#374151] flex items-center justify-center" style="padding: 12px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 700; border-style: solid;">
+                <i class="fas fa-mouse-pointer" style="margin-right: 8px;"></i> Sorot Baca
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+            <!-- 1. Contrast -->
+            <button @click="accConfig.cycleContrast()" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.contrast !== 'default'}">
+              <i v-show="accConfig.contrast !== 'default'" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper">
+                <i :class="{'fas fa-adjust': accConfig.contrast === 'default', 'fas fa-sun': accConfig.contrast === 'light', 'fas fa-eye-slash': accConfig.contrast === 'invert', 'fas fa-moon': accConfig.contrast === 'dark'}"></i>
+              </div>
+              <div class="acc-text-wrapper"><span>Kontras Tinggi</span><small class="capitalize">{{ accConfig.contrast }}</small></div>
+              <div class="acc-dot-container">
+                <div v-for="m in ['default', 'light', 'invert', 'dark']" :key="m" :style="{ width: accConfig.contrast === m ? '12px' : '6px', backgroundColor: accConfig.contrast === m ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div>
+              </div>
             </button>
-            <button 
-              @click="accStore.hoverToRead = !accStore.hoverToRead"
-              class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all text-xs text-center font-medium relative"
-              :class="accStore.hoverToRead ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-blue-300 text-gray-600'"
-            >
-              <i class="fas fa-mouse-pointer text-lg"></i>
-              <span>Arahkan Baca</span>
-              <i v-if="accStore.hoverToRead" class="fas fa-check-circle absolute top-2 right-2 text-blue-500"></i>
+            
+            <!-- 2. Text Size -->
+            <button @click="cycleFont()" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.fontLevel !== 'normal'}">
+              <i v-show="accConfig.fontLevel !== 'normal'" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper" style="height: 50px !important;">
+                <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
+                  <span :style="'font-size: ' + (accConfig.fontLevel === 'kecil' ? '12' : (accConfig.fontLevel === 'normal' ? '16' : (accConfig.fontLevel === 'sedang' ? '20' : '24'))) + 'px !important'" style="font-weight: bold; color: #374151 !important; line-height: 1 !important; margin: 0 !important;">T</span>
+                  <span :style="'font-size: ' + (accConfig.fontLevel === 'kecil' ? '24' : (accConfig.fontLevel === 'normal' ? '32' : (accConfig.fontLevel === 'sedang' ? '40' : '48'))) + 'px !important'" style="font-weight: bold; color: #374151 !important; line-height: 1 !important; margin: 0 !important;">T</span>
+                </div>
+              </div>
+              <div class="acc-text-wrapper"><span>Ukuran Teks</span><small class="capitalize">{{ accConfig.fontLevel }}</small></div>
+              <div class="acc-dot-container">
+                <div v-for="l in ['kecil', 'normal', 'sedang', 'besar']" :key="l" :style="{ width: accConfig.fontLevel === l ? '12px' : '6px', backgroundColor: accConfig.fontLevel === l ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div>
+              </div>
+            </button>
+            
+            <!-- 3. Highlight Links -->
+            <button @click="accConfig.update('links', !accConfig.links)" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.links}">
+              <i v-show="accConfig.links" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper"><i class="fas fa-link"></i></div>
+              <div class="acc-text-wrapper"><span>Sorot Tautan</span><small>{{ accConfig.links ? 'Aktif' : 'Default' }}</small></div>
+              <div class="acc-dot-container"><div :style="{ width: accConfig.links ? '24px' : '12px', backgroundColor: accConfig.links ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div></div>
+            </button>
+            
+            <!-- 4. Text Spacing -->
+            <button @click="accConfig.update('textSpacing', !accConfig.textSpacing)" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.textSpacing}">
+              <i v-show="accConfig.textSpacing" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper"><i class="fas fa-arrows-alt-h"></i></div>
+              <div class="acc-text-wrapper"><span>Spasi Teks</span><small>{{ accConfig.textSpacing ? 'Aktif' : 'Default' }}</small></div>
+              <div class="acc-dot-container"><div :style="{ width: accConfig.textSpacing ? '24px' : '12px', backgroundColor: accConfig.textSpacing ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div></div>
+            </button>
+            
+            <!-- 5. Hide Images -->
+            <button @click="accConfig.update('hideImages', !accConfig.hideImages)" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.hideImages}">
+              <i v-show="accConfig.hideImages" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper"><i class="fas fa-image"></i></div>
+              <div class="acc-text-wrapper"><span>Sembunyi Gbr</span><small>{{ accConfig.hideImages ? 'Aktif' : 'Default' }}</small></div>
+              <div class="acc-dot-container"><div :style="{ width: accConfig.hideImages ? '24px' : '12px', backgroundColor: accConfig.hideImages ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div></div>
+            </button>
+            
+            <!-- 6. Dyslexia -->
+            <button @click="accConfig.cycleDyslexic()" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.dyslexic !== 'default'}">
+              <i v-show="accConfig.dyslexic !== 'default'" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper">
+                <i :class="{'fas fa-font': accConfig.dyslexic === 'default', 'fas fa-universal-access': accConfig.dyslexic === 'open', 'fas fa-spell-check': accConfig.dyslexic === 'lexend'}"></i>
+              </div>
+              <div class="acc-text-wrapper"><span>Ramah Disleksia</span><small class="capitalize">{{ accConfig.dyslexic }}</small></div>
+              <div class="acc-dot-container">
+                <div v-for="m in ['default', 'open', 'lexend']" :key="m" :style="{ width: accConfig.dyslexic === m ? '12px' : '6px', backgroundColor: accConfig.dyslexic === m ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div>
+              </div>
+            </button>
+            
+            <!-- 7. Focus -->
+            <button @click="accConfig.cycleFocus()" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.focus !== 'default'}">
+              <i v-show="accConfig.focus !== 'default'" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper">
+                <i :class="{'fas fa-eye': accConfig.focus === 'default', 'fas fa-mouse-pointer': accConfig.focus === 'cursor', 'fas fa-low-vision': accConfig.focus === 'mask', 'fas fa-grip-lines-vertical': accConfig.focus === 'guide'}"></i>
+              </div>
+              <div class="acc-text-wrapper"><span>Fokus Membaca</span><small class="capitalize">{{ accConfig.focus }}</small></div>
+              <div class="acc-dot-container">
+                <div v-for="m in ['default', 'cursor', 'mask', 'guide']" :key="m" :style="{ width: accConfig.focus === m ? '12px' : '6px', backgroundColor: accConfig.focus === m ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div>
+              </div>
+            </button>
+            
+            <!-- 8. Keyboard Nav -->
+            <button @click="accConfig.update('keyboard', !accConfig.keyboard)" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.keyboard}">
+              <i v-show="accConfig.keyboard" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper"><i class="fas fa-keyboard"></i></div>
+              <div class="acc-text-wrapper"><span>Navigasi Key</span><small>{{ accConfig.keyboard ? 'Aktif' : 'Default' }}</small></div>
+              <div class="acc-dot-container"><div :style="{ width: accConfig.keyboard ? '24px' : '12px', backgroundColor: accConfig.keyboard ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div></div>
+            </button>
+            
+            <!-- 9. Alignment -->
+            <button @click="accConfig.cycleAlignment()" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.alignment !== 'default'}">
+              <i v-show="accConfig.alignment !== 'default'" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper">
+                <i :class="{'fas fa-bars': accConfig.alignment === 'default', 'fas fa-align-left': accConfig.alignment === 'left', 'fas fa-align-center': accConfig.alignment === 'center', 'fas fa-align-right': accConfig.alignment === 'right'}"></i>
+              </div>
+              <div class="acc-text-wrapper"><span>Perataan</span><small class="capitalize">{{ accConfig.alignment }}</small></div>
+              <div class="acc-dot-container">
+                <div v-for="m in ['default', 'left', 'center', 'right']" :key="m" :style="{ width: accConfig.alignment === m ? '12px' : '6px', backgroundColor: accConfig.alignment === m ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div>
+              </div>
+            </button>
+            
+            <!-- 10. Saturation -->
+            <button @click="accConfig.cycleSaturation()" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.saturation !== 'default'}">
+              <i v-show="accConfig.saturation !== 'default'" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper">
+                <i :class="{'fas fa-palette': accConfig.saturation === 'default', 'fas fa-brush': accConfig.saturation === 'low', 'fas fa-fill-drip': accConfig.saturation === 'high', 'fas fa-tint-slash': accConfig.saturation === 'mono'}"></i>
+              </div>
+              <div class="acc-text-wrapper"><span>Warna</span><small class="capitalize">{{ accConfig.saturation }}</small></div>
+              <div class="acc-dot-container">
+                <div v-for="s in ['default', 'low', 'high', 'mono']" :key="s" :style="{ width: accConfig.saturation === s ? '12px' : '6px', backgroundColor: accConfig.saturation === s ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div>
+              </div>
+            </button>
+            
+            <!-- 11. Headings -->
+            <button @click="accConfig.update('headings', !accConfig.headings)" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.headings}">
+              <i v-show="accConfig.headings" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper"><i class="fas fa-heading"></i></div>
+              <div class="acc-text-wrapper"><span>Sorot Judul</span><small>{{ accConfig.headings ? 'Aktif' : 'Default' }}</small></div>
+              <div class="acc-dot-container"><div :style="{ width: accConfig.headings ? '24px' : '12px', backgroundColor: accConfig.headings ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div></div>
+            </button>
+            
+            <!-- 12. Line Height -->
+            <button @click="accConfig.update('lineHeight', !accConfig.lineHeight)" class="acc-grid-btn acc-ignore" :class="{'active': accConfig.lineHeight}">
+              <i v-show="accConfig.lineHeight" class="fas fa-check-circle acc-check-icon"></i>
+              <div class="acc-icon-wrapper"><i class="fas fa-arrows-alt-v"></i></div>
+              <div class="acc-text-wrapper"><span>Tinggi Baris</span><small>{{ accConfig.lineHeight ? 'Aktif' : 'Default' }}</small></div>
+              <div class="acc-dot-container"><div :style="{ width: accConfig.lineHeight ? '24px' : '12px', backgroundColor: accConfig.lineHeight ? '#0052FF' : '#D1D5DB' }" class="acc-dot"></div></div>
             </button>
           </div>
 
-          <!-- Feature List -->
-          <div class="space-y-2">
-            <button 
-              @click="accStore.cycleContrast()"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all"
-              :class="accStore.contrast !== 'default' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.contrast !== 'default' ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-adjust w-5 text-center"></i>
-                <span class="text-sm font-medium">Kontras</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-1 bg-white rounded shadow-sm border border-gray-100 uppercase" :class="accStore.contrast !== 'default' ? 'text-blue-600' : 'text-gray-500'">{{ accStore.contrast }}</span>
+          <div style="margin-top: 24px; text-align: center; border-top: 1px solid #E5E7EB; padding-top: 20px;">
+            <button @click="resetAcc()" class="bg-gray-800 text-white hover:bg-black w-full flex items-center justify-center acc-ignore" style="padding: 14px; border-radius: 12px; border: none; cursor: pointer; font-size: 13px !important; font-weight: 700; margin-bottom: 12px;">
+              <i class="fas fa-undo" style="margin-right: 8px !important; font-size: 14px !important;"></i> Reset Semua
             </button>
-
-            <button 
-              @click="accStore.cycleTextSize()"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all"
-              :class="accStore.textSize !== 'normal' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.textSize !== 'normal' ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-text-height w-5 text-center"></i>
-                <span class="text-sm font-medium">Ukuran Teks</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-1 bg-white rounded shadow-sm border border-gray-100 uppercase" :class="accStore.textSize !== 'normal' ? 'text-blue-600' : 'text-gray-500'">{{ accStore.textSize }}</span>
-            </button>
-            
-            <button 
-              @click="accStore.highlightLinks = !accStore.highlightLinks"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all relative"
-              :class="accStore.highlightLinks ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.highlightLinks ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-link w-5 text-center"></i>
-                <span class="text-sm font-medium">Sorot Tautan</span>
-              </div>
-              <i v-if="accStore.highlightLinks" class="fas fa-check text-blue-500"></i>
-            </button>
-
-            <button 
-              @click="accStore.textSpacing = !accStore.textSpacing"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all relative"
-              :class="accStore.textSpacing ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.textSpacing ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-arrows-alt-h w-5 text-center"></i>
-                <span class="text-sm font-medium">Jarak Teks</span>
-              </div>
-              <i v-if="accStore.textSpacing" class="fas fa-check text-blue-500"></i>
-            </button>
-
-            <button 
-              @click="accStore.hideImages = !accStore.hideImages"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all relative"
-              :class="accStore.hideImages ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.hideImages ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-image w-5 text-center"></i>
-                <span class="text-sm font-medium">Sembunyikan Gambar</span>
-              </div>
-              <i v-if="accStore.hideImages" class="fas fa-check text-blue-500"></i>
-            </button>
-            
-            <button 
-              @click="accStore.cycleDyslexic()"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all"
-              :class="accStore.dyslexicFont !== 'default' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.dyslexicFont !== 'default' ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-font w-5 text-center"></i>
-                <span class="text-sm font-medium">Ramah Disleksia</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-1 bg-white rounded shadow-sm border border-gray-100 uppercase" :class="accStore.dyslexicFont !== 'default' ? 'text-blue-600' : 'text-gray-500'">{{ accStore.dyslexicFont }}</span>
-            </button>
-
-            <button 
-              @click="accStore.cycleFocusMode()"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all"
-              :class="accStore.focusMode !== 'default' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.focusMode !== 'default' ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-crosshairs w-5 text-center"></i>
-                <span class="text-sm font-medium">Mode Fokus</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-1 bg-white rounded shadow-sm border border-gray-100 uppercase" :class="accStore.focusMode !== 'default' ? 'text-blue-600' : 'text-gray-500'">{{ accStore.focusMode }}</span>
-            </button>
-
-            <button 
-              @click="accStore.keyboardNavigation = !accStore.keyboardNavigation"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all relative"
-              :class="accStore.keyboardNavigation ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.keyboardNavigation ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-keyboard w-5 text-center"></i>
-                <span class="text-sm font-medium">Navigasi Keyboard</span>
-              </div>
-              <i v-if="accStore.keyboardNavigation" class="fas fa-check text-blue-500"></i>
-            </button>
-            
-            <button 
-              @click="accStore.cycleTextAlign()"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all"
-              :class="accStore.textAlign !== 'default' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.textAlign !== 'default' ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-align-left w-5 text-center"></i>
-                <span class="text-sm font-medium">Perataan Teks</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-1 bg-white rounded shadow-sm border border-gray-100 uppercase" :class="accStore.textAlign !== 'default' ? 'text-blue-600' : 'text-gray-500'">{{ accStore.textAlign }}</span>
-            </button>
-            
-            <button 
-              @click="accStore.cycleSaturation()"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all"
-              :class="accStore.saturation !== 'default' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.saturation !== 'default' ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-palette w-5 text-center"></i>
-                <span class="text-sm font-medium">Saturasi</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-1 bg-white rounded shadow-sm border border-gray-100 uppercase" :class="accStore.saturation !== 'default' ? 'text-blue-600' : 'text-gray-500'">{{ accStore.saturation }}</span>
-            </button>
-
-            <button 
-              @click="accStore.highlightHeadings = !accStore.highlightHeadings"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all relative"
-              :class="accStore.highlightHeadings ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.highlightHeadings ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-heading w-5 text-center"></i>
-                <span class="text-sm font-medium">Sorot Judul</span>
-              </div>
-              <i v-if="accStore.highlightHeadings" class="fas fa-check text-blue-500"></i>
-            </button>
-            
-            <button 
-              @click="accStore.lineHeight = !accStore.lineHeight"
-              class="w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all relative"
-              :class="accStore.lineHeight ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'"
-            >
-              <div class="flex items-center gap-3" :class="accStore.lineHeight ? 'text-blue-700' : 'text-gray-700'">
-                <i class="fas fa-ruler-vertical w-5 text-center"></i>
-                <span class="text-sm font-medium">Tinggi Baris</span>
-              </div>
-              <i v-if="accStore.lineHeight" class="fas fa-check text-blue-500"></i>
-            </button>
+            <p style="font-size: 11px !important; color: #9CA3AF !important; margin: 0 !important; font-weight: 600 !important;">&copy; 2026 PPID KABUPATEN SINJAI</p>
           </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="p-3 border-t border-gray-100 bg-gray-50">
-          <button @click="resetAll" class="w-full py-2.5 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
-            <i class="fas fa-undo"></i> Atur Ulang Semua
-          </button>
         </div>
       </div>
     </transition>
-
-    <!-- Main Button -->
-    <button 
-      @click="toggleWidget"
-      aria-label="Buka Widget Aksesibilitas"
-      class="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-2xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 ring-4 ring-white focus:outline-none"
-    >
-      <i class="fas fa-universal-access text-2xl group-hover:rotate-12 transition-transform"></i>
-    </button>
   </div>
 </template>
 
+<script setup>
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
+
+const isSoundEnabled = ref(true)
+const isReaderActive = ref(false)
+const isHoverActive = ref(false)
+const isCurrentlySpeaking = ref(false)
+let hoverTimeout = null
+let speakingInterval = null
+
+const accConfig = reactive({
+  isOpen: false,
+  contrast: 'default',
+  fontLevel: 'normal',
+  links: false,
+  textSpacing: false,
+  hideImages: false,
+  dyslexic: 'default',
+  focus: 'default',
+  keyboard: false,
+  alignment: 'default',
+  saturation: 'default',
+  headings: false,
+  lineHeight: false,
+  
+  toggleMenu() {
+    this.isOpen = !this.isOpen
+  },
+  cycleContrast() {
+    const opts = ['default', 'light', 'invert', 'dark']
+    this.contrast = opts[(opts.indexOf(this.contrast) + 1) % opts.length]
+  },
+  setFontLevel(val) {
+    this.fontLevel = val
+  },
+  cycleDyslexic() {
+    const opts = ['default', 'open', 'lexend']
+    this.dyslexic = opts[(opts.indexOf(this.dyslexic) + 1) % opts.length]
+  },
+  cycleFocus() {
+    const opts = ['default', 'cursor', 'mask', 'guide']
+    this.focus = opts[(opts.indexOf(this.focus) + 1) % opts.length]
+  },
+  cycleAlignment() {
+    const opts = ['default', 'left', 'center', 'right']
+    this.alignment = opts[(opts.indexOf(this.alignment) + 1) % opts.length]
+  },
+  cycleSaturation() {
+    const opts = ['default', 'low', 'high', 'mono']
+    this.saturation = opts[(opts.indexOf(this.saturation) + 1) % opts.length]
+  },
+  update(key, val) {
+    this[key] = val
+  }
+})
+
+// Watch accConfig to save state in localstorage and potentially apply global classes
+watch(() => accConfig, (newConfig) => {
+  if (process.client) {
+    localStorage.setItem('acc_config_state', JSON.stringify(newConfig))
+    
+    // Apply changes to document body/html to ensure they take effect globally
+    document.body.setAttribute('data-acc-contrast', newConfig.contrast)
+    document.body.setAttribute('data-acc-font', newConfig.fontLevel)
+    document.body.setAttribute('data-acc-dyslexic', newConfig.dyslexic)
+    document.body.setAttribute('data-acc-focus', newConfig.focus)
+    document.body.setAttribute('data-acc-alignment', newConfig.alignment)
+    document.body.setAttribute('data-acc-saturation', newConfig.saturation)
+    
+    document.body.classList.toggle('acc-links', newConfig.links)
+    document.body.classList.toggle('acc-text-spacing', newConfig.textSpacing)
+    document.body.classList.toggle('acc-hide-images', newConfig.hideImages)
+    document.body.classList.toggle('acc-keyboard', newConfig.keyboard)
+    document.body.classList.toggle('acc-headings', newConfig.headings)
+    document.body.classList.toggle('acc-line-height', newConfig.lineHeight)
+  }
+}, { deep: true })
+
+const closeMenuOnOutsideClick = (e) => {
+  if (accConfig.isOpen && !e.target.closest('.acc-menu-panel')) {
+    accConfig.isOpen = false
+  }
+}
+
+const toggleMasterSound = () => {
+  isSoundEnabled.value = !isSoundEnabled.value
+  if (process.client) {
+    localStorage.setItem('acc_sound_enabled', isSoundEnabled.value.toString())
+    if (!isSoundEnabled.value) window.speechSynthesis.cancel()
+  }
+}
+
+const toggleReader = () => {
+  isReaderActive.value = !isReaderActive.value
+  isHoverActive.value = false
+  saveStates()
+  if (isReaderActive.value && !isSoundEnabled.value) toggleMasterSound()
+}
+
+const toggleHoverReader = () => {
+  isHoverActive.value = !isHoverActive.value
+  isReaderActive.value = false
+  saveStates()
+  if (isHoverActive.value && !isSoundEnabled.value) toggleMasterSound()
+}
+
+const saveStates = () => {
+  if (process.client) {
+    localStorage.setItem('acc_reader_active', isReaderActive.value.toString())
+    localStorage.setItem('acc_hover_active', isHoverActive.value.toString())
+  }
+}
+
+const cycleFont = () => {
+  const levels = ['kecil', 'normal', 'sedang', 'besar']
+  accConfig.setFontLevel(levels[(levels.indexOf(accConfig.fontLevel) + 1) % 4])
+}
+
+const resetAcc = () => {
+  if (process.client) {
+    localStorage.clear()
+    sessionStorage.clear()
+    location.reload()
+  }
+}
+
+const formatTextForTTS = (text) => {
+  if (!text) return ''
+  
+  const replacements = [
+    { p: /\bA\.\s/gi, r: "Andi' " },
+    { p: /\bDra\./gi, r: 'Doktoranda' },
+    { p: /\bDrs\./gi, r: 'Doktorandus' },
+    { p: /\bDr\./gi, r: 'Doktor' },
+    { p: /\bIr\./gi, r: 'Insinyur' },
+    { p: /\bHj\./gi, r: 'Hajjah' },
+    { p: /\bH\./gi, r: 'Haji' },
+    { p: /\bDra\b/gi, r: 'Doktoranda' },
+    { p: /\bDrs\b/gi, r: 'Doktorandus' },
+    { p: /\bHj\b/gi, r: 'Hajjah' },
+    { p: /\bM\.Si\b/gi, r: 'Magister Sains' },
+    { p: /\bM\.Pd\b/gi, r: 'Magister Pendidikan' },
+    { p: /\bM\.H\b/gi, r: 'Magister Hukum' },
+    { p: /\bM\.T\b/gi, r: 'Magister Teknik' },
+    { p: /\bM\.M\b/gi, r: 'Magister Manajemen' },
+    { p: /\bS\.Si\b/gi, r: 'Sarjana Sains' },
+    { p: /\bS\.Pd\b/gi, r: 'Sarjana Pendidikan' },
+    { p: /\bS\.Sos\b/gi, r: 'Sarjana Sosial' },
+    { p: /\bS\.H\b/gi, r: 'Sarjana Hukum' },
+    { p: /\bS\.T\b/gi, r: 'Sarjana Teknik' },
+    { p: /\bS\.E\b/gi, r: 'Sarjana Ekonomi' },
+    { p: /\bS\.Kom\b/gi, r: 'Sarjana Komputer' },
+    { p: /\bS\.IP\b/gi, r: 'Sarjana Ilmu Politik' },
+    { p: /\bS\.AP\b/gi, r: 'Sarjana Administrasi Publik' },
+    { p: /\bA\.Md\b/gi, r: 'Ahli Madya' },
+    { p: /\bNo\.\b/gi, r: 'Nomor' },
+    { p: /\bKab\.\b/gi, r: 'Kabupaten' },
+    { p: /\bKec\.\b/gi, r: 'Kecamatan' },
+    { p: /\bTtd\b/gi, r: 'Tertanda' }
+  ]
+
+  let processedText = text
+  
+  replacements.forEach(item => {
+    processedText = processedText.replace(item.p, item.r)
+  })
+
+  const abbreviations = ['SOP', 'DIP', 'PPID', 'IPM', 'TPAK', 'RKPD', 'RPJMD', 'LKPJ', 'SPBU', 'ASN', 'OPD', 'TTS']
+  abbreviations.forEach(abbr => { 
+    const regex = new RegExp('\\b' + abbr + '\\b', 'gi') 
+    processedText = processedText.replace(regex, abbr.split('').join(' ')) 
+  })
+
+  return processedText
+}
+
+const speak = (text) => {
+  if (!isSoundEnabled.value || !process.client) return
+  window.speechSynthesis.cancel()
+  const utterance = new SpeechSynthesisUtterance(formatTextForTTS(text))
+  utterance.lang = 'id-ID'
+  window.speechSynthesis.speak(utterance)
+}
+
+const handleElementSource = (target) => {
+  const el = target.closest('a, button, h1, h2, h3, h4, h5, h6, p, li, span, img, td, th, label, input')
+  if (!el) return
+  let text = el.tagName.toLowerCase() === 'img' ? (el.alt || 'Gambar') : (el.innerText || el.getAttribute('aria-label') || '')
+  if (text.trim().length > 1) speak(text.trim())
+}
+
+const onGlobalClick = (e) => {
+  closeMenuOnOutsideClick(e)
+  if (!isSoundEnabled.value || !isReaderActive.value || e.target.closest('.acc-widget-container')) return
+  handleElementSource(e.target)
+}
+
+const onGlobalMouseOver = (e) => {
+  if (!isSoundEnabled.value || !isHoverActive.value || e.target.closest('.acc-widget-container')) return
+  clearTimeout(hoverTimeout)
+  hoverTimeout = setTimeout(() => { handleElementSource(e.target) }, 600)
+}
+
+const onGlobalMouseMove = (e) => {
+  if (process.client) {
+    const mask = document.getElementById('reading-mask')
+    if (mask && accConfig.focus === 'mask') {
+      const y = e.clientY
+      mask.style.clipPath = `polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%, 0% 0%, 0% ${y - 50}px, 100% ${y - 50}px, 100% ${y + 50}px, 0% ${y + 50}px, 0% ${y - 50}px)`
+    }
+  }
+}
+
+onMounted(() => {
+  if (!process.client) return
+  
+  // Try to load saved config
+  const savedState = localStorage.getItem('acc_config_state')
+  if (savedState) {
+    try {
+      const parsed = JSON.parse(savedState)
+      Object.assign(accConfig, parsed)
+    } catch (e) {
+      console.error('Failed to parse acc config', e)
+    }
+  }
+
+  // Auth / Role defaults placeholder
+  // Assuming guest and empty name as default if not authenticated
+  const userRole = 'guest'
+  const userName = ''
+  const authStatus = false
+
+  const path = window.location.pathname.replace(/\/$/, "")
+  const isHome = path === "" || path === "/home" || path.endsWith("/v2") || path.endsWith("/v2/home")
+
+  const savedSound = localStorage.getItem('acc_sound_enabled')
+  isSoundEnabled.value = (savedSound !== null) ? (savedSound === 'true') : (userRole !== 'superadmin')
+
+  const sReader = localStorage.getItem('acc_reader_active')
+  const sHover = localStorage.getItem('acc_hover_active')
+  if (sReader !== null || sHover !== null) {
+    isReaderActive.value = (sReader === 'true')
+    isHoverActive.value = (sHover === 'true')
+  } else {
+    if (userRole === 'admin' || userRole === 'superadmin') {
+      isReaderActive.value = true; isHoverActive.value = false;
+    } else {
+      isReaderActive.value = false; isHoverActive.value = true;
+    }
+  }
+
+  const curId = authStatus ? 'u_auth' : 'guest'
+  if (isHome && sessionStorage.getItem('acc_greeted') !== curId) {
+    sessionStorage.setItem('acc_greeted', curId)
+    setTimeout(() => {
+      if (!isSoundEnabled.value) return
+      let msg = authStatus ? `Halo ${userName.split(' ')[0]}. Selamat datang di website P P I D Kabupaten Sinjai.` : "Selamat datang di website P P I D Kabupaten Sinjai."
+      speak(msg)
+    }, 1500)
+  }
+
+  speakingInterval = setInterval(() => { 
+    isCurrentlySpeaking.value = window.speechSynthesis.speaking 
+  }, 200)
+
+  document.addEventListener('click', onGlobalClick)
+  document.addEventListener('mouseover', onGlobalMouseOver)
+  document.addEventListener('mousemove', onGlobalMouseMove)
+})
+
+onUnmounted(() => {
+  if (!process.client) return
+  clearInterval(speakingInterval)
+  clearTimeout(hoverTimeout)
+  document.removeEventListener('click', onGlobalClick)
+  document.removeEventListener('mouseover', onGlobalMouseOver)
+  document.removeEventListener('mousemove', onGlobalMouseMove)
+})
+</script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
