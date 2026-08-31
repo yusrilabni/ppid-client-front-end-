@@ -102,49 +102,75 @@
           </section>
         </template>
         
-        <!-- OPD Belum Input Data -->
-        <section v-if="totalUnassigned > 0" class="pt-8">
-          <div class="mb-10 text-center max-w-2xl mx-auto">
-            <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-3">Unit Belum Mengisi Data Pimpinan ({{ totalUnassigned }})</h2>
-            <p class="text-sm text-gray-500 font-medium">Daftar unit organisasi yang belum memperbarui atau mengisi profil pimpinan daerahnya sama sekali.</p>
+        <!-- Status Pengisian Data Pimpinan Section -->
+        <section class="mt-20 border-t-2 border-dashed border-gray-200 pt-16">
+          <div class="mb-10">
+            <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-4">Status Pengisian Data Pimpinan ({{ totalUnassigned }} Unit)</h2>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl max-w-4xl">
+                <p class="text-sm text-blue-800 font-medium flex items-center">
+                    <i class="fas fa-info-circle mr-3 text-lg"></i>
+                    Berikut adalah data pimpinan masing-masing unit organisasi saat ini. Apabila terdapat perubahan pimpinan, silakan diperbarui.
+                </p>
+            </div>
           </div>
           
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="grid grid-cols-1 gap-8">
             <!-- OPD -->
             <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              <h3 class="text-xs font-black uppercase tracking-widest text-red-500 mb-4 pb-4 border-b border-gray-50 flex justify-between">
-                <span>Dinas / Badan / Kantor</span>
-                <span>{{ unassignedOpds.length }}</span>
+              <h3 class="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 pb-4 border-b border-gray-50 flex justify-between items-center">
+                <span><i class="fas fa-building mr-2"></i> Dinas / Badan / Kantor</span>
+                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{{ unassignedOpds.length }} Unit</span>
               </h3>
-              <ul class="space-y-3 max-h-96 overflow-y-auto no-scrollbar pr-2">
-                <li v-for="org in unassignedOpds" :key="org.id" class="text-xs font-bold text-gray-600 bg-gray-50 px-4 py-3 rounded-xl">
-                  {{ org.name }}
+              <ul class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                <li v-for="org in unassignedOpds" :key="org.id" class="text-sm text-gray-700 bg-gray-50 px-5 py-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 border border-gray-100 hover:border-blue-200 transition-colors">
+                  <div class="font-bold text-gray-800 flex-1">{{ org.name }}</div>
+                  <div class="flex flex-col md:items-end text-left md:text-right min-w-[250px]">
+                      <span class="font-medium text-gray-400 text-[10px] uppercase tracking-widest mb-1">Nama Pimpinan</span>
+                      <span class="font-bold text-sm" :class="org.is_updated ? 'text-gray-900' : 'text-gray-500'">{{ org.official_name }}</span>
+                      <span v-if="!org.is_updated" class="mt-2 text-[9px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-black uppercase tracking-wider self-start md:self-end">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Belum Diperbarui
+                      </span>
+                  </div>
                 </li>
               </ul>
             </div>
             
             <!-- Kecamatan -->
             <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              <h3 class="text-xs font-black uppercase tracking-widest text-orange-500 mb-4 pb-4 border-b border-gray-50 flex justify-between">
-                <span>Kecamatan</span>
-                <span>{{ unassignedKecamatans.length }}</span>
+              <h3 class="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 pb-4 border-b border-gray-50 flex justify-between items-center">
+                <span><i class="fas fa-map-marked-alt mr-2"></i> Kecamatan</span>
+                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{{ unassignedKecamatans.length }} Unit</span>
               </h3>
-              <ul class="space-y-3 max-h-96 overflow-y-auto no-scrollbar pr-2">
-                <li v-for="org in unassignedKecamatans" :key="org.id" class="text-xs font-bold text-gray-600 bg-gray-50 px-4 py-3 rounded-xl">
-                  {{ org.name }}
+              <ul class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                <li v-for="org in unassignedKecamatans" :key="org.id" class="text-sm text-gray-700 bg-gray-50 px-5 py-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 border border-gray-100 hover:border-blue-200 transition-colors">
+                  <div class="font-bold text-gray-800 flex-1">{{ org.name }}</div>
+                  <div class="flex flex-col md:items-end text-left md:text-right min-w-[250px]">
+                      <span class="font-medium text-gray-400 text-[10px] uppercase tracking-widest mb-1">Nama Pimpinan</span>
+                      <span class="font-bold text-sm" :class="org.is_updated ? 'text-gray-900' : 'text-gray-500'">{{ org.official_name }}</span>
+                      <span v-if="!org.is_updated" class="mt-2 text-[9px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-black uppercase tracking-wider self-start md:self-end">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Belum Diperbarui
+                      </span>
+                  </div>
                 </li>
               </ul>
             </div>
 
             <!-- Desa/Kelurahan -->
             <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              <h3 class="text-xs font-black uppercase tracking-widest text-amber-500 mb-4 pb-4 border-b border-gray-50 flex justify-between">
-                <span>Desa & Kelurahan</span>
-                <span>{{ unassignedDesas.length }}</span>
+              <h3 class="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 pb-4 border-b border-gray-50 flex justify-between items-center">
+                <span><i class="fas fa-home mr-2"></i> Desa & Kelurahan</span>
+                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{{ unassignedDesas.length }} Unit</span>
               </h3>
-              <ul class="space-y-3 max-h-96 overflow-y-auto no-scrollbar pr-2">
-                <li v-for="org in unassignedDesas" :key="org.id" class="text-xs font-bold text-gray-600 bg-gray-50 px-4 py-3 rounded-xl">
-                  {{ org.name }}
+              <ul class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                <li v-for="org in unassignedDesas" :key="org.id" class="text-sm text-gray-700 bg-gray-50 px-5 py-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 border border-gray-100 hover:border-blue-200 transition-colors">
+                  <div class="font-bold text-gray-800 flex-1">{{ org.name }}</div>
+                  <div class="flex flex-col md:items-end text-left md:text-right min-w-[250px]">
+                      <span class="font-medium text-gray-400 text-[10px] uppercase tracking-widest mb-1">Nama Pimpinan</span>
+                      <span class="font-bold text-sm" :class="org.is_updated ? 'text-gray-900' : 'text-gray-500'">{{ org.official_name }}</span>
+                      <span v-if="!org.is_updated" class="mt-2 text-[9px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-black uppercase tracking-wider self-start md:self-end">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Belum Diperbarui
+                      </span>
+                  </div>
                 </li>
               </ul>
             </div>
