@@ -95,7 +95,7 @@
 
                             <template v-if="authStore.user && authStore.user.unit_id == org.remote_id">
                                 <div class="pt-2">
-                                    <NuxtLink :to="`/profil/tentang-opd/${org.slug}/manage`" class="inline-flex items-center justify-center w-full bg-white text-blue-600 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
+                                    <NuxtLink :to="`/profil/tentang-opd/${org.slug}/manage`" class="inline-flex items-center justify-center w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2 shadow-lg shadow-amber-200 hover:-translate-y-1">
                                         <i class="fas fa-edit"></i> Kelola Profil Unit
                                     </NuxtLink>
                                 </div>
@@ -147,7 +147,7 @@
 
                         <template v-if="authStore.user && authStore.user.unit_id == org.remote_id">
                             <div class="pt-2">
-                                <NuxtLink :to="`/profil/tentang-opd/${org.slug}/manage`" class="inline-flex items-center justify-center w-full bg-white text-blue-600 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
+                                <NuxtLink :to="`/profil/tentang-opd/${org.slug}/manage`" class="inline-flex items-center justify-center w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-200 hover:-translate-y-1 border-none font-black text-xs py-4 rounded-2xl transition-all duration-500 uppercase tracking-widest gap-2">
                                     <i class="fas fa-edit"></i> Kelola Profil Unit
                                     </NuxtLink>
                             </div>
