@@ -103,6 +103,7 @@
         </template>
         
 
+
       </div>
 
     </div>
@@ -122,7 +123,7 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 const eselon2 = ref([])
 const eselon3 = ref([])
-
+const totalUnassigned = ref(0)
 
 const { isLoading: queryLoading, data: queryData, isFetching, isError, refetch } = useQuery({
   queryKey: ['pejabat_daerah'],
@@ -132,6 +133,7 @@ const { isLoading: queryLoading, data: queryData, isFetching, isError, refetch }
   },
   staleTime: 60000
 })
+
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
 useGlobalLoader(loading)
