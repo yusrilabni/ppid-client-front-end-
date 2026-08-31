@@ -23,6 +23,23 @@
 
       <div v-else-if="official" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         
+        <!-- Large Photo Upload Section at Top -->
+        <div class="bg-gradient-to-b from-blue-50/50 to-white p-10 flex flex-col items-center justify-center border-b border-gray-100 relative">
+          <div class="relative group cursor-pointer" @click="triggerPhotoUpload">
+            <div class="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gray-100 flex items-center justify-center transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+              <img v-if="photoPreview" :src="photoPreview" class="w-full h-full object-cover">
+              <img v-else-if="official?.photo" :src="`https://ppidkab.sinjaikab.go.id/storage/${official.photo}`" class="w-full h-full object-cover">
+              <i v-else class="fas fa-user text-6xl text-gray-300"></i>
+            </div>
+            
+            <div class="absolute bottom-4 right-4 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110 border-4 border-white">
+              <i class="fas fa-camera text-lg"></i>
+            </div>
+          </div>
+          <p class="text-xs font-bold text-gray-400 mt-6 uppercase tracking-widest text-center">Klik foto untuk memperbarui<br><span class="font-normal normal-case">(Rekomendasi rasio 1:1, Max 2MB)</span></p>
+          <input type="file" id="photo_input" accept="image/*" class="hidden" @change="onPhotoSelected">
+        </div>
+
         <!-- Tabs -->
         <div class="flex border-b border-gray-100 overflow-x-auto no-scrollbar">
           <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
@@ -40,17 +57,6 @@
           <div v-show="activeTab === 'biodata'" class="space-y-6 animate-fadeIn">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               
-              <div class="md:col-span-2 space-y-3">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Foto Profil Pejabat (Kosongkan jika tidak ingin mengubah)</label>
-                <div class="flex items-center gap-4">
-                  <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
-                    <img v-if="official?.photo" :src="`https://ppidkab.sinjaikab.go.id/storage/${official.photo}`" class="w-full h-full object-cover">
-                    <i v-else class="fas fa-user text-3xl text-gray-300 w-full h-full flex justify-center items-center"></i>
-                  </div>
-                  <input type="file" id="photo_input" accept="image/*" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 text-sm">
-                </div>
-              </div>
-
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
                 <input v-model="form.full_name" type="text" required class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
@@ -321,12 +327,24 @@ import api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
-const id = route.params.id
+const slug = route.params.slug
 
 const loading = ref(true)
 const saving = ref(false)
 const error = ref('')
 const official = ref(null)
+const photoPreview = ref(null)
+
+const triggerPhotoUpload = () => {
+  document.getElementById('photo_input').click()
+}
+
+const onPhotoSelected = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    photoPreview.value = URL.createObjectURL(file)
+  }
+}
 
 const activeTab = ref('biodata')
 const tabs = [
@@ -362,7 +380,7 @@ const removeItem = (key, index) => {
 
 onMounted(async () => {
   try {
-    const res = await api.get(`/profil/pimpinan/${id}/edit`)
+    const res = await api.get(`/profil/pimpinan/${slug}/edit`)
     if (res.data.success) {
       official.value = res.data.official
       
@@ -420,7 +438,7 @@ const handleSave = async () => {
       })
     })
 
-    const res = await api.post(`/profil/pimpinan/${id}`, formData, {
+    const res = await api.post(`/profil/pimpinan/${slug}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     
