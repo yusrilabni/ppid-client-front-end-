@@ -123,7 +123,7 @@ const form = ref({
 
 const imagePreview = ref(null)
 
-const breadcrumbsList = computed(() => getBreadcrumbs('manageTentangOpd', { organization: organization.value }))
+const breadcrumbsList = computed(() => getBreadcrumbs.manageTentangOpd({ organization: organization.value }))
 
 const triggerImageUpload = () => {
     document.getElementById('structure_image').click()
