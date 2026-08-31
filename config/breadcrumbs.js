@@ -36,6 +36,12 @@ export const getBreadcrumbs = {
     }
     return [home, { title: 'Profil', icon: 'fas fa-user' }, { title: title || 'Profil Pejabat', icon: 'fas fa-user-circle' }];
   },
+  editProfilPejabat: (title, slug) => [
+    home, 
+    { title: 'Profil', icon: 'fas fa-user' },
+    { title: title || 'Profil Pejabat', url: slug ? `/profil/${slug}` : '/profil/pejabat-daerah', icon: 'fas fa-user-circle' },
+    { title: 'Edit', icon: 'fas fa-edit' }
+  ],
   profilePage: () => [home, { title: 'Profil Pengguna', url: '/profile', icon: 'fas fa-user-circle' }],
   registerPage: () => [home, { title: 'Registrasi', url: '/register', icon: 'fas fa-user-plus' }],
   regulasi: () => [home, { title: 'Regulasi', url: '/regulasi', icon: 'fas fa-gavel' }],

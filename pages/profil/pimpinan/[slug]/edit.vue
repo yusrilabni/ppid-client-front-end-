@@ -1,6 +1,8 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumbs -->
+      <Breadcrumbs :breadcrumbs="breadcrumbsList" />
       
       <!-- Header -->
       <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -321,13 +323,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 const route = useRoute()
 const router = useRouter()
 const slug = route.params.slug
+
+const breadcrumbsList = computed(() => {
+  return getBreadcrumbs.editProfilPejabat(official.value?.full_name, official.value?.slug)
+})
 
 const loading = ref(true)
 const saving = ref(false)
