@@ -340,6 +340,8 @@ const loading = ref(true)
 const saving = ref(false)
 const error = ref('')
 const official = ref(null)
+const positions = ref([])
+const organizations = ref([])
 const photoPreview = ref(null)
 
 const triggerPhotoUpload = () => {
@@ -365,7 +367,7 @@ const tabs = [
 ]
 
 const form = ref({
-  full_name: '', nip: '', birth_place: '', birth_date: '',
+  full_name: '', nip: '', position_id: '', status_jabatan: '', organization_id: '', email: '', start_term: '', end_term: '', birth_place: '', birth_date: '',
   religion: '', jenis_kelamin: '', biography: '', status: 'active',
   home_address: '', marital_status: '', spouse_name: '',
   
@@ -390,6 +392,8 @@ onMounted(async () => {
     const res = await api.get(`/profil/pimpinan/${slug}/edit`)
     if (res.data.success) {
       official.value = res.data.official
+        positions.value = res.data.positions || []
+        organizations.value = res.data.organizations || []
       
       // Populate basic fields
       Object.keys(form.value).forEach(key => {
