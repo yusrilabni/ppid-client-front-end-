@@ -368,6 +368,20 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 const authStore = useAuthStore()
 const queryClient = useQueryClient()
 const route = useRoute()
+const router = useRouter()
+
+onMounted(() => {
+  // Protect profile route
+  if (!authStore.isAuthenticated) {
+    router.push('/login')
+  }
+})
+
+watch(() => authStore.isAuthenticated, (isAuth) => {
+  if (!isAuth) {
+    router.push('/login')
+  }
+})
 
 const linkedStatus = computed(() => route.query.linked)
 const linkedMessage = computed(() => route.query.msg ? decodeURIComponent(route.query.msg) : 'Gagal menautkan akun.')
