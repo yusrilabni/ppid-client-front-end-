@@ -40,7 +40,18 @@ const handleLogout = async () => {
   loadingStore.startLoading()
   try {
     await authStore.logout()
-    router.push({ name: 'home' })
+    const path = route.path
+    const isProtected = path.startsWith('/admin') || 
+                        path === '/profile' || 
+                        path.endsWith('/edit') || 
+                        path.endsWith('/create') || 
+                        path.endsWith('/manage')
+    
+    if (isProtected) {
+      router.push('/login')
+    } else {
+      router.push('/')
+    }
   } finally {
     loadingStore.stopLoading()
   }
