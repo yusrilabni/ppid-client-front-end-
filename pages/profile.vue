@@ -643,17 +643,14 @@ const verifyLinkOtp = async () => {
     })
     
     if (response.data.success) {
-      if (response.data.token) {
-        authStore.token = response.data.token
-        localStorage.setItem('ppid_token', response.data.token)
-      }
-      authStore.user = response.data.user
-      localStorage.setItem('ppid_user', JSON.stringify(response.data.user))
-      
       showLinkOtpModal.value = false
       linkOtpCode.value = ''
-      alert('Akun berhasil ditautkan dengan Google!')
-      window.location.href = '/profile'
+      
+      // Logout secara otomatis setelah menautkan akun
+      await authStore.logout()
+      
+      // Redirect ke login dengan pesan sukses
+      window.location.href = '/login?success=linked&msg=' + encodeURIComponent('Email berhasil ditautkan! Karena email Anda sudah tertaut, silakan Login kembali menggunakan tombol "Login dengan Google".')
     }
   } catch (error) {
     linkOtpError.value = error.response?.data?.message || 'Kode OTP salah atau kadaluarsa.'

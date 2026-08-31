@@ -17,6 +17,17 @@
           <p class="text-sm text-gray-600 mt-2">Sistem Informasi Pejabat Pengelola Informasi & Dokumentasi</p>
         </div>
         
+        <!-- Success Alert -->
+        <div v-if="successMsg" class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-start gap-3 shadow-sm">
+          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="text-sm font-bold text-emerald-800 leading-tight">Berhasil</h4>
+            <p class="text-xs text-emerald-600 mt-1 leading-relaxed">{{ successMsg }}</p>
+          </div>
+        </div>
+
         <!-- Error Alert -->
         <div v-if="error" class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-100 flex items-start gap-3 shadow-sm">
           <div class="flex-shrink-0 w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
@@ -116,9 +127,12 @@ const form = ref({ email: '', password: '' })
 const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
+const successMsg = ref('')
 
 onMounted(() => {
-  if (route.query.error === 'not_registered') {
+  if (route.query.success === 'linked') {
+    successMsg.value = route.query.msg ? decodeURIComponent(route.query.msg) : 'Akun berhasil ditautkan. Silakan login kembali.'
+  } else if (route.query.error === 'not_registered') {
     error.value = 'Email Anda belum terdaftar di sistem. Silakan buat akun terlebih dahulu.'
   } else if (route.query.error === 'auth_failed') {
     error.value = route.query.msg ? decodeURIComponent(route.query.msg) : 'Gagal masuk dengan Google. Silakan coba lagi.'
