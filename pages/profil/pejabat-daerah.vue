@@ -102,54 +102,6 @@
           </section>
         </template>
         
-        <!-- OPD Belum Input Data -->
-        <section v-if="totalUnassigned > 0" class="pt-8">
-          <div class="mb-10 text-center max-w-2xl mx-auto">
-            <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-3">Unit Belum Mengisi Data Pimpinan ({{ totalUnassigned }})</h2>
-            <p class="text-sm text-gray-500 font-medium">Daftar unit organisasi yang belum memperbarui atau mengisi profil pimpinan daerahnya sama sekali.</p>
-          </div>
-          
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- OPD -->
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              <h3 class="text-xs font-black uppercase tracking-widest text-red-500 mb-4 pb-4 border-b border-gray-50 flex justify-between">
-                <span>Dinas / Badan / Kantor</span>
-                <span>{{ unassignedOpds.length }}</span>
-              </h3>
-              <ul class="space-y-3 max-h-96 overflow-y-auto no-scrollbar pr-2">
-                <li v-for="org in unassignedOpds" :key="org.id" class="text-xs font-bold text-gray-600 bg-gray-50 px-4 py-3 rounded-xl">
-                  {{ org.name }}
-                </li>
-              </ul>
-            </div>
-            
-            <!-- Kecamatan -->
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              <h3 class="text-xs font-black uppercase tracking-widest text-orange-500 mb-4 pb-4 border-b border-gray-50 flex justify-between">
-                <span>Kecamatan</span>
-                <span>{{ unassignedKecamatans.length }}</span>
-              </h3>
-              <ul class="space-y-3 max-h-96 overflow-y-auto no-scrollbar pr-2">
-                <li v-for="org in unassignedKecamatans" :key="org.id" class="text-xs font-bold text-gray-600 bg-gray-50 px-4 py-3 rounded-xl">
-                  {{ org.name }}
-                </li>
-              </ul>
-            </div>
-
-            <!-- Desa/Kelurahan -->
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              <h3 class="text-xs font-black uppercase tracking-widest text-amber-500 mb-4 pb-4 border-b border-gray-50 flex justify-between">
-                <span>Desa & Kelurahan</span>
-                <span>{{ unassignedDesas.length }}</span>
-              </h3>
-              <ul class="space-y-3 max-h-96 overflow-y-auto no-scrollbar pr-2">
-                <li v-for="org in unassignedDesas" :key="org.id" class="text-xs font-bold text-gray-600 bg-gray-50 px-4 py-3 rounded-xl">
-                  {{ org.name }}
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
 
       </div>
 
@@ -171,24 +123,11 @@ const authStore = useAuthStore()
 const eselon2 = ref([])
 const eselon3 = ref([])
 
-const unassignedOpds = ref([])
-const unassignedKecamatans = ref([])
-const unassignedDesas = ref([])
-const totalUnassigned = ref(0)
 
 const { isLoading: queryLoading, data: queryData, isFetching, isError, refetch } = useQuery({
   queryKey: ['pejabat_daerah'],
   queryFn: async () => {
     const res = await api.get('/profil/pejabat-daerah')
-    return res.data
-  },
-  staleTime: 60000
-})
-
-const { data: queryUnassigned, isFetching: loadingUnassigned } = useQuery({
-  queryKey: ['organisasi_belum_isi'],
-  queryFn: async () => {
-    const res = await api.get('/profil/organisasi-belum-isi')
     return res.data
   },
   staleTime: 60000
@@ -204,14 +143,6 @@ watch(queryData, (newData) => {
   }
 }, { immediate: true })
 
-watch(queryUnassigned, (newData) => {
-  if (newData && newData.success && newData.data) {
-    unassignedOpds.value = newData.data.opds || []
-    unassignedKecamatans.value = newData.data.kecamatans || []
-    unassignedDesas.value = newData.data.desas || []
-    totalUnassigned.value = newData.data.total || 0
-  }
-}, { immediate: true })
 
 const groups = computed(() => [
   { 
