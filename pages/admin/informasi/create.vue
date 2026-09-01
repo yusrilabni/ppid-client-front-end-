@@ -294,7 +294,7 @@ const selectedJenisDesc = computed(() => {
 const units = ref([])
 const unitsOptions = computed(() => {
   return units.value.map(unit => ({
-    value: String(unit.id),
+    value: String(unit.remote_id || unit.id),
     label: unit.name
   }))
 })
