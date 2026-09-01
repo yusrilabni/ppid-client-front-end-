@@ -489,7 +489,7 @@ const generateAI = async () => {
         })
       }
       if (data.tahun) {
-        form.value.tanggal_dokumen = data.tahun + '-01-01'
+        form.value.tanggal_dokumen = data.tahun
       }
     }
   } catch (err) {
