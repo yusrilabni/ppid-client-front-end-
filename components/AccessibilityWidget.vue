@@ -174,7 +174,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useAccessibilityStore } from '@/stores/accessibility'
+
+const accConfig = useAccessibilityStore()
 
 const isSoundEnabled = ref(true)
 const isReaderActive = ref(false)
@@ -183,77 +186,9 @@ const isCurrentlySpeaking = ref(false)
 let hoverTimeout = null
 let speakingInterval = null
 
-const accConfig = reactive({
-  isOpen: false,
-  contrast: 'default',
-  fontLevel: 'normal',
-  links: false,
-  textSpacing: false,
-  hideImages: false,
-  dyslexic: 'default',
-  focus: 'default',
-  keyboard: false,
-  alignment: 'default',
-  saturation: 'default',
-  headings: false,
-  lineHeight: false,
-  
-  toggleMenu() {
-    this.isOpen = !this.isOpen
-  },
-  cycleContrast() {
-    const opts = ['default', 'light', 'invert', 'dark']
-    this.contrast = opts[(opts.indexOf(this.contrast) + 1) % opts.length]
-  },
-  setFontLevel(val) {
-    this.fontLevel = val
-  },
-  cycleDyslexic() {
-    const opts = ['default', 'open', 'lexend']
-    this.dyslexic = opts[(opts.indexOf(this.dyslexic) + 1) % opts.length]
-  },
-  cycleFocus() {
-    const opts = ['default', 'cursor', 'mask', 'guide']
-    this.focus = opts[(opts.indexOf(this.focus) + 1) % opts.length]
-  },
-  cycleAlignment() {
-    const opts = ['default', 'left', 'center', 'right']
-    this.alignment = opts[(opts.indexOf(this.alignment) + 1) % opts.length]
-  },
-  cycleSaturation() {
-    const opts = ['default', 'low', 'high', 'mono']
-    this.saturation = opts[(opts.indexOf(this.saturation) + 1) % opts.length]
-  },
-  update(key, val) {
-    this[key] = val
-  }
-})
-
-// Watch accConfig to save state in localstorage and potentially apply global classes
-watch(() => accConfig, (newConfig) => {
-  if (process.client) {
-    localStorage.setItem('acc_config_state', JSON.stringify(newConfig))
-    
-    // Apply changes to document body/html to ensure they take effect globally
-    document.body.setAttribute('data-acc-contrast', newConfig.contrast)
-    document.body.setAttribute('data-acc-font', newConfig.fontLevel)
-    document.body.setAttribute('data-acc-dyslexic', newConfig.dyslexic)
-    document.body.setAttribute('data-acc-focus', newConfig.focus)
-    document.body.setAttribute('data-acc-alignment', newConfig.alignment)
-    document.body.setAttribute('data-acc-saturation', newConfig.saturation)
-    
-    document.body.classList.toggle('acc-links', newConfig.links)
-    document.body.classList.toggle('acc-text-spacing', newConfig.textSpacing)
-    document.body.classList.toggle('acc-hide-images', newConfig.hideImages)
-    document.body.classList.toggle('acc-keyboard', newConfig.keyboard)
-    document.body.classList.toggle('acc-headings', newConfig.headings)
-    document.body.classList.toggle('acc-line-height', newConfig.lineHeight)
-  }
-}, { deep: true })
-
 const closeMenuOnOutsideClick = (e) => {
   if (accConfig.isOpen && !e.target.closest('.acc-menu-panel')) {
-    accConfig.isOpen = false
+    accConfig.toggleMenu()
   }
 }
 
@@ -287,16 +222,11 @@ const saveStates = () => {
 }
 
 const cycleFont = () => {
-  const levels = ['kecil', 'normal', 'sedang', 'besar']
-  accConfig.setFontLevel(levels[(levels.indexOf(accConfig.fontLevel) + 1) % 4])
+  accConfig.cycleFont()
 }
 
 const resetAcc = () => {
-  if (process.client) {
-    localStorage.clear()
-    sessionStorage.clear()
-    location.reload()
-  }
+  accConfig.resetAll()
 }
 
 const formatTextForTTS = (text) => {
@@ -388,29 +318,20 @@ const onGlobalMouseMove = (e) => {
 
 onMounted(() => {
   if (!process.client) return
-  
-  // Try to load saved config
-  const savedState = localStorage.getItem('acc_config_state')
-  if (savedState) {
-    try {
-      const parsed = JSON.parse(savedState)
-      Object.assign(accConfig, parsed)
-    } catch (e) {
-      console.error('Failed to parse acc config', e)
-    }
-  }
 
-  // Auth / Role defaults placeholder
-  // Assuming guest and empty name as default if not authenticated
+  // Terapkan font size dari store (restore setelah hard refresh)
+  const fontMap = { 'kecil': 12, 'normal': 16, 'sedang': 20, 'besar': 24 }
+  document.documentElement.style.fontSize = (fontMap[accConfig.fontLevel] || 16) + 'px'
+
   const userRole = 'guest'
   const userName = ''
   const authStatus = false
 
   const path = window.location.pathname.replace(/\/$/, "")
-  const isHome = path === "" || path === "/home" || path.endsWith("/v2") || path.endsWith("/v2/home")
+  const isHome = path === "" || path === "/home"
 
   const savedSound = localStorage.getItem('acc_sound_enabled')
-  isSoundEnabled.value = (savedSound !== null) ? (savedSound === 'true') : (userRole !== 'superadmin')
+  isSoundEnabled.value = (savedSound !== null) ? (savedSound === 'true') : true
 
   const sReader = localStorage.getItem('acc_reader_active')
   const sHover = localStorage.getItem('acc_hover_active')
@@ -418,11 +339,8 @@ onMounted(() => {
     isReaderActive.value = (sReader === 'true')
     isHoverActive.value = (sHover === 'true')
   } else {
-    if (userRole === 'admin' || userRole === 'superadmin') {
-      isReaderActive.value = true; isHoverActive.value = false;
-    } else {
-      isReaderActive.value = false; isHoverActive.value = true;
-    }
+    isReaderActive.value = false
+    isHoverActive.value = true
   }
 
   const curId = authStatus ? 'u_auth' : 'guest'
@@ -430,13 +348,12 @@ onMounted(() => {
     sessionStorage.setItem('acc_greeted', curId)
     setTimeout(() => {
       if (!isSoundEnabled.value) return
-      let msg = authStatus ? `Halo ${userName.split(' ')[0]}. Selamat datang di website P P I D Kabupaten Sinjai.` : "Selamat datang di website P P I D Kabupaten Sinjai."
-      speak(msg)
+      speak("Selamat datang di website P P I D Kabupaten Sinjai.")
     }, 1500)
   }
 
-  speakingInterval = setInterval(() => { 
-    isCurrentlySpeaking.value = window.speechSynthesis.speaking 
+  speakingInterval = setInterval(() => {
+    isCurrentlySpeaking.value = window.speechSynthesis.speaking
   }, 200)
 
   document.addEventListener('click', onGlobalClick)
