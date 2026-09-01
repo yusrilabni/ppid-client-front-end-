@@ -4,7 +4,9 @@
     <button type="button" 
         @click="toggle" 
         @keydown.escape="open = false"
-        class="relative w-full bg-white border-2 border-gray-100 rounded-2xl shadow-sm pl-5 pr-12 py-4 text-left cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 sm:text-base transition-all duration-300 group">
+        :disabled="disabled"
+        class="relative w-full border-2 border-gray-100 rounded-2xl shadow-sm pl-5 pr-12 py-4 text-left transition-all duration-300 group"
+        :class="disabled ? 'bg-gray-50/80 cursor-not-allowed opacity-75' : 'bg-white cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'">
         
         <span class="flex items-center">
             <span class="block truncate transition-colors duration-300" 
@@ -101,6 +103,10 @@ const props = defineProps({
         type: Boolean,
         default: null
     },
+    disabled: {
+        type: Boolean,
+        default: false
+    },
     labelKey: {
         type: String,
         default: 'label'
@@ -116,6 +122,11 @@ const emit = defineEmits(['update:modelValue', 'change']);
 const open = ref(false);
 const search = ref('');
 const rootEl = ref(null);
+
+const toggle = () => {
+    if (props.disabled) return;
+    open.value = !open.value;
+};
 
 const displaySearch = computed(() => {
     if (props.searchable === false) return false;
@@ -150,10 +161,6 @@ const filteredData = computed(() => {
         item.label && String(item.label).toLowerCase().includes(term)
     );
 });
-
-const toggle = () => {
-    open.value = !open.value;
-};
 
 const select = (item) => {
     emit('update:modelValue', item.value);

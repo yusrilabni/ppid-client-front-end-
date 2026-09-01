@@ -70,18 +70,15 @@
                 />
               </div>
 
-              <div v-if="isSuperAdmin">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja <span class="text-gray-400 text-xs font-normal ml-1">(Opsional)</span></label>
+              <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja <span v-if="isSuperAdmin" class="text-gray-400 text-xs font-normal ml-1">(Opsional)</span></label>
                 <CustomSelect 
                   v-model="form.target_unit"
                   :options="unitsOptions"
                   placeholder="Pilih Unit Kerja"
                   :searchable="true"
+                  :disabled="!isSuperAdmin"
                 />
-              </div>
-              <div v-else>
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja</label>
-                <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed" :value="userUnitName" readonly>
               </div>
 
               <div>
