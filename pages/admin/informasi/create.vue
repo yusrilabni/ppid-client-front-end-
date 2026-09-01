@@ -166,8 +166,6 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'admin' })
-
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
