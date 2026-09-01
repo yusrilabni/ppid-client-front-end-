@@ -518,7 +518,7 @@ const deleteItem = async (item) => {
       }
     } catch (error) {
       console.error('Failed to delete item:', error)
-      alert('Gagal menghapus dokumen.')
+      alert('Gagal menghapus dokumen: ' + (error.response?.data?.message || error.message || 'Error tidak diketahui'))
     }
   }
 }
