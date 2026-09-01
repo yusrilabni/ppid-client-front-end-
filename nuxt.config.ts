@@ -8,7 +8,8 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
   ],
   routeRules: {
-    '/v2/**': { redirect: { to: '/', statusCode: 301 } }
+    '/v2/**': { redirect: { to: '/', statusCode: 301 } },
+    '/front/**': { redirect: { to: '/', statusCode: 301 } }
   },
   css: [
     '~/assets/css/index.css',
