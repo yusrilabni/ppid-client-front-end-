@@ -209,6 +209,14 @@
                         <a v-if="!item.official && !isStruktur(item.content) && item.file_url" :href="item.file_url" target="_blank" download class="w-9 h-9 flex items-center justify-center bg-green-50 text-green-600 rounded-xl hover:bg-green-600 hover:text-white transition-all shadow-sm" title="Download">
                           <i class="fas fa-download text-sm"></i>
                         </a>
+                        <template v-if="isAdmin">
+                          <a :href="`${api.defaults.baseURL.replace('/api/v1', '')}/admin/informasi/${item.id}/edit`" target="_blank" class="w-9 h-9 flex items-center justify-center bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm" title="Edit">
+                            <i class="fas fa-edit text-sm"></i>
+                          </a>
+                          <button @click="deleteItem(item)" class="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Hapus">
+                            <i class="fas fa-trash text-sm"></i>
+                          </button>
+                        </template>
                       </div>
                     </td>
                   </tr>
@@ -269,6 +277,14 @@
                   <a v-if="!item.official && !isStruktur(item.content) && item.file_url" :href="item.file_url" target="_blank" download class="w-10 flex-shrink-0 bg-green-50 text-green-600 flex items-center justify-center rounded-xl hover:bg-green-600 hover:text-white transition-colors">
                     <i class="fas fa-download text-sm"></i>
                   </a>
+                  <template v-if="isAdmin">
+                    <a :href="`${api.defaults.baseURL.replace('/api/v1', '')}/admin/informasi/${item.id}/edit`" target="_blank" class="w-10 flex-shrink-0 bg-amber-50 text-amber-600 flex items-center justify-center rounded-xl hover:bg-amber-600 hover:text-white transition-colors" title="Edit">
+                      <i class="fas fa-edit text-sm"></i>
+                    </a>
+                    <button @click="deleteItem(item)" class="w-10 flex-shrink-0 bg-red-50 text-red-600 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-colors" title="Hapus">
+                      <i class="fas fa-trash text-sm"></i>
+                    </button>
+                  </template>
                 </div>
               </div>
             </template>
@@ -309,7 +325,7 @@ import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
@@ -483,6 +499,23 @@ const getDetailLink = (item) => {
     return `/informasi/detail/${item.slug || item.id}`
   }
   return `/informasi/detail/${item.slug || item.id}`
+}
+
+const queryClient = useQueryClient()
+
+const deleteItem = async (item) => {
+  if (confirm(`Apakah Anda yakin ingin menghapus dokumen "${item.title}"?`)) {
+    try {
+      const res = await api.delete('/informasi-crud/' + item.id)
+      if (res.data?.success || res.status === 200) {
+        alert('Dokumen berhasil dihapus.')
+        queryClient.invalidateQueries({ queryKey: ['informasi', category.value] })
+      }
+    } catch (error) {
+      console.error('Failed to delete item:', error)
+      alert('Gagal menghapus dokumen.')
+    }
+  }
 }
 
 watch(category, () => {
