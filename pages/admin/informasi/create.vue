@@ -87,12 +87,11 @@
 
               <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Tahun Dokumen <span class="text-red-500">*</span></label>
-                <div class="border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition duration-200 w-full h-[48px] flex items-center bg-white">
-                  <CustomDate 
-                    v-model="form.tahun" 
-                    placeholder="Pilih Tanggal Dokumen" 
-                  />
-                </div>
+                <CustomDate 
+                  v-model="form.tahun" 
+                  placeholder="Pilih Tanggal Dokumen" 
+                  variant="standard"
+                />
               </div>
 
               <div class="md:col-span-2">
