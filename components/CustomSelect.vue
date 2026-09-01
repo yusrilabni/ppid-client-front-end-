@@ -35,7 +35,7 @@
       <div v-if="open" 
           class="absolute mt-1 w-full rounded-2xl bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] z-[9999] border border-gray-100 overflow-hidden ring-1 ring-black/5">
 
-          <div v-if="shouldShowSearch" class="p-3 bg-gray-50/50 border-b border-gray-100">
+          <div v-if="displaySearch" class="p-3 bg-gray-50/50 border-b border-gray-100">
               <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <i class="fas fa-search text-blue-500 text-xs"></i>
@@ -97,6 +97,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    searchable: {
+        type: Boolean,
+        default: null
+    },
     labelKey: {
         type: String,
         default: 'label'
@@ -112,6 +116,14 @@ const emit = defineEmits(['update:modelValue', 'change']);
 const open = ref(false);
 const search = ref('');
 const rootEl = ref(null);
+
+const displaySearch = computed(() => {
+    if (props.searchable === false) return false;
+    if (props.searchable === true) return true;
+    if (props.shouldShowSearch) return true;
+    return props.options.length >= 10;
+});
+
 
 const normalizedOptions = computed(() => {
     return props.options.map(item => {
