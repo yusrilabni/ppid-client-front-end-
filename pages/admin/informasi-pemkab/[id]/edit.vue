@@ -66,7 +66,7 @@
                   <button type="button" @click="generateAI" :disabled="generatingAI" class="relative group bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold py-4 px-6 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.7)] transition-all duration-300 flex items-center justify-center min-w-[160px] transform hover:-translate-y-1 z-10 disabled:opacity-70 disabled:hover:-translate-y-0 disabled:cursor-not-allowed">
                     <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl blur opacity-30 group-hover:opacity-70 transition duration-500 group-hover:duration-200 -z-10"></div>
                     <span class="relative flex items-center gap-2">
-                      <i class="fas fa-sparkles" :class="{'animate-pulse': !generatingAI, 'fa-spin': generatingAI}"></i> {{ generatingAI ? 'Generating...' : 'Generate AI' }}
+                      <i class="fas fa-robot" :class="{'animate-pulse': !generatingAI, 'fa-spin': generatingAI}"></i> {{ generatingAI ? 'Generating...' : 'Generate AI' }}
                     </span>
                   </button>
                 </div>
