@@ -110,7 +110,7 @@
                           <i class="fas fa-building text-[10px] text-gray-400 transition-all duration-300"></i>
                       </div>
                       <span class="text-[10px] font-black uppercase tracking-[0.15em]">
-                          {{ filters.filter_unit === '1' ? 'Tampilkan Semua Unit' : 'Hanya Unit Saya' }}
+                          {{ filters.filter_unit === '1' ? 'Hanya Unit Saya' : 'Tampilkan Semua Unit' }}
                       </span>
                   </div>
                 </label>
@@ -386,7 +386,7 @@ const filters = reactive({
   sort: 'created_at_desc',
   per_page: '10',
   unit_id: '',
-  filter_unit: '0',
+  filter_unit: '1',
   page: 1
 })
 
@@ -478,7 +478,7 @@ const resetFilters = () => {
   filters.sort = 'created_at_desc'
   filters.per_page = '10'
   filters.unit_id = ''
-  filters.filter_unit = '0'
+  filters.filter_unit = '1'
   filters.page = 1
 }
 
