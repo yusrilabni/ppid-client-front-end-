@@ -96,6 +96,14 @@ const props = defineProps({
     shouldShowSearch: {
         type: Boolean,
         default: false
+    },
+    labelKey: {
+        type: String,
+        default: 'label'
+    },
+    valueKey: {
+        type: String,
+        default: 'value'
     }
 });
 
@@ -105,16 +113,29 @@ const open = ref(false);
 const search = ref('');
 const rootEl = ref(null);
 
+const normalizedOptions = computed(() => {
+    return props.options.map(item => {
+        if (item && typeof item === 'object') {
+            return {
+                ...item,
+                label: item[props.labelKey] !== undefined ? item[props.labelKey] : item.label,
+                value: item[props.valueKey] !== undefined ? item[props.valueKey] : item.value
+            };
+        }
+        return { label: item, value: item };
+    });
+});
+
 const selectedLabel = computed(() => {
-    const selected = props.options.find(item => String(item.value) === String(props.modelValue));
+    const selected = normalizedOptions.value.find(item => String(item.value) === String(props.modelValue));
     return selected ? selected.label : null;
 });
 
 const filteredData = computed(() => {
     const term = search.value.toLowerCase().trim();
-    if (!term) return props.options;
-    return props.options.filter(item => 
-        item.label && item.label.toLowerCase().includes(term)
+    if (!term) return normalizedOptions.value;
+    return normalizedOptions.value.filter(item => 
+        item.label && String(item.label).toLowerCase().includes(term)
     );
 });
 

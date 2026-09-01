@@ -6,12 +6,16 @@
       class="w-full flex items-center justify-between transition-all cursor-pointer focus:outline-none"
       :class="[
         variant === 'standard' 
-          ? 'px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 text-base' 
+          ? 'bg-white border-2 border-gray-100 rounded-2xl shadow-sm pl-5 pr-12 py-4 text-left sm:text-base' 
           : 'pl-4 pr-10 py-2.5 text-xs bg-transparent font-bold text-gray-600 rounded-2xl border-none',
-        isOpen ? (variant === 'standard' ? 'ring-2 ring-blue-500 border-blue-500' : 'bg-white shadow-sm ring-2 ring-blue-500/20') : (variant === 'standard' ? '' : 'hover:bg-gray-50/50')
+        isOpen ? (variant === 'standard' ? 'border-blue-500 ring-4 ring-blue-500/10' : 'bg-white shadow-sm ring-2 ring-blue-500/20') : (variant === 'standard' ? '' : 'hover:bg-gray-50/50')
       ]"
     >
-      <span :class="modelValue ? 'text-gray-700' : 'text-gray-400'">
+      <span :class="[
+        variant === 'standard' 
+          ? (modelValue ? 'text-gray-900 font-bold' : 'text-gray-400 font-medium')
+          : (modelValue ? 'text-gray-700' : 'text-gray-400')
+      ]">
         {{ formattedDate || placeholder }}
       </span>
     </div>
