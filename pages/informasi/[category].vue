@@ -520,6 +520,16 @@ const getEditLink = (item) => {
 const queryClient = useQueryClient()
 const alertMessage = ref('')
 const alertType = ref('success')
+let alertTimer = null
+
+watch(alertMessage, (newVal) => {
+  if (newVal) {
+    if (alertTimer) clearTimeout(alertTimer)
+    alertTimer = setTimeout(() => {
+      alertMessage.value = ''
+    }, 5000)
+  }
+})
 
 onMounted(() => {
   if (route.query.deleted || route.query.status === 'deleted') {
