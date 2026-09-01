@@ -33,10 +33,10 @@
         <div class="mt-8 mb-10">
           <form @submit.prevent class="relative">
             <!-- Minimalist Search Bar -->
-            <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl shadow-blue-500/5 border border-white mb-6 relative z-50">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl shadow-blue-500/5 border border-white mb-6 relative z-50">
               
               <!-- Search Input -->
-              <div class="flex-1">
+              <div class="md:col-span-2 lg:col-span-4">
                 <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-4">Pencarian Pintar</label>
                 <div class="bg-gray-50/50 rounded-2xl relative z-50">
                   <CustomInput 
@@ -47,49 +47,53 @@
                 </div>
               </div>
 
-              <!-- Grid Controls -->
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:w-auto relative z-50">
-                <div class="min-w-[140px] relative" style="z-index: 100;">
-                  <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Mulai</label>
-                  <div class="bg-gray-50/50 rounded-2xl">
-                    <CustomDate v-model="filters.date_from" />
-                  </div>
+              <!-- Mulai -->
+              <div class="lg:col-span-2 relative" style="z-index: 100;">
+                <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Mulai</label>
+                <div class="bg-gray-50/50 rounded-2xl">
+                  <CustomDate v-model="filters.date_from" />
                 </div>
-                <div class="min-w-[140px] relative" style="z-index: 100;">
-                  <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Sampai</label>
-                  <div class="bg-gray-50/50 rounded-2xl">
-                    <CustomDate v-model="filters.date_to" />
-                  </div>
+              </div>
+
+              <!-- Sampai -->
+              <div class="lg:col-span-2 relative" style="z-index: 100;">
+                <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Sampai</label>
+                <div class="bg-gray-50/50 rounded-2xl">
+                  <CustomDate v-model="filters.date_to" />
                 </div>
-                <div class="min-w-[120px] relative" style="z-index: 100;">
-                  <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Urutan</label>
-                  <div class="bg-gray-50/50 rounded-2xl">
-                    <CustomSelect 
-                      v-model="filters.sort"
-                      :options="[
-                        { value: 'created_at_desc', label: 'Waktu Sistem (Terbaru)' },
-                        { value: 'tanggal_upload_desc', label: 'Tgl Dokumen (Terbaru)' },
-                        { value: 'tanggal_upload_asc', label: 'Tgl Dokumen (Terlama)' },
-                        { value: 'title_asc', label: 'Judul (A-Z)' },
-                        { value: 'title_desc', label: 'Judul (Z-A)' }
-                      ]"
-                      :searchable="false"
-                    />
-                  </div>
+              </div>
+
+              <!-- Urutan -->
+              <div class="lg:col-span-2 relative" style="z-index: 100;">
+                <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Urutan</label>
+                <div class="bg-gray-50/50 rounded-2xl">
+                  <CustomSelect 
+                    v-model="filters.sort"
+                    :options="[
+                      { value: 'created_at_desc', label: 'Waktu Sistem (Terbaru)' },
+                      { value: 'tanggal_upload_desc', label: 'Tgl Dokumen (Terbaru)' },
+                      { value: 'tanggal_upload_asc', label: 'Tgl Dokumen (Terlama)' },
+                      { value: 'title_asc', label: 'Judul (A-Z)' },
+                      { value: 'title_desc', label: 'Judul (Z-A)' }
+                    ]"
+                    :searchable="false"
+                  />
                 </div>
-                <div class="min-w-[100px] relative" style="z-index: 90;">
-                  <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Limit</label>
-                  <div class="bg-gray-50/50 rounded-2xl">
-                    <CustomSelect 
-                      v-model="filters.per_page"
-                      :options="[
-                        { value: '10', label: '10 Baris' },
-                        { value: '20', label: '20 Baris' },
-                        { value: '50', label: '50 Baris' }
-                      ]"
-                      :searchable="false"
-                    />
-                  </div>
+              </div>
+
+              <!-- Limit -->
+              <div class="lg:col-span-2 relative" style="z-index: 90;">
+                <label class="block text-[10px] font-black text-blue-900/40 mb-2 uppercase tracking-[0.2em] ml-2">Limit</label>
+                <div class="bg-gray-50/50 rounded-2xl">
+                  <CustomSelect 
+                    v-model="filters.per_page"
+                    :options="[
+                      { value: '10', label: '10 Baris' },
+                      { value: '20', label: '20 Baris' },
+                      { value: '50', label: '50 Baris' }
+                    ]"
+                    :searchable="false"
+                  />
                 </div>
               </div>
             </div>
