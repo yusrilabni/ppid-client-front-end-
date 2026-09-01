@@ -61,7 +61,7 @@
               </div>
 
               <div v-if="isSuperAdmin">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja <span class="text-red-500">*</span></label>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja <span class="text-gray-400 text-xs font-normal ml-1">(Opsional)</span></label>
                 <CustomSelect 
                   v-model="form.target_unit"
                   :options="unitsOptions"
