@@ -113,8 +113,11 @@
                     </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-4 relative z-10">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 relative z-10">
                 <h2 class="text-xl font-bold text-gray-800">Daftar Dokumen</h2>
+                <NuxtLink v-if="isAdmin" to="/admin/informasi-pemkab/create" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-xl transition duration-200 flex items-center justify-center shadow-md">
+                    <i class="fas fa-plus mr-2"></i> Tambah Informasi Pemkab
+                </NuxtLink>
             </div>
 
             <!-- Daftar Dokumen -->
@@ -139,7 +142,7 @@
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-40">Kategori</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-40">Sumber</th>
                                     <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-28 text-center">Tanggal</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-32 text-center">Aksi</th>
+                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase min-w-[140px] text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100/50">
@@ -193,7 +196,7 @@
                                             {{ formatDate(dokumen.published_at || dokumen.created_at) }}
                                         </span>
                                     </td>
-                                    <td class="py-4 px-6 text-center align-middle w-48">
+                                    <td class="py-4 px-6 text-center align-middle">
                                         <div class="flex items-center justify-center space-x-2">
                                             <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
@@ -201,6 +204,14 @@
                                             <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Unduh">
                                                 <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i>
                                             </a>
+                                            <template v-if="isAdmin && canEditOrDelete(dokumen)">
+                                                <NuxtLink :to="`/admin/informasi-pemkab/${dokumen.id}/edit`" class="inline-flex items-center justify-center w-9 h-9 bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </NuxtLink>
+                                                <button @click="deleteItem(dokumen)" class="inline-flex items-center justify-center w-9 h-9 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Hapus">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </template>
                                         </div>
                                     </td>
                                 </tr>
@@ -298,12 +309,44 @@ import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 import { ref, computed, watch } from 'vue'
 
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import api, { getStorageUrl, getAssetUrl } from '@/services/api'
 import CustomSelect from '@/components/CustomSelect.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
+const queryClient = useQueryClient()
+
+const isAdmin = computed(() => authStore.isAuthenticated && (authStore.isAdmin || authStore.user?.unit_id))
+
+const canEditOrDelete = (dokumen) => {
+  if (!authStore.isAuthenticated) return false
+  if (authStore.isSuperAdmin) return true
+  const userUnitId = authStore.user?.unit_id || authStore.user?.organization_id
+  if (!userUnitId) return false
+  return String(dokumen.unit_id) === String(userUnitId) || String(dokumen.organization_id) === String(userUnitId)
+}
+
+const deleteItem = async (dokumen) => {
+  if (!canEditOrDelete(dokumen)) {
+    alert('Akses ditolak. Anda hanya dapat menghapus dokumen unit Anda sendiri.')
+    return
+  }
+  if (confirm(`Apakah Anda yakin ingin menghapus dokumen "${dokumen.judul}"?`)) {
+    try {
+      const res = await api.delete('/informasi-pemkab-crud/' + dokumen.id)
+      if (res.data?.success || res.status === 200) {
+        alert(`Dokumen "${dokumen.judul}" berhasil dihapus.`)
+        queryClient.invalidateQueries({ queryKey: ['informasi-pemkab'] })
+      }
+    } catch (error) {
+      console.error('Failed to delete item:', error)
+      alert('Gagal menghapus dokumen: ' + (error.response?.data?.message || error.message))
+    }
+  }
+}
 
 // OG meta dinamis berbasis filter aktif
 const pageTitle = computed(() => {
