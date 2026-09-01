@@ -371,14 +371,48 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
+/* Fade transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
+
+/* Widget container */
+.acc-widget-container { font-family: 'Inter', sans-serif !important; font-size: 16px !important; box-sizing: border-box !important; }
+.acc-menu-panel { display: flex; flex-direction: column; }
+
+/* Grid buttons */
+.acc-grid-btn { background: white !important; color: #374151 !important; border: 1px solid #E5E7EB !important; border-radius: 16px !important; padding: 16px 10px !important; cursor: pointer !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: flex-start !important; text-align: center !important; min-height: 145px !important; width: 100% !important; position: relative !important; transition: all 0.2s !important; }
+.acc-grid-btn:hover { background: #F3F4F6 !important; }
+.acc-grid-btn.active { border: 2px solid #0052FF !important; }
+
+/* Check icon (sudut kanan atas saat aktif) */
+.acc-check-icon { position: absolute !important; top: 10px !important; right: 10px !important; color: #0052FF !important; font-size: 14px !important; margin: 0 !important; }
+
+/* Icon area */
+.acc-icon-wrapper { height: 50px !important; display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 12px !important; width: 100% !important; margin-top: 5px !important; }
+.acc-icon-wrapper i, .acc-icon-wrapper svg { font-size: 32px !important; width: 32px !important; height: 32px !important; line-height: 1 !important; color: #374151 !important; fill: #374151 !important; }
+
+/* Label teks */
+.acc-text-wrapper { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; flex-grow: 1 !important; width: 100% !important; }
+.acc-text-wrapper span { font-size: 13px !important; font-weight: 700 !important; line-height: 1.2 !important; color: #374151 !important; margin-bottom: 4px !important; }
+.acc-text-wrapper small { font-size: 11px !important; font-weight: 500 !important; opacity: 0.7 !important; color: #6B7280 !important; margin: 0 !important; line-height: 1.2 !important; }
+
+/* Progress dots */
+.acc-dot-container { display: flex !important; gap: 4px !important; height: 4px !important; justify-content: center !important; align-items: center !important; width: 100% !important; margin-top: 10px !important; }
+.acc-dot { height: 4px !important; border-radius: 2px !important; display: block !important; }
+
+/* Mobile: panel full-screen dari kiri */
+@media (max-width: 1023px) {
+  .acc-menu-panel { position: fixed !important; top: 0 !important; left: 0 !important; bottom: 0 !important; width: 300px !important; max-width: 85vw !important; height: 100vh !important; border-radius: 0 !important; box-shadow: 10px 0 25px rgba(0,0,0,0.2) !important; z-index: 100002 !important; }
+}
+
+/* Reading mask (mode fokus) */
+.acc-reading-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999998; background: rgba(0,0,0,0.85); display: none; }
+body.acc-focus-mask .acc-reading-mask { display: block !important; }
 </style>
