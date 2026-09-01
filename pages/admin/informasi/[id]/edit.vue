@@ -191,10 +191,6 @@ import PedomanModal from '@/components/PedomanModal.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
 import CustomDate from '@/components/CustomDate.vue'
 
-definePageMeta({
-  middleware: ['auth']
-})
-
 const route = useRoute()
 const router = useRouter()
 const informasiId = route.params.id
