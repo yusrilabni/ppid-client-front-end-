@@ -301,6 +301,7 @@ const generateAI = async () => {
     const res = await api.post('/ai-settings/generate', { prompt: form.value.title })
     if (res.data.success && res.data.data) {
       const generatedData = res.data.data
+      form.value.title = generatedData.title || form.value.title
       form.value.doc_desc = generatedData.doc_desc || form.value.doc_desc
       form.value.doc_content = generatedData.doc_content || form.value.doc_content
       form.value.jenis_dokumen = generatedData.jenis_dokumen || form.value.jenis_dokumen
@@ -366,7 +367,7 @@ const submitForm = async () => {
       if (!form.value.file_url) {
         throw new Error('Silakan masukkan URL file.')
       }
-      formData.append('file_url', form.value.file_url)
+      formData.append('url', form.value.file_url)
     }
 
     if (!isSuperAdmin.value) {
