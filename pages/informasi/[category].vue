@@ -210,10 +210,10 @@
                           <i class="fas fa-download text-sm"></i>
                         </a>
                         <template v-if="isAdmin">
-                          <a :href="`${api.defaults.baseURL.replace('/api/v1', '')}/admin/informasi/${item.id}/edit`" target="_blank" class="w-9 h-9 flex items-center justify-center bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm" title="Edit">
+                          <a :href="getEditLink(item)" target="_blank" class="w-9 h-9 flex items-center justify-center bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm" title="Edit">
                             <i class="fas fa-edit text-sm"></i>
                           </a>
-                          <button @click="deleteItem(item)" class="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Hapus">
+                          <button @click.prevent="deleteItem(item)" class="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Hapus">
                             <i class="fas fa-trash text-sm"></i>
                           </button>
                         </template>
@@ -278,10 +278,10 @@
                     <i class="fas fa-download text-sm"></i>
                   </a>
                   <template v-if="isAdmin">
-                    <a :href="`${api.defaults.baseURL.replace('/api/v1', '')}/admin/informasi/${item.id}/edit`" target="_blank" class="w-10 flex-shrink-0 bg-amber-50 text-amber-600 flex items-center justify-center rounded-xl hover:bg-amber-600 hover:text-white transition-colors" title="Edit">
+                    <a :href="getEditLink(item)" target="_blank" class="w-10 flex-shrink-0 bg-amber-50 text-amber-600 flex items-center justify-center rounded-xl hover:bg-amber-600 hover:text-white transition-colors" title="Edit">
                       <i class="fas fa-edit text-sm"></i>
                     </a>
-                    <button @click="deleteItem(item)" class="w-10 flex-shrink-0 bg-red-50 text-red-600 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-colors" title="Hapus">
+                    <button @click.prevent="deleteItem(item)" class="w-10 flex-shrink-0 bg-red-50 text-red-600 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-colors" title="Hapus">
                       <i class="fas fa-trash text-sm"></i>
                     </button>
                   </template>
@@ -499,6 +499,11 @@ const getDetailLink = (item) => {
     return `/informasi/detail/${item.slug || item.id}`
   }
   return `/informasi/detail/${item.slug || item.id}`
+}
+
+const getEditLink = (item) => {
+  const baseUrl = api.defaults.baseURL ? api.defaults.baseURL.replace('/api/v1', '') : 'https://ppidkab.sinjaikab.go.id'
+  return `${baseUrl}/admin/informasi/${item.id}/edit`
 }
 
 const queryClient = useQueryClient()
