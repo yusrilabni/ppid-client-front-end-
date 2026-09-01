@@ -17,6 +17,18 @@
           </NuxtLink>
         </div>
 
+        <!-- Alert Notification Banner -->
+        <div v-if="alertMessage" class="mt-4 p-4 rounded-2xl border flex items-center justify-between shadow-sm transition-all duration-300"
+             :class="alertType === 'danger' || alertType === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700'">
+          <div class="flex items-center gap-3">
+            <i :class="alertType === 'danger' || alertType === 'error' ? 'fas fa-exclamation-circle text-red-500 text-lg' : 'fas fa-check-circle text-green-500 text-lg'"></i>
+            <span class="text-sm font-semibold">{{ alertMessage }}</span>
+          </div>
+          <button @click="alertMessage = ''" class="text-xs font-bold uppercase tracking-wider opacity-70 hover:opacity-100">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
         <!-- Search and Filter Controls -->
         <div class="mt-8 mb-10">
           <form @submit.prevent class="relative">
@@ -506,18 +518,32 @@ const getEditLink = (item) => {
 }
 
 const queryClient = useQueryClient()
+const alertMessage = ref('')
+const alertType = ref('success')
+
+onMounted(() => {
+  if (route.query.deleted || route.query.status === 'deleted') {
+    alertMessage.value = route.query.message || 'Dokumen berhasil dihapus.'
+    alertType.value = 'danger'
+  } else if (route.query.success || route.query.message) {
+    alertMessage.value = route.query.message || 'Berhasil menyimpan data.'
+    alertType.value = 'success'
+  }
+})
 
 const deleteItem = async (item) => {
   if (confirm(`Apakah Anda yakin ingin menghapus dokumen "${item.title}"?`)) {
     try {
       const res = await api.delete('/informasi-crud/' + item.id)
       if (res.data?.success || res.status === 200) {
-        alert('Dokumen berhasil dihapus.')
+        alertMessage.value = `Dokumen "${item.title}" berhasil dihapus.`
+        alertType.value = 'danger'
         queryClient.invalidateQueries({ queryKey: ['informasi', category.value] })
       }
     } catch (error) {
       console.error('Failed to delete item:', error)
-      alert('Gagal menghapus dokumen: ' + (error.response?.data?.message || error.message || 'Error tidak diketahui'))
+      alertMessage.value = 'Gagal menghapus dokumen: ' + (error.response?.data?.message || error.message || 'Error tidak diketahui')
+      alertType.value = 'danger'
     }
   }
 }

@@ -424,7 +424,7 @@ const submitForm = async () => {
     if (res.data?.success || res.status === 200) {
       success.value = res.data?.message || 'Informasi berhasil diperbarui.'
       setTimeout(() => {
-        router.push(categorySlug.value ? `/informasi/${categorySlug.value}` : '/admin')
+        router.push(categorySlug.value ? `/informasi/${categorySlug.value}?message=${encodeURIComponent(success.value)}` : '/admin')
       }, 1500)
     }
   } catch (err) {

@@ -487,7 +487,7 @@ const submitForm = async () => {
     if (res.data.success || res.status === 200 || res.status === 201) {
       success.value = 'Informasi berhasil ditambahkan.'
       setTimeout(() => {
-        router.push(categorySlug.value ? `/informasi/${categorySlug.value}` : '/admin')
+        router.push(categorySlug.value ? `/informasi/${categorySlug.value}?message=${encodeURIComponent('Informasi berhasil ditambahkan.')}` : '/admin')
       }, 1500)
     }
   } catch (err) {
