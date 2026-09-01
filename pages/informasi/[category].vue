@@ -222,10 +222,10 @@
                           <i class="fas fa-download text-sm"></i>
                         </a>
                         <template v-if="isAdmin">
-                          <NuxtLink :to="getEditLink(item)" class="w-9 h-9 flex items-center justify-center bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm" title="Edit">
+                          <NuxtLink v-if="canEditOrDelete(item)" :to="getEditLink(item)" class="w-9 h-9 flex items-center justify-center bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm" title="Edit">
                             <i class="fas fa-edit text-sm"></i>
                           </NuxtLink>
-                          <button @click.prevent="deleteItem(item)" class="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Hapus">
+                          <button v-if="canEditOrDelete(item)" @click.prevent="deleteItem(item)" class="w-9 h-9 flex items-center justify-center bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Hapus">
                             <i class="fas fa-trash text-sm"></i>
                           </button>
                         </template>
@@ -290,10 +290,10 @@
                     <i class="fas fa-download text-sm"></i>
                   </a>
                   <template v-if="isAdmin">
-                    <NuxtLink :to="getEditLink(item)" class="w-10 flex-shrink-0 bg-amber-50 text-amber-600 flex items-center justify-center rounded-xl hover:bg-amber-600 hover:text-white transition-colors" title="Edit">
+                    <NuxtLink v-if="canEditOrDelete(item)" :to="getEditLink(item)" class="w-10 flex-shrink-0 bg-amber-50 text-amber-600 flex items-center justify-center rounded-xl hover:bg-amber-600 hover:text-white transition-colors" title="Edit">
                       <i class="fas fa-edit text-sm"></i>
                     </NuxtLink>
-                    <button @click.prevent="deleteItem(item)" class="w-10 flex-shrink-0 bg-red-50 text-red-600 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-colors" title="Hapus">
+                    <button v-if="canEditOrDelete(item)" @click.prevent="deleteItem(item)" class="w-10 flex-shrink-0 bg-red-50 text-red-600 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-colors" title="Hapus">
                       <i class="fas fa-trash text-sm"></i>
                     </button>
                   </template>
@@ -386,7 +386,7 @@ const filters = reactive({
   sort: 'created_at_desc',
   per_page: '10',
   unit_id: '',
-  filter_unit: '1',
+  filter_unit: '0',
   page: 1
 })
 
@@ -478,7 +478,7 @@ const resetFilters = () => {
   filters.sort = 'created_at_desc'
   filters.per_page = '10'
   filters.unit_id = ''
-  filters.filter_unit = '1'
+  filters.filter_unit = '0'
   filters.page = 1
 }
 
@@ -517,6 +517,15 @@ const getEditLink = (item) => {
   return `/admin/informasi/${item.id}/edit`
 }
 
+const canEditOrDelete = (item) => {
+  if (!authStore.isAuthenticated) return false
+  if (authStore.isSuperAdmin) return true
+  // Regular Admin can only edit/delete items that match their unit_id
+  const userUnitId = authStore.user?.unit_id || authStore.user?.organization_id
+  if (!userUnitId) return false
+  return String(item.unit_id) === String(userUnitId)
+}
+
 const queryClient = useQueryClient()
 const alertMessage = ref('')
 const alertType = ref('success')
@@ -542,6 +551,11 @@ onMounted(() => {
 })
 
 const deleteItem = async (item) => {
+  if (!canEditOrDelete(item)) {
+    alertMessage.value = 'Anda hanya dapat menghapus dokumen milik unit kerja Anda sendiri.'
+    alertType.value = 'danger'
+    return
+  }
   if (confirm(`Apakah Anda yakin ingin menghapus dokumen "${item.title}"?`)) {
     try {
       const res = await api.delete('/informasi-crud/' + item.id)
