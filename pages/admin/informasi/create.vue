@@ -1,13 +1,7 @@
 <template>
   <div class="container mx-auto py-8 px-4">
     <div class="max-w-4xl mx-auto">
-      <div class="mb-6 flex items-center space-x-2 text-sm text-gray-500">
-        <NuxtLink to="/" class="hover:text-blue-600"><i class="fas fa-home"></i> Beranda</NuxtLink>
-        <span>/</span>
-        <NuxtLink v-if="selectedCategory" :to="`/informasi/${categorySlug}`" class="hover:text-blue-600"><i class="fas fa-file-alt"></i> {{ selectedCategory }}</NuxtLink>
-        <span v-if="selectedCategory">/</span>
-        <span class="text-gray-800 font-medium"><i class="fas fa-plus-circle"></i> Tambah Informasi</span>
-      </div>
+      <Breadcrumbs :breadcrumbs="breadcrumbItems" />
 
       <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white flex justify-between items-center">
@@ -57,19 +51,23 @@
               </div>
 
               <div>
-                <label for="category" class="block text-gray-700 text-sm font-semibold mb-2">Kategori Informasi <span class="text-red-500">*</span></label>
-                <select v-model="form.category" id="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" required>
-                  <option value="">Pilih Kategori</option>
-                  <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-                </select>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Kategori Informasi <span class="text-red-500">*</span></label>
+                <CustomSelect 
+                  v-model="form.category"
+                  :options="categoriesOptions"
+                  placeholder="Pilih Kategori"
+                  :shouldShowSearch="false"
+                />
               </div>
 
               <div v-if="isSuperAdmin">
-                <label for="target_unit" class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja <span class="text-red-500">*</span></label>
-                <select v-model="form.target_unit" id="target_unit" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" required>
-                  <option value="">Pilih Unit Kerja</option>
-                  <option v-for="unit in units" :key="unit.id" :value="unit.id">{{ unit.name }}</option>
-                </select>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja <span class="text-red-500">*</span></label>
+                <CustomSelect 
+                  v-model="form.target_unit"
+                  :options="unitsOptions"
+                  placeholder="Pilih Unit Kerja"
+                  :shouldShowSearch="true"
+                />
               </div>
               <div v-else>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Unit Kerja</label>
@@ -77,11 +75,13 @@
               </div>
 
               <div>
-                <label for="jenis_dokumen" class="block text-gray-700 text-sm font-semibold mb-2">Jenis Dokumen <span class="text-red-500">*</span></label>
-                <select v-model="form.jenis_dokumen" id="jenis_dokumen" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" required>
-                  <option value="">Pilih Jenis Dokumen</option>
-                  <option v-for="jenis in jenisDokumenOptions" :key="jenis.value" :value="jenis.value">{{ jenis.label }}</option>
-                </select>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Jenis Dokumen <span class="text-red-500">*</span></label>
+                <CustomSelect 
+                  v-model="form.jenis_dokumen"
+                  :options="jenisDokumenOptions"
+                  placeholder="Pilih Jenis Dokumen"
+                  :shouldShowSearch="true"
+                />
                 <div class="mt-2 text-xs text-blue-600 font-medium italic min-h-[1rem]">{{ selectedJenisDesc }}</div>
               </div>
 
@@ -169,6 +169,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import CustomSelect from '@/components/CustomSelect.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -188,11 +190,22 @@ const categorySlug = computed(() => {
   return ''
 })
 
-const categories = [
-  'Informasi Berkala',
-  'Informasi Setiap Saat',
-  'Informasi Serta Merta',
-  'Informasi Dikecualikan'
+const breadcrumbItems = computed(() => {
+  const items = [
+    { title: 'Beranda', url: '/', icon: 'fas fa-home' }
+  ]
+  if (selectedCategory.value) {
+    items.push({ title: selectedCategory.value, url: `/informasi/${categorySlug.value}`, icon: 'fas fa-file-alt' })
+  }
+  items.push({ title: 'Tambah Informasi', url: null, icon: 'fas fa-plus-circle' })
+  return items
+})
+
+const categoriesOptions = [
+  { value: 'Informasi Berkala', label: 'Informasi Berkala' },
+  { value: 'Informasi Setiap Saat', label: 'Informasi Setiap Saat' },
+  { value: 'Informasi Serta Merta', label: 'Informasi Serta Merta' },
+  { value: 'Informasi Dikecualikan', label: 'Informasi Dikecualikan' }
 ]
 
 const jenisDokumenOptions = [
@@ -232,8 +245,14 @@ const selectedJenisDesc = computed(() => {
 })
 
 const units = ref([])
-const isSuperAdmin = ref(true) // Should be fetched from auth context
-const userUnitName = ref('Unit Kerja Anda') // Should be fetched from auth context
+const unitsOptions = computed(() => {
+  return units.value.map(unit => ({
+    value: unit.id,
+    label: unit.name
+  }))
+})
+const isSuperAdmin = ref(true) // Will be updated from auth context
+const userUnitName = ref('Unit Kerja Anda') // Will be updated from auth context
 const userUnitId = ref('') 
 
 const fileInput = ref(null)
@@ -308,7 +327,7 @@ onMounted(() => {
   if (userStr) {
     try {
       const user = JSON.parse(userStr)
-      isSuperAdmin.value = user.role === 'superadmin' || user.role === 'admin'
+      isSuperAdmin.value = user.role === 'superadmin'
       if (!isSuperAdmin.value) {
         userUnitName.value = user.unit?.name || user.organization?.name || 'Unit Kerja'
         userUnitId.value = user.unit_id || user.organization_id || ''
