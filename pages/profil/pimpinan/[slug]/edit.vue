@@ -59,26 +59,60 @@
                 </select>
               </div>
               <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">NIP</label>
+                <input v-model="form.nip" type="text" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500" placeholder="19XXXXXXXXXXXXXX">
+              </div>
+              <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status Jabatan</label>
                 <select v-model="form.status_jabatan" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
                   <option value="">-- Pilih Status Jabatan --</option>
                   <option v-for="s in statusJabatanOptions" :key="s" :value="s">{{ s }}</option>
                 </select>
               </div>
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">NIP</label>
-                <input v-model="form.nip" type="text" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500" placeholder="19XXXXXXXXXXXXXX">
-              </div>
               <div v-show="showOrganizationField" class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">OPD / Organisasi</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unit Kerja / OPD <span class="text-red-500">*</span></label>
                 <select v-model="form.organization_id" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
                   <option value="">-- Pilih OPD --</option>
                   <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.name }}</option>
                 </select>
               </div>
               <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Agama</label>
+                <select v-model="form.religion" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
+                  <option value="">-- Pilih Agama --</option>
+                  <option v-for="a in agamaOptions" :key="a" :value="a">{{ a }}</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tempat Lahir</label>
+                <input v-model="form.birth_place" type="text" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tanggal Lahir</label>
+                <input v-model="form.birth_date" type="date" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status Pernikahan</label>
+                <select v-model="form.marital_status" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
+                  <option value="">-- Pilih --</option>
+                  <option v-for="m in maritalOptions" :key="m" :value="m">{{ m }}</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Jenis Kelamin</label>
+                <select v-model="form.jenis_kelamin" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
+                  <option value="">-- Pilih --</option>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </div>
+              <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Alamat Email</label>
                 <input v-model="form.email" type="email" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500" placeholder="nama@email.com">
+              </div>
+              <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Alamat Rumah</label>
+                <input v-model="form.home_address" type="text" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
               </div>
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Mulai Masa Jabatan</label>
@@ -89,7 +123,7 @@
                 <input v-model="form.end_term" type="date" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
               </div>
               <div class="md:col-span-2 space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status Aktif <span class="text-red-500">*</span></label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status Publikasi <span class="text-red-500">*</span></label>
                 <div class="flex gap-4">
                   <label v-for="(lbl, val) in statusOptions" :key="val"
                     class="flex-1 flex items-center justify-center px-4 py-3 border rounded-xl cursor-pointer transition-all"
@@ -102,60 +136,27 @@
             </div>
           </div>
 
-          <!-- TAB: BIODATA -->
+          <!-- TAB: BIODATA & BIOGRAFI -->
           <div v-show="activeTab === 'biodata'" class="space-y-6 animate-fadeIn">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 gap-8">
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tempat Lahir</label>
-                <input v-model="form.birth_place" type="text" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
-              </div>
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tanggal Lahir</label>
-                <input v-model="form.birth_date" type="date" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
-              </div>
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Agama</label>
-                <select v-model="form.religion" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
-                  <option value="">-- Pilih Agama --</option>
-                  <option v-for="a in agamaOptions" :key="a" :value="a">{{ a }}</option>
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Jenis Kelamin</label>
-                <select v-model="form.jenis_kelamin" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
-                  <option value="">-- Pilih --</option>
-                  <option value="Laki-laki">Laki-laki</option>
-                  <option value="Perempuan">Perempuan</option>
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status Pernikahan</label>
-                <select v-model="form.marital_status" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
-                  <option value="">-- Pilih --</option>
-                  <option v-for="m in maritalOptions" :key="m" :value="m">{{ m }}</option>
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Alamat Domisili</label>
-                <input v-model="form.home_address" type="text" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
-              </div>
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Pasangan (Suami/Istri)</label>
-                <input v-model="form.spouse_name" type="text" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
-              </div>
-              <div class="md:col-span-2 space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Biografi Singkat</label>
-                <textarea v-model="form.biography" rows="6" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500" placeholder="Tuliskan biografi lengkap pimpinan di sini..."></textarea>
+                <textarea v-model="form.biography" rows="12" class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 leading-relaxed" placeholder="Tuliskan biografi lengkap pimpinan di sini..."></textarea>
               </div>
             </div>
           </div>
 
           <!-- TAB: KELUARGA -->
           <div v-show="activeTab === 'keluarga'" class="space-y-6 animate-fadeIn">
+            <div class="mb-6 space-y-2">
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Pasangan (Suami/Istri)</label>
+              <input v-model="form.spouse_name" type="text" class="w-full md:w-1/2 px-5 py-4 rounded-2xl bg-gray-50 border-none font-bold text-gray-800 focus:ring-2 focus:ring-blue-500">
+            </div>
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-xl font-black text-gray-800 tracking-tight">Data Anak</h3>
               <button type="button" @click="addItem('children', { name: '', birth_place: '', birth_date: '' })" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-xs font-black uppercase shadow-sm">Tambah Anak</button>
             </div>
+
             <div v-for="(child, index) in form.children" :key="index" class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm mb-4">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div><label class="text-[9px] font-black text-gray-400 uppercase">Nama Anak</label><input v-model="child.name" type="text" class="w-full mt-1 px-4 py-3 rounded-xl bg-gray-50 border-none font-bold"></div>
@@ -312,7 +313,7 @@ const showOrganizationField = computed(() => {
 const activeTab = ref('identitas')
 const tabs = [
   { id: 'identitas', name: 'Identitas', icon: 'fas fa-id-card' },
-  { id: 'biodata', name: 'Biodata', icon: 'fas fa-user-circle' },
+  { id: 'biodata', name: 'Biografi', icon: 'fas fa-book' },
   { id: 'keluarga', name: 'Keluarga', icon: 'fas fa-users' },
   { id: 'pendidikan', name: 'Pendidikan', icon: 'fas fa-graduation-cap' },
   { id: 'karir', name: 'Karir', icon: 'fas fa-briefcase' },
