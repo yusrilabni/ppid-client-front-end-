@@ -86,8 +86,13 @@
               </div>
 
               <div>
-                <label for="tahun" class="block text-gray-700 text-sm font-semibold mb-2">Tahun Dokumen <span class="text-red-500">*</span></label>
-                <input v-model="form.tahun" type="date" id="tahun" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" required>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Tahun Dokumen <span class="text-red-500">*</span></label>
+                <div class="border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition duration-200 w-full h-[48px] flex items-center bg-white">
+                  <CustomDate 
+                    v-model="form.tahun" 
+                    placeholder="Pilih Tanggal Dokumen" 
+                  />
+                </div>
               </div>
 
               <div class="md:col-span-2">
@@ -171,6 +176,7 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
+import CustomDate from '@/components/CustomDate.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -293,11 +299,12 @@ const generateAI = async () => {
   }
   generatingAI.value = true
   try {
-    const res = await api.post('/ai/generate-informasi', { title: form.value.title })
-    if (res.data.success) {
-      form.value.doc_desc = res.data.doc_desc || form.value.doc_desc
-      form.value.doc_content = res.data.doc_content || form.value.doc_content
-      form.value.jenis_dokumen = res.data.jenis_dokumen || form.value.jenis_dokumen
+    const res = await api.post('/ai-settings/generate', { prompt: form.value.title })
+    if (res.data.success && res.data.data) {
+      const generatedData = res.data.data
+      form.value.doc_desc = generatedData.doc_desc || form.value.doc_desc
+      form.value.doc_content = generatedData.doc_content || form.value.doc_content
+      form.value.jenis_dokumen = generatedData.jenis_dokumen || form.value.jenis_dokumen
     }
   } catch (err) {
     console.error('AI Generation error', err)
