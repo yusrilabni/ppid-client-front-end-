@@ -185,6 +185,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import PedomanModal from '@/components/PedomanModal.vue'
@@ -369,16 +370,25 @@ const fetchInformasi = async () => {
 onMounted(() => {
   fetchUnits()
   fetchInformasi()
-  const userStr = localStorage.getItem('user') || localStorage.getItem('auth.user')
-  if (userStr) {
-    try {
-      const user = JSON.parse(userStr)
-      isSuperAdmin.value = user.role === 'superadmin'
-      if (!isSuperAdmin.value) {
-        userUnitName.value = user.unit?.name || user.organization?.name || 'Unit Kerja'
-        userUnitId.value = user.unit_id || user.organization_id || ''
-      }
-    } catch (e) { }
+  const authStore = useAuthStore()
+  if (authStore.user) {
+    isSuperAdmin.value = authStore.isSuperAdmin
+    if (!isSuperAdmin.value) {
+      userUnitName.value = authStore.user.unit?.name || authStore.user.organization?.name || 'Unit Kerja'
+      userUnitId.value = authStore.user.unit_id || authStore.user.organization_id || ''
+    }
+  } else {
+    const userStr = localStorage.getItem('user') || localStorage.getItem('auth.user')
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr)
+        isSuperAdmin.value = user.role === 'superadmin' || user.is_superadmin === 1
+        if (!isSuperAdmin.value) {
+          userUnitName.value = user.unit?.name || user.organization?.name || 'Unit Kerja'
+          userUnitId.value = user.unit_id || user.organization_id || ''
+        }
+      } catch (e) { }
+    }
   }
 })
 
