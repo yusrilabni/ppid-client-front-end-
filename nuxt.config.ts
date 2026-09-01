@@ -7,6 +7,9 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
   ],
+  routeRules: {
+    '/v2/**': { redirect: { to: '/', statusCode: 301 } }
+  },
   css: [
     '~/assets/css/index.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
