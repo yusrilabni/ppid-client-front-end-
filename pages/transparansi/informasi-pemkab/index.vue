@@ -36,6 +36,26 @@
 
     <div class="bg-gray-50 pb-16">
         <div class="container max-w-6xl mx-auto px-4 -mt-8 relative z-20">
+            <!-- Notifikasi -->
+            <div v-if="notification.message" 
+                 :class="[
+                   'mb-6 px-6 py-4 rounded-2xl shadow-sm flex items-start backdrop-blur-sm relative z-50 border',
+                   notification.type === 'red' ? 'bg-red-50/90 border-red-200 text-red-700' : 'bg-green-50/90 border-green-200 text-green-700'
+                 ]">
+                <div class="flex-shrink-0 mt-0.5">
+                    <i :class="notification.type === 'red' ? 'fas fa-exclamation-circle text-red-500 text-xl' : 'fas fa-check-circle text-green-500 text-xl'"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-sm font-bold" :class="notification.type === 'red' ? 'text-red-800' : 'text-green-800'">
+                        {{ notification.type === 'red' ? 'Perhatian' : 'Berhasil' }}
+                    </h3>
+                    <p class="mt-1 text-sm">{{ notification.message }}</p>
+                </div>
+                <button @click="notification.message = ''" class="ml-auto pl-3 text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
             <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl shadow-blue-500/5 border border-white mb-6 relative z-50">
                     <div class="flex-1 relative" style="z-index: 50;">
                         <label class="block text-sm font-semibold text-gray-700 mb-2 ml-2">
@@ -329,21 +349,23 @@ const canEditOrDelete = (dokumen) => {
   return String(dokumen.unit_id) === String(userUnitId) || String(dokumen.organization_id) === String(userUnitId)
 }
 
+const notification = ref({ type: '', message: '' })
+
 const deleteItem = async (dokumen) => {
   if (!canEditOrDelete(dokumen)) {
-    alert('Akses ditolak. Anda hanya dapat menghapus dokumen unit Anda sendiri.')
+    notification.value = { type: 'red', message: 'Akses ditolak. Anda hanya dapat menghapus dokumen unit Anda sendiri.' }
     return
   }
   if (confirm(`Apakah Anda yakin ingin menghapus dokumen "${dokumen.judul}"?`)) {
     try {
       const res = await api.delete('/informasi-pemkab-crud/' + dokumen.id)
       if (res.data?.success || res.status === 200) {
-        alert(`Dokumen "${dokumen.judul}" berhasil dihapus.`)
+        notification.value = { type: 'red', message: `Dokumen "${dokumen.judul}" berhasil dihapus.` }
         queryClient.invalidateQueries({ queryKey: ['informasi-pemkab'] })
       }
     } catch (error) {
       console.error('Failed to delete item:', error)
-      alert('Gagal menghapus dokumen: ' + (error.response?.data?.message || error.message))
+      notification.value = { type: 'red', message: 'Gagal menghapus dokumen: ' + (error.response?.data?.message || error.message) }
     }
   }
 }
@@ -544,6 +566,21 @@ onMounted(() => {
     search: route.query.search || '',
     per_page: route.query.per_page || '10',
     page: route.query.page || 1
+  }
+
+  // Cek notifikasi dari URL (create/edit)
+  if (route.query.message) {
+    notification.value = { type: 'green', message: route.query.message }
+    // Bersihkan URL dari parameter message
+    const query = { ...route.query }
+    delete query.message
+    router.replace({ query })
+  }
+  if (route.query.error) {
+    notification.value = { type: 'red', message: route.query.error }
+    const query = { ...route.query }
+    delete query.error
+    router.replace({ query })
   }
 })
 
