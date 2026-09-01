@@ -95,12 +95,12 @@
             </div>
 
             <!-- Lower Filter Row -->
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-6 px-2 relative z-40">
-              <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6 px-2 relative z-40">
+              <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 w-full lg:w-auto">
                 <!-- ADMIN TOGGLES -->
-                <label v-if="isAdmin && !authStore.isSuperAdmin" class="relative flex items-center cursor-pointer group select-none">
+                <label v-if="isAdmin && !authStore.isSuperAdmin" class="relative flex items-center cursor-pointer group select-none w-full sm:w-auto">
                   <input type="checkbox" v-model="filters.filter_unit" true-value="1" false-value="0" class="sr-only peer">
-                  <div class="px-6 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm transition-all duration-300 flex items-center gap-3 
+                  <div class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm transition-all duration-300 flex items-center justify-center sm:justify-start gap-3 
                       peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-blue-500 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-blue-200 peer-checked:border-transparent
                       hover:border-blue-300 hover:shadow-md active:scale-95
                       peer-checked:[&_.icon-box]:bg-emerald-500 peer-checked:[&_.fa-check]:scale-100 peer-checked:[&_.fa-check]:opacity-100 peer-checked:[&_.fa-check]:text-white peer-checked:[&_.fa-building]:scale-0 peer-checked:[&_.fa-building]:opacity-0">
@@ -116,11 +116,11 @@
                 </label>
 
                 <!-- PUBLIC / REGULAR USER: UNIT FILTER DROPDOWN -->
-                <div v-else class="flex flex-col md:flex-row items-center gap-4 bg-white/50 backdrop-blur-sm p-2 pr-6 rounded-3xl border border-gray-100 shadow-sm w-full lg:w-auto">
-                    <div class="bg-blue-600 text-white px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 flex items-center gap-2 whitespace-nowrap">
+                <div v-else class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 bg-white/50 backdrop-blur-sm p-2 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-sm w-full lg:w-auto">
+                    <div class="bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-2.5 rounded-xl sm:rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 flex items-center justify-center gap-2 whitespace-nowrap">
                         <i class="fas fa-building"></i> Filter Unit
                     </div>
-                    <div class="min-w-[280px] w-full md:w-auto relative z-50">
+                    <div class="w-full sm:min-w-[280px] sm:w-auto relative z-50">
                         <CustomSelect 
                           v-model="filters.unit_id"
                           :options="[{ remote_id: '', name: 'Semua Unit Kerja' }, ...units]"
@@ -132,7 +132,7 @@
                 </div>
               </div>
 
-              <button type="button" @click="resetFilters" class="px-6 py-3 rounded-2xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all duration-300 flex items-center gap-2 lg:ml-auto group border border-transparent hover:border-red-100 shadow-sm">
+              <button type="button" @click="resetFilters" class="w-full lg:w-auto px-6 py-3 rounded-2xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all duration-300 flex items-center justify-center gap-2 group border border-transparent hover:border-red-100 shadow-sm">
                 <i class="fas fa-sync-alt text-[10px] group-hover:rotate-180 transition-transform duration-500"></i>
                 <span class="text-[10px] font-black uppercase tracking-widest">Reset Filter</span>
               </button>
