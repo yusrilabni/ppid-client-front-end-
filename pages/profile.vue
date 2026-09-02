@@ -430,7 +430,7 @@ watch(profileData, (data) => {
   if (data) {
     form.value.nip = data.user?.nip || ''
     form.value.name = data.user?.name || ''
-    form.value.email = data.user?.email || ''
+    form.value.email = (!data.user?.email || data.user?.email === '-') ? '' : data.user.email
     form.value.facebook = data.user?.facebook || ''
     form.value.instagram = data.user?.instagram || ''
     form.value.tiktok = data.user?.tiktok || ''
@@ -486,7 +486,8 @@ const updateProfile = async () => {
     const formData = new FormData()
     formData.append('nip', form.value.nip)
     if (form.value.email_can_update) {
-      formData.append('email', form.value.email)
+      const emailToSend = form.value.email === '-' ? '' : form.value.email;
+      formData.append('email', emailToSend)
     }
     formData.append('name', form.value.name)
     formData.append('facebook', form.value.facebook)
