@@ -159,7 +159,7 @@
                                     <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-32">Kategori</th>
                                     <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Sumber</th>
                                     <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-28 text-center">Tanggal</th>
-                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-44 text-center">Aksi</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-52 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100/50">
@@ -214,7 +214,7 @@
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 text-center align-middle">
-                                        <div class="flex flex-wrap items-center justify-center gap-2">
+                                        <div class="flex flex-nowrap items-center justify-center gap-2">
                                             <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
                                             </NuxtLink>
