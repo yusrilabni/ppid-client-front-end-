@@ -120,8 +120,8 @@ const submitTwibbon = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     
-    alert('Twibbon berhasil ditambahkan!')
-    router.push('/admin/twibbon')
+    // alert('Twibbon berhasil ditambahkan!')
+    router.push({ path: '/admin/twibbon', query: { success: 'created' } })
   } catch (error) {
     console.error('Upload error:', error)
     alert(error.response?.data?.message || 'Gagal menyimpan twibbon')

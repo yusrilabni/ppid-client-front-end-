@@ -1,5 +1,11 @@
 <template>
   <div class="p-6">
+    <!-- Notification Banner -->
+    <div v-if="notification.show" class="mb-6 p-4 rounded-xl flex items-center gap-3 transition-all duration-300 shadow-sm" :class="notification.isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'">
+      <i :class="notification.isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'" class="text-xl"></i>
+      <p class="font-medium">{{ notification.message }}</p>
+    </div>
+
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Manajemen Twibbon</h1>
       <NuxtLink to="/admin/twibbon/create" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-200 shadow-sm flex items-center gap-2">
@@ -62,23 +68,38 @@
 <script setup>
 definePageMeta({ layout: 'admin' })
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { useRuntimeConfig } from '#app'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
 
 const loading = ref(true)
 const twibbons = ref([])
+const notification = ref({ show: false, message: '', isError: false })
+
+const showNotification = (message, isError = false) => {
+  notification.value = { show: true, message, isError }
+  setTimeout(() => {
+    notification.value.show = false
+  }, 5000)
+}
 
 onMounted(() => {
   if (!authStore.isSuperAdmin) {
     router.push('/admin')
     return
   }
+  
+  if (route.query.success === 'created') {
+    showNotification('Twibbon berhasil ditambahkan!')
+    router.replace({ query: {} })
+  }
+  
   fetchTwibbons()
 })
 
@@ -98,11 +119,15 @@ const fetchTwibbons = async () => {
   try {
     loading.value = true
     const res = await api.get('/twibbon')
-    const resData = res.data?.data
-    if (Array.isArray(resData)) {
-      twibbons.value = resData
-    } else if (resData?.data && Array.isArray(resData.data)) {
-      twibbons.value = resData.data
+    
+    // Parse response data robustly
+    const data = res.data
+    if (Array.isArray(data)) {
+      twibbons.value = data
+    } else if (data?.data && Array.isArray(data.data)) {
+      twibbons.value = data.data
+    } else if (data?.data?.data && Array.isArray(data.data.data)) {
+      twibbons.value = data.data.data
     } else {
       twibbons.value = []
     }
@@ -119,8 +144,9 @@ const deleteTwibbon = async (id) => {
   try {
     await api.delete(`/twibbon/${id}`)
     twibbons.value = twibbons.value.filter(t => t.id !== id)
+    showNotification('Twibbon berhasil dihapus!')
   } catch (error) {
-    alert('Gagal menghapus twibbon')
+    showNotification('Gagal menghapus twibbon', true)
   }
 }
 </script>
