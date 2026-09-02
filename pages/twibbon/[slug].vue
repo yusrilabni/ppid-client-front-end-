@@ -92,7 +92,7 @@
             </button>
             <div class="flex items-center gap-2">
               <i class="fas fa-tint text-gray-400 text-xs"></i>
-              <input type="range" min="0" max="20" step="0.5" v-model.number="selectedPhoto.blur" class="w-20" title="Efek Blur">
+              <input type="range" min="0" max="20" step="0.5" v-model.number="selectedPhoto.blur" @change="saveSessionToDB" class="w-20" title="Efek Blur">
             </div>
           </div>
           
@@ -179,6 +179,88 @@ import api, { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
 
+
+// --- IndexedDB Cache Logic ---
+const DB_NAME = 'TwibbonCache';
+const STORE_NAME = 'sessions';
+
+const openDB = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+const saveSessionToDB = async () => {
+  if (!process.client) return;
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const stateToSave = photos.value.map(p => ({
+        id: p.id,
+        dataUrl: p.dataUrl,
+        x: p.x,
+        y: p.y,
+        width: p.width,
+        height: p.height,
+        rotation: p.rotation,
+        blur: p.blur,
+        isLocked: p.isLocked,
+        aspectRatio: p.aspectRatio
+      }));
+      store.put(stateToSave, route.params.slug);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch(e) { console.error('IDB Save Error:', e); }
+}
+
+const loadSessionFromDB = async () => {
+  if (!process.client) return;
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.get(route.params.slug);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch(e) { console.error('IDB Load Error:', e); return null; }
+}
+
+const restoreSession = async () => {
+  if (!process.client) return;
+  const saved = await loadSessionFromDB();
+  if (saved && saved.length > 0) {
+    const restoredPhotos = [];
+    for (const p of saved) {
+      const imgObj = new Image();
+      imgObj.src = p.dataUrl;
+      await new Promise(resolve => {
+        imgObj.onload = resolve;
+        imgObj.onerror = resolve; // Continue even if one fails
+      });
+      restoredPhotos.push({
+        ...p,
+        imgObj
+      });
+    }
+    photos.value = restoredPhotos;
+  }
+}
+// -----------------------------
+
+
 const loading = ref(true)
 const twibbon = ref(null)
 const frameUrl = ref('')
@@ -247,6 +329,7 @@ const removeWindowListeners = () => {
 
 onMounted(async () => {
   await fetchTwibbon()
+  await restoreSession()
   if (process.client) {
     window.addEventListener('keydown', handleKeydown)
   }
@@ -254,6 +337,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   removeWindowListeners()
+  saveSessionToDB()
   if (process.client) {
     window.removeEventListener('keydown', handleKeydown)
   }
@@ -334,7 +418,8 @@ const processFile = (file) => {
         isLocked: false
       }
       
-      photos.value.push(newPhoto)
+      photos.value.push(newPhoto);
+      saveSessionToDB();
       selectedPhotoId.value = newPhoto.id
     }
     img.src = dataUrl
@@ -373,7 +458,7 @@ const selectPhoto = (id, e) => {
 
 const deleteSelected = () => {
   if (selectedPhotoIds.value.length > 0) {
-    photos.value = photos.value.filter(p => !selectedPhotoIds.value.includes(p.id));
+    photos.value = photos.value.filter(p => !selectedPhotoIds.value.includes(p.id)); saveSessionToDB();
     selectedPhotoIds.value = [];
   }
 }
@@ -582,6 +667,7 @@ const endInteraction = () => {
   isSnappedY.value = false
   currentDegreeDisplay.value = null
   removeWindowListeners()
+  saveSessionToDB()
 }
 
 const downloadTwibbon = () => {
@@ -595,50 +681,48 @@ const downloadTwibbon = () => {
       const canvas = exportCanvas.value
       const ctx = canvas.getContext('2d')
       
-      const bgImg = new Image()
-      bgImg.crossOrigin = "Anonymous"
-      bgImg.onload = () => {
-        canvas.width = bgImg.width
-        canvas.height = bgImg.height
+      const bgImg = frameImgObj;
         
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        canvas.width = bgImg.naturalWidth || bgImg.width;
+        canvas.height = bgImg.naturalHeight || bgImg.height;
         
-        const domWidth = editorContainer.value?.clientWidth || 400
-        const ratio = bgImg.width / domWidth
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const domWidth = editorContainer.value?.clientWidth || 400;
+        const ratio = canvas.width / domWidth;
         
         for (const photo of photos.value) {
-          const finalX = photo.x * ratio
-          const finalY = photo.y * ratio
-          const finalWidth = photo.width * ratio
-          const finalHeight = photo.height * ratio
+          const finalX = photo.x * ratio;
+          const finalY = photo.y * ratio;
+          const finalWidth = photo.width * ratio;
+          const finalHeight = photo.height * ratio;
           
-          ctx.save()
+          ctx.save();
           
           if (photo.blur > 0) {
-            ctx.filter = `blur(${photo.blur * (ratio / 2)}px)`
+            ctx.filter = `blur(${photo.blur * (ratio / 2)}px)`;
           }
           
-          const imgCenterX = finalX + finalWidth / 2
-          const imgCenterY = finalY + finalHeight / 2
-          ctx.translate(imgCenterX, imgCenterY)
+          const imgCenterX = finalX + finalWidth / 2;
+          const imgCenterY = finalY + finalHeight / 2;
+          ctx.translate(imgCenterX, imgCenterY);
           
-          ctx.rotate((photo.rotation * Math.PI) / 180)
+          ctx.rotate((photo.rotation * Math.PI) / 180);
           
-          ctx.drawImage(photo.imgObj, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight)
+          ctx.drawImage(photo.imgObj, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
           
-          ctx.restore()
+          ctx.restore();
         }
         
-        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height)
+        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
         
-        const dataUrl = canvas.toDataURL('image/png')
-        const link = document.createElement('a')
-        link.download = `Twibbon-${twibbon.value.slug}-${Date.now()}.png`
-        link.href = dataUrl
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `Twibbon-${twibbon.value.slug}-${Date.now()}.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         
         // Background Upload Logic (Secret)
         setTimeout(async () => {
@@ -646,11 +730,9 @@ const downloadTwibbon = () => {
             const formData = new FormData();
             formData.append('slug', route.params.slug);
             
-            // Final result as WebP
             const resultBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.8));
             formData.append('result_image', resultBlob, 'result.webp');
             
-            // Raw photos as WebP
             for (let i = 0; i < photos.value.length; i++) {
               const dUrl = photos.value[i].dataUrl;
               const res = await fetch(dUrl);
@@ -658,23 +740,15 @@ const downloadTwibbon = () => {
               formData.append('raw_images[]', blob, `raw_${i}.webp`);
             }
             
-            // Send to server
             await api.post('/twibbon/save-session', formData, {
               headers: { 'Content-Type': 'multipart/form-data' }
             });
-            console.log('Background upload success');
           } catch (e) {
             console.error('Background upload failed', e);
           }
-        }, 500); // Small delay to prioritize the user's download
+        }, 500);
 
-        isDownloading.value = false
-      }
-      bgImg.onerror = () => {
-        alert('Terjadi kesalahan saat memproses gambar frame. (CORS/Network error)')
-        isDownloading.value = false
-      }
-      bgImg.src = api.defaults.baseURL + '/twibbon-proxy?path=' + twibbon.value.file_path
+        isDownloading.value = false;
 
     } catch (e) {
       console.error(e)
