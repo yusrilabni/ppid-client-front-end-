@@ -152,9 +152,7 @@ const isActive = (url) => route.path === url || route.path.startsWith(url + '/')
 const hasActiveChild = (children) => children.some(child => isActive(child.url))
 const handleClickOutside = (e) => {
   if (activeSubMenu.value !== null) {
-    if (!e.target.closest('.relative') && !e.target.closest('.absolute')) {
-      activeSubMenu.value = null
-    }
+    activeSubMenu.value = null
   }
 }
 
