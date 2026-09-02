@@ -10,7 +10,7 @@
       </div>
     </div>
     
-    <div class="container mx-auto px-4 max-w-4xl -mt-8">
+    <div class="container mx-auto px-4 max-w-4xl -mt-8 pb-24 md:pb-8">
       <div class="bg-white rounded-2xl shadow-xl p-4 md:p-8 flex flex-col md:flex-row gap-8 items-start">
         
         <!-- Area Editor -->
@@ -106,6 +106,23 @@
         </div>
 
       </div>
+    </div>
+
+    <!-- Sticky Bottom Action Bar for Mobile -->
+    <div v-if="userPhotoData" class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 md:hidden z-50 flex gap-3 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)]">
+      <label for="upload-photo-mobile" class="flex-1 bg-blue-50 border border-blue-200 text-blue-700 font-semibold py-3 px-2 rounded-xl text-center cursor-pointer text-sm flex items-center justify-center">
+        <i class="fas fa-image mr-1"></i> Ganti
+        <input id="upload-photo-mobile" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
+      </label>
+      <button 
+        @click="downloadTwibbon" 
+        :disabled="isDownloading"
+        class="flex-[2] bg-blue-600 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:bg-blue-700 transition flex items-center justify-center gap-2 text-sm"
+      >
+        <i v-if="isDownloading" class="fas fa-spinner fa-spin"></i>
+        <i v-else class="fas fa-download"></i>
+        {{ isDownloading ? 'Tunggu...' : 'Unduh Hasil' }}
+      </button>
     </div>
   </div>
 </template>
