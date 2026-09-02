@@ -10,7 +10,7 @@ const mobileSidebarOpen = ref(false)
 
 const menuItems = computed(() => {
   const items = [
-    { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin' },
+    { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin-dashboard' },
   ]
   if (authStore.isSuperAdmin) {
     items.push({ name: 'Twibbon', icon: 'fas fa-camera-retro', route: 'admin-twibbon' })
