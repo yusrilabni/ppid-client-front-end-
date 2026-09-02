@@ -20,7 +20,7 @@
             <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
           </div>
 
-          <div v-else ref="editorContainer" class="relative w-full max-w-md aspect-square mx-auto bg-gray-200 rounded-xl overflow-hidden shadow-inner checkerboard"
+          <div v-else ref="editorContainer" class="relative w-full aspect-square mx-auto bg-gray-200 rounded-xl overflow-hidden shadow-inner checkerboard"
                :class="{ 'ring-4 ring-blue-500 bg-blue-50': isDragOverCanvas }"
                @mousemove="onDrag" @mouseup="endInteraction" @mouseleave="endInteraction"
                @touchmove="onDrag" @touchend="endInteraction"
@@ -64,7 +64,7 @@
             </div>
           </div>
           
-          <div v-if="userPhotoData" class="w-full max-w-md mt-4 text-center">
+          <div v-if="userPhotoData" class="w-full mt-4 text-center">
              <p class="text-sm text-gray-500"><i class="fas fa-hand-pointer mr-1"></i> Geser foto atau tarik ujung kotak untuk mengubah ukuran</p>
           </div>
         </div>
