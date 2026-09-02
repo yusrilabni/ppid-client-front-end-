@@ -32,7 +32,7 @@
 
     <div v-else class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div v-for="item in twibbons" :key="item.id" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition flex flex-col">
-        <NuxtLink :to="`/admin/twibbon/${item.slug}/edit`" class="block h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center p-4 checkerboard cursor-pointer">
+        <NuxtLink :to="`/admin/twibbon/${item.slug}`" class="block h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center p-4 checkerboard cursor-pointer" title="Buka Editor Twibbon">
           <img :src="getStorageUrl(item.file_path)" :alt="item.judul" class="max-h-full object-contain drop-shadow-md z-10 relative group-hover:scale-105 transition-transform duration-300">
           <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
         </NuxtLink>
