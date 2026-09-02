@@ -412,7 +412,7 @@ const startDrag = (e, targetPhoto) => {
   
   initialGroupStates.clear();
   activePhotos.forEach(p => {
-    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation });
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
   });
 
   if (e.touches && e.touches.length >= 2) {
@@ -463,7 +463,7 @@ const startRotate = (e) => {
   startY = coords.y;
   initialGroupStates.clear();
   activePhotos.forEach(p => {
-    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation });
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
   });
   initialRotation = activePhotos[0].rotation;
   addWindowListeners();
@@ -483,7 +483,7 @@ const onDrag = (e) => {
       if (!state) return;
       let newW = state.width * scale;
       if (newW < 50) newW = 50;
-      const newH = newW / state.aspectRatio;
+      const newH = newW / (state.aspectRatio || (state.width / state.height));
       const dxP = (newW - state.width) / 2;
       const dyP = (newH - state.height) / 2;
       photo.width = newW;
@@ -541,7 +541,7 @@ const onDrag = (e) => {
       if (resizeCorner === 'bl' || resizeCorner === 'tl') newW = state.width - dx;
       if (newW < 50) newW = 50;
       
-      const newH = newW / state.aspectRatio;
+      const newH = newW / (state.aspectRatio || (state.width / state.height));
       
       if (resizeCorner === 'bl' || resizeCorner === 'tl') {
         photo.x = state.x + (state.width - newW);
