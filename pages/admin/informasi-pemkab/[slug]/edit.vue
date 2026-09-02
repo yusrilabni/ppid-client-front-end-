@@ -441,11 +441,22 @@ const loadData = async () => {
       form.value.kategori = data.kategori || ''
       
       try {
-        form.value.jenis_dokumen = typeof data.jenis_dokumen === 'string' ? JSON.parse(data.jenis_dokumen) : (data.jenis_dokumen || [])
+        if (typeof data.jenis_dokumen === 'string') {
+          // Backward compatibility if somehow stored as JSON array
+          if (data.jenis_dokumen.startsWith('[')) {
+            form.value.jenis_dokumen = JSON.parse(data.jenis_dokumen)
+          } else {
+            // It's a comma-separated string
+            form.value.jenis_dokumen = data.jenis_dokumen.split(',').map(s => s.trim()).filter(Boolean)
+          }
+        } else {
+          form.value.jenis_dokumen = data.jenis_dokumen || []
+        }
       } catch(e) { form.value.jenis_dokumen = [] }
       
-      form.value.target_unit = data.target_unit ? String(data.target_unit) : ''
-      form.value.tanggal_dokumen = data.tanggal_dokumen ? data.tanggal_dokumen.split(' ')[0] : ''
+      form.value.target_unit = data.unit_id ? String(data.unit_id) : ''
+      const rawDate = data.published_at || data.created_at
+      form.value.tanggal_dokumen = rawDate ? rawDate.split(' ')[0] : ''
       form.value.status = data.status || 'published'
       
       isRevertingVisibility = true
