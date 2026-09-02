@@ -347,6 +347,16 @@ const canEditOrDelete = (dokumen) => {
 }
 
 const notification = ref({ type: '', message: '' })
+let notificationTimeout = null
+
+watch(() => notification.value.message, (newMsg) => {
+  if (newMsg) {
+    if (notificationTimeout) clearTimeout(notificationTimeout)
+    notificationTimeout = setTimeout(() => {
+      notification.value.message = ''
+    }, 5000)
+  }
+})
 
 const deleteItem = async (dokumen) => {
   if (!canEditOrDelete(dokumen)) {
