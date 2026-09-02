@@ -52,7 +52,7 @@
                <img :src="photo.dataUrl" class="w-full h-full object-fill max-w-none pointer-events-none select-none drop-shadow-md">
                
                <!-- Handles for selected photo ONLY -->
-               <template v-if="selectedPhotoIds.includes(photo.id) && !photo.isLocked">
+               <template v-if="selectedPhotoIds.includes(photo.id) && !photo.isLocked && !isInteracting">
                  <div class="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startResize($event, 'tl')" @touchstart.stop.prevent="startResize($event, 'tl')"></div>
                  <div class="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'tr')" @touchstart.stop.prevent="startResize($event, 'tr')"></div>
                  <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'bl')" @touchstart.stop.prevent="startResize($event, 'bl')"></div>
@@ -78,7 +78,7 @@
           </div>
           
           <!-- Floating Toolbar (Appears above the canvas when a photo is selected) -->
-          <div v-if="selectedPhotos.length > 0" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl px-4 py-2 flex items-center gap-4 z-50 border border-gray-200" @click.stop>
+          <div v-if="selectedPhotos.length > 0 && !isInteracting" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl px-4 py-2 flex items-center gap-4 z-50 border border-gray-200" @click.stop>
             <button @click="deleteSelected" class="text-red-500 hover:text-red-700" title="Hapus">
               <i class="fas fa-trash"></i>
             </button>
@@ -200,12 +200,14 @@ let frameImgObj = null
 const isDownloading = ref(false)
 const isDragOver = ref(false)
 const isDragOverCanvas = ref(false)
+const isInteracting = ref(false)
 
 // Interaction state
 let isDragging = false
 let isResizing = false
 let isPinching = false
 let isRotating = false
+  isInteracting.value = false
 let resizeCorner = ''
 let startX = 0
 let startY = 0
@@ -416,6 +418,7 @@ const startDrag = (e, targetPhoto) => {
 
   if (e.touches && e.touches.length >= 2) {
     isPinching = true;
+    isInteracting.value = true;
     initialDistance = getPinchDistance(e);
     initialPosX = targetPhoto.x;
     initialPosY = targetPhoto.y;
@@ -426,6 +429,7 @@ const startDrag = (e, targetPhoto) => {
   }
 
   isDragging = true;
+  isInteracting.value = true;
   const coords = getClientCoords(e);
   startX = coords.x;
   startY = coords.y;
@@ -438,6 +442,7 @@ const startResize = (e, corner) => {
   const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
   if (activePhotos.length === 0) return;
   isResizing = true;
+  isInteracting.value = true;
   resizeCorner = corner;
   const coords = getClientCoords(e);
   startX = coords.x;
@@ -453,6 +458,7 @@ const startRotate = (e) => {
   const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
   if (activePhotos.length === 0) return;
   isRotating = true;
+  isInteracting.value = true;
   const coords = getClientCoords(e);
   startX = coords.x;
   startY = coords.y;
@@ -552,7 +558,7 @@ const onDrag = (e) => {
   else if (isRotating) {
     activePhotos.forEach(photo => {
       const state = initialGroupStates.get(photo.id);
-      let newRotation = state.rotation + dx * 0.5;
+      let newRotation = state.rotation + dx * 0.5; // Changed to minus logic below
       let rawDeg = newRotation % 360;
       if (rawDeg < 0) rawDeg += 360;
       const snapAngles = [0, 45, 90, 180, 270, 360];
@@ -573,6 +579,7 @@ const endInteraction = () => {
   isResizing = false
   isPinching = false
   isRotating = false
+  isInteracting.value = false
   isSnappedX.value = false
   isSnappedY.value = false
   currentDegreeDisplay.value = null
