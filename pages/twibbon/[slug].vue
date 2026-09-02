@@ -143,10 +143,9 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRuntimeConfig } from '#app'
-import { getStorageUrl } from '@/services/api'
+import api, { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
-const config = useRuntimeConfig()
 
 const loading = ref(true)
 const twibbon = ref(null)
@@ -187,8 +186,8 @@ onMounted(async () => {
 
 const fetchTwibbon = async () => {
   try {
-    const { data } = await $fetch(`${config.public.apiBase}/twibbon/${route.params.slug}`)
-    twibbon.value = data?.data
+    const res = await api.get(`/twibbon/${route.params.slug}`)
+    twibbon.value = res.data?.data || res.data
     if (twibbon.value) {
       frameUrl.value = getStorageUrl(twibbon.value.file_path)
     }

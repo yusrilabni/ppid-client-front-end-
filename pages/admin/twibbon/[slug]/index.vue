@@ -2,7 +2,7 @@
   <div class="bg-gray-50 min-h-screen pb-12">
     <div class="bg-blue-600 text-white pt-8 pb-16">
       <div class="container mx-auto px-4 max-w-4xl">
-        <NuxtLink to="/twibbon" class="text-blue-200 hover:text-white transition flex items-center gap-2 mb-6">
+        <NuxtLink to="/admin/twibbon" class="text-blue-200 hover:text-white transition flex items-center gap-2 mb-6">
           <i class="fas fa-arrow-left"></i> Kembali ke Galeri
         </NuxtLink>
         <h1 class="text-3xl font-bold mb-2">{{ twibbon?.judul || 'Memuat...' }}</h1>
@@ -144,10 +144,9 @@ definePageMeta({ layout: 'admin' })
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRuntimeConfig } from '#app'
-import { getStorageUrl } from '@/services/api'
+import api, { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
-const config = useRuntimeConfig()
 
 const loading = ref(true)
 const twibbon = ref(null)
@@ -188,8 +187,8 @@ onMounted(async () => {
 
 const fetchTwibbon = async () => {
   try {
-    const { data } = await $fetch(`${config.public.apiBase}/twibbon/${route.params.slug}`)
-    twibbon.value = data?.data
+    const res = await api.get(`/twibbon/${route.params.slug}`)
+    twibbon.value = res.data?.data || res.data
     if (twibbon.value) {
       frameUrl.value = getStorageUrl(twibbon.value.file_path)
     }
