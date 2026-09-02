@@ -417,7 +417,7 @@ const downloadTwibbon = () => {
         alert('Terjadi kesalahan saat memproses gambar frame. (CORS/Network error)')
         isDownloading.value = false
       }
-      bgImg.src = '/api/proxy-image?url=' + encodeURIComponent(frameUrl.value)
+      bgImg.src = api.defaults.baseURL + '/twibbon-proxy?path=' + twibbon.value.file_path
 
     } catch (e) {
       console.error(e)
