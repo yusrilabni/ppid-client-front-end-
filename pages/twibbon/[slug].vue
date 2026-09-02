@@ -46,7 +46,8 @@
                    filter: `blur(${photo.blur}px)`
                  }"
                  @mousedown.stop="selectPhoto(photo.id, $event)"
-                 @touchstart.stop="selectPhoto(photo.id, $event)">
+                 @touchstart.stop="selectPhoto(photo.id, $event)"
+                 @click.stop>
                  
                <img :src="photo.dataUrl" class="w-full h-full object-fill max-w-none pointer-events-none select-none drop-shadow-md">
                
