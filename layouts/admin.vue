@@ -27,7 +27,7 @@ async function handleLogout() {
 <template>
   <div class="min-h-screen bg-gray-100 flex">
     <!-- Sidebar -->
-    <aside :class="[sidebarOpen ? 'w-64' : 'w-20', 'hidden lg:flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 text-white transition-all duration-300 ease-in-out z-20']">
+    <aside :class="[sidebarOpen ? 'w-64' : 'w-20', 'hidden lg:flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 text-white transition-all duration-300 ease-in-out z-20 sticky top-0 h-screen']">
       <div class="p-4 flex items-center gap-3 border-b border-gray-700">
         <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
           <i class="fas fa-shield-alt text-white"></i>
@@ -90,9 +90,9 @@ async function handleLogout() {
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col h-[100dvh] lg:h-screen overflow-hidden">
+    <div class="flex-1 flex flex-col min-w-0">
       <!-- Top Bar -->
-      <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+      <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10 sticky top-0">
         <div class="flex items-center gap-4">
           <button @click="sidebarOpen = !sidebarOpen" class="hidden lg:block text-gray-500 hover:text-gray-700">
             <i class="fas fa-bars text-lg"></i>
@@ -112,7 +112,7 @@ async function handleLogout() {
         </div>
       </header>
       <!-- Page Content -->
-      <main class="flex-1 p-6 overflow-y-auto bg-gray-50">
+      <main class="flex-1 p-4 lg:p-6 bg-gray-50">
         <slot />
       </main>
     </div>
