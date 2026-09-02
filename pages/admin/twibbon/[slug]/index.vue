@@ -52,7 +52,8 @@
                <img :src="photo.dataUrl" class="w-full h-full object-fill max-w-none pointer-events-none select-none drop-shadow-md">
                
                <!-- Handles for selected photo ONLY -->
-               <template v-if="selectedPhotoIds.includes(photo.id) && !photo.isLocked && !isInteracting">
+               <template v-if="selectedPhotoIds.includes(photo.id) && !photo.isLocked">
+<div :class="{ \"opacity-0\": isInteracting }">
                  <div class="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startResize($event, 'tl')" @touchstart.stop.prevent="startResize($event, 'tl')"></div>
                  <div class="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'tr')" @touchstart.stop.prevent="startResize($event, 'tr')"></div>
                  <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'bl')" @touchstart.stop.prevent="startResize($event, 'bl')"></div>
@@ -61,6 +62,7 @@
                  <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full border-2 border-blue-600 shadow-md flex items-center justify-center cursor-ew-resize z-30 text-blue-600" @mousedown.stop.prevent="startRotate" @touchstart.stop.prevent="startRotate">
                    <i class="fas fa-sync-alt text-xs pointer-events-none"></i>
                  </div>
+               </div>
                </template>
             </div>
 
@@ -559,14 +561,11 @@ const onDrag = (e) => {
     activePhotos.forEach(photo => {
       const state = initialGroupStates.get(photo.id);
       let newRotation = state.rotation + dx * 0.5; // Changed to minus logic below
-      let rawDeg = newRotation % 360;
-      if (rawDeg < 0) rawDeg += 360;
-      const snapAngles = [0, 45, 90, 180, 270, 360];
-      for (let angle of snapAngles) {
-        if (Math.abs(rawDeg - angle) < 5 || Math.abs(rawDeg - angle) > 355) {
-          newRotation = newRotation - rawDeg + (angle === 360 ? 0 : angle);
-          break;
-        }
+      let remainder = newRotation % 45;
+      if (Math.abs(remainder) < 5) {
+        newRotation -= remainder;
+      } else if (Math.abs(remainder) > 40) {
+        newRotation += (newRotation > 0 ? 45 - remainder : -45 - remainder);
       }
       photo.rotation = newRotation;
       if (photo.id === activePhotos[0].id) currentDegreeDisplay.value = Math.round(newRotation % 360);
