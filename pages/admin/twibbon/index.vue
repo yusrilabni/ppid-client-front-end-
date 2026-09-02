@@ -32,7 +32,7 @@
 
     <div v-else class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div v-for="item in twibbons" :key="item.id" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition flex flex-col">
-        <NuxtLink :to="`/twibbon/${item.slug}`" target="_blank" class="block h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center p-4 checkerboard cursor-pointer">
+        <NuxtLink :to="`/admin/twibbon/${item.slug}/edit`" class="block h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center p-4 checkerboard cursor-pointer">
           <img :src="getStorageUrl(item.file_path)" :alt="item.judul" class="max-h-full object-contain drop-shadow-md z-10 relative group-hover:scale-105 transition-transform duration-300">
           <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
         </NuxtLink>
@@ -42,8 +42,11 @@
             <p class="text-xs text-gray-500"><i class="far fa-clock mr-1"></i> {{ formatDate(item.created_at) }}</p>
           </div>
           <div class="flex items-center gap-2 mt-2 pt-3 border-t border-gray-100">
-            <NuxtLink :to="`/twibbon/${item.slug}`" target="_blank" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold py-2 px-3 rounded-lg text-center transition flex items-center justify-center gap-1">
-              <i class="fas fa-external-link-alt"></i> Buka Editor
+            <NuxtLink :to="`/admin/twibbon/${item.slug}/edit`" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold py-2 px-3 rounded-lg text-center transition flex items-center justify-center gap-1">
+              <i class="fas fa-edit"></i> Edit
+            </NuxtLink>
+            <NuxtLink :to="`/twibbon/${item.slug}`" target="_blank" class="bg-green-50 hover:bg-green-100 text-green-600 p-2 px-3 rounded-lg transition flex items-center justify-center" title="Buka Halaman Publik">
+              <i class="fas fa-external-link-alt"></i>
             </NuxtLink>
             <button @click="deleteTwibbon(item.id)" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 px-3 rounded-lg transition flex items-center justify-center" title="Hapus Twibbon">
               <i class="fas fa-trash"></i>
