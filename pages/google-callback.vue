@@ -22,6 +22,15 @@ onMounted(async () => {
   const code = route.query.code
   const state = route.query.state || 'login'
 
+  // Timeout safety — jika backend tidak merespons dalam 15 detik, redirect dengan error
+  const timeout = setTimeout(() => {
+    if (state === 'link') {
+      router.push('/profile?linked=failed&msg=' + encodeURIComponent('Koneksi ke server timeout. Coba lagi.'))
+    } else {
+      router.push('/login?error=auth_failed&msg=' + encodeURIComponent('Koneksi ke server timeout. Coba lagi.'))
+    }
+  }, 15000)
+
   if (code) {
     try {
       // POST the code to Laravel backend
@@ -29,6 +38,7 @@ onMounted(async () => {
         code: code,
         state: state
       })
+      clearTimeout(timeout)
 
       if (response.data.success) {
         if (response.data.require_otp) {
@@ -57,6 +67,7 @@ onMounted(async () => {
         router.push('/login?error=auth_failed&msg=' + encodeURIComponent(response.data.message || 'Unknown error'))
       }
     } catch (error) {
+      clearTimeout(timeout)
       console.error('Failed to verify Google code:', error)
       const errorData = error.response?.data
       
@@ -75,6 +86,7 @@ onMounted(async () => {
       }
     }
   } else {
+    clearTimeout(timeout)
     router.push('/login?error=auth_failed')
   }
 })
