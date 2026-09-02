@@ -8,9 +8,15 @@ const authStore = useAuthStore()
 const sidebarOpen = ref(true)
 const mobileSidebarOpen = ref(false)
 
-const menuItems = [
-  { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin' },
-]
+const menuItems = computed(() => {
+  const items = [
+    { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin' },
+  ]
+  if (authStore.isSuperAdmin) {
+    items.push({ name: 'Twibbon', icon: 'fas fa-camera-retro', route: 'admin-twibbon' })
+  }
+  return items
+})
 
 async function handleLogout() {
   await authStore.logout()
