@@ -250,7 +250,7 @@
             
             <div v-if="otpStep === 'request'">
               <p class="text-sm text-gray-500 mb-6">
-                Untuk memutuskan tautan Google, kami perlu mengirimkan kode OTP 6-digit ke email Anda <strong>{{ profileData?.user?.email }}</strong> sebagai verifikasi keamanan.
+                Untuk memutuskan tautan Google, kami perlu mengirimkan kode OTP 6-digit ke email atau nomor WhatsApp Anda sebagai verifikasi keamanan.
               </p>
               
               <div v-if="otpError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs text-left rounded-lg border border-red-100">
@@ -270,7 +270,7 @@
 
             <div v-if="otpStep === 'verify'">
               <p class="text-sm text-gray-500 mb-2">
-                Masukkan 6-digit kode OTP yang telah dikirimkan ke email Anda.
+                Masukkan 6-digit kode OTP yang telah dikirimkan ke Anda.
               </p>
               
               <div v-if="otpError" class="mb-4 p-3 bg-red-50 text-red-700 text-xs text-left rounded-lg border border-red-100">
