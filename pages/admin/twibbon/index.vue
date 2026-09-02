@@ -45,9 +45,6 @@
             <NuxtLink :to="`/admin/twibbon/${item.slug}/edit`" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold py-2 px-3 rounded-lg text-center transition flex items-center justify-center gap-1">
               <i class="fas fa-edit"></i> Edit
             </NuxtLink>
-            <NuxtLink :to="`/twibbon/${item.slug}`" target="_blank" class="bg-green-50 hover:bg-green-100 text-green-600 p-2 px-3 rounded-lg transition flex items-center justify-center" title="Buka Halaman Publik">
-              <i class="fas fa-external-link-alt"></i>
-            </NuxtLink>
             <button @click="deleteTwibbon(item.id)" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 px-3 rounded-lg transition flex items-center justify-center" title="Hapus Twibbon">
               <i class="fas fa-trash"></i>
             </button>
