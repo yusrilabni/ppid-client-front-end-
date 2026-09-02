@@ -243,7 +243,13 @@ const handleRegister = async () => {
   try {
     const res = await authStore.register(form.value)
     if (!res.success) throw new Error(res.message)
-    router.push('/')
+    const pending = localStorage.getItem('pending_download_twibbon');
+      if (pending) {
+        localStorage.removeItem('pending_download_twibbon');
+        router.push('/twibbon/' + pending + '?auto_download=1');
+      } else {
+        router.push('/');
+      }
   } catch (err) {
     error.value = err.message || 'Registrasi gagal. Silakan coba lagi.'
   } finally {
@@ -305,7 +311,13 @@ const handleVerifyOtp = async () => {
       authStore.user = response.data.user
       
       closeOtpModal()
-      router.push('/')
+      const pending = localStorage.getItem('pending_download_twibbon');
+      if (pending) {
+        localStorage.removeItem('pending_download_twibbon');
+        router.push('/twibbon/' + pending + '?auto_download=1');
+      } else {
+        router.push('/');
+      }
     } else {
       throw new Error(response.data.message || 'Verifikasi gagal.')
     }

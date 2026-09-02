@@ -153,7 +153,13 @@ const handleLogin = async () => {
   try {
     const res = await authStore.login(form.value)
     if (!res.success) throw new Error(res.message)
-    router.push(route.query.redirect || '/')
+    const pending = localStorage.getItem('pending_download_twibbon');
+    if (pending) {
+      localStorage.removeItem('pending_download_twibbon');
+      router.push('/twibbon/' + pending + '?auto_download=1');
+    } else {
+      router.push(route.query.redirect || '/');
+    }
   } catch (err) {
     error.value = err.message || 'Login gagal. Silakan periksa kembali kredensial Anda.'
   } finally {

@@ -57,10 +57,16 @@ onMounted(async () => {
           authStore.token = response.data.token
           authStore.user = response.data.user
           
-          if (state === 'link') {
+                    if (state === 'link') {
             router.push('/profile?linked=success')
           } else {
-            router.push('/')
+            const pending = localStorage.getItem('pending_download_twibbon');
+            if (pending) {
+              localStorage.removeItem('pending_download_twibbon');
+              router.push('/twibbon/' + pending + '?auto_download=1');
+            } else {
+              router.push('/')
+            }
           }
         }
       } else {

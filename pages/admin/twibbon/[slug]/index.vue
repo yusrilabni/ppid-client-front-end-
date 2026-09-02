@@ -175,10 +175,12 @@
 definePageMeta({ layout: 'admin' })
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { useRuntimeConfig } from '#app'
 import api, { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
+const authStore = useAuthStore()
 
 
 // --- IndexedDB Cache Logic ---
@@ -330,7 +332,13 @@ const removeWindowListeners = () => {
 
 onMounted(async () => {
   await fetchTwibbon()
-  await restoreSession()
+    await restoreSession()
+  if (route.query.auto_download === '1') {
+    setTimeout(() => {
+      downloadTwibbon();
+    }, 1500);
+    router.replace(route.path);
+  }
   if (process.client) {
     window.addEventListener('keydown', handleKeydown)
   }
@@ -673,6 +681,16 @@ const endInteraction = () => {
 
 const downloadTwibbon = () => {
   if (photos.value.length === 0 || !frameImgObj) return
+  
+  if (!authStore.isAuthenticated) {
+    if (process.client) {
+      localStorage.setItem('pending_download_twibbon', route.params.slug);
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id';
+      window.location.href = `${apiUrl}/api/v1/auth/google/redirect?action=login`;
+    }
+    return;
+  }
+  
   isDownloading.value = true
 
   deselectAll()
