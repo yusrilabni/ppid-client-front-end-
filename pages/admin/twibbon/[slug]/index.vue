@@ -3,7 +3,7 @@
     <div class="bg-blue-600 text-white pt-8 pb-16">
       <div class="container mx-auto px-4 max-w-4xl">
         <NuxtLink to="/admin/twibbon" class="text-blue-200 hover:text-white transition flex items-center gap-2 mb-6">
-          <i class="fas fa-arrow-left"></i> Kembali ke Galeri
+          <i class="fas fa-arrow-left"></i> Kembali ke Daftar Twibbon
         </NuxtLink>
         <h1 class="text-3xl font-bold mb-2">{{ twibbon?.judul || 'Memuat...' }}</h1>
         <p class="text-blue-100">Pasang foto terbaik Anda dan bagikan ke media sosial!</p>
