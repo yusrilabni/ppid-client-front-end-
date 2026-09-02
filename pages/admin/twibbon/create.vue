@@ -13,11 +13,41 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Judul Twibbon <span class="text-red-500">*</span></label>
           <input 
             v-model="form.judul" 
+            @input="generateSlug"
             type="text" 
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
             placeholder="Contoh: Hari Kemerdekaan RI ke-79"
           >
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Custom Slug (URL) <span class="text-red-500">*</span></label>
+            <div class="flex">
+              <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">/twibbon/</span>
+              <input 
+                v-model="form.slug" 
+                type="text" 
+                required
+                class="flex-1 w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                placeholder="contoh-slug-kustom"
+              >
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Hanya boleh berisi huruf, angka, dan strip (-).</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status Visibilitas <span class="text-red-500">*</span></label>
+            <select 
+              v-model="form.status" 
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white"
+            >
+              <option value="public">🌐 Publik (Bisa diakses siapa saja)</option>
+              <option value="private">🔒 Privat (Hanya untuk Admin)</option>
+            </select>
+          </div>
         </div>
 
         <div>
@@ -77,6 +107,8 @@ const loading = ref(false)
 const isDragging = ref(false)
 const form = ref({
   judul: '',
+  slug: '',
+  status: 'public',
   file: null
 })
 const previewUrl = ref(null)
@@ -86,6 +118,15 @@ onMounted(() => {
     router.push('/admin')
   }
 })
+
+const generateSlug = () => {
+  // Only auto-generate if user hasn't explicitly typed a very custom slug
+  // or just always auto-sync unless they manually edit it.
+  form.value.slug = form.value.judul
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '')
+}
 
 const handleFileUpload = (e) => {
   processFile(e.target.files[0])
@@ -108,12 +149,14 @@ const processFile = (file) => {
 }
 
 const submitTwibbon = async () => {
-  if (!form.value.file || !form.value.judul) return
+  if (!form.value.file || !form.value.judul || !form.value.slug) return
   
   try {
     loading.value = true
     const formData = new FormData()
     formData.append('judul', form.value.judul)
+    formData.append('slug', form.value.slug)
+    formData.append('status', form.value.status)
     formData.append('file', form.value.file)
 
     await api.post('/twibbon', formData, {

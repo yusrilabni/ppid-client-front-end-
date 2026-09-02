@@ -38,7 +38,15 @@
         </NuxtLink>
         <div class="p-4 flex-1 flex flex-col justify-between gap-3">
           <div>
-            <h3 class="font-bold text-gray-800 text-sm truncate mb-1" :title="item.judul">{{ item.judul }}</h3>
+            <div class="flex justify-between items-start mb-1">
+              <h3 class="font-bold text-gray-800 text-sm truncate mr-2" :title="item.judul">{{ item.judul }}</h3>
+              <span 
+                class="text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap"
+                :class="item.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'"
+              >
+                {{ item.status === 'public' ? 'Publik' : 'Privat' }}
+              </span>
+            </div>
             <p class="text-xs text-gray-500"><i class="far fa-clock mr-1"></i> {{ formatDate(item.created_at) }}</p>
           </div>
           <div class="flex items-center gap-2 mt-2 pt-3 border-t border-gray-100">
