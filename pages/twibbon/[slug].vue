@@ -21,8 +21,12 @@
           </div>
 
           <div v-else ref="editorContainer" class="relative w-full max-w-md aspect-square mx-auto bg-gray-200 rounded-xl overflow-hidden shadow-inner checkerboard"
+               :class="{ 'ring-4 ring-blue-500 bg-blue-50': isDragOverCanvas }"
                @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseleave="endDrag"
-               @touchstart="startDrag" @touchmove="onDrag" @touchend="endDrag">
+               @touchstart="startDrag" @touchmove="onDrag" @touchend="endDrag"
+               @dragover.prevent="isDragOverCanvas = true"
+               @dragleave.prevent="isDragOverCanvas = false"
+               @drop.prevent="handleCanvasDrop">
             
             <!-- Elemen ini hanya tampilan interaktif (DOM) -->
             <div class="absolute inset-0 z-10 w-full h-full cursor-move" style="touch-action: none;">
@@ -48,7 +52,7 @@
             <div v-if="!userPhotoData" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/10 pointer-events-none">
               <div class="bg-white/90 px-4 py-2 rounded-lg shadow-sm text-center">
                 <i class="fas fa-image text-gray-400 text-2xl mb-1"></i>
-                <p class="text-sm font-medium text-gray-600">Silakan unggah foto Anda</p>
+                <p class="text-sm font-medium text-gray-600">Silakan unggah atau tarik (drag) foto Anda kesini</p>
               </div>
             </div>
           </div>
@@ -69,9 +73,13 @@
           <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
             <h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-cog mr-2"></i> Pengaturan</h3>
             
-            <label for="upload-photo" class="w-full bg-white border-2 border-dashed border-blue-300 hover:border-blue-500 text-blue-600 hover:bg-blue-50 transition font-medium py-3 px-4 rounded-xl text-center cursor-pointer flex flex-col items-center justify-center gap-2 mb-4">
+            <label for="upload-photo" 
+                   @dragover.prevent="isDragOver = true"
+                   @dragleave.prevent="isDragOver = false"
+                   @drop.prevent="handlePhotoDrop"
+                   :class="['w-full border-2 border-dashed transition font-medium py-3 px-4 rounded-xl text-center cursor-pointer flex flex-col items-center justify-center gap-2 mb-4', isDragOver ? 'border-blue-600 bg-blue-100 text-blue-700' : 'bg-white border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-600']">
               <i class="fas fa-upload text-xl"></i>
-              <span>{{ userPhotoData ? 'Ganti Foto' : 'Pilih Foto Anda' }}</span>
+              <span>{{ userPhotoData ? 'Ganti Foto' : 'Pilih atau Tarik Foto Kesini' }}</span>
               <input id="upload-photo" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
             </label>
 
@@ -89,6 +97,7 @@
           <div class="bg-blue-50 text-blue-800 p-4 rounded-xl text-sm leading-relaxed">
             <h4 class="font-bold mb-1"><i class="fas fa-info-circle mr-1"></i> Tips Penggunaan:</h4>
             <ul class="list-disc pl-5 space-y-1 text-blue-700/80">
+              <li>Anda bisa menarik (drag & drop) foto langsung ke area bingkai.</li>
               <li>Gunakan foto dengan pencahayaan terang.</li>
               <li>Gunakan penggeser (slider) untuk mengatur ukuran.</li>
               <li>Sentuh dan geser (drag) foto untuk memposisikan wajah Anda agar pas dengan bingkai.</li>
@@ -178,8 +187,26 @@ const onFrameLoad = (e) => {
   frameImgObj = e.target
 }
 
-const handlePhotoUpload = (e) => {
-  const file = e.target.files[0]
+const isDragOver = ref(false)
+const isDragOverCanvas = ref(false)
+
+const handlePhotoDrop = (e) => {
+  isDragOver.value = false
+  const file = e.dataTransfer.files[0]
+  if (file && file.type.startsWith('image/')) {
+    processFile(file)
+  }
+}
+
+const handleCanvasDrop = (e) => {
+  isDragOverCanvas.value = false
+  const file = e.dataTransfer.files[0]
+  if (file && file.type.startsWith('image/')) {
+    processFile(file)
+  }
+}
+
+const processFile = (file) => {
   if (!file) return
 
   const reader = new FileReader()
@@ -205,6 +232,11 @@ const handlePhotoUpload = (e) => {
     img.src = event.target.result
   }
   reader.readAsDataURL(file)
+}
+
+const handlePhotoUpload = (e) => {
+  const file = e.target.files[0]
+  processFile(file)
 }
 
 // Mouse / Touch events for dragging

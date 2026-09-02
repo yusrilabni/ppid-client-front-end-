@@ -98,7 +98,14 @@ const fetchTwibbons = async () => {
   try {
     loading.value = true
     const res = await api.get('/twibbon')
-    twibbons.value = res.data?.data?.data || []
+    const resData = res.data?.data
+    if (Array.isArray(resData)) {
+      twibbons.value = resData
+    } else if (resData?.data && Array.isArray(resData.data)) {
+      twibbons.value = resData.data
+    } else {
+      twibbons.value = []
+    }
   } catch (error) {
     console.error('Error fetching twibbons:', error)
   } finally {

@@ -7,7 +7,7 @@
       <h1 class="text-2xl font-bold text-gray-800">Tambah Twibbon Baru</h1>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 w-full">
       <form @submit.prevent="submitTwibbon" class="space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Judul Twibbon <span class="text-red-500">*</span></label>
@@ -22,16 +22,22 @@
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Frame Twibbon (PNG transparan) <span class="text-red-500">*</span></label>
-          <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition-colors bg-gray-50 relative">
-            <div class="space-y-1 text-center">
-              <i class="fas fa-image text-3xl text-gray-400 mb-3"></i>
-              <div class="flex text-sm text-gray-600 justify-center">
-                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 px-2 py-1">
-                  <span>Upload file</span>
-                  <input id="file-upload" type="file" class="sr-only" accept="image/*" @change="handleFileUpload" required>
+          <div 
+            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg transition-colors bg-gray-50 relative"
+            :class="isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'"
+            @dragover.prevent="isDragging = true"
+            @dragleave.prevent="isDragging = false"
+            @drop.prevent="handleDrop"
+          >
+            <div class="space-y-1 text-center pointer-events-none">
+              <i class="fas fa-image text-3xl mb-3" :class="isDragging ? 'text-blue-500' : 'text-gray-400'"></i>
+              <div class="flex text-sm text-gray-600 justify-center pointer-events-auto">
+                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 px-2 py-1 shadow-sm border border-blue-100">
+                  <span>Pilih File atau Tarik (Drag & Drop) Kesini</span>
+                  <input id="file-upload" type="file" class="sr-only" accept="image/*" @change="handleFileUpload" :required="!form.file">
                 </label>
               </div>
-              <p class="text-xs text-gray-500">PNG, JPG up to 10MB (Otomatis konversi ke WebP)</p>
+              <p class="text-xs text-gray-500 mt-2">PNG, JPG maksimal 10MB (Otomatis dikonversi ke WebP)</p>
             </div>
           </div>
           
@@ -68,6 +74,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const loading = ref(false)
+const isDragging = ref(false)
 const form = ref({
   judul: '',
   file: null
@@ -81,10 +88,22 @@ onMounted(() => {
 })
 
 const handleFileUpload = (e) => {
-  const file = e.target.files[0]
-  if (file) {
+  processFile(e.target.files[0])
+}
+
+const handleDrop = (e) => {
+  isDragging.value = false
+  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    processFile(e.dataTransfer.files[0])
+  }
+}
+
+const processFile = (file) => {
+  if (file && file.type.startsWith('image/')) {
     form.value.file = file
     previewUrl.value = URL.createObjectURL(file)
+  } else if (file) {
+    alert('Harap unggah file gambar yang valid.')
   }
 }
 
