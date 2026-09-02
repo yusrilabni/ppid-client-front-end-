@@ -120,7 +120,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full lg:w-48 flex-none pt-2 lg:pt-0 flex gap-2">
+                    <div class="w-full lg:w-32 flex-none pt-2 lg:pt-0 flex gap-2">
                         <button @click="applyFilters" class="flex-1 lg:flex-none w-full lg:w-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 rounded-xl h-[44px] transition-all flex items-center justify-center font-bold" title="Terapkan Filter">
                             <i class="fas fa-search lg:mr-0"></i> <span class="inline lg:hidden ml-2">Cari</span>
                         </button>
@@ -150,16 +150,16 @@
                 </div>
 
                 <template v-else-if="items.length > 0">
-                    <div class="hidden md:block overflow-x-auto relative z-10">
-                        <table class="min-w-full w-full whitespace-nowrap bg-transparent">
+                    <div class="hidden md:block overflow-x-hidden relative z-10 w-full">
+                        <table class="w-full bg-transparent table-fixed">
                             <thead>
                                 <tr class="bg-gray-100/60 border-b border-gray-200 text-left backdrop-blur-sm">
-                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-12 text-center">No</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase min-w-[350px] w-[45%]">Detail Dokumen</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-40">Kategori</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-40">Sumber</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase w-28 text-center">Tanggal</th>
-                                    <th class="py-4 px-6 font-bold text-gray-700 text-sm tracking-wide uppercase min-w-[140px] text-center">Aksi</th>
+                                    <th class="py-4 px-3 font-bold text-gray-700 text-sm tracking-wide uppercase w-12 text-center">No</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-[40%]">Detail Dokumen</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-32">Kategori</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Sumber</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-28 text-center">Tanggal</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-36 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100/50">
@@ -193,8 +193,8 @@
                                             {{ dokumen.jenis_dokumen }}
                                         </span>
                                     </td>
-                                    <td class="py-4 px-6 whitespace-normal align-middle">
-                                        <div v-if="dokumen.user" class="mb-1.5 text-xs text-gray-600 font-medium whitespace-nowrap">
+                                    <td class="py-4 px-4 whitespace-normal align-middle">
+                                        <div v-if="dokumen.user" class="mb-1.5 text-xs text-gray-600 font-medium break-words">
                                             <i class="fas fa-user-circle mr-1 text-gray-400"></i>
                                             <template v-if="dokumen.user.role === 'superadmin' || (dokumen.user.admin_kabupaten && dokumen.user.admin_kabupaten == 1)">
                                                 Admin Kabupaten ({{ dokumen.user.name }})
@@ -203,8 +203,8 @@
                                                 {{ dokumen.user.name }}
                                             </template>
                                         </div>
-                                        <span v-if="dokumen.organization" class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <i class="fas fa-building mr-1.5"></i> {{ dokumen.organization.name }}
+                                        <span v-if="dokumen.organization" class="inline-block px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 break-words max-w-full">
+                                            <i class="fas fa-building mr-1"></i> {{ dokumen.organization.name }}
                                         </span>
                                         <span v-else class="text-xs text-gray-400 italic">Pemerintah Kabupaten</span>
                                     </td>
