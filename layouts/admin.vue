@@ -90,7 +90,7 @@ async function handleLogout() {
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+    <div class="flex-1 flex flex-col h-[100dvh] lg:h-screen overflow-hidden">
       <!-- Top Bar -->
       <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
         <div class="flex items-center gap-4">
