@@ -173,6 +173,7 @@ const isDragOverCanvas = ref(false)
 // Interaction state
 let isDragging = false
 let isResizing = false
+let isPinching = false
 let resizeCorner = ''
 let startX = 0
 let startY = 0
@@ -180,6 +181,7 @@ let initialPosX = 0
 let initialPosY = 0
 let startImgWidth = 0
 let startImgHeight = 0
+let initialDistance = 0
 
 onMounted(async () => {
   await fetchTwibbon()
@@ -258,8 +260,29 @@ const getClientCoords = (e) => {
   return { x: e.clientX, y: e.clientY }
 }
 
+const getPinchDistance = (e) => {
+  if (e.touches && e.touches.length >= 2) {
+    return Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    )
+  }
+  return 0
+}
+
 const startDrag = (e) => {
   if (!userPhotoData.value) return
+  
+  if (e.touches && e.touches.length >= 2) {
+    isPinching = true
+    initialDistance = getPinchDistance(e)
+    initialPosX = posX.value
+    initialPosY = posY.value
+    startImgWidth = imgWidth.value
+    startImgHeight = imgHeight.value
+    return
+  }
+
   isDragging = true
   const coords = getClientCoords(e)
   startX = coords.x
@@ -282,7 +305,27 @@ const startResize = (e, corner) => {
 }
 
 const onDrag = (e) => {
+  if (isPinching && e.touches && e.touches.length >= 2) {
+    if (e.cancelable) e.preventDefault()
+    const currentDistance = getPinchDistance(e)
+    const scale = currentDistance / initialDistance
+    
+    let newW = startImgWidth * scale
+    if (newW < 50) newW = 50
+    const newH = newW / aspectRatio.value
+    
+    const dx = (newW - startImgWidth) / 2
+    const dy = (newH - startImgHeight) / 2
+    
+    imgWidth.value = newW
+    imgHeight.value = newH
+    posX.value = initialPosX - dx
+    posY.value = initialPosY - dy
+    return
+  }
+
   if (!isDragging && !isResizing) return
+  if (e.cancelable) e.preventDefault()
   
   const coords = getClientCoords(e)
   const dx = coords.x - startX
@@ -325,6 +368,7 @@ const onDrag = (e) => {
 const endInteraction = () => {
   isDragging = false
   isResizing = false
+  isPinching = false
 }
 
 const downloadTwibbon = () => {
@@ -373,7 +417,7 @@ const downloadTwibbon = () => {
         alert('Terjadi kesalahan saat memproses gambar frame. (CORS/Network error)')
         isDownloading.value = false
       }
-      bgImg.src = frameUrl.value
+      bgImg.src = '/api/proxy-image?url=' + encodeURIComponent(frameUrl.value)
 
     } catch (e) {
       console.error(e)
