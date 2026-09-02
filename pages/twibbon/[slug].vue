@@ -22,28 +22,35 @@
 
           <div v-else ref="editorContainer" class="relative w-full max-w-md aspect-square mx-auto bg-gray-200 rounded-xl overflow-hidden shadow-inner checkerboard"
                :class="{ 'ring-4 ring-blue-500 bg-blue-50': isDragOverCanvas }"
-               @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseleave="endDrag"
-               @touchstart="startDrag" @touchmove="onDrag" @touchend="endDrag"
+               @mousemove="onDrag" @mouseup="endInteraction" @mouseleave="endInteraction"
+               @touchmove="onDrag" @touchend="endInteraction"
                @dragover.prevent="isDragOverCanvas = true"
                @dragleave.prevent="isDragOverCanvas = false"
                @drop.prevent="handleCanvasDrop">
             
-            <!-- Elemen ini hanya tampilan interaktif (DOM) -->
-            <div class="absolute inset-0 z-10 w-full h-full cursor-move" style="touch-action: none;">
-               <!-- User Photo -->
-               <img v-if="userPhotoData" :src="userPhotoData" 
-                    class="absolute select-none pointer-events-none"
-                    :style="{ 
-                      transform: `translate(${posX}px, ${posY}px) scale(${scale})`,
-                      transformOrigin: 'top left',
-                      width: `${photoWidth}px`,
-                      height: `${photoHeight}px`
-                    }"
-               >
+            <!-- User Photo with Resizer Handles -->
+            <div v-if="userPhotoData"
+                 class="absolute z-10" 
+                 :style="{ 
+                   transform: `translate(${posX}px, ${posY}px)`,
+                   width: `${imgWidth}px`,
+                   height: `${imgHeight}px`,
+                   cursor: isDragging ? 'grabbing' : 'grab'
+                 }"
+                 @mousedown.prevent="startDrag"
+                 @touchstart.prevent="startDrag">
+                 
+               <img :src="userPhotoData" class="w-full h-full object-fill max-w-none pointer-events-none select-none drop-shadow-md">
+               
+               <!-- 4 Corner Handles (Visible when photo exists) -->
+               <div class="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startResize($event, 'tl')" @touchstart.stop.prevent="startResize($event, 'tl')"></div>
+               <div class="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'tr')" @touchstart.stop.prevent="startResize($event, 'tr')"></div>
+               <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'bl')" @touchstart.stop.prevent="startResize($event, 'bl')"></div>
+               <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startResize($event, 'br')" @touchstart.stop.prevent="startResize($event, 'br')"></div>
             </div>
 
-            <!-- Frame Twibbon -->
-            <img :src="frameUrl" @load="onFrameLoad" class="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none select-none">
+            <!-- Frame Twibbon (Top layer, pointer events disabled) -->
+            <img v-if="frameUrl" :src="frameUrl" @load="onFrameLoad" class="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none select-none drop-shadow-xl">
             
             <!-- Hidden Canvas for Export -->
             <canvas ref="exportCanvas" class="hidden"></canvas>
@@ -52,19 +59,13 @@
             <div v-if="!userPhotoData" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/10 pointer-events-none">
               <div class="bg-white/90 px-4 py-2 rounded-lg shadow-sm text-center">
                 <i class="fas fa-image text-gray-400 text-2xl mb-1"></i>
-                <p class="text-sm font-medium text-gray-600">Silakan unggah atau tarik (drag) foto Anda kesini</p>
+                <p class="text-sm font-medium text-gray-600">Silakan unggah atau tarik foto kesini</p>
               </div>
             </div>
           </div>
           
-          <!-- Controls -->
-          <div v-if="userPhotoData" class="w-full max-w-md mt-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
-            <label class="text-sm font-medium text-gray-700 flex justify-between mb-2">
-              <span><i class="fas fa-search-plus mr-1"></i> Perbesar/Perkecil</span>
-              <span>{{ Math.round(scale * 100) }}%</span>
-            </label>
-            <input type="range" v-model="scale" min="0.1" max="3" step="0.01" class="w-full accent-blue-600">
-            <p class="text-xs text-gray-500 mt-2 text-center"><i class="fas fa-hand-pointer mr-1"></i> Geser foto pada area bingkai untuk menyesuaikan posisi</p>
+          <div v-if="userPhotoData" class="w-full max-w-md mt-4 text-center">
+             <p class="text-sm text-gray-500"><i class="fas fa-hand-pointer mr-1"></i> Geser foto atau tarik ujung kotak untuk mengubah ukuran</p>
           </div>
         </div>
         
@@ -97,10 +98,9 @@
           <div class="bg-blue-50 text-blue-800 p-4 rounded-xl text-sm leading-relaxed">
             <h4 class="font-bold mb-1"><i class="fas fa-info-circle mr-1"></i> Tips Penggunaan:</h4>
             <ul class="list-disc pl-5 space-y-1 text-blue-700/80">
-              <li>Anda bisa menarik (drag & drop) foto langsung ke area bingkai.</li>
-              <li>Gunakan foto dengan pencahayaan terang.</li>
-              <li>Gunakan penggeser (slider) untuk mengatur ukuran.</li>
-              <li>Sentuh dan geser (drag) foto untuk memposisikan wajah Anda agar pas dengan bingkai.</li>
+              <li>Tarik (drag) foto Anda tepat ke dalam area bingkai.</li>
+              <li>Untuk memperbesar/memperkecil, <b>tarik tombol bulat</b> di sudut foto.</li>
+              <li>Sentuh bagian tengah foto untuk menggeser posisinya.</li>
             </ul>
           </div>
         </div>
@@ -143,6 +143,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRuntimeConfig } from '#app'
+import { getStorageUrl } from '@/services/api'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -155,41 +156,40 @@ const userPhotoData = ref(null)
 const exportCanvas = ref(null)
 const editorContainer = ref(null)
 
-// Drag and Scale state
-const scale = ref(1)
+// Transform state
 const posX = ref(0)
 const posY = ref(0)
-const photoWidth = ref(0)
-const photoHeight = ref(0)
+const imgWidth = ref(0)
+const imgHeight = ref(0)
+const aspectRatio = ref(1)
+
 let frameImgObj = null
 let userImgObj = null
 
 const isDownloading = ref(false)
+const isDragOver = ref(false)
+const isDragOverCanvas = ref(false)
 
 // Interaction state
 let isDragging = false
+let isResizing = false
+let resizeCorner = ''
 let startX = 0
 let startY = 0
 let initialPosX = 0
 let initialPosY = 0
+let startImgWidth = 0
+let startImgHeight = 0
 
 onMounted(async () => {
   await fetchTwibbon()
 })
-
-const getStorageUrl = (path) => {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  const baseUrl = config.public.apiBase.replace('/api/v1', '')
-  return `${baseUrl}/storage/${path}`
-}
 
 const fetchTwibbon = async () => {
   try {
     const { data } = await $fetch(`${config.public.apiBase}/twibbon/${route.params.slug}`)
     twibbon.value = data?.data
     if (twibbon.value) {
-      // Proxy or direct URL for CORS if needed, but since it's same domain it's usually fine
       frameUrl.value = getStorageUrl(twibbon.value.file_path)
     }
   } catch (error) {
@@ -203,9 +203,6 @@ const fetchTwibbon = async () => {
 const onFrameLoad = (e) => {
   frameImgObj = e.target
 }
-
-const isDragOver = ref(false)
-const isDragOverCanvas = ref(false)
 
 const handlePhotoDrop = (e) => {
   isDragOver.value = false
@@ -230,21 +227,19 @@ const processFile = (file) => {
   reader.onload = (event) => {
     userPhotoData.value = event.target.result
     
-    // Reset positions and load image to get dimensions
     const img = new Image()
     img.onload = () => {
       userImgObj = img
-      photoWidth.value = img.width
-      photoHeight.value = img.height
+      aspectRatio.value = img.width / img.height
       
-      // Auto scale to fit inside view area
       const containerSize = editorContainer.value?.clientWidth || 400 
-      const minScale = Math.max(containerSize / img.width, containerSize / img.height)
-      scale.value = minScale
+      // Set default scale so it fits nicely
+      const defaultWidth = containerSize * 0.8
+      imgWidth.value = defaultWidth
+      imgHeight.value = defaultWidth / aspectRatio.value
       
-      // Center image
-      posX.value = (containerSize - (img.width * minScale)) / 2
-      posY.value = (containerSize - (img.height * minScale)) / 2
+      posX.value = (containerSize - imgWidth.value) / 2
+      posY.value = (containerSize - imgHeight.value) / 2
     }
     img.src = event.target.result
   }
@@ -256,7 +251,6 @@ const handlePhotoUpload = (e) => {
   processFile(file)
 }
 
-// Mouse / Touch events for dragging
 const getClientCoords = (e) => {
   if (e.touches && e.touches.length > 0) {
     return { x: e.touches[0].clientX, y: e.touches[0].clientY }
@@ -272,21 +266,65 @@ const startDrag = (e) => {
   startY = coords.y
   initialPosX = posX.value
   initialPosY = posY.value
-  e.preventDefault()
+}
+
+const startResize = (e, corner) => {
+  if (!userPhotoData.value) return
+  isResizing = true
+  resizeCorner = corner
+  const coords = getClientCoords(e)
+  startX = coords.x
+  startY = coords.y
+  initialPosX = posX.value
+  initialPosY = posY.value
+  startImgWidth = imgWidth.value
+  startImgHeight = imgHeight.value
 }
 
 const onDrag = (e) => {
-  if (!isDragging) return
+  if (!isDragging && !isResizing) return
+  
   const coords = getClientCoords(e)
   const dx = coords.x - startX
   const dy = coords.y - startY
-  posX.value = initialPosX + dx
-  posY.value = initialPosY + dy
-  e.preventDefault()
+  
+  if (isDragging) {
+    posX.value = initialPosX + dx
+    posY.value = initialPosY + dy
+  } 
+  else if (isResizing) {
+    let newW = startImgWidth
+    
+    if (resizeCorner === 'br') {
+      newW = startImgWidth + dx
+    } else if (resizeCorner === 'bl') {
+      newW = startImgWidth - dx
+    } else if (resizeCorner === 'tr') {
+      newW = startImgWidth + dx
+    } else if (resizeCorner === 'tl') {
+      newW = startImgWidth - dx
+    }
+    
+    // Minimum size
+    if (newW < 50) newW = 50
+    const newH = newW / aspectRatio.value
+    
+    // Adjust position so the opposite corner stays anchored
+    if (resizeCorner === 'bl' || resizeCorner === 'tl') {
+      posX.value = initialPosX + (startImgWidth - newW)
+    }
+    if (resizeCorner === 'tr' || resizeCorner === 'tl') {
+      posY.value = initialPosY + (startImgHeight - newH)
+    }
+    
+    imgWidth.value = newW
+    imgHeight.value = newH
+  }
 }
 
-const endDrag = () => {
+const endInteraction = () => {
   isDragging = false
+  isResizing = false
 }
 
 const downloadTwibbon = () => {
@@ -298,31 +336,21 @@ const downloadTwibbon = () => {
       const canvas = exportCanvas.value
       const ctx = canvas.getContext('2d')
       
-      // Gunakan resolusi asli frame untuk kualitas terbaik
-      // Wait, we need to load the frame as an Image object securely to draw on canvas
       const bgImg = new Image()
       bgImg.crossOrigin = "Anonymous"
       bgImg.onload = () => {
         canvas.width = bgImg.width
         canvas.height = bgImg.height
         
-        // Clear
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         
-        // Calculate relative scale between DOM view (max 400px approx) and original image
-        // To be accurate, we must find the exact DOM size of the frame container
-        // Since container is aspect-square, and background is object-contain
-        // Let's assume the frame itself dictates the square ratio or the background size.
-        
-        // Actually, the simplest way is to scale the user image based on frame dimensions.
-        // We know DOM width vs Frame width ratio.
         const domWidth = editorContainer.value?.clientWidth || 400
         const ratio = bgImg.width / domWidth
         
         const finalX = posX.value * ratio
         const finalY = posY.value * ratio
-        const finalWidth = photoWidth.value * scale.value * ratio
-        const finalHeight = photoHeight.value * scale.value * ratio
+        const finalWidth = imgWidth.value * ratio
+        const finalHeight = imgHeight.value * ratio
         
         // 1. Draw User Photo
         ctx.drawImage(userImgObj, finalX, finalY, finalWidth, finalHeight)
@@ -330,10 +358,8 @@ const downloadTwibbon = () => {
         // 2. Draw Frame
         ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height)
         
-        // 3. Export to PNG
+        // 3. Export
         const dataUrl = canvas.toDataURL('image/png')
-        
-        // Download Trigger
         const link = document.createElement('a')
         link.download = `Twibbon-${twibbon.value.slug}.png`
         link.href = dataUrl
@@ -344,7 +370,7 @@ const downloadTwibbon = () => {
         isDownloading.value = false
       }
       bgImg.onerror = () => {
-        alert('Terjadi kesalahan saat memproses gambar frame (CORS/Network error).')
+        alert('Terjadi kesalahan saat memproses gambar frame. (CORS/Network error)')
         isDownloading.value = false
       }
       bgImg.src = frameUrl.value
