@@ -31,22 +31,24 @@
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div v-for="item in twibbons" :key="item.id" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition">
-        <div class="h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center p-4 checkerboard">
-          <img :src="getStorageUrl(item.file_path)" :alt="item.judul" class="max-h-full object-contain drop-shadow-md z-10 relative">
-          <!-- Overlay actions -->
-          <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
-            <NuxtLink :to="`/twibbon/${item.slug}`" target="_blank" class="w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition" title="Lihat Publik">
-              <i class="fas fa-eye"></i>
+      <div v-for="item in twibbons" :key="item.id" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition flex flex-col">
+        <NuxtLink :to="`/twibbon/${item.slug}`" target="_blank" class="block h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center p-4 checkerboard cursor-pointer">
+          <img :src="getStorageUrl(item.file_path)" :alt="item.judul" class="max-h-full object-contain drop-shadow-md z-10 relative group-hover:scale-105 transition-transform duration-300">
+          <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
+        </NuxtLink>
+        <div class="p-4 flex-1 flex flex-col justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-gray-800 text-sm truncate mb-1" :title="item.judul">{{ item.judul }}</h3>
+            <p class="text-xs text-gray-500"><i class="far fa-clock mr-1"></i> {{ formatDate(item.created_at) }}</p>
+          </div>
+          <div class="flex items-center gap-2 mt-2 pt-3 border-t border-gray-100">
+            <NuxtLink :to="`/twibbon/${item.slug}`" target="_blank" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold py-2 px-3 rounded-lg text-center transition flex items-center justify-center gap-1">
+              <i class="fas fa-external-link-alt"></i> Buka Editor
             </NuxtLink>
-            <button @click="deleteTwibbon(item.id)" class="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition shadow-lg" title="Hapus">
+            <button @click="deleteTwibbon(item.id)" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 px-3 rounded-lg transition flex items-center justify-center" title="Hapus Twibbon">
               <i class="fas fa-trash"></i>
             </button>
           </div>
-        </div>
-        <div class="p-4">
-          <h3 class="font-bold text-gray-800 text-sm truncate mb-1" :title="item.judul">{{ item.judul }}</h3>
-          <p class="text-xs text-gray-500"><i class="far fa-clock mr-1"></i> {{ formatDate(item.created_at) }}</p>
         </div>
       </div>
     </div>
