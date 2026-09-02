@@ -463,10 +463,11 @@ const handlePhotoChange = (e) => {
   reader.readAsDataURL(file)
 }
 
-const removePhoto = () => {
+const removePhoto = async () => {
   photoPreview.value = null
   form.value.photo = null
   form.value.remove_photo = true
+  await updateProfile()
 }
 
 const updateProfile = async () => {
@@ -511,7 +512,8 @@ const updateProfile = async () => {
          return {
             ...old,
             user: response.data.data.user,
-            profile_photo_url: response.data.data.profile_photo_url
+            profile_photo_url: response.data.data.profile_photo_url,
+            is_manual_photo: response.data.data.is_manual_photo
          }
       })
       
