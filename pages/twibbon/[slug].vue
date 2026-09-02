@@ -30,25 +30,28 @@
             <!-- Snapping Guides -->
             <div v-if="isSnappedX" class="absolute top-0 bottom-0 left-1/2 w-[1px] bg-blue-500 z-40 pointer-events-none"></div>
             <div v-if="isSnappedY" class="absolute left-0 right-0 top-1/2 h-[1px] bg-blue-500 z-40 pointer-events-none"></div>
+            <div v-if="currentDegreeDisplay !== null" class="absolute top-4 left-1/2 -translate-x-1/2 bg-black/75 text-white px-3 py-1 rounded-full text-sm font-bold z-50 pointer-events-none">
+              {{ currentDegreeDisplay }}&deg;
+            </div>
 
             <!-- Photos (Multi-layer) -->
             <div v-for="photo in photos" :key="photo.id"
                  class="absolute"
-                 :class="{ 'z-10': selectedPhotoId !== photo.id, 'z-20 ring-2 ring-blue-400 ring-offset-1': selectedPhotoId === photo.id }"
+                 :class="{ 'z-10': !selectedPhotoIds.includes(photo.id), 'z-20 ring-2 ring-blue-400 ring-offset-1': selectedPhotoIds.includes(photo.id) }"
                  :style="{ 
                    transform: `translate(${photo.x}px, ${photo.y}px) rotate(${photo.rotation}deg)`,
                    width: `${photo.width}px`,
                    height: `${photo.height}px`,
-                   cursor: photo.isLocked ? 'not-allowed' : (isDragging && selectedPhotoId === photo.id ? 'grabbing' : 'grab'),
+                   cursor: photo.isLocked ? 'not-allowed' : (isDragging && selectedPhotoIds.includes(photo.id) ? 'grabbing' : 'grab'),
                    filter: `blur(${photo.blur}px)`
                  }"
-                 @mousedown.prevent.stop="selectPhoto(photo.id, $event)"
-                 @touchstart.prevent.stop="selectPhoto(photo.id, $event)">
+                 @mousedown.stop="selectPhoto(photo.id, $event)"
+                 @touchstart.stop="selectPhoto(photo.id, $event)">
                  
                <img :src="photo.dataUrl" class="w-full h-full object-fill max-w-none pointer-events-none select-none drop-shadow-md">
                
                <!-- Handles for selected photo ONLY -->
-               <template v-if="selectedPhotoId === photo.id && !photo.isLocked">
+               <template v-if="selectedPhotoIds.includes(photo.id) && !photo.isLocked">
                  <div class="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startResize($event, 'tl')" @touchstart.stop.prevent="startResize($event, 'tl')"></div>
                  <div class="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'tr')" @touchstart.stop.prevent="startResize($event, 'tr')"></div>
                  <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'bl')" @touchstart.stop.prevent="startResize($event, 'bl')"></div>
@@ -68,13 +71,13 @@
             <div v-if="photos.length === 0" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/10 pointer-events-none">
               <div class="bg-white/90 px-4 py-2 rounded-lg shadow-sm text-center">
                 <i class="fas fa-image text-gray-400 text-2xl mb-1"></i>
-                <p class="text-sm font-medium text-gray-600">Silakan unggah atau tarik foto kesini (Maks. 5)</p>
+                <p class="text-sm font-medium text-gray-600">Silakan unggah atau tarik foto kesini (Maks. 10)</p>
               </div>
             </div>
           </div>
           
           <!-- Floating Toolbar (Appears above the canvas when a photo is selected) -->
-          <div v-if="selectedPhoto" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl px-4 py-2 flex items-center gap-4 z-50 border border-gray-200" @click.stop>
+          <div v-if="selectedPhotos.length > 0" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl px-4 py-2 flex items-center gap-4 z-50 border border-gray-200" @click.stop>
             <button @click="deleteSelected" class="text-red-500 hover:text-red-700" title="Hapus">
               <i class="fas fa-trash"></i>
             </button>
@@ -91,7 +94,7 @@
           </div>
           
           <div v-if="photos.length > 0" class="w-full mt-4 text-center">
-             <p class="text-sm text-gray-500"><i class="fas fa-hand-pointer mr-1"></i> Pilih foto untuk menggeser, mengubah ukuran, atau mengatur filter ({{ photos.length }}/5)</p>
+             <p class="text-sm text-gray-500"><i class="fas fa-hand-pointer mr-1"></i> Pilih foto untuk menggeser, mengubah ukuran, atau mengatur filter ({{ photos.length }}/10)</p>
           </div>
         </div>
         
@@ -104,13 +107,10 @@
                    @dragover.prevent="isDragOver = true"
                    @dragleave.prevent="isDragOver = false"
                    @drop.prevent="handlePhotoDrop"
-                   :class="['w-full border-2 border-dashed transition font-medium py-3 px-4 rounded-xl text-center flex flex-col items-center justify-center gap-2 mb-4', 
-                     photos.length >= 5 ? 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed' :
-                     (isDragOver ? 'border-blue-600 bg-blue-100 text-blue-700 cursor-pointer' : 'bg-white border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-600 cursor-pointer')
-                   ]">
+                   :class="['w-full border-2 border-dashed transition font-medium py-3 px-4 rounded-xl text-center flex flex-col items-center justify-center gap-2 mb-4', isDragOver ? 'border-blue-600 bg-blue-100 text-blue-700' : 'bg-white border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-600', photos.length >= 10 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer']">
               <i class="fas fa-upload text-xl"></i>
-              <span>{{ photos.length >= 5 ? 'Batas Maks. 5 Foto' : (photos.length > 0 ? 'Tambah Foto Lain' : 'Pilih atau Tarik Foto Kesini') }}</span>
-              <input v-if="photos.length < 5" id="upload-photo" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
+              <span>{{ photos.length > 0 ? 'Tambah Foto Lain' : 'Pilih atau Tarik Foto Kesini' }}</span>
+              <input v-if="photos.length < 10" id="upload-photo" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
             </label>
 
             <button 
@@ -139,9 +139,9 @@
 
     <!-- Sticky Bottom Action Bar for Mobile -->
     <div v-if="photos.length > 0" class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 md:hidden z-50 flex gap-3 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)]">
-      <label for="upload-photo-mobile" class="flex-1 bg-blue-50 border border-blue-200 text-blue-700 font-semibold py-3 px-2 rounded-xl text-center text-sm flex items-center justify-center" :class="{ 'opacity-50 cursor-not-allowed': photos.length >= 5, 'cursor-pointer': photos.length < 5 }">
+      <label for="upload-photo-mobile" class="flex-1 bg-blue-50 border border-blue-200 text-blue-700 font-semibold py-3 px-2 rounded-xl text-center text-sm flex items-center justify-center" :class="{ 'opacity-50 cursor-not-allowed': photos.length >= 10, 'cursor-pointer': photos.length < 10 }">
         <i class="fas fa-plus mr-1"></i> Tambah
-        <input v-if="photos.length < 5" id="upload-photo-mobile" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
+        <input v-if="photos.length < 10" id="upload-photo-mobile" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
       </label>
       <button 
         @click="downloadTwibbon" 
@@ -181,9 +181,11 @@ const twibbon = ref(null)
 const frameUrl = ref('')
 
 const photos = ref([])
-const selectedPhotoId = ref(null)
+const selectedPhotoIds = ref([])
 
-const selectedPhoto = computed(() => photos.value.find(p => p.id === selectedPhotoId.value) || null)
+const selectedPhotos = computed(() => photos.value.filter(p => selectedPhotoIds.value.includes(p.id)));
+const selectedPhoto = computed(() => selectedPhotos.value[0] || null);
+const currentDegreeDisplay = ref(null)
 
 const exportCanvas = ref(null)
 const editorContainer = ref(null)
@@ -211,6 +213,7 @@ let startImgWidth = 0
 let startImgHeight = 0
 let initialDistance = 0
 let initialRotation = 0
+let initialGroupStates = new Map()
 
 const handleKeydown = (e) => {
   if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -288,9 +291,14 @@ const handleCanvasDrop = (e) => {
 
 const processFile = (file) => {
   if (!file) return
-  if (photos.value.length >= 5) {
-    alert('Batas maksimal 5 foto telah tercapai.')
+  if (photos.value.length >= 10) {
+    alert('Batas maksimal 10 foto telah tercapai.')
     return
+  }
+  if (photos.value.length >= 3) {
+    if (!confirm('Peringatan: Mengunggah lebih dari 3 foto akan memakan banyak memori browser dan dapat berdampak pada kecepatan. Anda yakin ingin melanjutkan?')) {
+      return
+    }
   }
 
   const reader = new FileReader()
@@ -337,36 +345,45 @@ const handlePhotoUpload = (e) => {
 }
 
 const deselectAll = () => {
-  selectedPhotoId.value = null
+  selectedPhotoIds.value = []
 }
 
 const selectPhoto = (id, e) => {
-  selectedPhotoId.value = id
-  const photo = photos.value.find(p => p.id === id)
+  if (e && e.ctrlKey) {
+    if (selectedPhotoIds.value.includes(id)) {
+      selectedPhotoIds.value = selectedPhotoIds.value.filter(pid => pid !== id);
+    } else {
+      selectedPhotoIds.value.push(id);
+    }
+  } else {
+    if (!selectedPhotoIds.value.includes(id)) {
+      selectedPhotoIds.value = [id];
+    }
+  }
+  const photo = photos.value.find(p => p.id === id);
   if (photo && !photo.isLocked) {
-    startDrag(e, photo)
+    startDrag(e, photo);
   }
 }
 
 const deleteSelected = () => {
-  if (selectedPhotoId.value) {
-    photos.value = photos.value.filter(p => p.id !== selectedPhotoId.value)
-    selectedPhotoId.value = null
+  if (selectedPhotoIds.value.length > 0) {
+    photos.value = photos.value.filter(p => !selectedPhotoIds.value.includes(p.id));
+    selectedPhotoIds.value = [];
   }
 }
 
 const centerSelected = () => {
-  if (selectedPhoto.value) {
-    const containerSize = editorContainer.value?.clientWidth || 400
-    selectedPhoto.value.x = (containerSize - selectedPhoto.value.width) / 2
-    selectedPhoto.value.y = (containerSize - selectedPhoto.value.height) / 2
-  }
+  const containerSize = editorContainer.value?.clientWidth || 400;
+  selectedPhotos.value.forEach(p => {
+    p.x = (containerSize - p.width) / 2;
+    p.y = (containerSize - p.height) / 2;
+  });
 }
 
 const toggleLockSelected = () => {
-  if (selectedPhoto.value) {
-    selectedPhoto.value.isLocked = !selectedPhoto.value.isLocked
-  }
+  const allLocked = selectedPhotos.value.every(p => p.isLocked);
+  selectedPhotos.value.forEach(p => p.isLocked = !allLocked);
 }
 
 const getClientCoords = (e) => {
@@ -386,139 +403,166 @@ const getPinchDistance = (e) => {
   return 0
 }
 
-const startDrag = (e, photo) => {
-  if (!photo || photo.isLocked) return
+const startDrag = (e, targetPhoto) => {
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
   
+  initialGroupStates.clear();
+  activePhotos.forEach(p => {
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation });
+  });
+
   if (e.touches && e.touches.length >= 2) {
-    isPinching = true
-    initialDistance = getPinchDistance(e)
-    initialPosX = photo.x
-    initialPosY = photo.y
-    startImgWidth = photo.width
-    startImgHeight = photo.height
-    addWindowListeners()
-    return
+    isPinching = true;
+    initialDistance = getPinchDistance(e);
+    initialPosX = targetPhoto.x;
+    initialPosY = targetPhoto.y;
+    startImgWidth = targetPhoto.width;
+    startImgHeight = targetPhoto.height;
+    addWindowListeners();
+    return;
   }
 
-  isDragging = true
-  const coords = getClientCoords(e)
-  startX = coords.x
-  startY = coords.y
-  initialPosX = photo.x
-  initialPosY = photo.y
-  addWindowListeners()
+  isDragging = true;
+  const coords = getClientCoords(e);
+  startX = coords.x;
+  startY = coords.y;
+  initialPosX = targetPhoto.x;
+  initialPosY = targetPhoto.y;
+  addWindowListeners();
 }
 
 const startResize = (e, corner) => {
-  if (!selectedPhoto.value || selectedPhoto.value.isLocked) return
-  isResizing = true
-  resizeCorner = corner
-  const coords = getClientCoords(e)
-  startX = coords.x
-  startY = coords.y
-  initialPosX = selectedPhoto.value.x
-  initialPosY = selectedPhoto.value.y
-  startImgWidth = selectedPhoto.value.width
-  startImgHeight = selectedPhoto.value.height
-  addWindowListeners()
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
+  isResizing = true;
+  resizeCorner = corner;
+  const coords = getClientCoords(e);
+  startX = coords.x;
+  startY = coords.y;
+  initialGroupStates.clear();
+  activePhotos.forEach(p => {
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
+  });
+  addWindowListeners();
 }
 
 const startRotate = (e) => {
-  if (!selectedPhoto.value || selectedPhoto.value.isLocked) return
-  isRotating = true
-  const coords = getClientCoords(e)
-  startX = coords.x
-  startY = coords.y
-  initialRotation = selectedPhoto.value.rotation
-  addWindowListeners()
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
+  isRotating = true;
+  const coords = getClientCoords(e);
+  startX = coords.x;
+  startY = coords.y;
+  initialGroupStates.clear();
+  activePhotos.forEach(p => {
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation });
+  });
+  initialRotation = activePhotos[0].rotation;
+  addWindowListeners();
 }
 
 const onDrag = (e) => {
-  const photo = selectedPhoto.value
-  if (!photo || photo.isLocked) return
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
 
   if (isPinching && e.touches && e.touches.length >= 2) {
-    if (e.cancelable) e.preventDefault()
-    const currentDistance = getPinchDistance(e)
-    const scale = currentDistance / initialDistance
+    if (e.cancelable) e.preventDefault();
+    const currentDistance = getPinchDistance(e);
+    const scale = currentDistance / initialDistance;
     
-    let newW = startImgWidth * scale
-    if (newW < 50) newW = 50
-    const newH = newW / photo.aspectRatio
-    
-    const dx = (newW - startImgWidth) / 2
-    const dy = (newH - startImgHeight) / 2
-    
-    photo.width = newW
-    photo.height = newH
-    photo.x = initialPosX - dx
-    photo.y = initialPosY - dy
-    return
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      if (!state) return;
+      let newW = state.width * scale;
+      if (newW < 50) newW = 50;
+      const newH = newW / state.aspectRatio;
+      const dxP = (newW - state.width) / 2;
+      const dyP = (newH - state.height) / 2;
+      photo.width = newW;
+      photo.height = newH;
+      photo.x = state.x - dxP;
+      photo.y = state.y - dyP;
+    });
+    return;
   }
 
-  if (!isDragging && !isResizing && !isRotating) return
-  if (e.cancelable) e.preventDefault()
+  if (!isDragging && !isResizing && !isRotating) return;
+  if (e.cancelable) e.preventDefault();
   
-  const coords = getClientCoords(e)
-  const dx = coords.x - startX
-  const dy = coords.y - startY
+  const coords = getClientCoords(e);
+  const dx = coords.x - startX;
+  const dy = coords.y - startY;
   
   if (isDragging) {
-    let newX = initialPosX + dx
-    let newY = initialPosY + dy
+    const target = activePhotos[0];
+    const targetState = initialGroupStates.get(target.id);
+    let newX = targetState.x + dx;
+    let newY = targetState.y + dy;
     
-    const containerSize = editorContainer.value?.clientWidth || 400
-    const centerX = containerSize / 2
-    const centerY = containerSize / 2
+    const containerSize = editorContainer.value?.clientWidth || 400;
+    const centerX = containerSize / 2;
+    const centerY = containerSize / 2;
     
-    const imgCenterX = newX + photo.width / 2
-    const imgCenterY = newY + photo.height / 2
-    
-    if (Math.abs(imgCenterX - centerX) < 8) {
-      newX = centerX - photo.width / 2
-      isSnappedX.value = true
+    let snappedDx = dx;
+    let snappedDy = dy;
+
+    if (Math.abs((newX + target.width/2) - centerX) < 8) {
+      snappedDx = (centerX - target.width/2) - targetState.x;
+      isSnappedX.value = true;
     } else {
-      isSnappedX.value = false
+      isSnappedX.value = false;
+    }
+    if (Math.abs((newY + target.height/2) - centerY) < 8) {
+      snappedDy = (centerY - target.height/2) - targetState.y;
+      isSnappedY.value = true;
+    } else {
+      isSnappedY.value = false;
     }
     
-    if (Math.abs(imgCenterY - centerY) < 8) {
-      newY = centerY - photo.height / 2
-      isSnappedY.value = true
-    } else {
-      isSnappedY.value = false
-    }
-    
-    photo.x = newX
-    photo.y = newY
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      photo.x = state.x + snappedDx;
+      photo.y = state.y + snappedDy;
+    });
   } 
   else if (isResizing) {
-    let newW = startImgWidth
-    
-    if (resizeCorner === 'br') {
-      newW = startImgWidth + dx
-    } else if (resizeCorner === 'bl') {
-      newW = startImgWidth - dx
-    } else if (resizeCorner === 'tr') {
-      newW = startImgWidth + dx
-    } else if (resizeCorner === 'tl') {
-      newW = startImgWidth - dx
-    }
-    
-    if (newW < 50) newW = 50
-    const newH = newW / photo.aspectRatio
-    
-    if (resizeCorner === 'bl' || resizeCorner === 'tl') {
-      photo.x = initialPosX + (startImgWidth - newW)
-    }
-    if (resizeCorner === 'tr' || resizeCorner === 'tl') {
-      photo.y = initialPosY + (startImgHeight - newH)
-    }
-    
-    photo.width = newW
-    photo.height = newH
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      let newW = state.width;
+      if (resizeCorner === 'br' || resizeCorner === 'tr') newW = state.width + dx;
+      if (resizeCorner === 'bl' || resizeCorner === 'tl') newW = state.width - dx;
+      if (newW < 50) newW = 50;
+      
+      const newH = newW / state.aspectRatio;
+      
+      if (resizeCorner === 'bl' || resizeCorner === 'tl') {
+        photo.x = state.x + (state.width - newW);
+      }
+      if (resizeCorner === 'tr' || resizeCorner === 'tl') {
+        photo.y = state.y + (state.height - newH);
+      }
+      
+      photo.width = newW;
+      photo.height = newH;
+    });
   }
   else if (isRotating) {
-    photo.rotation = initialRotation + dx * 0.5
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      let newRotation = state.rotation + dx * 0.5;
+      let rawDeg = newRotation % 360;
+      if (rawDeg < 0) rawDeg += 360;
+      const snapAngles = [0, 45, 90, 180, 270, 360];
+      for (let angle of snapAngles) {
+        if (Math.abs(rawDeg - angle) < 5 || Math.abs(rawDeg - angle) > 355) {
+          newRotation = newRotation - rawDeg + (angle === 360 ? 0 : angle);
+          break;
+        }
+      }
+      photo.rotation = newRotation;
+      if (photo.id === activePhotos[0].id) currentDegreeDisplay.value = Math.round(newRotation % 360);
+    });
   }
 }
 
@@ -529,6 +573,7 @@ const endInteraction = () => {
   isRotating = false
   isSnappedX.value = false
   isSnappedY.value = false
+  currentDegreeDisplay.value = null
   removeWindowListeners()
 }
 
