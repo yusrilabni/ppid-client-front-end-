@@ -127,9 +127,6 @@
                         <button @click="resetFilters" class="flex-1 lg:flex-none w-full lg:w-14 bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm rounded-xl h-[44px] transition-all flex items-center justify-center border border-gray-200" title="Reset Filter">
                             <i class="fas fa-undo-alt lg:mr-0"></i> <span class="inline lg:hidden ml-2 font-semibold">Reset</span>
                         </button>
-                        <button @click="copyShareLink" class="flex-1 lg:flex-none w-full lg:w-14 bg-white border-2 border-blue-500 hover:bg-blue-50 text-blue-600 shadow-sm rounded-xl h-[44px] transition-all flex items-center justify-center" title="Bagikan Hasil Filter">
-                            <i class="fas fa-share-alt lg:mr-0"></i> <span class="inline lg:hidden ml-2 font-semibold">Bagikan</span>
-                        </button>
                     </div>
             </div>
 
@@ -535,25 +532,6 @@ const updateRoute = () => {
 }
 
 
-
-const copyShareLink = () => {
-  const queryObj = { ...filters.value };
-  // Remove empty parameters to make URL cleaner
-  Object.keys(queryObj).forEach(key => {
-    if (!queryObj[key] || queryObj[key] === '') {
-      delete queryObj[key];
-    }
-  });
-  const queryString = new URLSearchParams(queryObj).toString();
-  const url = `https://ppid.sinjaikab.go.id/share/informasi-pemkab${queryString ? '?' + queryString : ''}`;
-  
-  navigator.clipboard.writeText(url).then(() => {
-    alert('Tautan khusus untuk filter ini berhasil disalin!\nSilakan tempel (paste) di WhatsApp atau Facebook Anda.');
-  }).catch(err => {
-    console.error('Gagal menyalin:', err);
-    prompt('Salin tautan berikut secara manual:', url);
-  });
-}
 
 import { onMounted } from 'vue'
 

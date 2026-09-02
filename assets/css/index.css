@@ -86,7 +86,7 @@ main {
 .acc-sat-low { filter: saturate(0.5) !important; }
 .acc-sat-high { filter: saturate(2) !important; }
 .acc-sat-mono { filter: grayscale(1) !important; }
-.acc-highlight-links a:not(.acc-ignore) { outline: 4px solid #ff00ff !important; outline-offset: 2px !important; background-color: #ffff00 !important; color: #000 !important; font-weight: bold !important; }
+.acc-highlight-links a:not(.acc-ignore), .acc-highlight-links button:not(.acc-ignore) { outline: 4px solid #ff00ff !important; outline-offset: 2px !important; background-color: #ffff00 !important; color: #000 !important; font-weight: bold !important; }
 .acc-highlight-headings h1, .acc-highlight-headings h2, .acc-highlight-headings h3 { background-color: #0000ff !important; color: #fff !important; padding: 8px !important; border-left: 12px solid #ffff00 !important; display: block !important; }
 .acc-text-spacing *:not(.acc-ignore) { letter-spacing: 2px !important; }
 .acc-hide-images img { visibility: hidden !important; opacity: 0 !important; }
