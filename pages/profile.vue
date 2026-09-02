@@ -68,7 +68,7 @@
                 <template v-if="photoPreview">
                   <img :src="photoPreview" alt="Profile Photo" class="rounded-full h-28 w-28 object-cover border border-gray-200">
                 </template>
-                <template v-else-if="profileData.profile_photo_url">
+                <template v-else-if="profileData.profile_photo_url && !form.remove_photo">
                   <img :src="getStorageUrl(profileData.profile_photo_url)" alt="Profile Photo" class="rounded-full h-28 w-28 object-cover border border-gray-200">
                 </template>
                 <template v-else>
@@ -80,10 +80,17 @@
 
               <input type="file" class="hidden" ref="photoInput" @change="handlePhotoChange" accept="image/*">
 
-              <button type="button" @click="$refs.photoInput.click()" 
-                class="mt-4 inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
-                Pilih Foto Baru
-              </button>
+              <div class="mt-4 flex gap-2 justify-center">
+                <button type="button" @click="$refs.photoInput.click()" 
+                  class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                  Pilih Foto Baru
+                </button>
+
+                <button type="button" v-if="profileData.is_manual_photo || photoPreview" @click="removePhoto"
+                  class="inline-flex items-center px-4 py-2 bg-white border border-red-300 rounded-md font-semibold text-xs text-red-600 uppercase tracking-widest shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                  Hapus Foto
+                </button>
+              </div>
               
               <p v-if="errors.photo" class="mt-2 text-sm text-red-600">{{ errors.photo[0] }}</p>
             </div>
@@ -412,6 +419,7 @@ const form = ref({
   tiktok: '',
   linkedin: '',
   photo: null,
+  remove_photo: false,
   email_can_update: false
 })
 
@@ -427,6 +435,7 @@ watch(profileData, (data) => {
     form.value.instagram = data.user?.instagram || ''
     form.value.tiktok = data.user?.tiktok || ''
     form.value.linkedin = data.user?.linkedin || ''
+    form.value.remove_photo = false
     form.value.email_can_update = !data.is_asn || !data.user?.email || data.user?.email === '-'
   }
 }, { immediate: true })
@@ -445,12 +454,19 @@ const handlePhotoChange = (e) => {
   if (!file) return
 
   form.value.photo = file
+  form.value.remove_photo = false
   
   const reader = new FileReader()
   reader.onload = (e) => {
     photoPreview.value = e.target.result
   }
   reader.readAsDataURL(file)
+}
+
+const removePhoto = () => {
+  photoPreview.value = null
+  form.value.photo = null
+  form.value.remove_photo = true
 }
 
 const updateProfile = async () => {
@@ -471,6 +487,10 @@ const updateProfile = async () => {
     
     if (form.value.photo) {
       formData.append('photo', form.value.photo)
+    }
+    
+    if (form.value.remove_photo) {
+      formData.append('remove_photo', '1')
     }
 
     const response = await api.post('/profile', formData, {
