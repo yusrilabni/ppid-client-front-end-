@@ -70,13 +70,11 @@ definePageMeta({ layout: 'admin' })
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import api from '@/services/api'
-import { useRuntimeConfig } from '#app'
+import api, { getStorageUrl } from '@/services/api'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const config = useRuntimeConfig()
 
 const loading = ref(true)
 const twibbons = ref([])
@@ -102,13 +100,6 @@ onMounted(() => {
   
   fetchTwibbons()
 })
-
-const getStorageUrl = (path) => {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  const baseUrl = config.public.apiBase.replace('/api/v1', '')
-  return `${baseUrl}/storage/${path}`
-}
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
