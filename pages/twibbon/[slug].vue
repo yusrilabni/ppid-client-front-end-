@@ -65,7 +65,7 @@
             </div>
 
             <!-- Frame Twibbon (Top layer, pointer events disabled) -->
-            <img v-if="frameUrl" :src="frameUrl" @load="onFrameLoad" class="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none select-none drop-shadow-xl" style="z-index: 25;">
+            <img v-if="frameUrl" crossorigin="anonymous" :src="frameUrl" @load="onFrameLoad" class="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none select-none drop-shadow-xl" style="z-index: 25;">
             
             <canvas ref="exportCanvas" class="hidden"></canvas>
             
@@ -262,7 +262,7 @@ const fetchTwibbon = async () => {
     const res = await api.get(`/twibbon/${route.params.slug}`)
     twibbon.value = res.data?.data || res.data
     if (twibbon.value) {
-      frameUrl.value = getStorageUrl(twibbon.value.file_path)
+      frameUrl.value = api.defaults.baseURL + '/twibbon-proxy?path=' + twibbon.value.file_path
     }
   } catch (error) {
     console.error(error)
