@@ -2,7 +2,7 @@
   <div>
     <div class="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 pt-6 md:pt-10 pb-24 overflow-hidden">
         <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
-        <div class="container max-w-6xl mx-auto px-4 relative z-10 text-center">
+        <div class="w-full max-w-[98%] xl:max-w-screen-2xl mx-auto px-4 relative z-10 text-center">
             <!-- Breadcrumbs -->
             <Breadcrumbs :breadcrumbs="getBreadcrumbs.informasiPemkab()" theme="dark" />
 
@@ -35,7 +35,7 @@
     </div>
 
     <div class="bg-gray-50 pb-16">
-        <div class="container max-w-6xl mx-auto px-4 -mt-8 relative z-20">
+        <div class="w-full max-w-[98%] xl:max-w-screen-2xl mx-auto px-4 -mt-8 relative z-20">
             <!-- Notifikasi -->
             <div v-if="notification.message" 
                  :class="[
