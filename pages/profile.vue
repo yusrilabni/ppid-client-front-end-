@@ -464,10 +464,18 @@ const handlePhotoChange = (e) => {
 }
 
 const removePhoto = async () => {
+  if (!confirm('Apakah Anda yakin ingin menghapus foto profil ini?')) return;
+  
   photoPreview.value = null
   form.value.photo = null
   form.value.remove_photo = true
-  await updateProfile()
+  
+  const success = await updateProfile()
+  if (success) {
+    alert('Foto berhasil dihapus dari database!')
+  } else {
+    alert('Gagal menghapus foto. Periksa peringatan error di form Anda.')
+  }
 }
 
 const updateProfile = async () => {
@@ -520,13 +528,17 @@ const updateProfile = async () => {
       // Update auth store user and localStorage
       authStore.user = response.data.data.user
       localStorage.setItem('ppid_user', JSON.stringify(authStore.user))
+      
+      return true
     }
+    return false
   } catch (error) {
     if (error.response?.status === 422) {
       errors.value = error.response.data.errors || {}
     } else {
       console.error('Error updating profile:', error)
     }
+    return false
   } finally {
     saving.value = false
   }
