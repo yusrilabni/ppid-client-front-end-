@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6">
+  <div class="p-6 pb-32">
     <div class="flex items-center gap-4 mb-6">
       <NuxtLink to="/admin/twibbon" class="text-gray-500 hover:text-blue-600 transition">
         <i class="fas fa-arrow-left text-xl"></i>
@@ -47,12 +47,12 @@
           </div>
         </div>
 
-        <div class="flex justify-end pt-4 border-t">
+        <div class="flex justify-end pt-6 mt-4 border-t pb-2">
           <NuxtLink to="/admin/twibbon" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg mr-3 hover:bg-gray-50 transition">Batal</NuxtLink>
           <button 
             type="submit" 
             :disabled="loading"
-            class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2"
+            class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-2 shadow-sm"
           >
             <i v-if="loading" class="fas fa-spinner fa-spin"></i>
             {{ loading ? 'Menyimpan...' : 'Simpan Twibbon' }}
