@@ -222,7 +222,7 @@
                                                 <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i>
                                             </a>
                                             <template v-if="isAdmin && canEditOrDelete(dokumen)">
-                                                <NuxtLink :to="`/admin/informasi-pemkab/${dokumen.id}/edit`" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Edit">
+                                                <NuxtLink :to="`/admin/informasi-pemkab/${dokumen.slug || dokumen.id}/edit`" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </NuxtLink>
                                                 <button @click="deleteItem(dokumen)" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Hapus">

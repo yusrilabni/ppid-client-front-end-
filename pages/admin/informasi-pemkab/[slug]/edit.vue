@@ -289,7 +289,8 @@ import CustomSelect from '@/components/CustomSelect.vue'
 
 const router = useRouter()
 const route = useRoute()
-const docId = route.params.id
+const docSlug = route.params.slug
+let realDocId = null
 
 const breadcrumbItems = [
   { title: 'Beranda', url: '/', icon: 'fas fa-home' },
@@ -431,9 +432,10 @@ const fetchUnits = async () => {
 
 const loadData = async () => {
   try {
-    const response = await api.get(`/informasi-pemkab-crud/${docId}/edit`)
+    const response = await api.get(`/informasi-pemkab-crud/${docSlug}/edit`)
     if (response.data && response.data.data) {
       const data = response.data.data
+      realDocId = data.id
       form.value.judul = data.judul || ''
       form.value.deskripsi = data.deskripsi || ''
       form.value.kategori = data.kategori || ''
@@ -544,7 +546,7 @@ const submitForm = async () => {
       formData.append('link', form.value.link)
     }
 
-    const res = await api.post(`/informasi-pemkab-crud/${docId}`, formData, {
+    const res = await api.post(`/informasi-pemkab-crud/${realDocId}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     
