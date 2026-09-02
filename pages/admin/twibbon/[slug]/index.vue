@@ -22,17 +22,19 @@
 
           <div v-else ref="editorContainer" class="relative w-full aspect-square mx-auto bg-gray-200 rounded-xl overflow-hidden shadow-inner checkerboard"
                :class="{ 'ring-4 ring-blue-500 bg-blue-50': isDragOverCanvas }"
-               @mousemove="onDrag" @mouseup="endInteraction" @mouseleave="endInteraction"
-               @touchmove="onDrag" @touchend="endInteraction"
                @dragover.prevent="isDragOverCanvas = true"
                @dragleave.prevent="isDragOverCanvas = false"
                @drop.prevent="handleCanvasDrop">
             
+            <!-- Snapping Guides -->
+            <div v-if="isSnappedX" class="absolute top-0 bottom-0 left-1/2 w-[1px] bg-blue-500 z-40 pointer-events-none"></div>
+            <div v-if="isSnappedY" class="absolute left-0 right-0 top-1/2 h-[1px] bg-blue-500 z-40 pointer-events-none"></div>
+
             <!-- User Photo with Resizer Handles -->
             <div v-if="userPhotoData"
                  class="absolute z-10" 
                  :style="{ 
-                   transform: `translate(${posX}px, ${posY}px)`,
+                   transform: `translate(${posX}px, ${posY}px) rotate(${rotation}deg)`,
                    width: `${imgWidth}px`,
                    height: `${imgHeight}px`,
                    cursor: isDragging ? 'grabbing' : 'grab'
@@ -47,6 +49,11 @@
                <div class="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'tr')" @touchstart.stop.prevent="startResize($event, 'tr')"></div>
                <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startResize($event, 'bl')" @touchstart.stop.prevent="startResize($event, 'bl')"></div>
                <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-blue-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startResize($event, 'br')" @touchstart.stop.prevent="startResize($event, 'br')"></div>
+               
+               <!-- Rotation Handle -->
+               <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full border-2 border-blue-600 shadow-md flex items-center justify-center cursor-ew-resize z-30 text-blue-600" @mousedown.stop.prevent="startRotate" @touchstart.stop.prevent="startRotate">
+                 <i class="fas fa-sync-alt text-xs"></i>
+               </div>
             </div>
 
             <!-- Frame Twibbon (Top layer, pointer events disabled) -->
@@ -141,7 +148,7 @@
 
 <script setup>
 definePageMeta({ layout: 'admin' })
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRuntimeConfig } from '#app'
 import api, { getStorageUrl } from '@/services/api'
@@ -162,6 +169,9 @@ const posY = ref(0)
 const imgWidth = ref(0)
 const imgHeight = ref(0)
 const aspectRatio = ref(1)
+const rotation = ref(0)
+const isSnappedX = ref(false)
+const isSnappedY = ref(false)
 
 let frameImgObj = null
 let userImgObj = null
@@ -174,6 +184,7 @@ const isDragOverCanvas = ref(false)
 let isDragging = false
 let isResizing = false
 let isPinching = false
+let isRotating = false
 let resizeCorner = ''
 let startX = 0
 let startY = 0
@@ -182,9 +193,32 @@ let initialPosY = 0
 let startImgWidth = 0
 let startImgHeight = 0
 let initialDistance = 0
+let initialRotation = 0
+
+const addWindowListeners = () => {
+  if (process.client) {
+    window.addEventListener('mousemove', onDrag)
+    window.addEventListener('touchmove', onDrag, { passive: false })
+    window.addEventListener('mouseup', endInteraction)
+    window.addEventListener('touchend', endInteraction)
+  }
+}
+
+const removeWindowListeners = () => {
+  if (process.client) {
+    window.removeEventListener('mousemove', onDrag)
+    window.removeEventListener('touchmove', onDrag)
+    window.removeEventListener('mouseup', endInteraction)
+    window.removeEventListener('touchend', endInteraction)
+  }
+}
 
 onMounted(async () => {
   await fetchTwibbon()
+})
+
+onBeforeUnmount(() => {
+  removeWindowListeners()
 })
 
 const fetchTwibbon = async () => {
@@ -242,6 +276,7 @@ const processFile = (file) => {
       
       posX.value = (containerSize - imgWidth.value) / 2
       posY.value = (containerSize - imgHeight.value) / 2
+      rotation.value = 0
     }
     img.src = event.target.result
   }
@@ -280,6 +315,7 @@ const startDrag = (e) => {
     initialPosY = posY.value
     startImgWidth = imgWidth.value
     startImgHeight = imgHeight.value
+    addWindowListeners()
     return
   }
 
@@ -289,6 +325,7 @@ const startDrag = (e) => {
   startY = coords.y
   initialPosX = posX.value
   initialPosY = posY.value
+  addWindowListeners()
 }
 
 const startResize = (e, corner) => {
@@ -302,6 +339,17 @@ const startResize = (e, corner) => {
   initialPosY = posY.value
   startImgWidth = imgWidth.value
   startImgHeight = imgHeight.value
+  addWindowListeners()
+}
+
+const startRotate = (e) => {
+  if (!userPhotoData.value) return
+  isRotating = true
+  const coords = getClientCoords(e)
+  startX = coords.x
+  startY = coords.y
+  initialRotation = rotation.value
+  addWindowListeners()
 }
 
 const onDrag = (e) => {
@@ -324,7 +372,7 @@ const onDrag = (e) => {
     return
   }
 
-  if (!isDragging && !isResizing) return
+  if (!isDragging && !isResizing && !isRotating) return
   if (e.cancelable) e.preventDefault()
   
   const coords = getClientCoords(e)
@@ -332,8 +380,32 @@ const onDrag = (e) => {
   const dy = coords.y - startY
   
   if (isDragging) {
-    posX.value = initialPosX + dx
-    posY.value = initialPosY + dy
+    let newX = initialPosX + dx
+    let newY = initialPosY + dy
+    
+    const containerSize = editorContainer.value?.clientWidth || 400
+    const centerX = containerSize / 2
+    const centerY = containerSize / 2
+    
+    const imgCenterX = newX + imgWidth.value / 2
+    const imgCenterY = newY + imgHeight.value / 2
+    
+    if (Math.abs(imgCenterX - centerX) < 8) {
+      newX = centerX - imgWidth.value / 2
+      isSnappedX.value = true
+    } else {
+      isSnappedX.value = false
+    }
+    
+    if (Math.abs(imgCenterY - centerY) < 8) {
+      newY = centerY - imgHeight.value / 2
+      isSnappedY.value = true
+    } else {
+      isSnappedY.value = false
+    }
+    
+    posX.value = newX
+    posY.value = newY
   } 
   else if (isResizing) {
     let newW = startImgWidth
@@ -348,11 +420,9 @@ const onDrag = (e) => {
       newW = startImgWidth - dx
     }
     
-    // Minimum size
     if (newW < 50) newW = 50
     const newH = newW / aspectRatio.value
     
-    // Adjust position so the opposite corner stays anchored
     if (resizeCorner === 'bl' || resizeCorner === 'tl') {
       posX.value = initialPosX + (startImgWidth - newW)
     }
@@ -363,12 +433,19 @@ const onDrag = (e) => {
     imgWidth.value = newW
     imgHeight.value = newH
   }
+  else if (isRotating) {
+    rotation.value = initialRotation + dx * 0.5
+  }
 }
 
 const endInteraction = () => {
   isDragging = false
   isResizing = false
   isPinching = false
+  isRotating = false
+  isSnappedX.value = false
+  isSnappedY.value = false
+  removeWindowListeners()
 }
 
 const downloadTwibbon = () => {
@@ -396,8 +473,22 @@ const downloadTwibbon = () => {
         const finalWidth = imgWidth.value * ratio
         const finalHeight = imgHeight.value * ratio
         
-        // 1. Draw User Photo
-        ctx.drawImage(userImgObj, finalX, finalY, finalWidth, finalHeight)
+        // Save context state before transforming
+        ctx.save()
+        
+        // Move to the center of the image
+        const imgCenterX = finalX + finalWidth / 2
+        const imgCenterY = finalY + finalHeight / 2
+        ctx.translate(imgCenterX, imgCenterY)
+        
+        // Rotate (canvas uses radians)
+        ctx.rotate((rotation.value * Math.PI) / 180)
+        
+        // 1. Draw User Photo (offset by half its width and height because origin is now at center)
+        ctx.drawImage(userImgObj, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight)
+        
+        // Restore context state
+        ctx.restore()
         
         // 2. Draw Frame
         ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height)
