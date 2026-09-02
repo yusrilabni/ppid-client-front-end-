@@ -159,7 +159,7 @@
                                     <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-32">Kategori</th>
                                     <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-48">Sumber</th>
                                     <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-28 text-center">Tanggal</th>
-                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-36 text-center">Aksi</th>
+                                    <th class="py-4 px-4 font-bold text-gray-700 text-sm tracking-wide uppercase w-44 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100/50">
@@ -214,18 +214,18 @@
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 text-center align-middle">
-                                        <div class="flex items-center justify-center space-x-2">
-                                            <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Lihat Detail">
+                                        <div class="flex flex-wrap items-center justify-center gap-2">
+                                            <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
                                             </NuxtLink>
-                                            <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Unduh">
+                                            <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Unduh">
                                                 <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i>
                                             </a>
                                             <template v-if="isAdmin && canEditOrDelete(dokumen)">
-                                                <NuxtLink :to="`/admin/informasi-pemkab/${dokumen.id}/edit`" class="inline-flex items-center justify-center w-9 h-9 bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Edit">
+                                                <NuxtLink :to="`/admin/informasi-pemkab/${dokumen.id}/edit`" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </NuxtLink>
-                                                <button @click="deleteItem(dokumen)" class="inline-flex items-center justify-center w-9 h-9 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Hapus">
+                                                <button @click="deleteItem(dokumen)" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Hapus">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </template>
