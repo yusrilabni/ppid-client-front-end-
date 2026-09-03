@@ -678,6 +678,22 @@ const startTextDrag = (e, t) => {
   window.addEventListener('touchend', handleTextMouseUp);
 }
 
+const startRotateText = (e, t) => {
+  if (t.isLocked) return;
+  activeTextObj = t;
+  isTextRotating = true;
+  isInteracting.value = true;
+  const coords = getClientCoords(e);
+  textStartX = coords.x;
+  textStartY = coords.y;
+  initialTextRotation = t.rotation || 0;
+  
+  window.addEventListener('mousemove', handleTextMouseMove);
+  window.addEventListener('mouseup', handleTextMouseUp);
+  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTextMouseUp);
+}
+
 let initialTextWidth = 0;
 let initialTextHeight = 0;
 
@@ -753,7 +769,7 @@ const handleTextMouseMove = (e) => {
       activeTextObj.fontSize = Math.round(newSize);
     }
   } else if (isTextRotating) {
-    let newRotation = initialTextRotation + dx * 0.5;
+    let newRotation = initialTextRotation - dx * 0.5;
     let remainder = newRotation % 45;
     if (Math.abs(remainder) < 5) {
       newRotation -= remainder;
@@ -940,7 +956,7 @@ const onDrag = (e) => {
   else if (isRotating) {
     activePhotos.forEach(photo => {
       const state = initialGroupStates.get(photo.id);
-      let newRotation = state.rotation + dx * 0.5; // Changed to minus logic below
+      let newRotation = state.rotation - dx * 0.5;
       let remainder = newRotation % 45;
       if (Math.abs(remainder) < 5) {
         newRotation -= remainder;
