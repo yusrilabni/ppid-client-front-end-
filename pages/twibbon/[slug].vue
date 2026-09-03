@@ -275,18 +275,32 @@ const saveSessionToDB = async () => {
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
-      const stateToSave = photos.value.map(p => ({
-        id: p.id,
-        dataUrl: p.dataUrl,
-        x: p.x,
-        y: p.y,
-        width: p.width,
-        height: p.height,
-        rotation: p.rotation,
-        blur: p.blur,
-        isLocked: p.isLocked,
-        aspectRatio: p.aspectRatio
-      }));
+      const stateToSave = {
+        photos: photos.value.map(p => ({
+          id: p.id,
+          dataUrl: p.dataUrl,
+          x: p.x,
+          y: p.y,
+          width: p.width,
+          height: p.height,
+          rotation: p.rotation,
+          blur: p.blur,
+          isLocked: p.isLocked,
+          aspectRatio: p.aspectRatio
+        })),
+        texts: texts.value.map(t => ({
+          id: t.id,
+          text: t.text,
+          x: t.x,
+          y: t.y,
+          fontSize: t.fontSize,
+          color: t.color,
+          rotation: t.rotation,
+          customWidth: t.customWidth || null,
+          customHeight: t.customHeight || null,
+          isLocked: t.isLocked || false
+        }))
+      };
       store.put(stateToSave, route.params.slug);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
@@ -311,21 +325,31 @@ const loadSessionFromDB = async () => {
 const restoreSession = async () => {
   if (!process.client) return;
   const saved = await loadSessionFromDB();
-  if (saved && saved.length > 0) {
-    const restoredPhotos = [];
-    for (const p of saved) {
-      const imgObj = new Image();
-      imgObj.src = p.dataUrl;
-      await new Promise(resolve => {
-        imgObj.onload = resolve;
-        imgObj.onerror = resolve; // Continue even if one fails
-      });
-      restoredPhotos.push({
-        ...p,
-        imgObj
-      });
+  if (saved) {
+    // Backward compatibility check for array vs object
+    const savedPhotos = Array.isArray(saved) ? saved : (saved.photos || []);
+    const savedTexts = Array.isArray(saved) ? [] : (saved.texts || []);
+    
+    if (savedPhotos.length > 0) {
+      const restoredPhotos = [];
+      for (const p of savedPhotos) {
+        const imgObj = new Image();
+        imgObj.src = p.dataUrl;
+        await new Promise(resolve => {
+          imgObj.onload = resolve;
+          imgObj.onerror = resolve;
+        });
+        restoredPhotos.push({
+          ...p,
+          imgObj
+        });
+      }
+      photos.value = restoredPhotos;
     }
-    photos.value = restoredPhotos;
+    
+    if (savedTexts.length > 0) {
+      texts.value = savedTexts;
+    }
   }
 }
 // -----------------------------
