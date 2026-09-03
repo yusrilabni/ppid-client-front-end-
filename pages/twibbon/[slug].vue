@@ -88,15 +88,23 @@
                          rows="1"
                          placeholder="Ketik teks..."></textarea>
 
-               <!-- Handles for selected text ONLY -->
+               <!-- Handles for selected text ONLY (4 Sudut + 4 Tepi Atas/Bawah/Kiri/Kanan + 1 Rotate) -->
                <template v-if="selectedTextIds.includes(t.id) && !t.isLocked">
                  <div :class="{ 'opacity-0': isInteracting }">
+                   <!-- 4 Handles Sudut (Diagonal Resize Font) -->
                    <div class="absolute -top-2.5 -left-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tl')" @touchstart.stop.prevent="startTextResize($event, t, 'tl')"></div>
                    <div class="absolute -top-2.5 -right-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tr')" @touchstart.stop.prevent="startTextResize($event, t, 'tr')"></div>
                    <div class="absolute -bottom-2.5 -left-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'bl')" @touchstart.stop.prevent="startTextResize($event, t, 'bl')"></div>
                    <div class="absolute -bottom-2.5 -right-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'br')" @touchstart.stop.prevent="startTextResize($event, t, 'br')"></div>
                    
-                   <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full border border-indigo-600 shadow flex items-center justify-center cursor-ew-resize z-30 text-indigo-600" @mousedown.stop.prevent="startRotateText($event, t)" @touchstart.stop.prevent="startRotateText($event, t)">
+                   <!-- 4 Handles Tepi (Kiri/Kanan melebarkan, Atas/Bawah meninggikan/mependekkan font) -->
+                   <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-6 h-3 bg-white rounded-full border-2 border-indigo-600 shadow cursor-ns-resize z-30" title="Atur Tinggi Font" @mousedown.stop.prevent="startTextResize($event, t, 'top')" @touchstart.stop.prevent="startTextResize($event, t, 'top')"></div>
+                   <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-3 bg-white rounded-full border-2 border-indigo-600 shadow cursor-ns-resize z-30" title="Atur Tinggi Font" @mousedown.stop.prevent="startTextResize($event, t, 'bottom')" @touchstart.stop.prevent="startTextResize($event, t, 'bottom')"></div>
+                   <div class="absolute top-1/2 -left-2 -translate-y-1/2 w-3 h-6 bg-white rounded-full border-2 border-indigo-600 shadow cursor-ew-resize z-30" title="Atur Lebar" @mousedown.stop.prevent="startTextResize($event, t, 'left')" @touchstart.stop.prevent="startTextResize($event, t, 'left')"></div>
+                   <div class="absolute top-1/2 -right-2 -translate-y-1/2 w-3 h-6 bg-white rounded-full border-2 border-indigo-600 shadow cursor-ew-resize z-30" title="Atur Lebar" @mousedown.stop.prevent="startTextResize($event, t, 'right')" @touchstart.stop.prevent="startTextResize($event, t, 'right')"></div>
+
+                   <!-- Rotate Handle -->
+                   <div class="absolute -bottom-9 left-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full border border-indigo-600 shadow flex items-center justify-center cursor-ew-resize z-30 text-indigo-600" @mousedown.stop.prevent="startRotateText($event, t)" @touchstart.stop.prevent="startRotateText($event, t)">
                      <i class="fas fa-sync-alt text-[10px] pointer-events-none"></i>
                    </div>
                  </div>
@@ -701,9 +709,14 @@ const handleTextMouseMove = (e) => {
     activeTextObj.y = initialTextY + dy;
   } else if (isTextResizing) {
     let scaleDelta = dx;
-    if (textResizeCorner === 'tl' || textResizeCorner === 'bl') {
+    if (textResizeCorner === 'tl' || textResizeCorner === 'bl' || textResizeCorner === 'left') {
       scaleDelta = -dx;
+    } else if (textResizeCorner === 'top') {
+      scaleDelta = -dy;
+    } else if (textResizeCorner === 'bottom') {
+      scaleDelta = dy;
     }
+    
     let newSize = initialTextFontSize + scaleDelta * 0.5;
     if (newSize < 10) newSize = 10;
     if (newSize > 400) newSize = 400;
