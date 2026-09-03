@@ -66,6 +66,21 @@
                </template>
             </div>
 
+            <!-- Text Layers -->
+            <div v-for="t in texts" :key="t.id"
+                 class="absolute flex flex-col items-center justify-center pointer-events-auto select-none cursor-pointer"
+                 :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30': selectedTextIds.includes(t.id) }"
+                 :style="{ 
+                   transform: `translate(calc(-50% + ${t.x}px), calc(-50% + ${t.y}px)) rotate(${t.rotation}deg)`,
+                   left: '50%', top: '50%'
+                 }"
+                 @click.stop="selectText(t.id, $event)">
+                 
+               <div :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', whiteSpace: 'nowrap', padding: '4px 8px', border: selectedTextIds.includes(t.id) ? '2px dashed #6366f1' : '2px solid transparent', borderRadius: '4px' }">
+                 {{ t.text }}
+               </div>
+            </div>
+
             <!-- Frame Twibbon (Top layer, pointer events disabled) -->
             <img v-if="frameUrl" crossorigin="anonymous" :src="frameUrl" @load="onFrameLoad" class="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none select-none drop-shadow-xl" style="z-index: 25;">
             
@@ -79,12 +94,12 @@
             </div>
           </div>
           
-          <!-- Floating Toolbar (Appears above the canvas when a photo is selected) -->
+          <!-- Floating Toolbar (HANYA TAMPIL SAAT FOTO DIPILIH) -->
           <div v-if="selectedPhotos.length > 0 && !isInteracting" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl px-4 py-2 flex items-center gap-4 z-50 border border-gray-200" @click.stop>
-            <button @click="deleteSelected" class="text-red-500 hover:text-red-700" title="Hapus">
+            <button @click="deleteSelected" class="text-red-500 hover:text-red-700" title="Hapus Foto">
               <i class="fas fa-trash"></i>
             </button>
-            <button @click="centerSelected" class="text-blue-500 hover:text-blue-700" title="Tengahkan">
+            <button @click="centerSelected" class="text-blue-500 hover:text-blue-700" title="Tengahkan Foto">
               <i class="fas fa-crosshairs"></i>
             </button>
             <button @click="toggleLockSelected" :class="selectedPhoto.isLocked ? 'text-orange-500 hover:text-orange-700' : 'text-gray-500 hover:text-gray-700'" :title="selectedPhoto.isLocked ? 'Buka Kunci' : 'Kunci'">
@@ -94,6 +109,24 @@
               <i class="fas fa-tint text-gray-400 text-xs"></i>
               <input type="range" min="0" max="20" step="0.5" v-model.number="selectedPhoto.blur" @change="saveSessionToDB" class="w-20" title="Efek Blur">
             </div>
+          </div>
+
+          <!-- Floating Toolbar (HANYA TAMPIL SAAT TEKS DIPILIH) -->
+          <div v-else-if="selectedTextIds.length > 0 && selectedText" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl px-4 py-2 flex items-center gap-3 z-50 border border-indigo-200" @click.stop>
+            <i class="fas fa-font text-indigo-600 text-xs"></i>
+            <input type="text" v-model="selectedText.text" @change="saveSessionToDB" class="w-32 border border-gray-300 rounded text-xs px-2 py-1 placeholder-gray-400" placeholder="Isi teks...">
+            
+            <div class="flex items-center gap-1 border border-gray-200 rounded px-1 py-0.5 bg-gray-50">
+              <input type="color" v-model="selectedText.color" @change="saveSessionToDB" class="w-6 h-6 border-0 rounded cursor-pointer p-0 bg-transparent" title="Pilih Warna">
+              <button @click="pickColorForText(selectedText)" class="p-1 hover:bg-gray-200 text-gray-600 rounded" title="Pipet Warna (EyeDropper)"><i class="fas fa-eye-dropper text-xs"></i></button>
+            </div>
+
+            <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+              <span class="text-[10px] text-gray-500 font-semibold">Ukuran:</span>
+              <input type="number" min="10" max="200" v-model.number="selectedText.fontSize" @change="saveSessionToDB" class="w-12 border border-gray-300 rounded text-xs px-1 text-center" title="Ukuran Font">
+            </div>
+
+            <button @click="deleteSelectedText" class="text-red-500 hover:text-red-700 text-xs p-1" title="Hapus Teks"><i class="fas fa-trash"></i></button>
           </div>
           
           <div v-if="photos.length > 0" class="w-full mt-4 text-center">
@@ -110,11 +143,16 @@
                    @dragover.prevent="isDragOver = true"
                    @dragleave.prevent="isDragOver = false"
                    @drop.prevent="handlePhotoDrop"
-                   :class="['w-full border-2 border-dashed transition font-medium py-3 px-4 rounded-xl text-center flex flex-col items-center justify-center gap-2 mb-4', isDragOver ? 'border-blue-600 bg-blue-100 text-blue-700' : 'bg-white border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-600', photos.length >= 10 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer']">
+                   :class="['w-full border-2 border-dashed transition font-medium py-3 px-4 rounded-xl text-center flex flex-col items-center justify-center gap-2 mb-3', isDragOver ? 'border-blue-600 bg-blue-100 text-blue-700' : 'bg-white border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-600', photos.length >= 10 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer']">
               <i class="fas fa-upload text-xl"></i>
               <span>{{ photos.length > 0 ? 'Tambah Foto Lain' : 'Pilih atau Tarik Foto Kesini' }}</span>
               <input v-if="photos.length < 10" id="upload-photo" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
             </label>
+
+            <button @click="addText" class="w-full border-2 border-indigo-600 bg-white text-indigo-700 font-medium py-2.5 px-4 rounded-xl text-center flex items-center justify-center gap-2 mb-4 hover:bg-indigo-50 transition cursor-pointer text-sm">
+              <i class="fas fa-font text-lg"></i>
+              <span>Tambah Teks Baru</span>
+            </button>
 
             <button 
               @click="downloadTwibbon" 
@@ -268,8 +306,11 @@ const twibbon = ref(null)
 const frameUrl = ref('')
 
 const photos = ref([])
+const texts = ref([])
 const selectedPhotoIds = ref([])
+const selectedTextIds = ref([])
 
+const selectedText = computed(() => texts.value.find(t => selectedTextIds.value.includes(t.id)))
 const selectedPhotos = computed(() => photos.value.filter(p => selectedPhotoIds.value.includes(p.id)));
 const selectedPhoto = computed(() => selectedPhotos.value[0] || null);
 const currentDegreeDisplay = ref(null)
@@ -444,9 +485,52 @@ const handlePhotoUpload = (e) => {
 
 const deselectAll = () => {
   selectedPhotoIds.value = []
+  selectedTextIds.value = []
+}
+
+const selectText = (id, e) => {
+  selectedPhotoIds.value = []
+  selectedTextIds.value = [id]
+}
+
+const addText = () => {
+  texts.value.push({ 
+    id: Date.now(), 
+    text: 'Teks Baru', 
+    x: 0, 
+    y: 0, 
+    fontSize: 40, 
+    color: '#ffffff', 
+    rotation: 0 
+  })
+  selectedTextIds.value = [texts.value[texts.value.length - 1].id]
+  selectedPhotoIds.value = []
+  saveSessionToDB()
+}
+
+const deleteSelectedText = () => {
+  texts.value = texts.value.filter(t => !selectedTextIds.value.includes(t.id))
+  selectedTextIds.value = []
+  saveSessionToDB()
+}
+
+const pickColorForText = async (textItem) => {
+  if (!window.EyeDropper) {
+    alert('Browser Anda tidak mendukung fitur Pipet Warna (EyeDropper).');
+    return;
+  }
+  try {
+    const dropper = new EyeDropper();
+    const result = await dropper.open();
+    textItem.color = result.sRGBHex;
+    saveSessionToDB();
+  } catch (e) {
+    console.log('Eyedropper cancelled', e);
+  }
 }
 
 const selectPhoto = (id, e) => {
+  selectedTextIds.value = []
   if (e && e.ctrlKey) {
     if (selectedPhotoIds.value.includes(id)) {
       selectedPhotoIds.value = selectedPhotoIds.value.filter(pid => pid !== id);
@@ -732,6 +816,23 @@ const downloadTwibbon = () => {
           ctx.restore();
         }
         
+        // Draw Texts
+        for (const t of texts.value) {
+          ctx.save();
+          const finalXText = t.x * ratio;
+          const finalYText = t.y * ratio;
+          const imgCenterXText = (canvas.width / 2) + finalXText;
+          const imgCenterYText = (canvas.height / 2) + finalYText;
+          ctx.translate(imgCenterXText, imgCenterYText);
+          ctx.rotate((t.rotation * Math.PI) / 180);
+          ctx.font = `bold ${t.fontSize * ratio}px Arial`;
+          ctx.fillStyle = t.color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(t.text, 0, 0);
+          ctx.restore();
+        }
+
         ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
         
         const dataUrl = canvas.toDataURL('image/png');
