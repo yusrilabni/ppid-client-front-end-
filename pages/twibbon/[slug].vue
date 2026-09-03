@@ -398,7 +398,7 @@ const texts = ref([])
 const selectedPhotoIds = ref([])
 const selectedTextIds = ref([])
 
-const hasEyeDropper = computed(() => process.client && typeof window !== 'undefined' && !!window['EyeDropper']);
+const hasEyeDropper = ref(false);
 const selectedText = computed(() => texts.value.find(t => selectedTextIds.value.includes(t.id)))
 const selectedPhotos = computed(() => photos.value.filter(p => selectedPhotoIds.value.includes(p.id)));
 const selectedPhoto = computed(() => selectedPhotos.value[0] || null);
@@ -470,6 +470,7 @@ onMounted(async () => {
   }
   if (process.client) {
     window.addEventListener('keydown', handleKeydown)
+    hasEyeDropper.value = !!window['EyeDropper'];
   }
 })
 
