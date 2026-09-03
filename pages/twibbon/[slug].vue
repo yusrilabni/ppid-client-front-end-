@@ -82,6 +82,7 @@
                <textarea v-model="t.text" 
                          @change="saveSessionToDB"
                          @input="autoResizeTextarea($event)"
+                         :ref="(el) => updateTextareaSize(el, t)"
                          :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', lineHeight: '1.2' }" 
                          class="bg-transparent border-0 outline-none text-center p-1 m-0 font-sans resize-none overflow-hidden focus:bg-black/20 focus:rounded inline-block" 
                          rows="1"
@@ -534,20 +535,23 @@ const deleteSelectedText = () => {
   saveSessionToDB()
 }
 
-const autoResizeTextarea = (e) => {
-  const el = e.target;
+const updateTextareaSize = (el, textItem) => {
+  if (!el) return;
   el.style.height = 'auto';
   el.style.width = 'auto';
   
-  // Hitung lebar baris terpanjang
-  const lines = el.value.split('\n');
+  const lines = (el.value || '').split('\n');
   const maxLineLength = Math.max(...lines.map(l => l.length), 1);
-  const fontPx = parseInt(window.getComputedStyle(el).fontSize) || 40;
+  const fontPx = textItem?.fontSize || parseInt(window.getComputedStyle(el).fontSize) || 40;
   
-  // Perhitungan lebar dinamis berbasis font size & panjang teks
   const approxWidth = Math.max(maxLineLength * (fontPx * 0.65) + 20, 60);
   el.style.width = `${approxWidth}px`;
   el.style.height = `${el.scrollHeight}px`;
+}
+
+const autoResizeTextarea = (e) => {
+  const el = e.target;
+  updateTextareaSize(el);
 }
 
 const pickColorForText = async (textItem) => {
