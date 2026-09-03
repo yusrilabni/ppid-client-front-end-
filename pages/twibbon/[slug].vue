@@ -1177,9 +1177,18 @@ const downloadTwibbon = () => {
           ctx.shadowOffsetY = 1 * ratio;
           ctx.shadowBlur = 3 * ratio;
           
-          // Hitung batas lebar maksimum kotak teks dengan toleransi aman agar kata di ujung tidak terpotong
-          const containerWidth = editorContainer.value?.clientWidth || 400;
-          const maxCanvasTextWidth = (t.customWidth ? t.customWidth : (containerWidth * 0.95)) * ratio;
+          // Hitung batas lebar maksimum kotak teks berdasarkan patokan aktual kotak textarea di layar (dikalikan ratio)
+          let targetTextWidth = t.customWidth;
+          if (!targetTextWidth && process.client) {
+            const textareaEl = document.querySelector(`textarea[placeholder="Ketik teks..."]`);
+            if (textareaEl && textareaEl.offsetWidth) {
+              targetTextWidth = textareaEl.offsetWidth + 10;
+            }
+          }
+          if (!targetTextWidth) {
+            targetTextWidth = (editorContainer.value?.clientWidth || 400) * 0.85;
+          }
+          const maxCanvasTextWidth = targetTextWidth * ratio;
 
           // Pembungkus Kata Otomatis (Word Wrap Engine + Split Enter)
           const rawLines = (t.text || '').split('\n');
