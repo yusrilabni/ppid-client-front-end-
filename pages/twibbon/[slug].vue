@@ -69,22 +69,37 @@
             <!-- Text Layers -->
             <div v-for="t in texts" :key="t.id"
                  class="absolute flex flex-col items-center justify-center pointer-events-auto select-none"
-                 :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30 ring-2 ring-indigo-400 ring-offset-1': selectedTextIds.includes(t.id) }"
+                 :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30 ring-2 ring-indigo-500 ring-offset-1 border border-indigo-400': selectedTextIds.includes(t.id) }"
                  :style="{ 
                    transform: `translate(calc(-50% + ${t.x}px), calc(-50% + ${t.y}px)) rotate(${t.rotation}deg)`,
                    left: '50%', top: '50%',
-                   cursor: isDragging && selectedTextIds.includes(t.id) ? 'grabbing' : 'grab'
+                   cursor: t.isLocked ? 'not-allowed' : (isDragging && selectedTextIds.includes(t.id) ? 'grabbing' : 'grab')
                  }"
-                 @mousedown.stop="selectText(t.id, $event); startDrag($event, t)"
-                 @touchstart.stop="selectText(t.id, $event); startDrag($event, t)"
+                 @mousedown.stop="selectText(t.id, $event); startTextDrag($event, t)"
+                 @touchstart.stop="selectText(t.id, $event); startTextDrag($event, t)"
                  @click.stop>
                  
-               <input type="text" 
-                      v-model="t.text" 
-                      @change="saveSessionToDB" 
-                      :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)' }" 
-                      class="bg-transparent border-0 outline-none text-center p-0 m-0 w-auto font-sans focus:bg-black/20 focus:rounded px-1" 
-                      style="min-width: 50px;">
+               <textarea v-model="t.text" 
+                         @change="saveSessionToDB"
+                         @input="autoResizeTextarea($event)"
+                         :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', lineHeight: '1.2' }" 
+                         class="bg-transparent border-0 outline-none text-center p-1 m-0 font-sans resize-none overflow-hidden focus:bg-black/20 focus:rounded" 
+                         rows="1"
+                         placeholder="Ketik teks..."></textarea>
+
+               <!-- Handles for selected text ONLY -->
+               <template v-if="selectedTextIds.includes(t.id) && !t.isLocked">
+                 <div :class="{ 'opacity-0': isInteracting }">
+                   <div class="absolute -top-2.5 -left-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tl')" @touchstart.stop.prevent="startTextResize($event, t, 'tl')"></div>
+                   <div class="absolute -top-2.5 -right-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tr')" @touchstart.stop.prevent="startTextResize($event, t, 'tr')"></div>
+                   <div class="absolute -bottom-2.5 -left-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'bl')" @touchstart.stop.prevent="startTextResize($event, t, 'bl')"></div>
+                   <div class="absolute -bottom-2.5 -right-2.5 w-5 h-5 bg-white rounded-full border-2 border-indigo-600 shadow cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'br')" @touchstart.stop.prevent="startTextResize($event, t, 'br')"></div>
+                   
+                   <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-7 h-7 bg-white rounded-full border border-indigo-600 shadow flex items-center justify-center cursor-ew-resize z-30 text-indigo-600" @mousedown.stop.prevent="startRotateText($event, t)" @touchstart.stop.prevent="startRotateText($event, t)">
+                     <i class="fas fa-sync-alt text-[10px] pointer-events-none"></i>
+                   </div>
+                 </div>
+               </template>
             </div>
 
             <!-- Frame Twibbon (Top layer, pointer events disabled) -->
@@ -519,6 +534,14 @@ const deleteSelectedText = () => {
   saveSessionToDB()
 }
 
+const autoResizeTextarea = (e) => {
+  const el = e.target;
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+  el.style.width = 'auto';
+  el.style.width = (el.scrollWidth + 10) + 'px';
+}
+
 const pickColorForText = async (textItem) => {
   if (!window.EyeDropper) {
     alert('Browser Anda tidak mendukung fitur Pipet Warna (EyeDropper).');
@@ -821,7 +844,7 @@ const downloadTwibbon = () => {
           ctx.restore();
         }
         
-        // Draw Texts
+        // Draw Texts (Multi-line Enter Support)
         for (const t of texts.value) {
           ctx.save();
           const finalXText = t.x * ratio;
@@ -830,11 +853,21 @@ const downloadTwibbon = () => {
           const imgCenterYText = (canvas.height / 2) + finalYText;
           ctx.translate(imgCenterXText, imgCenterYText);
           ctx.rotate((t.rotation * Math.PI) / 180);
-          ctx.font = `bold ${t.fontSize * ratio}px Arial`;
+          
+          const fontSizeScaled = t.fontSize * ratio;
+          ctx.font = `bold ${fontSizeScaled}px Arial`;
           ctx.fillStyle = t.color;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(t.text, 0, 0);
+          
+          const lines = (t.text || '').split('\n');
+          const lineHeight = fontSizeScaled * 1.2;
+          const startYOffset = -((lines.length - 1) * lineHeight) / 2;
+          
+          lines.forEach((line, index) => {
+            ctx.fillText(line, 0, startYOffset + (index * lineHeight));
+          });
+          
           ctx.restore();
         }
 
