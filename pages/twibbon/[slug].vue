@@ -68,17 +68,23 @@
 
             <!-- Text Layers -->
             <div v-for="t in texts" :key="t.id"
-                 class="absolute flex flex-col items-center justify-center pointer-events-auto select-none cursor-pointer"
-                 :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30': selectedTextIds.includes(t.id) }"
+                 class="absolute flex flex-col items-center justify-center pointer-events-auto select-none"
+                 :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30 ring-2 ring-indigo-400 ring-offset-1': selectedTextIds.includes(t.id) }"
                  :style="{ 
                    transform: `translate(calc(-50% + ${t.x}px), calc(-50% + ${t.y}px)) rotate(${t.rotation}deg)`,
-                   left: '50%', top: '50%'
+                   left: '50%', top: '50%',
+                   cursor: isDragging && selectedTextIds.includes(t.id) ? 'grabbing' : 'grab'
                  }"
-                 @click.stop="selectText(t.id, $event)">
+                 @mousedown.stop="selectText(t.id, $event); startDrag($event, t)"
+                 @touchstart.stop="selectText(t.id, $event); startDrag($event, t)"
+                 @click.stop>
                  
-               <div :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', whiteSpace: 'nowrap', padding: '4px 8px', border: selectedTextIds.includes(t.id) ? '2px dashed #6366f1' : '2px solid transparent', borderRadius: '4px' }">
-                 {{ t.text }}
-               </div>
+               <input type="text" 
+                      v-model="t.text" 
+                      @change="saveSessionToDB" 
+                      :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)' }" 
+                      class="bg-transparent border-0 outline-none text-center p-0 m-0 w-auto font-sans focus:bg-black/20 focus:rounded px-1" 
+                      style="min-width: 50px;">
             </div>
 
             <!-- Frame Twibbon (Top layer, pointer events disabled) -->
@@ -113,8 +119,7 @@
 
           <!-- Floating Toolbar (HANYA TAMPIL SAAT TEKS DIPILIH) -->
           <div v-else-if="selectedTextIds.length > 0 && selectedText" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl px-4 py-2 flex items-center gap-3 z-50 border border-indigo-200" @click.stop>
-            <i class="fas fa-font text-indigo-600 text-xs"></i>
-            <input type="text" v-model="selectedText.text" @change="saveSessionToDB" class="w-32 border border-gray-300 rounded text-xs px-2 py-1 placeholder-gray-400" placeholder="Isi teks...">
+            <span class="text-xs font-semibold text-indigo-600 flex items-center gap-1"><i class="fas fa-font"></i> Teks</span>
             
             <div class="flex items-center gap-1 border border-gray-200 rounded px-1 py-0.5 bg-gray-50">
               <input type="color" v-model="selectedText.color" @change="saveSessionToDB" class="w-6 h-6 border-0 rounded cursor-pointer p-0 bg-transparent" title="Pilih Warna">
