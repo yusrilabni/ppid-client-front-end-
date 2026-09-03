@@ -143,17 +143,31 @@
           </div>
 
           <!-- Floating Toolbar (HANYA TAMPIL SAAT TEKS DIPILIH) -->
-          <div v-else-if="selectedTextIds.length > 0 && selectedText" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl px-4 py-2 flex items-center gap-3 z-50 border border-indigo-200" @click.stop>
-            <span class="text-xs font-semibold text-indigo-600 flex items-center gap-1"><i class="fas fa-font"></i> Teks</span>
+          <div v-else-if="selectedTextIds.length > 0 && selectedText" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl px-3 py-1.5 flex items-center gap-2 z-50 border border-indigo-200" @click.stop>
+            <span class="text-xs font-semibold text-indigo-600 hidden sm:flex items-center gap-1"><i class="fas fa-font"></i> Teks</span>
             
-            <div class="flex items-center gap-1 border border-gray-200 rounded px-1 py-0.5 bg-gray-50">
-              <input type="color" v-model="selectedText.color" @change="saveSessionToDB" class="w-6 h-6 border-0 rounded cursor-pointer p-0 bg-transparent" title="Pilih Warna">
-              <button @click="pickColorForText(selectedText)" class="p-1 hover:bg-gray-200 text-gray-600 rounded" title="Pipet Warna (EyeDropper)"><i class="fas fa-eye-dropper text-xs"></i></button>
+            <!-- Color Selector + Presets -->
+            <div class="flex items-center gap-1 border border-gray-200 rounded px-1.5 py-1 bg-gray-50">
+              <input type="color" v-model="selectedText.color" @change="saveSessionToDB" class="w-6 h-6 border-0 rounded cursor-pointer p-0 bg-transparent" title="Pilih Warna Kustom">
+              
+              <!-- Quick Palette Presets (Cocok untuk HP) -->
+              <div class="flex items-center gap-1 ml-1 border-l border-gray-300 pl-1.5">
+                <button v-for="c in ['#ffffff', '#000000', '#ef4444', '#eab308', '#3b82f6', '#22c55e']" :key="c"
+                        @click="selectedText.color = c; saveSessionToDB()"
+                        class="w-4 h-4 rounded-full border border-gray-400 shadow-sm transition hover:scale-110"
+                        :style="{ backgroundColor: c }"
+                        :title="`Warna ${c}`"></button>
+              </div>
+
+              <!-- EyeDropper Button (Hanya tampil jika browser HP/Desktop mendukung) -->
+              <button v-if="hasEyeDropper" @click="pickColorForText(selectedText)" class="p-1 hover:bg-gray-200 text-gray-600 rounded ml-1" title="Pipet Warna (EyeDropper)">
+                <i class="fas fa-eye-dropper text-xs"></i>
+              </button>
             </div>
 
             <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded px-2 py-1">
-              <span class="text-[10px] text-gray-500 font-semibold">Ukuran:</span>
-              <input type="number" min="10" max="200" v-model.number="selectedText.fontSize" @change="saveSessionToDB" class="w-12 border border-gray-300 rounded text-xs px-1 text-center" title="Ukuran Font">
+              <span class="text-[10px] text-gray-500 font-semibold hidden sm:inline">Ukuran:</span>
+              <input type="number" min="10" max="200" v-model.number="selectedText.fontSize" @change="saveSessionToDB" class="w-11 border border-gray-300 rounded text-xs px-1 text-center" title="Ukuran Font">
             </div>
 
             <button @click="deleteSelectedText" class="text-red-500 hover:text-red-700 text-xs p-1" title="Hapus Teks"><i class="fas fa-trash"></i></button>
@@ -364,6 +378,7 @@ const texts = ref([])
 const selectedPhotoIds = ref([])
 const selectedTextIds = ref([])
 
+const hasEyeDropper = computed(() => process.client && typeof window !== 'undefined' && !!window.EyeDropper);
 const selectedText = computed(() => texts.value.find(t => selectedTextIds.value.includes(t.id)))
 const selectedPhotos = computed(() => photos.value.filter(p => selectedPhotoIds.value.includes(p.id)));
 const selectedPhoto = computed(() => selectedPhotos.value[0] || null);
