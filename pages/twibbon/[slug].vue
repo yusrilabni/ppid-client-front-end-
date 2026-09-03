@@ -13,62 +13,14 @@
     <div class="container mx-auto px-4 max-w-4xl -mt-8 pb-24 md:pb-8">
       <div class="bg-white rounded-2xl shadow-xl p-4 md:p-8 flex flex-col md:flex-row gap-8 items-start" @click.stop>
         
-        
         <!-- Area Editor -->
         <div class="w-full md:w-3/5 flex flex-col items-center relative">
           
-          <!-- Top Canva-style Toolbar -->
-          <div class="w-full bg-white border border-gray-200 rounded-t-xl p-2 flex items-center gap-3 shadow-sm overflow-x-auto whitespace-nowrap z-40 relative">
-            <button @click="addText" class="px-3 py-1.5 hover:bg-gray-100 rounded text-gray-700 text-sm font-medium flex items-center gap-2" title="Tambah Teks"><i class="fas fa-font"></i></button>
-            <label for="upload-photo-top" class="px-3 py-1.5 hover:bg-gray-100 rounded text-gray-700 text-sm font-medium flex items-center gap-2 cursor-pointer" title="Tambah Foto" :class="{ 'opacity-50 cursor-not-allowed': photos.length >= 10 }">
-              <i class="fas fa-image"></i>
-              <input v-if="photos.length < 10" id="upload-photo-top" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
-            </label>
-            
-            <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div> <!-- Divider -->
-            
-            <template v-if="selectedPhotoIds.length > 0">
-              <div class="flex items-center gap-3">
-                <button @click="centerSelected" class="px-2 py-1.5 hover:bg-gray-100 rounded text-gray-700" title="Tengahkan Foto"><i class="fas fa-crosshairs"></i></button>
-                <button @click="toggleLockSelected" class="px-2 py-1.5 hover:bg-gray-100 rounded" :class="selectedPhoto.isLocked ? 'text-orange-500' : 'text-gray-700'" title="Kunci/Buka"><i :class="selectedPhoto.isLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i></button>
-                <button @click="deleteSelected" class="px-2 py-1.5 hover:bg-red-50 text-red-500 rounded" title="Hapus Foto"><i class="fas fa-trash"></i></button>
-                
-                <div class="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded border border-gray-200">
-                  <i class="fas fa-tint text-gray-400 text-xs"></i>
-                  <input type="range" min="0" max="20" step="0.5" v-model.number="selectedPhoto.blur" @change="saveSessionToDB" class="w-20" title="Efek Blur">
-                </div>
-              </div>
-            </template>
-            
-            <template v-else-if="selectedTextIds.length > 0 && selectedText">
-              <div class="flex items-center gap-3 shrink-0">
-                <input type="text" v-model="selectedText.text" @change="saveSessionToDB" class="w-32 border border-gray-300 rounded text-sm px-2 py-1 placeholder-gray-400" placeholder="Isi teks...">
-                
-                <div class="flex items-center border border-gray-300 rounded bg-white">
-                  <input type="number" min="10" max="400" v-model.number="selectedText.fontSize" @change="saveSessionToDB" class="w-16 border-0 text-sm px-2 py-1 text-center" title="Ukuran Font">
-                </div>
-                
-                <div class="flex items-center border border-gray-300 rounded overflow-hidden bg-white">
-                  <input type="color" v-model="selectedText.color" @change="saveSessionToDB" class="w-8 h-8 cursor-pointer border-0 p-0 rounded-none bg-transparent" title="Pilih Warna">
-                  <input type="text" v-model="selectedText.color" @change="saveSessionToDB" class="w-20 border-0 text-sm px-2 uppercase font-mono text-gray-600" maxlength="7">
-                  <button @click="pickColorForText(selectedText)" class="px-2 py-1 hover:bg-gray-100 border-l border-gray-200 text-gray-600" title="Pipet Warna Layar (Scope Color)"><i class="fas fa-eye-dropper"></i></button>
-                </div>
-
-                <button @click="selectedText.isLocked = !selectedText.isLocked" class="px-2 py-1.5 hover:bg-gray-100 rounded" :class="selectedText.isLocked ? 'text-orange-500' : 'text-gray-700'" title="Kunci/Buka"><i :class="selectedText.isLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i></button>
-                <button @click="deleteSelectedText" class="px-2 py-1.5 hover:bg-red-50 text-red-500 rounded" title="Hapus Teks"><i class="fas fa-trash"></i></button>
-              </div>
-            </template>
-            
-            <template v-else>
-              <span class="text-xs text-gray-400 italic">Pilih foto/teks pada kanvas untuk mengedit...</span>
-            </template>
-          </div>
-          
-          <div v-if="loading" class="w-full aspect-square bg-gray-100 rounded-b-xl animate-pulse flex items-center justify-center">
+          <div v-if="loading" class="w-full aspect-square bg-gray-100 rounded-xl animate-pulse flex items-center justify-center">
             <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
           </div>
 
-          <div v-else ref="editorContainer" class="relative w-full aspect-square mx-auto bg-gray-200 rounded-b-xl overflow-hidden shadow-inner checkerboard"
+          <div v-else ref="editorContainer" class="relative w-full aspect-square mx-auto bg-gray-200 rounded-xl overflow-hidden shadow-inner checkerboard"
                :class="{ 'ring-4 ring-blue-500 bg-blue-50': isDragOverCanvas }"
                @dragover.prevent="isDragOverCanvas = true"
                @dragleave.prevent="isDragOverCanvas = false"
@@ -114,38 +66,6 @@
                </template>
             </div>
 
-            
-            
-            <!-- Text Layers -->
-            <div v-for="t in texts" :key="t.id"
-                 class="absolute flex flex-col items-center justify-center pointer-events-auto"
-                 :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30': selectedTextIds.includes(t.id) }"
-                 :style="{ 
-                   transform: `translate(calc(-50% + ${t.x}px), calc(-50% + ${t.y}px)) rotate(${t.rotation}deg)`,
-                   cursor: t.isLocked ? 'not-allowed' : (isDragging && selectedTextIds.includes(t.id) ? 'grabbing' : 'grab'),
-                   left: '50%', top: '50%'
-                 }"
-                 @mousedown.stop="selectText(t.id, $event); startTextDrag($event, t)"
-                 @touchstart.stop="selectText(t.id, $event); startTextDrag($event, t)"
-                 @click.stop>
-                 
-               <div :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 2px rgba(0,0,0,0.5)', whiteSpace: 'nowrap', padding: '4px', border: selectedTextIds.includes(t.id) ? '1px dashed rgba(255,255,255,0.7)' : '1px solid transparent' }" class="select-none pointer-events-none">
-                 {{ t.text }}
-               </div>
-               
-               <!-- Handles for selected text -->
-               <template v-if="selectedTextIds.includes(t.id) && !t.isLocked">
-                 <div class="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tl')" @touchstart.stop.prevent="startTextResize($event, t, 'tl')"></div>
-                 <div class="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tr')" @touchstart.stop.prevent="startTextResize($event, t, 'tr')"></div>
-                 <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'bl')" @touchstart.stop.prevent="startTextResize($event, t, 'bl')"></div>
-                 <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'br')" @touchstart.stop.prevent="startTextResize($event, t, 'br')"></div>
-                 
-                 <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full border-2 border-indigo-600 shadow-md flex items-center justify-center cursor-ew-resize z-30 text-indigo-600" @mousedown.stop.prevent="startRotateText($event, t)" @touchstart.stop.prevent="startRotateText($event, t)">
-                   <i class="fas fa-sync-alt text-xs pointer-events-none"></i>
-                 </div>
-               </template>
-            </div>
-            
             <!-- Frame Twibbon (Top layer, pointer events disabled) -->
             <img v-if="frameUrl" crossorigin="anonymous" :src="frameUrl" @load="onFrameLoad" class="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none select-none drop-shadow-xl" style="z-index: 25;">
             
@@ -159,7 +79,24 @@
             </div>
           </div>
           
-          <div v-if="photos.length > 0 || texts.length > 0" class="w-full mt-4 text-center">
+          <!-- Floating Toolbar (Appears above the canvas when a photo is selected) -->
+          <div v-if="selectedPhotos.length > 0 && !isInteracting" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-xl px-4 py-2 flex items-center gap-4 z-50 border border-gray-200" @click.stop>
+            <button @click="deleteSelected" class="text-red-500 hover:text-red-700" title="Hapus">
+              <i class="fas fa-trash"></i>
+            </button>
+            <button @click="centerSelected" class="text-blue-500 hover:text-blue-700" title="Tengahkan">
+              <i class="fas fa-crosshairs"></i>
+            </button>
+            <button @click="toggleLockSelected" :class="selectedPhoto.isLocked ? 'text-orange-500 hover:text-orange-700' : 'text-gray-500 hover:text-gray-700'" :title="selectedPhoto.isLocked ? 'Buka Kunci' : 'Kunci'">
+              <i :class="selectedPhoto.isLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i>
+            </button>
+            <div class="flex items-center gap-2">
+              <i class="fas fa-tint text-gray-400 text-xs"></i>
+              <input type="range" min="0" max="20" step="0.5" v-model.number="selectedPhoto.blur" @change="saveSessionToDB" class="w-20" title="Efek Blur">
+            </div>
+          </div>
+          
+          <div v-if="photos.length > 0" class="w-full mt-4 text-center">
              <p class="text-sm text-gray-500"><i class="fas fa-hand-pointer mr-1"></i> Pilih foto untuk menggeser, mengubah ukuran, atau mengatur filter ({{ photos.length }}/10)</p>
           </div>
         </div>
@@ -179,68 +116,6 @@
               <input v-if="photos.length < 10" id="upload-photo" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
             </label>
 
-            
-            <button @click="addText" class="w-full border-2 border-indigo-600 bg-white text-indigo-700 font-medium py-3 px-4 rounded-xl text-center flex items-center justify-center gap-2 mb-6 hover:bg-indigo-50 transition cursor-pointer">
-              <i class="fas fa-font text-xl"></i>
-              <span>Tambah Teks Baru</span>
-            </button>
-
-            <!-- Persistent Toolbar Panel -->
-            <div class="bg-white border border-gray-200 rounded-xl p-4 mb-6 shadow-sm">
-              <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2 border-b pb-2">
-                <i class="fas fa-sliders-h"></i> Alat Edit
-              </h4>
-              
-              <div v-if="selectedPhotoIds.length > 0" class="flex flex-col gap-3">
-                <div class="flex items-center justify-between bg-blue-50 p-2 rounded-lg">
-                  <span class="text-xs font-semibold text-blue-700">Foto Terpilih</span>
-                  <div class="flex gap-2">
-                    <button @click="centerSelected" class="p-2 bg-white rounded shadow-sm text-blue-600 hover:bg-blue-100" title="Tengahkan"><i class="fas fa-crosshairs"></i></button>
-                    <button @click="toggleLockSelected" class="p-2 bg-white rounded shadow-sm text-orange-600 hover:bg-orange-100" title="Kunci/Buka"><i :class="selectedPhoto.isLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i></button>
-                    <button @click="deleteSelected" class="p-2 bg-white rounded shadow-sm text-red-600 hover:bg-red-100" title="Hapus"><i class="fas fa-trash"></i></button>
-                  </div>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <label class="text-xs text-gray-600">Efek Blur</label>
-                  <input type="range" min="0" max="20" step="0.5" v-model.number="selectedPhoto.blur" @change="saveSessionToDB" class="w-full">
-                </div>
-              </div>
-
-              <div v-else-if="selectedTextIds.length > 0" class="flex flex-col gap-3">
-                <div class="flex items-center justify-between bg-indigo-50 p-2 rounded-lg">
-                  <span class="text-xs font-semibold text-indigo-700">Teks Terpilih</span>
-                  <div class="flex gap-2">
-                    <button @click="texts.find(t=>t.id===selectedTextIds[0]).isLocked = !texts.find(t=>t.id===selectedTextIds[0]).isLocked" class="p-2 bg-white rounded shadow-sm text-orange-600 hover:bg-orange-100" title="Kunci/Buka"><i :class="texts.find(t=>t.id===selectedTextIds[0]).isLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i></button>
-                    <button @click="deleteSelectedText" class="p-2 bg-white rounded shadow-sm text-red-600 hover:bg-red-100" title="Hapus"><i class="fas fa-trash"></i></button>
-                  </div>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <label class="text-xs text-gray-600">Isi Teks</label>
-                  <input type="text" v-model="texts.find(t=>t.id===selectedTextIds[0]).text" @change="saveSessionToDB" class="w-full border-gray-300 rounded-lg text-sm p-2">
-                </div>
-                <div class="flex gap-4">
-                  <div class="flex flex-col gap-1 flex-1">
-                    <label class="text-xs text-gray-600">Warna (Pilih / Pipet)</label>
-                    <div class="flex gap-2">
-                      <input type="color" v-model="texts.find(t=>t.id===selectedTextIds[0]).color" @change="saveSessionToDB" class="w-full h-8 rounded cursor-pointer border-0 p-0">
-                      <button @click="pickColorForText(texts.find(t=>t.id===selectedTextIds[0]))" class="px-3 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 text-gray-700" title="Pipet Warna Layar (Scope Color)">
-                        <i class="fas fa-eye-dropper"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="flex flex-col gap-1 flex-1">
-                    <label class="text-xs text-gray-600">Ukuran</label>
-                    <input type="range" min="10" max="150" step="1" v-model.number="texts.find(t=>t.id===selectedTextIds[0]).fontSize" @change="saveSessionToDB" class="w-full">
-                  </div>
-                </div>
-              </div>
-
-              <div v-else class="py-4 text-center text-gray-400 text-sm">
-                <i class="fas fa-hand-pointer block text-2xl mb-2 opacity-50"></i>
-                Klik sebuah foto atau teks pada kanvas untuk memunculkan menu pengaturannya di sini.
-              </div>
-            </div>
-            
             <button 
               @click="downloadTwibbon" 
               :disabled="photos.length === 0 || isDownloading"
@@ -393,11 +268,8 @@ const twibbon = ref(null)
 const frameUrl = ref('')
 
 const photos = ref([])
-const texts = ref([])
-const selectedTextIds = ref([])
 const selectedPhotoIds = ref([])
 
-const selectedText = computed(() => texts.value.find(t => selectedTextIds.value.includes(t.id)));
 const selectedPhotos = computed(() => photos.value.filter(p => selectedPhotoIds.value.includes(p.id)));
 const selectedPhoto = computed(() => selectedPhotos.value[0] || null);
 const currentDegreeDisplay = ref(null)
@@ -574,21 +446,7 @@ const deselectAll = () => {
   selectedPhotoIds.value = []
 }
 
-const selectText = (id, event) => {
-  selectedPhotoIds.value = []
-  if (event && event.shiftKey) {
-    if (selectedTextIds.value.includes(id)) {
-      selectedTextIds.value = selectedTextIds.value.filter(i => i !== id)
-    } else {
-      selectedTextIds.value.push(id)
-    }
-  } else {
-    selectedTextIds.value = [id]
-  }
-}
-
 const selectPhoto = (id, e) => {
-  selectedTextIds.value = []
   if (e && e.ctrlKey) {
     if (selectedPhotoIds.value.includes(id)) {
       selectedPhotoIds.value = selectedPhotoIds.value.filter(pid => pid !== id);
@@ -603,45 +461,6 @@ const selectPhoto = (id, e) => {
   const photo = photos.value.find(p => p.id === id);
   if (photo && !photo.isLocked) {
     startDrag(e, photo);
-  }
-}
-
-
-
-const addText = () => {
-  texts.value.push({ 
-    id: Date.now(), 
-    text: 'Teks Baru', 
-    x: 0, 
-    y: 0, 
-    fontSize: 40, 
-    color: '#ffffff', 
-    rotation: 0, 
-    isLocked: false 
-  })
-  selectedTextIds.value = [texts.value[texts.value.length - 1].id]
-  selectedPhotoIds.value = []
-  saveSessionToDB()
-}
-
-const deleteSelectedText = () => {
-  texts.value = texts.value.filter(t => !selectedTextIds.value.includes(t.id))
-  selectedTextIds.value = []
-  saveSessionToDB()
-}
-
-const pickColorForText = async (textItem) => {
-  if (!window.EyeDropper) {
-    alert('Browser Anda tidak mendukung fitur Pipet Warna (EyeDropper).');
-    return;
-  }
-  try {
-    const dropper = new EyeDropper();
-    const result = await dropper.open();
-    textItem.color = result.sRGBHex;
-    saveSessionToDB();
-  } catch (e) {
-    console.log('Eyedropper cancelled', e);
   }
 }
 
@@ -665,127 +484,198 @@ const toggleLockSelected = () => {
   selectedPhotos.value.forEach(p => p.isLocked = !allLocked);
 }
 
-// --- COMPLETE TEXT INTERACTION ENGINE ---
 const getClientCoords = (e) => {
   if (e.touches && e.touches.length > 0) {
-    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY }
   }
-  if (e.changedTouches && e.changedTouches.length > 0) {
-    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+  return { x: e.clientX, y: e.clientY }
+}
+
+const getPinchDistance = (e) => {
+  if (e.touches && e.touches.length >= 2) {
+    return Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    )
   }
-  return { x: e.clientX || 0, y: e.clientY || 0 };
-};
-
-let isTextDragging = false;
-let isTextResizing = false;
-let isTextRotating = false;
-let textStartX = 0;
-let textStartY = 0;
-let initialTextX = 0;
-let initialTextY = 0;
-let initialTextFontSize = 40;
-let initialTextRotation = 0;
-let textResizeCorner = '';
-let activeTextObj = null;
-
-const startTextDrag = (e, t) => {
-  if (t.isLocked) return;
-  activeTextObj = t;
-  isTextDragging = true;
-  isInteracting.value = true;
-  const coords = getClientCoords(e);
-  textStartX = coords.x;
-  textStartY = coords.y;
-  initialTextX = t.x;
-  initialTextY = t.y;
-  
-  window.addEventListener('mousemove', handleTextMouseMove);
-  window.addEventListener('mouseup', handleTextMouseUp);
-  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
-  window.addEventListener('touchend', handleTextMouseUp);
+  return 0
 }
 
-const startTextResize = (e, t, corner) => {
-  if (t.isLocked) return;
-  activeTextObj = t;
-  isTextResizing = true;
-  isInteracting.value = true;
-  textResizeCorner = corner;
-  const coords = getClientCoords(e);
-  textStartX = coords.x;
-  textStartY = coords.y;
-  initialTextFontSize = t.fontSize || 40;
+const startDrag = (e, targetPhoto) => {
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
   
-  window.addEventListener('mousemove', handleTextMouseMove);
-  window.addEventListener('mouseup', handleTextMouseUp);
-  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
-  window.addEventListener('touchend', handleTextMouseUp);
+  initialGroupStates.clear();
+  activePhotos.forEach(p => {
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
+  });
+
+  if (e.touches && e.touches.length >= 2) {
+    isPinching = true;
+    isInteracting.value = true;
+    initialDistance = getPinchDistance(e);
+    initialPosX = targetPhoto.x;
+    initialPosY = targetPhoto.y;
+    startImgWidth = targetPhoto.width;
+    startImgHeight = targetPhoto.height;
+    addWindowListeners();
+    return;
+  }
+
+  isDragging = true;
+  isInteracting.value = true;
+  const coords = getClientCoords(e);
+  startX = coords.x;
+  startY = coords.y;
+  initialPosX = targetPhoto.x;
+  initialPosY = targetPhoto.y;
+  addWindowListeners();
 }
 
-const startRotateText = (e, t) => {
-  if (t.isLocked) return;
-  activeTextObj = t;
-  isTextRotating = true;
+const startResize = (e, corner) => {
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
+  isResizing = true;
   isInteracting.value = true;
+  resizeCorner = corner;
   const coords = getClientCoords(e);
-  textStartX = coords.x;
-  textStartY = coords.y;
-  initialTextRotation = t.rotation || 0;
-  
-  window.addEventListener('mousemove', handleTextMouseMove);
-  window.addEventListener('mouseup', handleTextMouseUp);
-  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
-  window.addEventListener('touchend', handleTextMouseUp);
+  startX = coords.x;
+  startY = coords.y;
+  initialGroupStates.clear();
+  activePhotos.forEach(p => {
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
+  });
+  addWindowListeners();
 }
 
-const handleTextTouchMove = (e) => {
+const startRotate = (e) => {
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
+  isRotating = true;
+  isInteracting.value = true;
+  const coords = getClientCoords(e);
+  startX = coords.x;
+  startY = coords.y;
+  initialGroupStates.clear();
+  activePhotos.forEach(p => {
+    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
+  });
+  initialRotation = activePhotos[0].rotation;
+  addWindowListeners();
+}
+
+const onDrag = (e) => {
+  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
+  if (activePhotos.length === 0) return;
+
+  if (isPinching && e.touches && e.touches.length >= 2) {
+    if (e.cancelable) e.preventDefault();
+    const currentDistance = getPinchDistance(e);
+    const scale = currentDistance / initialDistance;
+    
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      if (!state) return;
+      let newW = state.width * scale;
+      if (newW < 50) newW = 50;
+      const newH = newW / (state.aspectRatio || (state.width / state.height));
+      const dxP = (newW - state.width) / 2;
+      const dyP = (newH - state.height) / 2;
+      photo.width = newW;
+      photo.height = newH;
+      photo.x = state.x - dxP;
+      photo.y = state.y - dyP;
+    });
+    return;
+  }
+
+  if (!isDragging && !isResizing && !isRotating) return;
   if (e.cancelable) e.preventDefault();
-  handleTextMouseMove(e);
-}
-
-const handleTextMouseMove = (e) => {
-  if (!activeTextObj) return;
-  const coords = getClientCoords(e);
-  const dx = coords.x - textStartX;
-  const dy = coords.y - textStartY;
   
-  if (isTextDragging) {
-    activeTextObj.x = initialTextX + dx;
-    activeTextObj.y = initialTextY + dy;
-  } else if (isTextResizing) {
-    let scaleDelta = dx;
-    if (textResizeCorner === 'tl' || textResizeCorner === 'bl') {
-      scaleDelta = -dx;
+  const coords = getClientCoords(e);
+  const dx = coords.x - startX;
+  const dy = coords.y - startY;
+  
+  if (isDragging) {
+    const target = activePhotos[0];
+    const targetState = initialGroupStates.get(target.id);
+    let newX = targetState.x + dx;
+    let newY = targetState.y + dy;
+    
+    const containerSize = editorContainer.value?.clientWidth || 400;
+    const centerX = containerSize / 2;
+    const centerY = containerSize / 2;
+    
+    let snappedDx = dx;
+    let snappedDy = dy;
+
+    if (Math.abs((newX + target.width/2) - centerX) < 8) {
+      snappedDx = (centerX - target.width/2) - targetState.x;
+      isSnappedX.value = true;
+    } else {
+      isSnappedX.value = false;
     }
-    let newSize = initialTextFontSize + scaleDelta * 0.5;
-    if (newSize < 10) newSize = 10;
-    if (newSize > 400) newSize = 400;
-    activeTextObj.fontSize = Math.round(newSize);
-  } else if (isTextRotating) {
-    let newRotation = initialTextRotation + dx * 0.5;
-    let remainder = newRotation % 45;
-    if (Math.abs(remainder) < 5) {
-      newRotation -= remainder;
-    } else if (Math.abs(remainder) > 40) {
-      newRotation += (newRotation > 0 ? 45 - remainder : -45 - remainder);
+    if (Math.abs((newY + target.height/2) - centerY) < 8) {
+      snappedDy = (centerY - target.height/2) - targetState.y;
+      isSnappedY.value = true;
+    } else {
+      isSnappedY.value = false;
     }
-    activeTextObj.rotation = Math.round(newRotation);
-    currentDegreeDisplay.value = Math.round(newRotation % 360);
+    
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      photo.x = state.x + snappedDx;
+      photo.y = state.y + snappedDy;
+    });
+  } 
+  else if (isResizing) {
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      let newW = state.width;
+      if (resizeCorner === 'br' || resizeCorner === 'tr') newW = state.width + dx;
+      if (resizeCorner === 'bl' || resizeCorner === 'tl') newW = state.width - dx;
+      if (newW < 50) newW = 50;
+      
+      const newH = newW / (state.aspectRatio || (state.width / state.height));
+      
+      if (resizeCorner === 'bl' || resizeCorner === 'tl') {
+        photo.x = state.x + (state.width - newW);
+      }
+      if (resizeCorner === 'tr' || resizeCorner === 'tl') {
+        photo.y = state.y + (state.height - newH);
+      }
+      
+      photo.width = newW;
+      photo.height = newH;
+    });
+  }
+  else if (isRotating) {
+    activePhotos.forEach(photo => {
+      const state = initialGroupStates.get(photo.id);
+      let newRotation = state.rotation + dx * 0.5; // Changed to minus logic below
+      let remainder = newRotation % 45;
+      if (Math.abs(remainder) < 5) {
+        newRotation -= remainder;
+      } else if (Math.abs(remainder) > 40) {
+        newRotation += (newRotation > 0 ? 45 - remainder : -45 - remainder);
+      }
+      photo.rotation = newRotation;
+      if (photo.id === activePhotos[0].id) currentDegreeDisplay.value = Math.round(newRotation % 360);
+    });
   }
 }
 
-const handleTextMouseUp = () => {
-  isTextDragging = false;
-  isTextResizing = false;
-  isTextRotating = false;
-  isInteracting.value = false;
-  currentDegreeDisplay.value = null;
-  saveSessionToDB();
-  
-  window.removeEventListener('mousemove', handleTextMouseMove);
-  window.removeEventListener('mouseup', handleTextMouseUp);
-  window.removeEventListener('touchmove', handleTextTouchMove);
-  window.removeEventListener('touchend', handleTextMouseUp);
+const endInteraction = () => {
+  isDragging = false
+  isResizing = false
+  isPinching = false
+  isRotating = false
+  isInteracting.value = false
+  isSnappedX.value = false
+  isSnappedY.value = false
+  currentDegreeDisplay.value = null
+  removeWindowListeners()
+  saveSessionToDB()
 }
 
 const downloadTwibbon = () => {
@@ -842,23 +732,6 @@ const downloadTwibbon = () => {
           ctx.restore();
         }
         
-              // Draw Texts
-        for (const t of texts.value) {
-          ctx.save();
-          const finalXText = t.x * ratio;
-          const finalYText = t.y * ratio;
-          const imgCenterXText = (canvas.width / 2) + finalXText;
-          const imgCenterYText = (canvas.height / 2) + finalYText;
-          ctx.translate(imgCenterXText, imgCenterYText);
-          ctx.rotate((t.rotation * Math.PI) / 180);
-          ctx.font = `bold ${t.fontSize * ratio}px Arial`;
-          ctx.fillStyle = t.color;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(t.text, 0, 0);
-          ctx.restore();
-        }
-
         ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
         
         const dataUrl = canvas.toDataURL('image/png');
