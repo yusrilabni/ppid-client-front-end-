@@ -422,7 +422,6 @@ let isDragging = false
 let isResizing = false
 let isPinching = false
 let isRotating = false
-  isInteracting.value = false
 let resizeCorner = ''
 let startX = 0
 let startY = 0
