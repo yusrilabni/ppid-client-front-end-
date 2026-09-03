@@ -1177,8 +1177,9 @@ const downloadTwibbon = () => {
           ctx.shadowOffsetY = 1 * ratio;
           ctx.shadowBlur = 3 * ratio;
           
-          // Hitung batas lebar maksimum kotak teks
-          const maxCanvasTextWidth = (t.customWidth ? t.customWidth : (editorContainer.value?.clientWidth * 0.85 || 340)) * ratio;
+          // Hitung batas lebar maksimum kotak teks dengan toleransi aman agar kata di ujung tidak terpotong
+          const containerWidth = editorContainer.value?.clientWidth || 400;
+          const maxCanvasTextWidth = (t.customWidth ? t.customWidth : (containerWidth * 0.95)) * ratio;
 
           // Pembungkus Kata Otomatis (Word Wrap Engine + Split Enter)
           const rawLines = (t.text || '').split('\n');
