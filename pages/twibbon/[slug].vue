@@ -66,10 +66,10 @@
                </template>
             </div>
 
-            <!-- Text Layers -->
+            <!-- Text Layers (Berada paling atas di atas Frame Twibbon z-25) -->
             <div v-for="t in texts" :key="t.id"
                  class="absolute flex flex-col items-center justify-center pointer-events-auto select-none"
-                 :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30 ring-2 ring-indigo-500 ring-offset-1 border border-indigo-400': selectedTextIds.includes(t.id) }"
+                 :class="{ 'z-[30]': !selectedTextIds.includes(t.id), 'z-[35] ring-2 ring-indigo-500 ring-offset-1 border border-indigo-400': selectedTextIds.includes(t.id) }"
                  :style="{ 
                    transform: `translate(calc(-50% + ${t.x}px), calc(-50% + ${t.y}px)) rotate(${t.rotation}deg)`,
                    left: '50%', top: '50%',
@@ -83,7 +83,7 @@
                          @change="saveSessionToDB"
                          @input="autoResizeTextarea($event)"
                          :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', lineHeight: '1.2' }" 
-                         class="bg-transparent border-0 outline-none text-center p-1 m-0 font-sans resize-none overflow-hidden focus:bg-black/20 focus:rounded" 
+                         class="bg-transparent border-0 outline-none text-center p-1 m-0 font-sans resize-none overflow-hidden focus:bg-black/20 focus:rounded inline-block" 
                          rows="1"
                          placeholder="Ketik teks..."></textarea>
 
@@ -537,9 +537,17 @@ const deleteSelectedText = () => {
 const autoResizeTextarea = (e) => {
   const el = e.target;
   el.style.height = 'auto';
-  el.style.height = el.scrollHeight + 'px';
   el.style.width = 'auto';
-  el.style.width = (el.scrollWidth + 10) + 'px';
+  
+  // Hitung lebar baris terpanjang
+  const lines = el.value.split('\n');
+  const maxLineLength = Math.max(...lines.map(l => l.length), 1);
+  const fontPx = parseInt(window.getComputedStyle(el).fontSize) || 40;
+  
+  // Perhitungan lebar dinamis berbasis font size & panjang teks
+  const approxWidth = Math.max(maxLineLength * (fontPx * 0.65) + 20, 60);
+  el.style.width = `${approxWidth}px`;
+  el.style.height = `${el.scrollHeight}px`;
 }
 
 const pickColorForText = async (textItem) => {
