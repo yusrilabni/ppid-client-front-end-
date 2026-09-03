@@ -159,10 +159,18 @@
           <div v-else-if="selectedTextIds.length > 0 && selectedText" class="absolute top-2 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl px-3 py-1.5 flex items-center gap-2 z-50 border border-indigo-200" @click.stop>
             <span class="text-xs font-semibold text-indigo-600 hidden sm:flex items-center gap-1"><i class="fas fa-font"></i> Teks</span>
             
-            <!-- Color Selector + Presets -->
+            <!-- Color Selector + Presets + Hex Code Input -->
             <div class="flex items-center gap-1 border border-gray-200 rounded px-1.5 py-1 bg-gray-50">
               <input type="color" v-model="selectedText.color" @change="saveSessionToDB" class="w-6 h-6 border-0 rounded cursor-pointer p-0 bg-transparent" title="Pilih Warna Kustom">
               
+              <!-- Input Teks Kode HEX/RGB -->
+              <input type="text" 
+                     v-model="selectedText.color" 
+                     @change="saveSessionToDB" 
+                     class="w-16 font-mono text-[11px] uppercase border border-gray-300 rounded px-1 py-0.5 text-center font-bold text-gray-700 bg-white" 
+                     title="Kode Warna HEX/RGB (Contoh: #FF0000)" 
+                     placeholder="#HEX">
+
               <!-- Quick Palette Presets (Cocok untuk HP) -->
               <div class="flex items-center gap-1 ml-1 border-l border-gray-300 pl-1.5">
                 <button v-for="c in ['#ffffff', '#000000', '#ef4444', '#eab308', '#3b82f6', '#22c55e']" :key="c"
@@ -1143,7 +1151,10 @@ const downloadTwibbon = () => {
           ctx.restore();
         }
         
-        // Draw Texts (Multi-line Enter Support)
+        // 2. Draw Frame Twibbon di Atas Foto
+        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
+        // 3. Draw Texts Layer Paling Atas (Di Atas Frame Twibbon)
         for (const t of texts.value) {
           ctx.save();
           const finalXText = t.x * ratio;
@@ -1169,8 +1180,6 @@ const downloadTwibbon = () => {
           
           ctx.restore();
         }
-
-        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
         
         const dataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
