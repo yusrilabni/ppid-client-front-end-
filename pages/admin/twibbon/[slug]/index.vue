@@ -13,14 +13,62 @@
     <div class="container mx-auto px-4 max-w-4xl -mt-8 pb-24 md:pb-8">
       <div class="bg-white rounded-2xl shadow-xl p-4 md:p-8 flex flex-col md:flex-row gap-8 items-start" @click.stop>
         
+        
         <!-- Area Editor -->
         <div class="w-full md:w-3/5 flex flex-col items-center relative">
           
-          <div v-if="loading" class="w-full aspect-square bg-gray-100 rounded-xl animate-pulse flex items-center justify-center">
+          <!-- Top Canva-style Toolbar -->
+          <div class="w-full bg-white border border-gray-200 rounded-t-xl p-2 flex items-center gap-3 shadow-sm overflow-x-auto whitespace-nowrap z-40 relative">
+            <button @click="addText" class="px-3 py-1.5 hover:bg-gray-100 rounded text-gray-700 text-sm font-medium flex items-center gap-2" title="Tambah Teks"><i class="fas fa-font"></i></button>
+            <label for="upload-photo-top" class="px-3 py-1.5 hover:bg-gray-100 rounded text-gray-700 text-sm font-medium flex items-center gap-2 cursor-pointer" title="Tambah Foto" :class="{ 'opacity-50 cursor-not-allowed': photos.length >= 10 }">
+              <i class="fas fa-image"></i>
+              <input v-if="photos.length < 10" id="upload-photo-top" type="file" class="hidden" accept="image/*" @change="handlePhotoUpload">
+            </label>
+            
+            <div class="w-px h-6 bg-gray-300 mx-1 shrink-0"></div> <!-- Divider -->
+            
+            <template v-if="selectedPhotoIds.length > 0">
+              <div class="flex items-center gap-3">
+                <button @click="centerSelected" class="px-2 py-1.5 hover:bg-gray-100 rounded text-gray-700" title="Tengahkan Foto"><i class="fas fa-crosshairs"></i></button>
+                <button @click="toggleLockSelected" class="px-2 py-1.5 hover:bg-gray-100 rounded" :class="selectedPhoto.isLocked ? 'text-orange-500' : 'text-gray-700'" title="Kunci/Buka"><i :class="selectedPhoto.isLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i></button>
+                <button @click="deleteSelected" class="px-2 py-1.5 hover:bg-red-50 text-red-500 rounded" title="Hapus Foto"><i class="fas fa-trash"></i></button>
+                
+                <div class="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                  <i class="fas fa-tint text-gray-400 text-xs"></i>
+                  <input type="range" min="0" max="20" step="0.5" v-model.number="selectedPhoto.blur" @change="saveSessionToDB" class="w-20" title="Efek Blur">
+                </div>
+              </div>
+            </template>
+            
+            <template v-else-if="selectedTextIds.length > 0 && selectedText">
+              <div class="flex items-center gap-3 shrink-0">
+                <input type="text" v-model="selectedText.text" @change="saveSessionToDB" class="w-32 border border-gray-300 rounded text-sm px-2 py-1 placeholder-gray-400" placeholder="Isi teks...">
+                
+                <div class="flex items-center border border-gray-300 rounded bg-white">
+                  <input type="number" min="10" max="400" v-model.number="selectedText.fontSize" @change="saveSessionToDB" class="w-16 border-0 text-sm px-2 py-1 text-center" title="Ukuran Font">
+                </div>
+                
+                <div class="flex items-center border border-gray-300 rounded overflow-hidden bg-white">
+                  <input type="color" v-model="selectedText.color" @change="saveSessionToDB" class="w-8 h-8 cursor-pointer border-0 p-0 rounded-none bg-transparent" title="Pilih Warna">
+                  <input type="text" v-model="selectedText.color" @change="saveSessionToDB" class="w-20 border-0 text-sm px-2 uppercase font-mono text-gray-600" maxlength="7">
+                  <button @click="pickColorForText(selectedText)" class="px-2 py-1 hover:bg-gray-100 border-l border-gray-200 text-gray-600" title="Pipet Warna Layar (Scope Color)"><i class="fas fa-eye-dropper"></i></button>
+                </div>
+
+                <button @click="selectedText.isLocked = !selectedText.isLocked" class="px-2 py-1.5 hover:bg-gray-100 rounded" :class="selectedText.isLocked ? 'text-orange-500' : 'text-gray-700'" title="Kunci/Buka"><i :class="selectedText.isLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i></button>
+                <button @click="deleteSelectedText" class="px-2 py-1.5 hover:bg-red-50 text-red-500 rounded" title="Hapus Teks"><i class="fas fa-trash"></i></button>
+              </div>
+            </template>
+            
+            <template v-else>
+              <span class="text-xs text-gray-400 italic">Pilih foto/teks pada kanvas untuk mengedit...</span>
+            </template>
+          </div>
+          
+          <div v-if="loading" class="w-full aspect-square bg-gray-100 rounded-b-xl animate-pulse flex items-center justify-center">
             <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
           </div>
 
-          <div v-else ref="editorContainer" class="relative w-full aspect-square mx-auto bg-gray-200 rounded-xl overflow-hidden shadow-inner checkerboard"
+          <div v-else ref="editorContainer" class="relative w-full aspect-square mx-auto bg-gray-200 rounded-b-xl overflow-hidden shadow-inner checkerboard"
                :class="{ 'ring-4 ring-blue-500 bg-blue-50': isDragOverCanvas }"
                @dragover.prevent="isDragOverCanvas = true"
                @dragleave.prevent="isDragOverCanvas = false"
@@ -67,23 +115,23 @@
             </div>
 
             
+            
             <!-- Text Layers -->
             <div v-for="t in texts" :key="t.id"
                  class="absolute flex flex-col items-center justify-center pointer-events-auto"
                  :class="{ 'z-10': !selectedTextIds.includes(t.id), 'z-30': selectedTextIds.includes(t.id) }"
                  :style="{ 
-                   transform: `translate(${t.x}px, ${t.y}px) rotate(${t.rotation}deg)`,
+                   transform: `translate(calc(-50% + ${t.x}px), calc(-50% + ${t.y}px)) rotate(${t.rotation}deg)`,
                    cursor: t.isLocked ? 'not-allowed' : (isDragging && selectedTextIds.includes(t.id) ? 'grabbing' : 'grab'),
                    left: '50%', top: '50%'
                  }"
-                 @mousedown.stop.prevent="selectText(t.id, $event); startTextDrag($event, t)"
-                 @touchstart.stop.prevent="selectText(t.id, $event); startTextDrag($event, t)"
+                 @mousedown.stop="selectText(t.id, $event); startTextDrag($event, t)"
+                 @touchstart.stop="selectText(t.id, $event); startTextDrag($event, t)"
                  @click.stop>
                  
-               <div :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 2px rgba(0,0,0,0.5)', transform: 'translate(-50%, -50%)', whiteSpace: 'nowrap' }" class="select-none pointer-events-none">
+               <div :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 2px rgba(0,0,0,0.5)', whiteSpace: 'nowrap', padding: '4px', border: selectedTextIds.includes(t.id) ? '1px dashed rgba(255,255,255,0.7)' : '1px solid transparent' }" class="select-none pointer-events-none">
                  {{ t.text }}
                </div>
-               
                
                <!-- Handles for selected text -->
                <template v-if="selectedTextIds.includes(t.id) && !t.isLocked">
@@ -350,6 +398,7 @@ const texts = ref([])
 const selectedTextIds = ref([])
 const selectedPhotoIds = ref([])
 
+const selectedText = computed(() => texts.value.find(t => selectedTextIds.value.includes(t.id)));
 const selectedPhotos = computed(() => photos.value.filter(p => selectedPhotoIds.value.includes(p.id)));
 const selectedPhoto = computed(() => selectedPhotos.value[0] || null);
 const currentDegreeDisplay = ref(null)
