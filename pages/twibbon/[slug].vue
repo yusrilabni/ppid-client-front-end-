@@ -666,6 +666,16 @@ const toggleLockSelected = () => {
 }
 
 // --- COMPLETE TEXT INTERACTION ENGINE ---
+const getClientCoords = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+  if (e.changedTouches && e.changedTouches.length > 0) {
+    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+  }
+  return { x: e.clientX || 0, y: e.clientY || 0 };
+};
+
 let isTextDragging = false;
 let isTextResizing = false;
 let isTextRotating = false;
