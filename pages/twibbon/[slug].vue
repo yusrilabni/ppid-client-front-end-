@@ -652,9 +652,10 @@ let colorPickingTargetText = null;
 const startUniversalEyeDropper = async (textItem) => {
   colorPickingTargetText = textItem;
   // Jika browser desktop punya EyeDropper native, prioritaskan EyeDropper native
-  if (process.client && window.EyeDropper) {
+  if (process.client && typeof window !== 'undefined' && window['EyeDropper']) {
     try {
-      const dropper = new EyeDropper();
+      const EyeDropperClass = window['EyeDropper'];
+      const dropper = new EyeDropperClass();
       const result = await dropper.open();
       if (result && result.sRGBHex) {
         textItem.color = result.sRGBHex;
