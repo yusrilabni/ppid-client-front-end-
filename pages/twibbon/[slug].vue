@@ -34,6 +34,19 @@
               {{ currentDegreeDisplay }}&deg;
             </div>
 
+            <!-- Overlay Pipet Warna Kustom HP & Desktop -->
+            <div v-if="isPickingColorActive" 
+                 class="absolute inset-0 z-50 bg-indigo-900/30 cursor-crosshair flex flex-col items-center justify-between p-4 transition"
+                 @click.stop="pickColorFromCanvasEvent($event)"
+                 @touchstart.stop.prevent="pickColorFromCanvasEvent($event)">
+               <div class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-full shadow-lg font-semibold animate-bounce flex items-center gap-1.5">
+                 <i class="fas fa-eye-dropper"></i> Sentuh/Klik area gambar untuk mengambil warna
+               </div>
+               <button @click.stop="isPickingColorActive = false" class="bg-white text-gray-700 text-xs px-3 py-1 rounded-full shadow hover:bg-gray-100 font-medium">
+                 Batal
+               </button>
+            </div>
+
             <!-- Photos (Multi-layer) -->
             <div v-for="photo in photos" :key="photo.id"
                  class="absolute"
@@ -159,8 +172,8 @@
                         :title="`Warna ${c}`"></button>
               </div>
 
-              <!-- EyeDropper Button (Hanya tampil jika browser HP/Desktop mendukung) -->
-              <button v-if="hasEyeDropper" @click="pickColorForText(selectedText)" class="p-1 hover:bg-gray-200 text-gray-600 rounded ml-1" title="Pipet Warna (EyeDropper)">
+              <!-- Universal EyeDropper Button (Dapat digunakan di HP maupun Desktop) -->
+              <button @click="startUniversalEyeDropper(selectedText)" class="p-1 hover:bg-gray-200 text-indigo-600 rounded ml-1 font-bold" title="Pipet Warna Kanvas">
                 <i class="fas fa-eye-dropper text-xs"></i>
               </button>
             </div>
@@ -365,6 +378,13 @@ const restoreSession = async () => {
       texts.value = savedTexts;
     }
   }
+}
+
+// Watcher Reaktif Otomatis untuk Simpan Teks Real-Time
+if (process.client) {
+  watch(texts, () => {
+    saveSessionToDB();
+  }, { deep: true });
 }
 // -----------------------------
 
@@ -626,18 +646,68 @@ const autoResizeTextarea = (e) => {
   updateTextareaSize(el);
 }
 
-const pickColorForText = async (textItem) => {
-  if (!window.EyeDropper) {
-    alert('Browser Anda tidak mendukung fitur Pipet Warna (EyeDropper).');
-    return;
+const isPickingColorActive = ref(false);
+let colorPickingTargetText = null;
+
+const startUniversalEyeDropper = async (textItem) => {
+  colorPickingTargetText = textItem;
+  // Jika browser desktop punya EyeDropper native, prioritaskan EyeDropper native
+  if (process.client && window.EyeDropper) {
+    try {
+      const dropper = new EyeDropper();
+      const result = await dropper.open();
+      if (result && result.sRGBHex) {
+        textItem.color = result.sRGBHex;
+        saveSessionToDB();
+        return;
+      }
+    } catch(e) { console.log('Native eyedropper cancelled/failed, using canvas picker overlay'); }
   }
+  
+  // Jika di HP / browser tanpa EyeDropper API native, gunakan Pipet Overlay Kanvas Universal
+  isPickingColorActive.value = true;
+}
+
+const pickColorFromCanvasEvent = (e) => {
+  if (!editorContainer.value || !colorPickingTargetText) return;
+  const rect = editorContainer.value.getBoundingClientRect();
+  const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+  
+  const touchX = clientX - rect.left;
+  const touchY = clientY - rect.top;
+  
+  // Render temporary canvas snapshot to extract pixel color at (touchX, touchY)
+  const tempCanvas = document.createElement('canvas');
+  const size = editorContainer.value.clientWidth || 400;
+  tempCanvas.width = size;
+  tempCanvas.height = size;
+  const ctx = tempCanvas.getContext('2d');
+  
+  // Draw current photos
+  for (const photo of photos.value) {
+    if (!photo.imgObj) continue;
+    ctx.save();
+    ctx.translate(photo.x + photo.width / 2, photo.y + photo.height / 2);
+    ctx.rotate((photo.rotation * Math.PI) / 180);
+    ctx.drawImage(photo.imgObj, -photo.width / 2, -photo.height / 2, photo.width, photo.height);
+    ctx.restore();
+  }
+  
+  // Draw frame twibbon if exists
+  if (frameImgObj) {
+    ctx.drawImage(frameImgObj, 0, 0, size, size);
+  }
+  
   try {
-    const dropper = new EyeDropper();
-    const result = await dropper.open();
-    textItem.color = result.sRGBHex;
+    const pixel = ctx.getImageData(Math.round(touchX), Math.round(touchY), 1, 1).data;
+    const hexColor = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
+    colorPickingTargetText.color = hexColor;
     saveSessionToDB();
-  } catch (e) {
-    console.log('Eyedropper cancelled', e);
+  } catch (err) {
+    console.error('Canvas pixel pick error:', err);
+  } finally {
+    isPickingColorActive.value = false;
   }
 }
 
