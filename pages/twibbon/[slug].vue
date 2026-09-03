@@ -380,12 +380,6 @@ const restoreSession = async () => {
   }
 }
 
-// Watcher Reaktif Otomatis untuk Simpan Teks Real-Time
-if (process.client) {
-  watch(texts, () => {
-    saveSessionToDB();
-  }, { deep: true });
-}
 // -----------------------------
 
 
@@ -470,6 +464,9 @@ onMounted(async () => {
   if (process.client) {
     window.addEventListener('keydown', handleKeydown)
     hasEyeDropper.value = !!window['Eye' + 'Dropper'];
+    watch(texts, () => {
+      saveSessionToDB();
+    }, { deep: true });
   }
 })
 
