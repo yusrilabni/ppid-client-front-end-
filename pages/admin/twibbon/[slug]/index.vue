@@ -84,9 +84,15 @@
                  {{ t.text }}
                </div>
                
+               
                <!-- Handles for selected text -->
                <template v-if="selectedTextIds.includes(t.id) && !t.isLocked">
-                 <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full border-2 border-blue-600 shadow-md flex items-center justify-center cursor-ew-resize z-30 text-blue-600" @mousedown.stop.prevent="startRotateText($event, t)" @touchstart.stop.prevent="startRotateText($event, t)">
+                 <div class="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tl')" @touchstart.stop.prevent="startTextResize($event, t, 'tl')"></div>
+                 <div class="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'tr')" @touchstart.stop.prevent="startTextResize($event, t, 'tr')"></div>
+                 <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nesw-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'bl')" @touchstart.stop.prevent="startTextResize($event, t, 'bl')"></div>
+                 <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-white rounded-full border-4 border-indigo-600 shadow-md cursor-nwse-resize z-30" @mousedown.stop.prevent="startTextResize($event, t, 'br')" @touchstart.stop.prevent="startTextResize($event, t, 'br')"></div>
+                 
+                 <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full border-2 border-indigo-600 shadow-md flex items-center justify-center cursor-ew-resize z-30 text-indigo-600" @mousedown.stop.prevent="startRotateText($event, t)" @touchstart.stop.prevent="startRotateText($event, t)">
                    <i class="fas fa-sync-alt text-xs pointer-events-none"></i>
                  </div>
                </template>
