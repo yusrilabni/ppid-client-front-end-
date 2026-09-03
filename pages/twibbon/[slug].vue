@@ -68,7 +68,7 @@
 
             <!-- Text Layers (Berada paling atas di atas Frame Twibbon z-25) -->
             <div v-for="t in texts" :key="t.id"
-                 class="absolute flex flex-col items-center justify-center pointer-events-auto select-none"
+                 class="absolute flex flex-col items-center justify-center pointer-events-auto select-none max-w-[90%]"
                  :class="{ 'z-[30]': !selectedTextIds.includes(t.id), 'z-[35] ring-2 ring-indigo-500 ring-offset-1 border border-indigo-400': selectedTextIds.includes(t.id) }"
                  :style="{ 
                    transform: `translate(calc(-50% + ${t.x}px), calc(-50% + ${t.y}px)) rotate(${t.rotation}deg)`,
@@ -84,7 +84,7 @@
                          @input="autoResizeTextarea($event)"
                          :ref="(el) => updateTextareaSize(el, t)"
                          :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', lineHeight: '1.2' }" 
-                         class="bg-transparent border-0 outline-none text-center p-1 m-0 font-sans resize-none overflow-hidden focus:bg-black/20 focus:rounded inline-block" 
+                         class="bg-transparent border-0 outline-none text-center p-1 m-0 font-sans resize-none overflow-hidden focus:bg-black/20 focus:rounded inline-block max-w-full break-words whitespace-pre-wrap" 
                          rows="1"
                          placeholder="Ketik teks..."></textarea>
 
@@ -544,7 +544,14 @@ const updateTextareaSize = (el, textItem) => {
   const maxLineLength = Math.max(...lines.map(l => l.length), 1);
   const fontPx = textItem?.fontSize || parseInt(window.getComputedStyle(el).fontSize) || 40;
   
-  const approxWidth = Math.max(maxLineLength * (fontPx * 0.65) + 20, 60);
+  const containerWidth = editorContainer.value?.clientWidth || 400;
+  const maxAllowedWidth = containerWidth * 0.85; // Maksimal 85% lebar kanvas
+  
+  let approxWidth = Math.max(maxLineLength * (fontPx * 0.65) + 20, 60);
+  if (approxWidth > maxAllowedWidth) {
+    approxWidth = maxAllowedWidth;
+  }
+  
   el.style.width = `${approxWidth}px`;
   el.style.height = `${el.scrollHeight}px`;
 }
