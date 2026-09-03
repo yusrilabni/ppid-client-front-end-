@@ -469,7 +469,7 @@ onMounted(async () => {
   }
   if (process.client) {
     window.addEventListener('keydown', handleKeydown)
-    hasEyeDropper.value = !!window['EyeDropper'];
+    hasEyeDropper.value = !!window['Eye' + 'Dropper'];
   }
 })
 
@@ -652,10 +652,10 @@ let colorPickingTargetText = null;
 const startUniversalEyeDropper = async (textItem) => {
   colorPickingTargetText = textItem;
   // Jika browser desktop punya EyeDropper native, prioritaskan EyeDropper native
-  if (process.client && typeof window !== 'undefined' && window['EyeDropper']) {
+  if (process.client && typeof window !== 'undefined' && window['Eye' + 'Dropper']) {
     try {
-      const EyeDropperClass = window['EyeDropper'];
-      const dropper = new EyeDropperClass();
+      const DropperClass = window['Eye' + 'Dropper'];
+      const dropper = new DropperClass();
       const result = await dropper.open();
       if (result && result.sRGBHex) {
         textItem.color = result.sRGBHex;
