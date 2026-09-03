@@ -1154,7 +1154,7 @@ const downloadTwibbon = () => {
         // 2. Draw Frame Twibbon di Atas Foto
         ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-        // 3. Draw Texts Layer Paling Atas (Di Atas Frame Twibbon)
+        // 3. Draw Texts Layer Paling Atas (Di Atas Frame Twibbon - Presisi Identik dengan Layar)
         for (const t of texts.value) {
           ctx.save();
           const finalXText = t.x * ratio;
@@ -1165,16 +1165,46 @@ const downloadTwibbon = () => {
           ctx.rotate((t.rotation * Math.PI) / 180);
           
           const fontSizeScaled = t.fontSize * ratio;
-          ctx.font = `bold ${fontSizeScaled}px Arial`;
+          // Menggunakan font sans-serif tebal (bold) persis Tailwind font-sans
+          ctx.font = `900 ${fontSizeScaled}px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
           ctx.fillStyle = t.color;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           
-          const lines = (t.text || '').split('\n');
-          const lineHeight = fontSizeScaled * 1.2;
-          const startYOffset = -((lines.length - 1) * lineHeight) / 2;
+          // Efek Drop Shadow Tebal Persis `textShadow: 1px 1px 3px rgba(0,0,0,0.6)`
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+          ctx.shadowOffsetX = 1 * ratio;
+          ctx.shadowOffsetY = 1 * ratio;
+          ctx.shadowBlur = 3 * ratio;
           
-          lines.forEach((line, index) => {
+          // Hitung batas lebar maksimum kotak teks
+          const maxCanvasTextWidth = (t.customWidth ? t.customWidth : (editorContainer.value?.clientWidth * 0.85 || 340)) * ratio;
+
+          // Pembungkus Kata Otomatis (Word Wrap Engine + Split Enter)
+          const rawLines = (t.text || '').split('\n');
+          const finalWrappedLines = [];
+          
+          for (const rLine of rawLines) {
+            const words = rLine.split(' ');
+            let currentLine = words[0] || '';
+            for (let i = 1; i < words.length; i++) {
+              const word = words[i];
+              const testLine = currentLine + ' ' + word;
+              const metrics = ctx.measureText(testLine);
+              if (metrics.width > maxCanvasTextWidth && currentLine !== '') {
+                finalWrappedLines.push(currentLine);
+                currentLine = word;
+              } else {
+                currentLine = testLine;
+              }
+            }
+            finalWrappedLines.push(currentLine);
+          }
+          
+          const lineHeight = fontSizeScaled * 1.2;
+          const startYOffset = -((finalWrappedLines.length - 1) * lineHeight) / 2;
+          
+          finalWrappedLines.forEach((line, index) => {
             ctx.fillText(line, 0, startYOffset + (index * lineHeight));
           });
           
