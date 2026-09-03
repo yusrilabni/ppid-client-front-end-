@@ -82,6 +82,7 @@
                <textarea v-model="t.text" 
                          @change="saveSessionToDB"
                          @input="autoResizeTextarea($event)"
+                         @focus="$event.target.select()"
                          :ref="(el) => updateTextareaSize(el, t)"
                          :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', lineHeight: '1.2' }" 
                          class="bg-transparent border-0 outline-none text-center p-1 m-0 font-sans resize-none overflow-hidden focus:bg-black/20 focus:rounded inline-block max-w-full break-words whitespace-pre-wrap" 
@@ -523,7 +524,7 @@ const selectText = (id, e) => {
 }
 
 const addText = () => {
-  texts.value.push({ 
+  const newText = { 
     id: Date.now(), 
     text: 'Teks Baru', 
     x: 0, 
@@ -531,10 +532,21 @@ const addText = () => {
     fontSize: 40, 
     color: '#ffffff', 
     rotation: 0 
-  })
-  selectedTextIds.value = [texts.value[texts.value.length - 1].id]
-  selectedPhotoIds.value = []
-  saveSessionToDB()
+  };
+  texts.value.push(newText);
+  selectedTextIds.value = [newText.id];
+  selectedPhotoIds.value = [];
+  saveSessionToDB();
+  
+  nextTick(() => {
+    if (process.client) {
+      const activeEl = document.querySelector(`textarea[placeholder="Ketik teks..."]`);
+      if (activeEl) {
+        activeEl.focus();
+        activeEl.select();
+      }
+    }
+  });
 }
 
 const deleteSelectedText = () => {
