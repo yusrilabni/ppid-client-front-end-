@@ -94,7 +94,7 @@
                  
                <textarea v-model="t.text" 
                          @change="saveSessionToDB"
-                         @input="autoResizeTextarea($event)"
+                         @input="t.text = $event.target.value; autoResizeTextarea($event)"
                          @focus="$event.target.select()"
                          :ref="(el) => updateTextareaSize(el, t)"
                          :style="{ color: t.color, fontSize: t.fontSize + 'px', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.6)', lineHeight: '1.2' }" 
