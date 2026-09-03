@@ -606,6 +606,8 @@ const selectPhoto = (id, e) => {
   }
 }
 
+
+
 const addText = () => {
   texts.value.push({ 
     id: Date.now(), 
@@ -663,198 +665,117 @@ const toggleLockSelected = () => {
   selectedPhotos.value.forEach(p => p.isLocked = !allLocked);
 }
 
-const getClientCoords = (e) => {
-  if (e.touches && e.touches.length > 0) {
-    return { x: e.touches[0].clientX, y: e.touches[0].clientY }
-  }
-  return { x: e.clientX, y: e.clientY }
-}
+// --- COMPLETE TEXT INTERACTION ENGINE ---
+let isTextDragging = false;
+let isTextResizing = false;
+let isTextRotating = false;
+let textStartX = 0;
+let textStartY = 0;
+let initialTextX = 0;
+let initialTextY = 0;
+let initialTextFontSize = 40;
+let initialTextRotation = 0;
+let textResizeCorner = '';
+let activeTextObj = null;
 
-const getPinchDistance = (e) => {
-  if (e.touches && e.touches.length >= 2) {
-    return Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    )
-  }
-  return 0
-}
-
-const startDrag = (e, targetPhoto) => {
-  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
-  if (activePhotos.length === 0) return;
+const startTextDrag = (e, t) => {
+  if (t.isLocked) return;
+  activeTextObj = t;
+  isTextDragging = true;
+  isInteracting.value = true;
+  const coords = getClientCoords(e);
+  textStartX = coords.x;
+  textStartY = coords.y;
+  initialTextX = t.x;
+  initialTextY = t.y;
   
-  initialGroupStates.clear();
-  activePhotos.forEach(p => {
-    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
-  });
-
-  if (e.touches && e.touches.length >= 2) {
-    isPinching = true;
-    isInteracting.value = true;
-    initialDistance = getPinchDistance(e);
-    initialPosX = targetPhoto.x;
-    initialPosY = targetPhoto.y;
-    startImgWidth = targetPhoto.width;
-    startImgHeight = targetPhoto.height;
-    addWindowListeners();
-    return;
-  }
-
-  isDragging = true;
-  isInteracting.value = true;
-  const coords = getClientCoords(e);
-  startX = coords.x;
-  startY = coords.y;
-  initialPosX = targetPhoto.x;
-  initialPosY = targetPhoto.y;
-  addWindowListeners();
+  window.addEventListener('mousemove', handleTextMouseMove);
+  window.addEventListener('mouseup', handleTextMouseUp);
+  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTextMouseUp);
 }
 
-const startResize = (e, corner) => {
-  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
-  if (activePhotos.length === 0) return;
-  isResizing = true;
+const startTextResize = (e, t, corner) => {
+  if (t.isLocked) return;
+  activeTextObj = t;
+  isTextResizing = true;
   isInteracting.value = true;
-  resizeCorner = corner;
+  textResizeCorner = corner;
   const coords = getClientCoords(e);
-  startX = coords.x;
-  startY = coords.y;
-  initialGroupStates.clear();
-  activePhotos.forEach(p => {
-    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
-  });
-  addWindowListeners();
+  textStartX = coords.x;
+  textStartY = coords.y;
+  initialTextFontSize = t.fontSize || 40;
+  
+  window.addEventListener('mousemove', handleTextMouseMove);
+  window.addEventListener('mouseup', handleTextMouseUp);
+  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTextMouseUp);
 }
 
-const startRotate = (e) => {
-  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
-  if (activePhotos.length === 0) return;
-  isRotating = true;
+const startRotateText = (e, t) => {
+  if (t.isLocked) return;
+  activeTextObj = t;
+  isTextRotating = true;
   isInteracting.value = true;
   const coords = getClientCoords(e);
-  startX = coords.x;
-  startY = coords.y;
-  initialGroupStates.clear();
-  activePhotos.forEach(p => {
-    initialGroupStates.set(p.id, { x: p.x, y: p.y, width: p.width, height: p.height, rotation: p.rotation, aspectRatio: p.aspectRatio });
-  });
-  initialRotation = activePhotos[0].rotation;
-  addWindowListeners();
+  textStartX = coords.x;
+  textStartY = coords.y;
+  initialTextRotation = t.rotation || 0;
+  
+  window.addEventListener('mousemove', handleTextMouseMove);
+  window.addEventListener('mouseup', handleTextMouseUp);
+  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTextMouseUp);
 }
 
-const onDrag = (e) => {
-  const activePhotos = selectedPhotos.value.filter(p => !p.isLocked);
-  if (activePhotos.length === 0) return;
-
-  if (isPinching && e.touches && e.touches.length >= 2) {
-    if (e.cancelable) e.preventDefault();
-    const currentDistance = getPinchDistance(e);
-    const scale = currentDistance / initialDistance;
-    
-    activePhotos.forEach(photo => {
-      const state = initialGroupStates.get(photo.id);
-      if (!state) return;
-      let newW = state.width * scale;
-      if (newW < 50) newW = 50;
-      const newH = newW / (state.aspectRatio || (state.width / state.height));
-      const dxP = (newW - state.width) / 2;
-      const dyP = (newH - state.height) / 2;
-      photo.width = newW;
-      photo.height = newH;
-      photo.x = state.x - dxP;
-      photo.y = state.y - dyP;
-    });
-    return;
-  }
-
-  if (!isDragging && !isResizing && !isRotating) return;
+const handleTextTouchMove = (e) => {
   if (e.cancelable) e.preventDefault();
-  
-  const coords = getClientCoords(e);
-  const dx = coords.x - startX;
-  const dy = coords.y - startY;
-  
-  if (isDragging) {
-    const target = activePhotos[0];
-    const targetState = initialGroupStates.get(target.id);
-    let newX = targetState.x + dx;
-    let newY = targetState.y + dy;
-    
-    const containerSize = editorContainer.value?.clientWidth || 400;
-    const centerX = containerSize / 2;
-    const centerY = containerSize / 2;
-    
-    let snappedDx = dx;
-    let snappedDy = dy;
+  handleTextMouseMove(e);
+}
 
-    if (Math.abs((newX + target.width/2) - centerX) < 8) {
-      snappedDx = (centerX - target.width/2) - targetState.x;
-      isSnappedX.value = true;
-    } else {
-      isSnappedX.value = false;
+const handleTextMouseMove = (e) => {
+  if (!activeTextObj) return;
+  const coords = getClientCoords(e);
+  const dx = coords.x - textStartX;
+  const dy = coords.y - textStartY;
+  
+  if (isTextDragging) {
+    activeTextObj.x = initialTextX + dx;
+    activeTextObj.y = initialTextY + dy;
+  } else if (isTextResizing) {
+    let scaleDelta = dx;
+    if (textResizeCorner === 'tl' || textResizeCorner === 'bl') {
+      scaleDelta = -dx;
     }
-    if (Math.abs((newY + target.height/2) - centerY) < 8) {
-      snappedDy = (centerY - target.height/2) - targetState.y;
-      isSnappedY.value = true;
-    } else {
-      isSnappedY.value = false;
+    let newSize = initialTextFontSize + scaleDelta * 0.5;
+    if (newSize < 10) newSize = 10;
+    if (newSize > 400) newSize = 400;
+    activeTextObj.fontSize = Math.round(newSize);
+  } else if (isTextRotating) {
+    let newRotation = initialTextRotation + dx * 0.5;
+    let remainder = newRotation % 45;
+    if (Math.abs(remainder) < 5) {
+      newRotation -= remainder;
+    } else if (Math.abs(remainder) > 40) {
+      newRotation += (newRotation > 0 ? 45 - remainder : -45 - remainder);
     }
-    
-    activePhotos.forEach(photo => {
-      const state = initialGroupStates.get(photo.id);
-      photo.x = state.x + snappedDx;
-      photo.y = state.y + snappedDy;
-    });
-  } 
-  else if (isResizing) {
-    activePhotos.forEach(photo => {
-      const state = initialGroupStates.get(photo.id);
-      let newW = state.width;
-      if (resizeCorner === 'br' || resizeCorner === 'tr') newW = state.width + dx;
-      if (resizeCorner === 'bl' || resizeCorner === 'tl') newW = state.width - dx;
-      if (newW < 50) newW = 50;
-      
-      const newH = newW / (state.aspectRatio || (state.width / state.height));
-      
-      if (resizeCorner === 'bl' || resizeCorner === 'tl') {
-        photo.x = state.x + (state.width - newW);
-      }
-      if (resizeCorner === 'tr' || resizeCorner === 'tl') {
-        photo.y = state.y + (state.height - newH);
-      }
-      
-      photo.width = newW;
-      photo.height = newH;
-    });
-  }
-  else if (isRotating) {
-    activePhotos.forEach(photo => {
-      const state = initialGroupStates.get(photo.id);
-      let newRotation = state.rotation + dx * 0.5; // Changed to minus logic below
-      let remainder = newRotation % 45;
-      if (Math.abs(remainder) < 5) {
-        newRotation -= remainder;
-      } else if (Math.abs(remainder) > 40) {
-        newRotation += (newRotation > 0 ? 45 - remainder : -45 - remainder);
-      }
-      photo.rotation = newRotation;
-      if (photo.id === activePhotos[0].id) currentDegreeDisplay.value = Math.round(newRotation % 360);
-    });
+    activeTextObj.rotation = Math.round(newRotation);
+    currentDegreeDisplay.value = Math.round(newRotation % 360);
   }
 }
 
-const endInteraction = () => {
-  isDragging = false
-  isResizing = false
-  isPinching = false
-  isRotating = false
-  isInteracting.value = false
-  isSnappedX.value = false
-  isSnappedY.value = false
-  currentDegreeDisplay.value = null
-  removeWindowListeners()
-  saveSessionToDB()
+const handleTextMouseUp = () => {
+  isTextDragging = false;
+  isTextResizing = false;
+  isTextRotating = false;
+  isInteracting.value = false;
+  currentDegreeDisplay.value = null;
+  saveSessionToDB();
+  
+  window.removeEventListener('mousemove', handleTextMouseMove);
+  window.removeEventListener('mouseup', handleTextMouseUp);
+  window.removeEventListener('touchmove', handleTextTouchMove);
+  window.removeEventListener('touchend', handleTextMouseUp);
 }
 
 const downloadTwibbon = () => {
