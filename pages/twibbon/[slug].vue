@@ -603,6 +603,119 @@ const getClientCoords = (e) => {
   return { x: e.clientX, y: e.clientY }
 }
 
+// --- COMPLETE TEXT INTERACTION ENGINE ---
+let isTextDragging = false;
+let isTextResizing = false;
+let isTextRotating = false;
+let textStartX = 0;
+let textStartY = 0;
+let initialTextX = 0;
+let initialTextY = 0;
+let initialTextFontSize = 40;
+let initialTextRotation = 0;
+let textResizeCorner = '';
+let activeTextObj = null;
+
+const startTextDrag = (e, t) => {
+  if (t.isLocked) return;
+  activeTextObj = t;
+  isTextDragging = true;
+  isInteracting.value = true;
+  const coords = getClientCoords(e);
+  textStartX = coords.x;
+  textStartY = coords.y;
+  initialTextX = t.x;
+  initialTextY = t.y;
+  
+  window.addEventListener('mousemove', handleTextMouseMove);
+  window.addEventListener('mouseup', handleTextMouseUp);
+  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTextMouseUp);
+}
+
+const startTextResize = (e, t, corner) => {
+  if (t.isLocked) return;
+  activeTextObj = t;
+  isTextResizing = true;
+  isInteracting.value = true;
+  textResizeCorner = corner;
+  const coords = getClientCoords(e);
+  textStartX = coords.x;
+  textStartY = coords.y;
+  initialTextFontSize = t.fontSize || 40;
+  
+  window.addEventListener('mousemove', handleTextMouseMove);
+  window.addEventListener('mouseup', handleTextMouseUp);
+  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTextMouseUp);
+}
+
+const startRotateText = (e, t) => {
+  if (t.isLocked) return;
+  activeTextObj = t;
+  isTextRotating = true;
+  isInteracting.value = true;
+  const coords = getClientCoords(e);
+  textStartX = coords.x;
+  textStartY = coords.y;
+  initialTextRotation = t.rotation || 0;
+  
+  window.addEventListener('mousemove', handleTextMouseMove);
+  window.addEventListener('mouseup', handleTextMouseUp);
+  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTextMouseUp);
+}
+
+const handleTextTouchMove = (e) => {
+  if (e.cancelable) e.preventDefault();
+  handleTextMouseMove(e);
+}
+
+const handleTextMouseMove = (e) => {
+  if (!activeTextObj) return;
+  const coords = getClientCoords(e);
+  const dx = coords.x - textStartX;
+  const dy = coords.y - textStartY;
+  
+  if (isTextDragging) {
+    activeTextObj.x = initialTextX + dx;
+    activeTextObj.y = initialTextY + dy;
+  } else if (isTextResizing) {
+    let scaleDelta = dx;
+    if (textResizeCorner === 'tl' || textResizeCorner === 'bl') {
+      scaleDelta = -dx;
+    }
+    let newSize = initialTextFontSize + scaleDelta * 0.5;
+    if (newSize < 10) newSize = 10;
+    if (newSize > 400) newSize = 400;
+    activeTextObj.fontSize = Math.round(newSize);
+  } else if (isTextRotating) {
+    let newRotation = initialTextRotation + dx * 0.5;
+    let remainder = newRotation % 45;
+    if (Math.abs(remainder) < 5) {
+      newRotation -= remainder;
+    } else if (Math.abs(remainder) > 40) {
+      newRotation += (newRotation > 0 ? 45 - remainder : -45 - remainder);
+    }
+    activeTextObj.rotation = Math.round(newRotation);
+    currentDegreeDisplay.value = Math.round(newRotation % 360);
+  }
+}
+
+const handleTextMouseUp = () => {
+  isTextDragging = false;
+  isTextResizing = false;
+  isTextRotating = false;
+  isInteracting.value = false;
+  currentDegreeDisplay.value = null;
+  saveSessionToDB();
+  
+  window.removeEventListener('mousemove', handleTextMouseMove);
+  window.removeEventListener('mouseup', handleTextMouseUp);
+  window.removeEventListener('touchmove', handleTextTouchMove);
+  window.removeEventListener('touchend', handleTextMouseUp);
+}
+
 const getPinchDistance = (e) => {
   if (e.touches && e.touches.length >= 2) {
     return Math.hypot(
