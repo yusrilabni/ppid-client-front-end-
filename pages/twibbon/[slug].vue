@@ -531,7 +531,9 @@ const addText = () => {
     y: 0, 
     fontSize: 40, 
     color: '#ffffff', 
-    rotation: 0 
+    rotation: 0,
+    customWidth: null,
+    customHeight: null
   };
   texts.value.push(newText);
   selectedTextIds.value = [newText.id];
@@ -557,23 +559,27 @@ const deleteSelectedText = () => {
 
 const updateTextareaSize = (el, textItem) => {
   if (!el) return;
-  el.style.height = 'auto';
-  el.style.width = 'auto';
   
-  const lines = (el.value || '').split('\n');
-  const maxLineLength = Math.max(...lines.map(l => l.length), 1);
-  const fontPx = textItem?.fontSize || parseInt(window.getComputedStyle(el).fontSize) || 40;
-  
-  const containerWidth = editorContainer.value?.clientWidth || 400;
-  const maxAllowedWidth = containerWidth * 0.85; // Maksimal 85% lebar kanvas
-  
-  let approxWidth = Math.max(maxLineLength * (fontPx * 0.65) + 20, 60);
-  if (approxWidth > maxAllowedWidth) {
-    approxWidth = maxAllowedWidth;
+  if (textItem?.customWidth) {
+    el.style.width = `${textItem.customWidth}px`;
+  } else {
+    el.style.width = 'auto';
+    const lines = (el.value || '').split('\n');
+    const maxLineLength = Math.max(...lines.map(l => l.length), 1);
+    const fontPx = textItem?.fontSize || parseInt(window.getComputedStyle(el).fontSize) || 40;
+    const containerWidth = editorContainer.value?.clientWidth || 400;
+    const maxAllowedWidth = containerWidth * 0.85;
+    let approxWidth = Math.max(maxLineLength * (fontPx * 0.65) + 20, 60);
+    if (approxWidth > maxAllowedWidth) approxWidth = maxAllowedWidth;
+    el.style.width = `${approxWidth}px`;
   }
   
-  el.style.width = `${approxWidth}px`;
-  el.style.height = `${el.scrollHeight}px`;
+  if (textItem?.customHeight) {
+    el.style.height = `${textItem.customHeight}px`;
+  } else {
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }
 }
 
 const autoResizeTextarea = (e) => {
@@ -672,6 +678,9 @@ const startTextDrag = (e, t) => {
   window.addEventListener('touchend', handleTextMouseUp);
 }
 
+let initialTextWidth = 0;
+let initialTextHeight = 0;
+
 const startTextResize = (e, t, corner) => {
   if (t.isLocked) return;
   activeTextObj = t;
@@ -683,26 +692,26 @@ const startTextResize = (e, t, corner) => {
   textStartY = coords.y;
   initialTextFontSize = t.fontSize || 40;
   
+  // Ambil elemen DOM textarea saat ini untuk lebar & tinggi awal
+  const container = e.target.closest('.absolute');
+  const textareaEl = container ? container.querySelector('textarea') : null;
+  if (textareaEl) {
+    initialTextWidth = textItemWidth(t, textareaEl);
+    initialTextHeight = textareaEl.offsetHeight || 50;
+  } else {
+    initialTextWidth = t.customWidth || 150;
+    initialTextHeight = t.customHeight || 50;
+  }
+  
   window.addEventListener('mousemove', handleTextMouseMove);
   window.addEventListener('mouseup', handleTextMouseUp);
   window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
   window.addEventListener('touchend', handleTextMouseUp);
 }
 
-const startRotateText = (e, t) => {
-  if (t.isLocked) return;
-  activeTextObj = t;
-  isTextRotating = true;
-  isInteracting.value = true;
-  const coords = getClientCoords(e);
-  textStartX = coords.x;
-  textStartY = coords.y;
-  initialTextRotation = t.rotation || 0;
-  
-  window.addEventListener('mousemove', handleTextMouseMove);
-  window.addEventListener('mouseup', handleTextMouseUp);
-  window.addEventListener('touchmove', handleTextTouchMove, { passive: false });
-  window.addEventListener('touchend', handleTextMouseUp);
+const textItemWidth = (t, textareaEl) => {
+  if (t.customWidth) return t.customWidth;
+  return textareaEl ? textareaEl.offsetWidth : 150;
 }
 
 const handleTextTouchMove = (e) => {
@@ -720,19 +729,29 @@ const handleTextMouseMove = (e) => {
     activeTextObj.x = initialTextX + dx;
     activeTextObj.y = initialTextY + dy;
   } else if (isTextResizing) {
-    let scaleDelta = dx;
-    if (textResizeCorner === 'tl' || textResizeCorner === 'bl' || textResizeCorner === 'left') {
-      scaleDelta = -dx;
-    } else if (textResizeCorner === 'top') {
-      scaleDelta = -dy;
-    } else if (textResizeCorner === 'bottom') {
-      scaleDelta = dy;
+    if (textResizeCorner === 'left' || textResizeCorner === 'right') {
+      // HANYA MENGUBAH LEBAR (HORIZONTAL SAJA)
+      let wDelta = (textResizeCorner === 'right') ? dx : -dx;
+      let newW = initialTextWidth + wDelta;
+      if (newW < 40) newW = 40;
+      activeTextObj.customWidth = Math.round(newW);
+    } else if (textResizeCorner === 'top' || textResizeCorner === 'bottom') {
+      // HANYA MENGUBAH TINGGI (VERTIKAL SAJA)
+      let hDelta = (textResizeCorner === 'bottom') ? dy : -dy;
+      let newH = initialTextHeight + hDelta;
+      if (newH < 25) newH = 25;
+      activeTextObj.customHeight = Math.round(newH);
+    } else {
+      // 4 HANDLE SUDUT: MENGUBAH UKURAN FONT (DIAGONAL)
+      let scaleDelta = dx;
+      if (textResizeCorner === 'tl' || textResizeCorner === 'bl') {
+        scaleDelta = -dx;
+      }
+      let newSize = initialTextFontSize + scaleDelta * 0.5;
+      if (newSize < 10) newSize = 10;
+      if (newSize > 400) newSize = 400;
+      activeTextObj.fontSize = Math.round(newSize);
     }
-    
-    let newSize = initialTextFontSize + scaleDelta * 0.5;
-    if (newSize < 10) newSize = 10;
-    if (newSize > 400) newSize = 400;
-    activeTextObj.fontSize = Math.round(newSize);
   } else if (isTextRotating) {
     let newRotation = initialTextRotation + dx * 0.5;
     let remainder = newRotation % 45;
