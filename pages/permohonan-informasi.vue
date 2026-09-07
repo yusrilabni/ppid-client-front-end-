@@ -7,7 +7,7 @@
         
         <div class="text-center mb-8 md:mb-10 mt-4 md:mt-6">
             <div class="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 md:mb-6 shadow-lg">
-                <img src="/logo/favicon_io/android-chrome-512x512.png" alt="Logo PPID" class="w-10 h-10 md:w-12 md:h-12">
+                <img :src="getStorageUrl('logo/ppid.webp')" alt="Logo PPID" class="w-10 h-10 md:w-12 md:h-12">
             </div>
             <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-3">Permohonan Informasi</h1>
             <p class="text-sm md:text-base text-gray-600 max-w-2xl mx-auto px-2">
@@ -313,7 +313,7 @@ import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
-import api from '@/services/api'
+import api, { getStorageUrl } from '@/services/api'
 
 const loading = ref(false)
 const success = ref(false)
