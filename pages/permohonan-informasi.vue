@@ -1,16 +1,12 @@
 <template>
   <div class="permohonan-page">
-    <PageHeader 
-      title=" " 
-      icon=""
-      :breadcrumbs="getBreadcrumbs.permohonanPage().map(c => ({ label: c.title, to: c.url }))" 
-    />
     <div class="container mx-auto py-6 md:py-8 px-4">
       <div class="max-w-6xl mx-auto">
+        <Breadcrumbs :breadcrumbs="getBreadcrumbs.permohonanPage()" class="mb-6" />
         
         <div class="text-center mb-8 md:mb-10 mt-4 md:mt-6">
-            <div class="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 md:mb-6 shadow-lg">
-                <img src="/logo/ppid_v2.webp" alt="Logo PPID" class="w-10 h-10 md:w-12 md:h-12">
+            <div class="inline-flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 md:mb-6 shadow-lg overflow-hidden p-2">
+                <img src="/logo/ppid_v2.webp" alt="Logo PPID" class="w-full h-full object-contain drop-shadow-md">
             </div>
             <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-3">Permohonan Informasi</h1>
             <p class="text-sm md:text-base text-gray-600 max-w-2xl mx-auto px-2">
