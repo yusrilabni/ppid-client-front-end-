@@ -1,9 +1,12 @@
 <template>
   <div class="permohonan-page">
-    <PageHeader title="Permohonan Informasi Publik" />
+    <PageHeader 
+      title=" " 
+      icon=""
+      :breadcrumbs="getBreadcrumbs.permohonanPage().map(c => ({ label: c.title, to: c.url }))" 
+    />
     <div class="container mx-auto py-6 md:py-8 px-4">
       <div class="max-w-6xl mx-auto">
-        <Breadcrumbs :breadcrumbs="getBreadcrumbs.permohonanPage()" class="mb-6" />
         
         <div class="text-center mb-8 md:mb-10 mt-4 md:mt-6">
             <div class="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 md:mb-6 shadow-lg">
