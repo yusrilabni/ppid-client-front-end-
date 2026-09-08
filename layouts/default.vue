@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import NavBar from '@/components/NavBar.vue'
 import FooterSection from '@/components/FooterSection.vue'
 import AccessibilityWidget from '@/components/AccessibilityWidget.vue'
+import PedomanAdminModal from '@/components/PedomanAdminModal.vue'
 import SurveyModal from '@/components/SurveyModal.vue'
 
 const accStore = useAccessibilityStore()
@@ -39,6 +40,7 @@ const linkGoogleAccount = () => {
     <FooterSection />
   </div>
   <AccessibilityWidget />
+    <PedomanAdminModal />
   <SurveyModal />
 </template>
 

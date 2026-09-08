@@ -75,6 +75,9 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       localStorage.removeItem('ppid_token')
       localStorage.removeItem('ppid_user')
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('pedoman_admin_shown')
+      }
     }
   }
 
@@ -90,6 +93,9 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null
         localStorage.removeItem('ppid_token')
         localStorage.removeItem('ppid_user')
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('pedoman_admin_shown')
+        }
       }
     }
   }

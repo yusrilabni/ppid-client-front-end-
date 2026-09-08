@@ -22,6 +22,7 @@ async function handleLogout() {
   await authStore.logout()
   router.push({ name: 'home' })
 }
+import PedomanAdminModal from '@/components/PedomanAdminModal.vue'
 </script>
 
 <template>
@@ -117,6 +118,7 @@ async function handleLogout() {
       </main>
     </div>
   </div>
+  <PedomanAdminModal />
 </template>
 
 
