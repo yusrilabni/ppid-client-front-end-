@@ -1,7 +1,7 @@
 <template>
 	<div>
 <transition><div v-show="isOpen"
-     class="fixed inset-0 z-[110] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-2 md:p-4" 
+     class="fixed inset-0 z-[9999] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-2 md:p-4" 
      >
     
     <div class="bg-white w-full max-w-6xl max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 font-sans text-slate-700 relative">
@@ -998,7 +998,7 @@
 </div></transition>
 
 <template v-if="authStore.isAuthenticated && (authStore.user?.role === 'admin' || authStore.user?.role === 'superadmin')">
-    <div class="fixed z-[105] bottom-6 right-6" >
+    <div class="fixed z-[9998] bottom-6 right-6" >
         <button @click="openModal" 
                 class="w-12 h-12 bg-indigo-700 hover:bg-indigo-800 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group relative border-2 border-white p-3 overflow-hidden">
             <i class="fas fa-chalkboard-teacher text-lg"></i>
@@ -1012,7 +1012,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -1048,12 +1048,12 @@ const prevTab = () => {
     }
 };
 
-onMounted(() => {
-    if (authStore.isAuthenticated && (authStore.user?.role === 'admin' || authStore.user?.role === 'superadmin')) {
+watch(() => authStore.isAuthenticated, (newVal) => {
+    if (newVal && (authStore.user?.role === 'admin' || authStore.user?.role === 'superadmin')) {
         if (!sessionStorage.getItem('pedoman_admin_shown')) {
             isOpen.value = true;
             sessionStorage.setItem('pedoman_admin_shown', 'true');
         }
     }
-});
+}, { immediate: true });
 </script>
