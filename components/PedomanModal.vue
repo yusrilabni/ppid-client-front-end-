@@ -1,11 +1,7 @@
 <template>
+<transition name="fade">
 <div v-if="modelValue" 
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-150"
-     class="fixed inset-0 z-[100] bg-slate-900/90 flex items-center justify-center p-2 md:p-6" 
-     style="display: none;">
+     class="fixed inset-0 z-[100] bg-slate-900/90 flex items-center justify-center p-2 md:p-6">
     
     <div class="bg-white w-full max-w-6xl max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 font-sans">
         
@@ -32,12 +28,12 @@
         <!-- Progress Bar -->
         <div class="w-full h-1 bg-slate-100 flex-shrink-0">
             <div class="h-full bg-blue-500 transition-all duration-200" 
-                 :style="{ width: $store.pedomanModal.scrollProgress + '%' }"></div>
+                 :style="{ width: scrollProgress + '%' }"></div>
         </div>
 
         <!-- Content Area -->
         <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50"
-             @scroll="$store.pedomanModal.updateProgress($el)">
+             @scroll="updateProgress($event)">
             
             <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -182,7 +178,7 @@
         </div>
     </div>
 </div>
-
+</transition>
 
 
 </template>
@@ -231,3 +227,14 @@ watch(() => props.modelValue, (newVal) => {
     }
 });
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
