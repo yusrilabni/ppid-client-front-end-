@@ -92,7 +92,7 @@
                  @touchstart.stop="selectText(t.id, $event); startTextDrag($event, t)"
                  @click.stop>
                  
-               <textarea v-model="t.text" 
+               <textarea :id="'textarea-' + t.id" v-model="t.text" 
                          @change="saveSessionToDB"
                          @input="t.text = $event.target.value; autoResizeTextarea($event)"
                          @focus="$event.target.select()"
@@ -1177,12 +1177,11 @@ const downloadTwibbon = () => {
           ctx.shadowOffsetY = 1 * ratio;
           ctx.shadowBlur = 3 * ratio;
           
-          // Hitung batas lebar maksimum kotak teks berdasarkan patokan aktual kotak textarea di layar (dikalikan ratio)
           let targetTextWidth = t.customWidth;
           if (!targetTextWidth && process.client) {
-            const textareaEl = document.querySelector(`textarea[placeholder="Ketik teks..."]`);
+            const textareaEl = document.getElementById(`textarea-${t.id}`);
             if (textareaEl && textareaEl.offsetWidth) {
-              targetTextWidth = textareaEl.offsetWidth + 10;
+              targetTextWidth = textareaEl.offsetWidth;
             }
           }
           if (!targetTextWidth) {
