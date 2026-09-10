@@ -10,6 +10,7 @@ import SurveyModal from '@/components/SurveyModal.vue'
 
 const accStore = useAccessibilityStore()
 const authStore = useAuthStore()
+const route = useRoute()
 
 const linkGoogleAccount = () => { 
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'
@@ -20,7 +21,7 @@ const linkGoogleAccount = () => {
 <template>
   <div id="acc-main-wrapper" :class="accStore.wrapperClasses" class="min-h-screen flex flex-col bg-gray-50">
     <ClientOnly>
-      <div v-if="authStore.isAdmin && (!authStore.user?.google_id || authStore.user?.email === '-')" 
+      <div v-if="authStore.isAdmin && (!authStore.user?.google_id || authStore.user?.email === '-') && route.query.linked !== 'otp_required'" 
            class="bg-red-600 text-white px-4 py-3 text-center text-sm md:text-base font-medium flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 shadow-md relative z-50">
         <div class="flex items-center gap-2">
           <i class="fas fa-exclamation-triangle text-red-200 text-lg"></i>
