@@ -2,11 +2,20 @@ export default defineEventHandler(async (event) => {
   try {
     const apiUrl = process.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id';
     
-    // Server Vercel diblokir oleh Firewall saat nembak backend?
-    // Solusi: Kita kembalikan instruksi Redirect 301 agar Google dan Browser
-    // mendownload Sitemap XML-nya LANGSUNG dari backend Laravel, melewati blokir Vercel!
-    return sendRedirect(event, `${apiUrl}/api/v1/sitemap`, 301);
+    // Karena domain backend diblokir oleh Google, kita TIDAK BOLEH menggunakan Redirect.
+    // Kita harus menyuruh server Vercel (Nuxt) untuk mendownload XML-nya secara diam-diam
+    // dari backend, lalu Nuxt yang akan menyajikannya ke Google. 
+    // Dengan cara ini, Google hanya melihat domain ppid.sinjaikab.go.id!
+    
+    const xmlContent = await $fetch(`${apiUrl}/api/v1/sitemap`, { 
+        responseType: 'text' // Ambil sebagai string XML mentah
+    });
+    
+    appendHeader(event, 'Content-Type', 'application/xml');
+    return xmlContent;
+    
   } catch (err) {
-    return "Terjadi kesalahan saat memuat sitemap.";
+    appendHeader(event, 'Content-Type', 'text/plain');
+    return "Terjadi kesalahan saat memuat sitemap dari backend.";
   }
 });
