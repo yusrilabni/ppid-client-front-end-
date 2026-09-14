@@ -102,7 +102,8 @@ const getYoutubeThumbnail = (url) => {
 onMounted(async () => {
   try {
     const res = await api.get('/galeri')
-    items.value = res.data.data.data || res.data.data
+    // Backend API langsung mengembalikan array, atau kadang dibungkus { data: [...] }
+    items.value = res.data.data?.data || res.data.data || res.data || []
   } catch (error) {
     console.error('Error fetching gallery:', error)
   } finally {
