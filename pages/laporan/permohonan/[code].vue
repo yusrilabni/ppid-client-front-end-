@@ -1,22 +1,34 @@
 <template>
   <div class="tracking-page bg-gray-50 min-h-screen pb-12">
-    <PageHeader title="Detail Permohonan" />
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      
-      <!-- BREADCRUMBS -->
-      <div class="mb-6 flex items-center space-x-2 text-sm text-gray-500">
-        <NuxtLink to="/" class="hover:text-blue-600"><i class="fas fa-home"></i> Beranda</NuxtLink>
-        <span>/</span>
-        <NuxtLink to="/laporan/permohonan" class="hover:text-blue-600">Laporan Permohonan</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-900 font-semibold" v-if="result">#{{ result.unique_code }}</span>
-      </div>
-      
-      <div v-if="loading" class="flex justify-center py-20">
-        <span class="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></span>
-      </div>
-      
-      <div v-else-if="result" class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+    <div class="container mx-auto py-4 md:py-8 px-2 sm:px-4">
+      <div class="max-w-6xl mx-auto">
+        <!-- BREADCRUMBS (Matched with version2) -->
+        <div class="mb-4">
+            <div class="flex items-center space-x-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap">
+                <NuxtLink to="/" class="hover:text-blue-600 flex items-center"><i class="fas fa-home mr-1"></i> Beranda</NuxtLink>
+                <span>/</span>
+                <NuxtLink to="/laporan/permohonan" class="hover:text-blue-600 flex items-center"><i class="fas fa-file-alt mr-1"></i> Permohonan Saya</NuxtLink>
+                <span>/</span>
+                <span class="text-gray-900 font-semibold flex items-center"><i class="fas fa-info-circle mr-1"></i> Detail</span>
+            </div>
+        </div>
+
+        <!-- BIG LOGO HEADER (Matched with version2) -->
+        <div class="text-center mb-6 md:mb-10 mt-4">
+            <div class="inline-flex items-center justify-center w-24 h-24 md:w-36 md:h-36 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 md:mb-6 shadow-lg overflow-hidden">
+                <img src="/logo/ppid.webp" alt="Logo PPID" class="w-20 h-20 md:w-32 md:h-32 object-contain">
+            </div>
+            <h1 class="text-2xl md:text-4xl font-extrabold text-gray-800 mb-2 px-2">Detail Permohonan</h1>
+            <p class="text-sm md:text-base text-gray-600 max-w-2xl mx-auto px-4 leading-relaxed">
+                Rincian lengkap permohonan informasi Anda, status, dan riwayat tanggapan.
+            </p>
+        </div>
+        
+        <div v-if="loading" class="flex justify-center py-20">
+          <span class="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></span>
+        </div>
+        
+        <div v-else-if="result" class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 mx-1 sm:mx-0">
         <!-- Header / Nomor Resi -->
         <div class="px-4 py-5 md:px-6 md:py-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 border-b border-blue-500">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
