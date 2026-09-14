@@ -1,126 +1,164 @@
 <template>
-  <div class="tracking-page">
+  <div class="tracking-page bg-gray-50 min-h-screen pb-12">
     <PageHeader title="Lacak Permohonan" />
-    <div class="container mx-auto px-4 py-12 max-w-4xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Breadcrumbs :breadcrumbs="getBreadcrumbs.trackingPage()" class="mb-6" />
-      <div class="bg-white rounded-xl shadow-lg p-8 border">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Cek Status Permohonan Anda</h2>
-        
-        <form @submit.prevent="checkStatus" class="mb-8 max-w-2xl mx-auto">
-          <div class="flex flex-col md:flex-row gap-4">
-            <input 
-              v-model="code" 
-              type="text" 
-              placeholder="Masukkan Kode Registrasi" 
-              class="flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-lg font-mono tracking-wider uppercase"
-              required
-            />
-            <button 
-              type="submit" 
-              :disabled="loading"
-              class="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center whitespace-nowrap"
-            >
-              <span v-if="loading" class="animate-spin h-5 w-5 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
-              <i v-else class="fas fa-search mr-2"></i> Lacak
-            </button>
-          </div>
-        </form>
-
-        <div v-if="result" class="border-t pt-8 mt-4">
-          <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-            <div>
-              <h3 class="text-xl font-bold text-gray-800">Detail Permohonan #{{ result.unique_code }}</h3>
-              <p class="text-sm text-gray-500 mt-1"><i class="fas fa-shield-alt mr-1"></i> Privasi: <span class="font-semibold">{{ result.privacy_status }}</span></p>
-            </div>
-            <span :class="getStatusClass(result.status_permohonan)" class="px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wide">
-              {{ formatStatus(result.status_permohonan) }}
-            </span>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg border border-gray-100">
-            <!-- Data Pemohon -->
-            <div class="space-y-4">
-              <h4 class="font-bold text-blue-800 border-b pb-2 mb-3"><i class="fas fa-user mr-2"></i>Data Pemohon</h4>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">Nama Lengkap</span>
-                <span class="font-medium text-gray-900">{{ result.nama_pemohon || '-' }}</span>
-              </div>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">Email</span>
-                <span class="font-medium text-gray-900">{{ result.email_pemohon || '-' }}</span>
-              </div>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">No. Telepon / WA</span>
-                <span class="font-medium text-gray-900">{{ result.nomor_telepon_pemohon || '-' }}</span>
-              </div>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">Alamat</span>
-                <span class="font-medium text-gray-900 text-sm">{{ result.alamat_pemohon || '-' }}</span>
-              </div>
-            </div>
-
-            <!-- Detail Informasi -->
-            <div class="space-y-4">
-              <h4 class="font-bold text-blue-800 border-b pb-2 mb-3"><i class="fas fa-file-alt mr-2"></i>Data Informasi</h4>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">Kategori Informasi</span>
-                <span class="font-medium text-gray-900">{{ result.kategori_informasi || '-' }}</span>
-              </div>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">Tanggal Pengajuan</span>
-                <span class="font-medium text-gray-900">{{ formatDate(result.created_at) }}</span>
-              </div>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">Rincian Informasi</span>
-                <p class="font-medium text-gray-900 text-sm whitespace-pre-line mt-1 bg-white p-3 border rounded-md">{{ result.detail_informasi }}</p>
-              </div>
-              
-              <div>
-                <span class="block text-xs text-gray-500 font-semibold uppercase">Tujuan Penggunaan</span>
-                <p class="font-medium text-gray-900 text-sm mt-1">{{ result.tujuan_penggunaan || '-' }}</p>
-              </div>
-            </div>
-          </div>
-            
-          <!-- Responses / Tanggapan Admin -->
-          <div v-if="result.responses && result.responses.length > 0" class="mt-8">
-            <h4 class="font-bold text-gray-800 mb-4"><i class="fas fa-comments mr-2"></i>Tanggapan Petugas</h4>
-            <div class="space-y-4">
-              <div v-for="(resp, index) in result.responses" :key="index" class="p-4 bg-blue-50 border border-blue-100 rounded-lg">
-                <div class="flex justify-between items-start mb-2">
-                  <span class="font-bold text-blue-900 text-sm">{{ resp.user ? resp.user.name : 'Admin/Petugas' }}</span>
-                  <span class="text-xs text-gray-500">{{ formatDate(resp.created_at) }}</span>
+      
+      <div v-if="loading" class="flex justify-center py-20">
+        <span class="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></span>
+      </div>
+      
+      <div v-else-if="result" class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        <!-- Header / Nomor Resi -->
+        <div class="px-4 py-5 md:px-6 md:py-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 border-b border-blue-500">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <h2 class="text-lg md:text-xl font-bold text-white flex items-center">
+                    <div class="bg-white/20 p-2 rounded-lg mr-3">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    #{{ result.unique_code }}
+                </h2>
+                <div class="flex items-center gap-2 w-full lg:w-auto">
+                    <NuxtLink to="/laporan/permohonan" class="flex items-center justify-center px-3 py-2 text-xs md:text-sm font-semibold rounded-lg bg-white text-blue-700 hover:bg-blue-50 shadow-md transition-all">
+                        <i class="fas fa-arrow-left mr-1.5 md:mr-2"></i> Kembali ke Daftar
+                    </NuxtLink>
                 </div>
-                <p class="text-gray-800 text-sm whitespace-pre-line">{{ resp.message }}</p>
-                <div v-if="resp.file_path || resp.link" class="mt-3 pt-3 border-t border-blue-200">
-                  <a v-if="resp.file_path" :href="getStorageUrl(resp.file_path)" target="_blank" class="inline-flex items-center text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 mr-2">
-                    <i class="fas fa-download mr-1"></i> Unduh Lampiran
-                  </a>
-                  <a v-if="resp.link" :href="resp.link" target="_blank" class="inline-flex items-center text-xs bg-gray-600 text-white px-3 py-1.5 rounded hover:bg-gray-700">
-                    <i class="fas fa-external-link-alt mr-1"></i> Buka Tautan
-                  </a>
-                </div>
-              </div>
             </div>
-          </div>
+        </div>
 
-          <div v-if="result.status_permohonan === 'ditolak'" class="mt-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-md">
-            <p class="font-bold mb-1"><i class="fas fa-times-circle mr-2"></i>Permohonan Ditolak</p>
-            <p class="text-sm">Silakan periksa tanggapan petugas di atas untuk alasan penolakan.</p>
-          </div>
+        <div class="p-4 md:p-8">
+            <!-- Status Badges -->
+            <div class="mb-8 flex flex-wrap gap-2 md:gap-4">
+                <span :class="getStatusClass(result.status_permohonan)" class="px-4 py-2 inline-flex items-center text-sm font-medium rounded-full border">
+                    <i class="fas fa-check-circle mr-2" v-if="result.status_permohonan === 'selesai'"></i>
+                    <i class="fas fa-spinner fa-spin mr-2" v-else-if="result.status_permohonan === 'diproses'"></i>
+                    <i class="fas fa-clock mr-2" v-else-if="result.status_permohonan === 'pending'"></i>
+                    <i class="fas fa-times-circle mr-2" v-else></i>
+                    {{ formatStatus(result.status_permohonan) }}
+                </span>
+
+                <span class="px-4 py-2 inline-flex items-center text-sm font-medium rounded-full border bg-sky-100 text-sky-800 border-sky-200">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    {{ result.privacy_status || 'Publik' }}
+                </span>
+            </div>
+
+            <!-- Informasi Pemohon -->
+            <div class="mb-10">
+                <h3 class="text-base md:text-lg font-bold text-gray-900 mb-5 pb-2 border-b-2 border-blue-100 flex items-center">
+                    <span class="bg-blue-500 text-white p-1.5 rounded-lg mr-3 shadow-sm">
+                        <i class="fas fa-user-circle"></i>
+                    </span>
+                    Informasi Pemohon
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                    <div class="space-y-5">
+                        <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-md">
+                            <label class="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Nama Pemohon</label>
+                            <div class="text-gray-900 font-semibold text-base">{{ result.nama_pemohon || '-' }}</div>
+                        </div>
+                        <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-md">
+                            <label class="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Pekerjaan</label>
+                            <div class="text-gray-900 font-medium">{{ result.pekerjaan || '-' }}</div>
+                        </div>
+                        <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-md">
+                            <label class="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Nomor Telepon</label>
+                            <div class="text-gray-900 font-medium">{{ result.nomor_telepon_pemohon || '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="space-y-5">
+                        <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-md">
+                            <label class="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Alamat</label>
+                            <div class="text-gray-900 font-medium text-sm leading-relaxed">{{ result.alamat_pemohon || '-' }}</div>
+                        </div>
+                        <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-md">
+                            <label class="block text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Email</label>
+                            <div class="text-gray-900 font-medium">{{ result.email_pemohon || '-' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Permohonan -->
+            <div class="space-y-8 mb-10">
+                <div class="group">
+                    <h3 class="text-base md:text-lg font-bold text-gray-900 mb-3 flex items-center">
+                        <span class="bg-indigo-500 text-white p-1.5 rounded-lg mr-3 shadow-sm group-hover:scale-110 transition-transform">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        Informasi yang Dimohon
+                    </h3>
+                    <div class="bg-gradient-to-br from-blue-50 to-white p-4 md:p-5 rounded-2xl border border-blue-100 shadow-sm leading-relaxed text-gray-800 text-base md:text-lg italic font-medium whitespace-pre-line">{{ result.detail_informasi }}</div>
+                </div>
+
+                <div class="group">
+                    <h3 class="text-base md:text-lg font-bold text-gray-900 mb-3 flex items-center">
+                        <span class="bg-emerald-500 text-white p-1.5 rounded-lg mr-3 shadow-sm group-hover:scale-110 transition-transform">
+                            <i class="fas fa-bullseye"></i>
+                        </span>
+                        Tujuan Penggunaan
+                    </h3>
+                    <div class="bg-emerald-50/30 p-4 md:p-5 rounded-2xl border border-emerald-100 shadow-sm leading-relaxed text-gray-700">{{ result.tujuan_penggunaan || '-' }}</div>
+                </div>
+            </div>
+
+            <!-- Riwayat Tanggapan -->
+            <div v-if="result.responses && result.responses.length > 0" class="mt-12">
+                <h3 class="text-base md:text-lg font-bold text-gray-900 mb-6 pb-2 border-b-2 border-blue-100 flex items-center">
+                    <span class="bg-purple-500 text-white p-1.5 rounded-lg mr-3 shadow-sm">
+                        <i class="fas fa-history"></i>
+                    </span>
+                    Riwayat Tanggapan
+                </h3>
+                
+                <div class="relative">
+                    <div class="absolute left-5 md:left-7 top-4 bottom-4 w-0.5 bg-gradient-to-b from-blue-200 via-indigo-200 to-transparent"></div>
+                    <div class="space-y-6 md:space-y-8 relative z-10">
+                        <div v-for="(resp, index) in result.responses" :key="index" class="flex items-start gap-3 md:gap-4">
+                            <div class="flex-shrink-0 z-10">
+                                <div class="h-10 w-10 md:h-14 md:w-14 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 border-2 border-white shadow-md flex items-center justify-center">
+                                    <i class="fas fa-user-tie text-lg md:text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="p-4 md:p-5 rounded-2xl rounded-tl-none border shadow-sm hover:shadow-md transition-shadow bg-white border-gray-100">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <p class="font-bold text-gray-900 text-sm md:text-base">
+                                            {{ resp.user ? resp.user.name : 'Petugas PPID' }}
+                                            <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded-full uppercase">Petugas</span>
+                                        </p>
+                                        <p class="text-[10px] md:text-xs font-medium text-gray-400 flex items-center italic">
+                                            <i class="far fa-clock mr-1"></i> {{ formatDate(resp.created_at) }}
+                                        </p>
+                                    </div>
+                                    <div class="text-gray-700 text-sm md:text-base leading-relaxed mb-4 whitespace-pre-line">{{ resp.message }}</div>
+                                    
+                                    <div v-if="resp.file_path || resp.link" class="pt-4 border-t border-gray-50 space-y-3">
+                                        <a v-if="resp.file_path" :href="getStorageUrl(resp.file_path)" target="_blank" class="group flex items-center p-2 rounded-xl bg-blue-50 border border-blue-100 hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
+                                            <div class="h-10 w-10 rounded-lg bg-white flex items-center justify-center text-blue-600 shadow-sm group-hover:scale-90 transition-transform">
+                                                <i class="fas fa-file-download text-lg"></i>
+                                            </div>
+                                            <div class="ml-3 flex-1">
+                                                <p class="text-xs font-bold text-blue-800 group-hover:text-white uppercase tracking-tighter">Unduh Lampiran</p>
+                                            </div>
+                                        </a>
+                                        <a v-if="resp.link" :href="resp.link" target="_blank" class="flex items-center text-xs md:text-sm text-indigo-600 hover:text-indigo-800 font-medium break-all">
+                                            <i class="fas fa-link mr-2"></i> {{ resp.link }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div v-else-if="searched && !loading" class="text-center py-8 text-red-500 bg-red-50 rounded-lg border border-red-100 mt-4">
-          <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
-          <p>Permohonan dengan kode <strong>{{ code }}</strong> tidak ditemukan.</p>
-        </div>
+      </div>
+      
+      <div v-else-if="!loading" class="text-center py-20 bg-white rounded-2xl shadow-lg border border-red-100 mt-4">
+        <i class="fas fa-search text-4xl text-red-400 mb-3"></i>
+        <p class="text-xl font-bold text-gray-800">Permohonan tidak ditemukan</p>
       </div>
     </div>
   </div>
@@ -132,11 +170,11 @@ import { getBreadcrumbs } from '@/config/breadcrumbs'
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const code = ref(route.params.code || '')
 const loading = ref(false)
-const searched = ref(false)
 const result = ref(null)
 
 onMounted(() => {
@@ -147,11 +185,7 @@ onMounted(() => {
 
 const checkStatus = async () => {
   if (!code.value.trim()) return
-  
   loading.value = true
-  searched.value = true
-  result.value = null
-  
   try {
     const res = await api.get(`/permohonan/status/${code.value}`)
     result.value = res.data.data
@@ -166,11 +200,8 @@ const formatDate = (dateString) => {
   if (!dateString) return '-'
   const date = new Date(dateString)
   return new Intl.DateTimeFormat('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    day: '2-digit', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
   }).format(date) + ' WITA'
 }
 
@@ -185,10 +216,9 @@ const formatStatus = (status) => {
 
 const getStatusClass = (status) => {
   const s = String(status).toLowerCase()
-  if (s.includes('selesai') || s.includes('diterima')) return 'bg-green-100 text-green-800 border border-green-200'
-  if (s.includes('tolak')) return 'bg-red-100 text-red-800 border border-red-200'
-  if (s.includes('proses')) return 'bg-blue-100 text-blue-800 border border-blue-200'
-  return 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+  if (s.includes('selesai') || s.includes('diterima')) return 'bg-green-100 text-green-800 border-green-200'
+  if (s.includes('tolak')) return 'bg-red-100 text-red-800 border-red-200'
+  if (s.includes('proses')) return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+  return 'bg-blue-100 text-blue-800 border-blue-200'
 }
 </script>
-
