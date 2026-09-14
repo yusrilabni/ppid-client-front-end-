@@ -212,6 +212,11 @@ const startCooldown = () => {
 }
 
 onMounted(() => {
+  if (authStore.isAuthenticated) {
+    router.push('/');
+    return;
+  }
+
   if (route.query.otp_required === 'true' && route.query.email) {
     showOtpModal.value = true
     otpEmail.value = decodeURIComponent(route.query.email)

@@ -130,6 +130,11 @@ const error = ref('')
 const successMsg = ref('')
 
 onMounted(() => {
+  if (authStore.isAuthenticated) {
+    router.push('/')
+    return
+  }
+
   if (route.query.success === 'linked' || route.query.success === 'unlinked') {
     successMsg.value = route.query.msg ? decodeURIComponent(route.query.msg) : 'Aksi berhasil. Silakan login kembali.'
   } else if (route.query.error === 'not_registered') {
