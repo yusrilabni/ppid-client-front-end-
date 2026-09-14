@@ -41,10 +41,10 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'Transparansi Informasi Publik' },
         { property: 'og:description', content: 'Transparansi Informasi Publik' },
-        { property: 'og:image', content: 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai_OG.jpg' },
+        { property: 'og:image', content: 'https://ppid.sinjaikab.go.id/logo/ppid.webp' },
         { property: 'og:type', content: 'website' },
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:image', content: 'https://ppid.sinjaikab.go.id/logo/Lambang_Kabupaten_Sinjai_OG.jpg' }
+        { name: 'twitter:image', content: 'https://ppid.sinjaikab.go.id/logo/ppid.webp' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/logo/favicon_io/favicon.ico' },
