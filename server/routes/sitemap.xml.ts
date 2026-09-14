@@ -1,4 +1,4 @@
-export default defineCachedEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   // Array URL statis (yang tidak berubah)
   const staticUrls = [
     { loc: 'https://ppid.sinjaikab.go.id/', changefreq: 'daily', priority: 1.0 },
@@ -58,7 +58,4 @@ export default defineCachedEventHandler(async (event) => {
 
   appendHeader(event, 'Content-Type', 'application/xml');
   return xmlStr;
-
-}, {
-  maxAge: 60 * 60, // Cache hasil sitemap selama 1 jam di server untuk mengurangi beban query
 });
