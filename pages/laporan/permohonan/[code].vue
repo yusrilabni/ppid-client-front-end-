@@ -202,6 +202,7 @@
         <i class="fas fa-search text-4xl text-red-400 mb-3"></i>
         <p class="text-xl font-bold text-gray-800">Permohonan tidak ditemukan</p>
       </div>
+      </div>
     </div>
   </div>
 </template>
