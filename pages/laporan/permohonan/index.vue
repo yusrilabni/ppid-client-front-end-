@@ -126,9 +126,9 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
                     <div class="flex items-center space-x-3">
-                      <a :href="`https://ppidkab.sinjaikab.go.id/laporan/permohonan/${item.unique_code}`" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-lg transition-colors">
+                      <NuxtLink :to="`/laporan/permohonan/${item.unique_code}`" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-lg transition-colors">
                         <i class="fas fa-eye mr-1"></i> Detail
-                      </a>
+                      </NuxtLink>
                     </div>
                   </td>
                 </tr>
@@ -164,9 +164,9 @@
                   </span>
                 </div>
                 <div class="flex gap-2">
-                  <a :href="`https://ppidkab.sinjaikab.go.id/laporan/permohonan/${item.unique_code}`" class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-sm">
+                  <NuxtLink :to="`/laporan/permohonan/${item.unique_code}`" class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-sm">
                     Detail
-                  </a>
+                  </NuxtLink>
                 </div>
               </div>
             </div>
