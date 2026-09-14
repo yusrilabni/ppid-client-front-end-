@@ -1,6 +1,5 @@
 <template>
   <div class="galeri-page bg-gray-50 min-h-screen">
-    <PageHeader title="Galeri PPID" />
     <div class="container mx-auto py-12 px-4">
       <div class="max-w-7xl mx-auto">
         <Breadcrumbs :breadcrumbs="getBreadcrumbs.galeri()" class="mb-6" />
@@ -23,7 +22,7 @@
               </div>
               
               <!-- Media Content -->
-              <div class="absolute inset-0">
+              <div class="absolute inset-0 cursor-default">
                 <template v-if="item.type === 'foto' || !item.type">
                   <img :src="getStorageUrl(item.image)" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" @error="(e) => e.target.src = '/placeholder.jpg'" />
                   <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full w-8 h-8 flex items-center justify-center">
@@ -43,7 +42,7 @@
             </div>
             
             <!-- Bottom Text Section -->
-            <div class="p-4 flex-grow flex flex-col">
+            <div class="p-4 flex-grow flex flex-col cursor-default">
               <h3 class="font-semibold text-gray-900 mb-2 line-clamp-1" :title="item.title">{{ item.title }}</h3>
               <div v-if="item.category" class="mb-2">
                 <span class="inline-block px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
@@ -78,7 +77,6 @@ import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
-import PageHeader from '@/components/PageHeader.vue'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 
 const items = ref([])
