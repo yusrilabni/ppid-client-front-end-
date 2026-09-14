@@ -294,16 +294,28 @@ const KATEGORI_JENIS_DOKUMEN = {
 
 const kategoriOptions = Object.keys(KATEGORI_JENIS_DOKUMEN).map(kat => ({ value: kat, label: kat }))
 const jenisDokumenOptions = computed(() => {
-  let allOpts = []
-  Object.values(KATEGORI_JENIS_DOKUMEN).forEach(arr => {
-    arr.forEach(item => {
-      if (!allOpts.find(o => o.value === item)) {
-        allOpts.push({value: item, label: item})
-      }
+  if (!form.value.kategori) {
+    let allOpts = []
+    Object.values(KATEGORI_JENIS_DOKUMEN).forEach(arr => {
+      arr.forEach(item => {
+        if (!allOpts.find(o => o.value === item)) {
+          allOpts.push({value: item, label: item})
+        }
+      })
     })
-  })
-  allOpts.sort((a, b) => a.label.localeCompare(b.label))
-  return allOpts
+    allOpts.sort((a, b) => a.label.localeCompare(b.label))
+    return allOpts
+  }
+  
+  const tags = KATEGORI_JENIS_DOKUMEN[form.value.kategori] || []
+  return tags.map(item => ({ value: item, label: item })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+watch(() => form.value.kategori, (newKat, oldKat) => {
+  if (oldKat && newKat && newKat !== oldKat) {
+    const validTags = KATEGORI_JENIS_DOKUMEN[newKat] || []
+    form.value.jenis_dokumen = form.value.jenis_dokumen.filter(tag => validTags.includes(tag))
+  }
 })
 
 const statusOptions = [
