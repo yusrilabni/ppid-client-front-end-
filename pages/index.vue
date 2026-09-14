@@ -615,10 +615,16 @@ const informasiItems = [
                   </template>
                 </a>
               </div>
-              <div class="p-4">
+              <div class="p-4 flex-grow flex flex-col cursor-default">
                 <h3 class="font-semibold text-gray-900 mb-1 line-clamp-1 text-sm md:text-base">{{ item.title }}</h3>
-                <span v-if="item.category" class="inline-block px-2 py-0.5 text-[10px] md:text-xs bg-blue-100 text-blue-800 rounded-full mb-2">{{ item.category }}</span>
-                <p v-if="item.description" class="text-xs md:text-sm text-gray-600 line-clamp-2">{{ item.description }}</p>
+                <span v-if="item.category" class="inline-block px-2 py-0.5 text-[10px] md:text-xs bg-blue-100 text-blue-800 rounded-full mb-2 w-fit">{{ item.category }}</span>
+                <p v-if="item.description" class="text-xs md:text-sm text-gray-600 line-clamp-2 mb-3">{{ item.description }}</p>
+                
+                <div v-if="item.type === 'foto' || !item.type" class="mt-auto pt-2 border-t border-gray-100">
+                  <a :href="`${api.defaults.baseURL}/galeri/${item.id}/download`" target="_blank" @click.stop class="inline-flex items-center text-[10px] md:text-xs text-blue-600 hover:text-blue-800 transition-colors">
+                    <i data-lucide="download" class="mr-1.5 h-3 w-3"></i> Download Asli (JPG)
+                  </a>
+                </div>
               </div>
             </div>
           </div>
