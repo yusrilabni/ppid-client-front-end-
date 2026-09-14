@@ -4,8 +4,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   if (process.client) {
     const authStore = useAuthStore()
     
-    // Waktu timeout diset ke 2 jam (dalam milidetik)
-    const TIMEOUT_MS = 2 * 60 * 60 * 1000;
+    // Waktu timeout diset ke 24 jam (dalam milidetik)
+    const TIMEOUT_MS = 24 * 60 * 60 * 1000;
     
     const updateActivity = () => {
       if (authStore.isAuthenticated) {
@@ -26,7 +26,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           // Jika sudah melebihi batas waktu, lakukan logout
           localStorage.removeItem('ppid_last_activity');
           await authStore.logout();
-          alert('Sesi Anda telah berakhir karena tidak ada aktivitas selama 2 jam. Silakan login kembali.');
+          alert('Sesi Anda telah berakhir karena tidak ada aktivitas selama 24 jam. Silakan login kembali.');
           window.location.href = '/login';
         }
       }
@@ -58,7 +58,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (diff > TIMEOUT_MS) {
           localStorage.removeItem('ppid_last_activity');
           authStore.logout().then(() => {
-            alert('Sesi Anda telah berakhir karena tidak ada aktivitas selama 2 jam. Silakan login kembali.');
+            alert('Sesi Anda telah berakhir karena tidak ada aktivitas selama 24 jam. Silakan login kembali.');
             window.location.href = '/login';
           });
           return; // Hentikan eksekusi plugin ini
