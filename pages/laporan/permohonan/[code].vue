@@ -1,8 +1,16 @@
 <template>
   <div class="tracking-page bg-gray-50 min-h-screen pb-12">
-    <PageHeader title="Lacak Permohonan" />
+    <PageHeader title="Detail Permohonan" />
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Breadcrumbs :breadcrumbs="getBreadcrumbs.trackingPage()" class="mb-6" />
+      
+      <!-- BREADCRUMBS -->
+      <div class="mb-6 flex items-center space-x-2 text-sm text-gray-500">
+        <NuxtLink to="/" class="hover:text-blue-600"><i class="fas fa-home"></i> Beranda</NuxtLink>
+        <span>/</span>
+        <NuxtLink to="/laporan/permohonan" class="hover:text-blue-600">Laporan Permohonan</NuxtLink>
+        <span>/</span>
+        <span class="text-gray-900 font-semibold" v-if="result">#{{ result.unique_code }}</span>
+      </div>
       
       <div v-if="loading" class="flex justify-center py-20">
         <span class="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></span>
@@ -117,22 +125,44 @@
                     <div class="space-y-6 md:space-y-8 relative z-10">
                         <div v-for="(resp, index) in result.responses" :key="index" class="flex items-start gap-3 md:gap-4">
                             <div class="flex-shrink-0 z-10">
-                                <div class="h-10 w-10 md:h-14 md:w-14 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 border-2 border-white shadow-md flex items-center justify-center">
-                                    <i class="fas fa-user-tie text-lg md:text-2xl"></i>
+                                <div class="h-10 w-10 md:h-14 md:w-14 rounded-full border-2 border-white shadow-md flex items-center justify-center"
+                                     :class="resp.user_id === result.user_id ? 'bg-gradient-to-br from-amber-100 to-orange-100 text-amber-600' : 'bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600'">
+                                    <i class="fas text-lg md:text-2xl" :class="resp.user_id === result.user_id ? 'fa-user' : 'fa-user-tie'"></i>
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <div class="p-4 md:p-5 rounded-2xl rounded-tl-none border shadow-sm hover:shadow-md transition-shadow bg-white border-gray-100">
-                                    <div class="flex justify-between items-start mb-3">
+                                <div class="p-4 md:p-5 rounded-2xl rounded-tl-none border shadow-sm hover:shadow-md transition-shadow"
+                                     :class="isRatingMsg(resp, index) ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200' : 'bg-white border-gray-100'">
+                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-1">
                                         <p class="font-bold text-gray-900 text-sm md:text-base">
-                                            {{ resp.user ? resp.user.name : 'Petugas PPID' }}
-                                            <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded-full uppercase">Petugas</span>
+                                            {{ resp.user ? resp.user.name : (resp.user_id === result.user_id ? 'Pemohon' : 'Petugas PPID') }}
+                                            
+                                            <span v-if="resp.user_id === result.user_id" class="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] rounded-full uppercase">Pemohon</span>
+                                            <span v-else class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded-full uppercase">Petugas</span>
+                                            
+                                            <span v-if="isRatingMsg(resp, index)" class="ml-1 px-2 py-0.5 bg-yellow-500 text-white text-[10px] rounded-full uppercase font-black tracking-tighter">
+                                                <i class="fas fa-star mr-1"></i>Penilaian
+                                            </span>
                                         </p>
-                                        <p class="text-[10px] md:text-xs font-medium text-gray-400 flex items-center italic">
-                                            <i class="far fa-clock mr-1"></i> {{ formatDate(resp.created_at) }}
-                                        </p>
+                                        <div class="flex flex-col items-end">
+                                            <p class="text-[10px] md:text-xs font-medium text-gray-400 flex items-center italic">
+                                                <i class="far fa-clock mr-1"></i> {{ formatDate(resp.created_at) }}
+                                            </p>
+                                            <div v-if="isRatingMsg(resp, index)" class="flex flex-col items-end mt-1">
+                                                <div class="flex gap-0.5">
+                                                    <i v-for="i in 5" :key="i" class="fas fa-star text-base md:text-xl shadow-sm"
+                                                       :class="i <= result.rating ? 'text-amber-500' : 'text-gray-200'"></i>
+                                                </div>
+                                                <span class="text-[9px] md:text-[11px] font-black text-amber-600 uppercase tracking-tighter mt-1 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+                                                    {{ getRatingLabel(result.rating) }}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="text-gray-700 text-sm md:text-base leading-relaxed mb-4 whitespace-pre-line">{{ resp.message }}</div>
+                                    <div class="text-gray-700 text-sm md:text-base leading-relaxed mb-4 whitespace-pre-line"
+                                         :class="{ 'italic font-medium': isRatingMsg(resp, index) }">
+                                        {{ resp.message }}
+                                    </div>
                                     
                                     <div v-if="resp.file_path || resp.link" class="pt-4 border-t border-gray-50 space-y-3">
                                         <a v-if="resp.file_path" :href="getStorageUrl(resp.file_path)" target="_blank" class="group flex items-center p-2 rounded-xl bg-blue-50 border border-blue-100 hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
@@ -165,8 +195,6 @@
 </template>
 
 <script setup>
-import Breadcrumbs from '@/components/Breadcrumbs.vue'
-import { getBreadcrumbs } from '@/config/breadcrumbs'
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import PageHeader from '@/components/PageHeader.vue'
@@ -194,6 +222,24 @@ const checkStatus = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const isRatingMsg = (resp, index) => {
+  if (!result.value) return false
+  const isOwner = resp.user_id === result.value.user_id
+  const isLast = index === result.value.responses.length - 1
+  return result.value.rating !== null && isLast && isOwner
+}
+
+const getRatingLabel = (rating) => {
+  const labels = {
+    1: 'Tidak Puas',
+    2: 'Kurang Puas',
+    3: 'Cukup Puas',
+    4: 'Puas',
+    5: 'Sangat Puas'
+  }
+  return labels[rating] || ''
 }
 
 const formatDate = (dateString) => {
