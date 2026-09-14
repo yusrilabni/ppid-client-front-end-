@@ -1,19 +1,72 @@
 <template>
-  <div class="galeri-page">
+  <div class="galeri-page bg-gray-50 min-h-screen">
     <PageHeader title="Galeri PPID" />
-    <div class="container mx-auto px-4 py-8">
-      <Breadcrumbs :breadcrumbs="getBreadcrumbs.galeri()" class="mb-6" />
-      <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <LoadingSkeleton v-for="i in 8" :key="i" class="h-64 w-full rounded-xl" />
-      </div>
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <div v-for="item in items" :key="item.id" class="group relative rounded-xl overflow-hidden shadow-md cursor-pointer aspect-square">
-          <img :src="getStorageUrl(item.image)" :alt="item.title" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-4">
-            <h3 class="text-white font-bold text-lg">{{ item.title }}</h3>
-            <p class="text-gray-200 text-sm line-clamp-2 mt-1">{{ item.description }}</p>
+    <div class="container mx-auto py-12 px-4">
+      <div class="max-w-7xl mx-auto">
+        <Breadcrumbs :breadcrumbs="getBreadcrumbs.galeri()" class="mb-6" />
+        
+        <!-- Loading State -->
+        <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <LoadingSkeleton v-for="i in 8" :key="i" class="h-80 w-full rounded-xl" />
+        </div>
+        
+        <!-- Gallery Grid -->
+        <div v-else-if="items && items.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div v-for="item in items" :key="item.id" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out overflow-hidden flex flex-col h-full group cursor-pointer">
+            
+            <!-- Image Wrapper with 4:3 aspect ratio -->
+            <div class="relative w-full pb-[75%] bg-gray-100">
+              
+              <!-- Pinned Indicator -->
+              <div v-if="item.is_pinned" class="absolute top-2 left-2 bg-orange-500 text-white rounded-full p-2 z-10 shadow-md" title="Foto di-pin">
+                <i class="fas fa-thumbtack text-xs"></i>
+              </div>
+              
+              <!-- Media Content -->
+              <div class="absolute inset-0">
+                <template v-if="item.type === 'foto' || !item.type">
+                  <img :src="getStorageUrl(item.image)" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" @error="(e) => e.target.src = '/placeholder.jpg'" />
+                  <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fas fa-camera text-sm text-gray-700"></i>
+                  </div>
+                </template>
+                <template v-else>
+                  <img v-if="getYoutubeThumbnail(item.video)" :src="getYoutubeThumbnail(item.video)" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <i class="fas fa-video text-5xl text-gray-400"></i>
+                  </div>
+                  <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fas fa-play-circle text-sm text-gray-700"></i>
+                  </div>
+                </template>
+              </div>
+            </div>
+            
+            <!-- Bottom Text Section -->
+            <div class="p-4 flex-grow flex flex-col">
+              <h3 class="font-semibold text-gray-900 mb-2 line-clamp-1" :title="item.title">{{ item.title }}</h3>
+              <div v-if="item.category" class="mb-2">
+                <span class="inline-block px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                  {{ item.category }}
+                </span>
+              </div>
+              <p v-if="item.description" class="text-sm text-gray-600 line-clamp-2 mt-auto">
+                {{ item.description }}
+              </p>
+            </div>
+            
           </div>
         </div>
+
+        <!-- Empty State -->
+        <div v-else class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-image text-gray-300 text-6xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada data galeri</h3>
+                <p class="text-gray-500">Belum ada galeri yang ditambahkan.</p>
+            </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -31,6 +84,23 @@ import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 const items = ref([])
 const loading = ref(true)
 
+const getYoutubeThumbnail = (url) => {
+  if (!url) return null;
+  let videoId = null;
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname.includes('youtube.com') || parsedUrl.hostname.includes('youtu.be')) {
+      if (parsedUrl.searchParams.has('v')) {
+        videoId = parsedUrl.searchParams.get('v');
+      } else {
+        const pathParts = parsedUrl.pathname.split('/').filter(Boolean);
+        videoId = pathParts[pathParts.length - 1];
+      }
+    }
+  } catch (e) {}
+  return videoId ? `https://img.youtube.com/vi/${videoId}/default.jpg` : null;
+}
+
 onMounted(async () => {
   try {
     const res = await api.get('/galeri')
@@ -42,4 +112,3 @@ onMounted(async () => {
   }
 })
 </script>
-
