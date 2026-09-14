@@ -25,8 +25,8 @@
               <a :href="item.type === 'foto' || !item.type ? getStorageUrl(item.image) : item.video"
                  class="absolute inset-0 glightbox cursor-pointer"
                  data-gallery="galeri-ppid"
-                 :data-title="item.title"
-                 :data-description="item.description || ''"
+                 :data-title="item.title || 'Galeri PPID'"
+                 :data-description="item.description || ' '"
                  :data-id="item.id"
                  :data-type="item.type === 'foto' || !item.type ? 'image' : 'video'">
                 <template v-if="item.type === 'foto' || !item.type">
@@ -135,12 +135,33 @@ onMounted(async () => {
           if (isFoto && galeriId && slideNode) {
             let innerContainer = slideNode.querySelector('.ginner-container');
             if (innerContainer && !innerContainer.querySelector('.custom-download-btn')) {
+              const btnWrapper = document.createElement('div');
+              btnWrapper.className = 'text-center mt-4 w-full flex justify-center custom-download-wrapper';
+              
               const btn = document.createElement('a');
               btn.href = `${api.defaults.baseURL}/galeri/${galeriId}/download`;
               btn.target = '_blank';
-              btn.className = 'custom-download-btn absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 hover:bg-blue-700 font-semibold text-sm flex items-center transition-colors';
+              btn.className = 'custom-download-btn inline-flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg transition-all font-semibold text-sm mx-auto';
               btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Download Asli (JPG)';
-              innerContainer.appendChild(btn);
+              btnWrapper.appendChild(btn);
+
+              let descBox = slideNode.querySelector('.gslide-description');
+              if (descBox) {
+                  let descInner = descBox.querySelector('.gdesc-inner');
+                  if (descInner) {
+                      descInner.appendChild(btnWrapper);
+                  } else {
+                      descBox.appendChild(btnWrapper);
+                  }
+              } else {
+                  let newDesc = document.createElement('div');
+                  newDesc.className = 'gslide-description description-bottom';
+                  let newDescInner = document.createElement('div');
+                  newDescInner.className = 'gdesc-inner';
+                  newDescInner.appendChild(btnWrapper);
+                  newDesc.appendChild(newDescInner);
+                  innerContainer.appendChild(newDesc);
+              }
             }
           }
         })
