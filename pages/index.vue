@@ -7,6 +7,25 @@ import { useQuery } from '@tanstack/vue-query'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 import { createIcons, icons } from 'lucide'
 import Swiper from 'swiper/bundle'
+import GLightbox from 'glightbox'
+import 'glightbox/dist/css/glightbox.css'
+
+const getYoutubeThumbnail = (url) => {
+  if (!url) return null;
+  let videoId = null;
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname.includes('youtube.com') || parsedUrl.hostname.includes('youtu.be')) {
+      if (parsedUrl.searchParams.has('v')) {
+        videoId = parsedUrl.searchParams.get('v');
+      } else {
+        const pathParts = parsedUrl.pathname.split('/').filter(Boolean);
+        videoId = pathParts[pathParts.length - 1];
+      }
+    }
+  } catch (e) {}
+  return videoId ? `https://img.youtube.com/vi/${videoId}/default.jpg` : null;
+}
 
 const authStore = useAuthStore()
 const homeData = ref({
@@ -222,6 +241,12 @@ watch([queryData, rssQueryData, loading, loadingRss], ([newData, newRssData, new
     swiperInitialized = true
     nextTick(() => {
       initSwiper()
+      GLightbox({
+        selector: '.glightbox',
+        touchNavigation: true,
+        loop: true,
+        autoplayVideos: true
+      })
     })
   }
 }, { immediate: true })
@@ -568,12 +593,27 @@ const informasiItems = [
           <div v-if="homeData.gallery && homeData.gallery.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <div v-for="item in homeData.gallery" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
               <div class="aspect-w-16 aspect-h-12 relative">
-                <NuxtLink :to="`/galeri/${item.id}`" class="block">
-                  <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2">
-                    <i data-lucide="camera" class="h-3 w-3 md:h-4 md:w-4 text-gray-700 flex justify-center items-center"></i>
-                  </div>
-                </NuxtLink>
+                <a :href="item.type === 'foto' || !item.type ? getStorageUrl(item.image) : item.video"
+                   class="block glightbox cursor-pointer absolute inset-0"
+                   data-gallery="home-galeri"
+                   :data-title="item.title"
+                   :data-description="item.description || ''">
+                  <template v-if="item.type === 'foto' || !item.type">
+                    <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2 z-10">
+                      <i data-lucide="camera" class="h-3 w-3 md:h-4 md:w-4 text-gray-700 flex justify-center items-center"></i>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <img v-if="getYoutubeThumbnail(item.video)" :src="getYoutubeThumbnail(item.video)" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <i data-lucide="video" class="h-8 w-8 text-gray-400"></i>
+                    </div>
+                    <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2 z-10">
+                      <i data-lucide="play-circle" class="h-3 w-3 md:h-4 md:w-4 text-gray-700 flex justify-center items-center"></i>
+                    </div>
+                  </template>
+                </a>
               </div>
               <div class="p-4">
                 <h3 class="font-semibold text-gray-900 mb-1 line-clamp-1 text-sm md:text-base">{{ item.title }}</h3>
