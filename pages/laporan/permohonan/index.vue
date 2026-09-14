@@ -13,7 +13,7 @@
             <NuxtLink v-if="authStore.isAuthenticated" to="#" class="inline-flex items-center justify-center px-4 py-2 text-xs md:text-sm font-bold rounded-xl bg-yellow-300 text-yellow-900 shadow-md hover:bg-yellow-400 transition-all duration-200">
               <i class="fas fa-user-check mr-2"></i> Permohonan Saya
             </NuxtLink>
-            <NuxtLink to="/permohonan-informasi" class="inline-flex items-center justify-center px-4 py-2 text-xs md:text-sm font-bold rounded-xl bg-white text-blue-600 shadow-md hover:bg-gray-100 transition-all duration-200">
+            <NuxtLink to="/laporan/permohonan/create" class="inline-flex items-center justify-center px-4 py-2 text-xs md:text-sm font-bold rounded-xl bg-white text-blue-600 shadow-md hover:bg-gray-100 transition-all duration-200">
               <i class="fas fa-plus-circle mr-2"></i> Buat Permohonan
             </NuxtLink>
           </div>

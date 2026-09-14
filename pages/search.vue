@@ -156,7 +156,7 @@
               </div>
               <h3 class="text-2xl font-black mb-4 relative z-10 leading-tight">Belum Menemukan Data?</h3>
               <p class="text-sm text-blue-100/80 mb-8 relative z-10 leading-relaxed font-medium">Anda dapat mengajukan permohonan informasi publik secara resmi jika data yang Anda cari belum tersedia di portal kami.</p>
-              <NuxtLink to="/permohonan-informasi" class="block w-full bg-white text-blue-800 text-center text-xs font-black uppercase tracking-[0.2em] py-4 rounded-2xl hover:bg-blue-50 transition-all shadow-xl active:scale-95 relative z-10">
+              <NuxtLink to="/laporan/permohonan/create" class="block w-full bg-white text-blue-800 text-center text-xs font-black uppercase tracking-[0.2em] py-4 rounded-2xl hover:bg-blue-50 transition-all shadow-xl active:scale-95 relative z-10">
                   Ajukan Permohonan
               </NuxtLink>
           </div>
