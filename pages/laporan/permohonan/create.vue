@@ -69,13 +69,21 @@
                             <label class="block text-xs md:text-sm font-semibold text-gray-700">
                                 Pekerjaan
                             </label>
-                            <div class="relative group">
+                            <CustomSelect 
+                                v-model="selectedPekerjaan" 
+                                :options="pekerjaanOptions" 
+                                searchable 
+                                placeholder="Pilih Pekerjaan..." 
+                            />
+                            
+                            <!-- Input manual jika memilih Lainnya -->
+                            <div v-if="selectedPekerjaan === 'Lainnya'" class="mt-3 relative group animate-fade-in-down">
                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i class="fas fa-briefcase text-sm"></i>
                                 </span>
-                                <input v-model="form.pekerjaan" type="text"
+                                <input v-model="customPekerjaan" type="text"
                                     class="w-full pl-10 pr-4 py-2.5 md:py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                                    placeholder="Contoh: PNS, Swasta, Pelajar">
+                                    placeholder="Ketik pekerjaan Anda di sini...">
                             </div>
                         </div>
 
@@ -320,6 +328,9 @@ const loading = ref(false)
 const success = ref(false)
 const trackingCode = ref('')
 const units = ref([])
+const pekerjaanOptions = ref([])
+const selectedPekerjaan = ref('')
+const customPekerjaan = ref('')
 
 const initialFormState = {
   nama_pemohon: '',
@@ -338,13 +349,20 @@ const initialFormState = {
 const form = ref({ ...initialFormState })
 
 onMounted(async () => {
+  // Ambil daftar pekerjaan dari API
+  try {
+    const resPekerjaan = await api.get('/pekerjaan')
+    pekerjaanOptions.value = [...(resPekerjaan.data?.data || resPekerjaan.data || []), 'Lainnya']
+  } catch (e) {
+    pekerjaanOptions.value = ['ASN / Pegawai Negeri', 'Karyawan Swasta', 'Pelajar / Mahasiswa', 'Lainnya']
+  }
+
   // Auto-fill dari data user yang login
   if (authStore.user) {
     form.value.nama_pemohon = authStore.user.name || ''
     form.value.email_pemohon = authStore.user.email || ''
-    // Jika ada nomor HP dan NIP di objek user (misal hasil dari /profile)
     form.value.nomor_telepon_pemohon = authStore.user.phone || authStore.user.nomor_hp || ''
-    form.value.pekerjaan = authStore.user.nip ? 'ASN / Pegawai Negeri' : ''
+    selectedPekerjaan.value = authStore.user.nip ? 'ASN / Pegawai Negeri' : ''
   }
 
   try {
@@ -358,6 +376,9 @@ onMounted(async () => {
 const submitForm = async () => {
   loading.value = true
   const formData = new FormData()
+  
+  // Set pekerjaan dari dropdown / custom input
+  form.value.pekerjaan = selectedPekerjaan.value === 'Lainnya' ? customPekerjaan.value : selectedPekerjaan.value
   
   Object.keys(form.value).forEach(key => {
     if (Array.isArray(form.value[key])) {
@@ -386,11 +407,14 @@ const resetForm = () => {
     form.value.nama_pemohon = authStore.user.name || ''
     form.value.email_pemohon = authStore.user.email || ''
     form.value.nomor_telepon_pemohon = authStore.user.phone || authStore.user.nomor_hp || ''
-    form.value.pekerjaan = authStore.user.nip ? 'ASN / Pegawai Negeri' : ''
+    selectedPekerjaan.value = authStore.user.nip ? 'ASN / Pegawai Negeri' : ''
+  } else {
+    selectedPekerjaan.value = ''
   }
 
   success.value = false
   trackingCode.value = ''
+  customPekerjaan.value = ''
   
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
