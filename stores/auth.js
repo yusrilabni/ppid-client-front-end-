@@ -32,6 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = responseData.data.user
         localStorage.setItem('ppid_token', responseData.data.token)
         localStorage.setItem('ppid_user', JSON.stringify(responseData.data.user))
+        localStorage.setItem('ppid_last_activity', Date.now().toString()) // FIX: Inisialisasi timer agar tidak auto-logout seketika
         return { success: true }
       }
       throw new Error(responseData.message || 'Login gagal')
@@ -75,6 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       localStorage.removeItem('ppid_token')
       localStorage.removeItem('ppid_user')
+      localStorage.removeItem('ppid_last_activity')
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('pedoman_admin_shown')
       }
@@ -93,6 +95,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null
         localStorage.removeItem('ppid_token')
         localStorage.removeItem('ppid_user')
+        localStorage.removeItem('ppid_last_activity')
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('pedoman_admin_shown')
         }

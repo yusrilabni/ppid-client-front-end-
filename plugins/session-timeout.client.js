@@ -50,8 +50,21 @@ export default defineNuxtPlugin((nuxtApp) => {
       window.addEventListener(event, activityHandler, { passive: true });
     });
 
-    // Set waktu aktivitas pertama saat memuat halaman jika sudah login
+    // Validasi sesi saat pertama kali halaman dimuat
     if (authStore.isAuthenticated) {
+      const lastActivity = localStorage.getItem('ppid_last_activity');
+      if (lastActivity) {
+        const diff = Date.now() - parseInt(lastActivity, 10);
+        if (diff > TIMEOUT_MS) {
+          localStorage.removeItem('ppid_last_activity');
+          authStore.logout().then(() => {
+            alert('Sesi Anda telah berakhir karena tidak ada aktivitas selama 2 jam. Silakan login kembali.');
+            window.location.href = '/login';
+          });
+          return; // Hentikan eksekusi plugin ini
+        }
+      }
+      // Jika masih valid, perbarui waktu aktivitas
       updateActivity();
     }
   }
