@@ -49,21 +49,15 @@
             
             <!-- Bottom Text Section -->
             <div class="p-4 flex-grow flex flex-col cursor-default">
-              <h3 class="font-semibold text-gray-900 mb-2 line-clamp-1" :title="item.title">{{ item.title }}</h3>
+              <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2" :title="item.title">{{ item.title }}</h3>
               <div v-if="item.category" class="mb-2">
                 <span class="inline-block px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                   {{ item.category }}
                 </span>
               </div>
-              <p v-if="item.description" class="text-sm text-gray-600 line-clamp-2 mt-auto mb-3">
+              <p v-if="item.description" class="text-sm text-gray-600 line-clamp-2 mt-auto">
                 {{ item.description }}
               </p>
-              
-              <div v-if="item.type === 'foto' || !item.type" class="mt-auto pt-2 border-t border-gray-100">
-                <a :href="`${api.defaults.baseURL}/galeri/${item.id}/download`" target="_blank" @click.stop class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                  <i class="fas fa-download mr-1.5"></i> Download Asli (JPG)
-                </a>
-              </div>
             </div>
             
           </div>

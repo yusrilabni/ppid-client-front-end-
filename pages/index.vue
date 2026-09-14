@@ -615,23 +615,23 @@ const informasiItems = [
           </div>
           <div v-if="homeData.gallery && homeData.gallery.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <div v-for="item in homeData.gallery" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
-              <div class="relative w-full pb-[75%] bg-gray-100">
+              <div class="aspect-w-16 aspect-h-12 relative overflow-hidden">
                 <a :href="item.type === 'foto' || !item.type ? getStorageUrl(item.image) : item.video"
-                   class="block glightbox cursor-pointer absolute inset-0"
+                   class="block glightbox cursor-pointer"
                    data-gallery="home-galeri"
                    :data-title="item.title"
                    :data-description="item.description || ''"
                    :data-id="item.id"
                    :data-type="item.type === 'foto' || !item.type ? 'image' : 'video'">
                   <template v-if="item.type === 'foto' || !item.type">
-                    <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <img :src="getStorageUrl(item.image) || '/placeholder.jpg'" :alt="item.title" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
                     <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2 z-10">
                       <i data-lucide="camera" class="h-3 w-3 md:h-4 md:w-4 text-gray-700 flex justify-center items-center"></i>
                     </div>
                   </template>
                   <template v-else>
-                    <img v-if="getYoutubeThumbnail(item.video)" :src="getYoutubeThumbnail(item.video)" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <img v-if="getYoutubeThumbnail(item.video)" :src="getYoutubeThumbnail(item.video)" :alt="item.title" class="w-full h-40 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <div v-else class="w-full h-40 md:h-48 bg-gray-200 flex items-center justify-center">
                       <i data-lucide="video" class="h-8 w-8 text-gray-400"></i>
                     </div>
                     <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2 z-10">
@@ -640,16 +640,10 @@ const informasiItems = [
                   </template>
                 </a>
               </div>
-              <div class="p-4 flex-grow flex flex-col cursor-default">
-                <h3 class="font-semibold text-gray-900 mb-1 line-clamp-1 text-sm md:text-base">{{ item.title }}</h3>
-                <span v-if="item.category" class="inline-block px-2 py-0.5 text-[10px] md:text-xs bg-blue-100 text-blue-800 rounded-full mb-2 w-fit">{{ item.category }}</span>
-                <p v-if="item.description" class="text-xs md:text-sm text-gray-600 line-clamp-2 mb-3">{{ item.description }}</p>
-                
-                <div v-if="item.type === 'foto' || !item.type" class="mt-auto pt-2 border-t border-gray-100">
-                  <a :href="`${api.defaults.baseURL}/galeri/${item.id}/download`" target="_blank" @click.stop class="inline-flex items-center text-[10px] md:text-xs text-blue-600 hover:text-blue-800 transition-colors">
-                    <i data-lucide="download" class="mr-1.5 h-3 w-3"></i> Download Asli (JPG)
-                  </a>
-                </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-gray-900 mb-1 line-clamp-2 text-sm md:text-base" :title="item.title">{{ item.title }}</h3>
+                <span v-if="item.category" class="inline-block px-2 py-0.5 text-[10px] md:text-xs bg-blue-100 text-blue-800 rounded-full mb-2">{{ item.category }}</span>
+                <p v-if="item.description" class="text-xs md:text-sm text-gray-600 line-clamp-2">{{ item.description }}</p>
               </div>
             </div>
           </div>
