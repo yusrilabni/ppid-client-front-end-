@@ -88,7 +88,6 @@ import { getBreadcrumbs } from '@/config/breadcrumbs'
 import { ref, onMounted, nextTick } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
-import GLightbox from 'glightbox'
 import 'glightbox/dist/css/glightbox.css'
 
 const items = ref([])
@@ -121,12 +120,17 @@ onMounted(async () => {
   } finally {
     loading.value = false
     await nextTick()
-    GLightbox({
-      selector: '.glightbox',
+    if (process.client) {
+      import('glightbox').then(m => {
+        const GLightbox = m.default || m;
+        GLightbox({
+          selector: '.glightbox',
       touchNavigation: true,
       loop: true,
       autoplayVideos: true
-    })
+        })
+      })
+    }
   }
 })
 </script>

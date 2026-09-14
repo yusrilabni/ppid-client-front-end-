@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/vue-query'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
 import { createIcons, icons } from 'lucide'
 import Swiper from 'swiper/bundle'
-import GLightbox from 'glightbox'
 import 'glightbox/dist/css/glightbox.css'
 
 const getYoutubeThumbnail = (url) => {
@@ -241,12 +240,17 @@ watch([queryData, rssQueryData, loading, loadingRss], ([newData, newRssData, new
     swiperInitialized = true
     nextTick(() => {
       initSwiper()
-      GLightbox({
-        selector: '.glightbox',
+      if (process.client) {
+        import('glightbox').then(m => {
+          const GLightbox = m.default || m;
+          GLightbox({
+            selector: '.glightbox',
         touchNavigation: true,
         loop: true,
         autoplayVideos: true
-      })
+          })
+        })
+      }
     })
   }
 }, { immediate: true })
