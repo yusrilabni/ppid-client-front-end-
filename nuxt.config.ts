@@ -9,7 +9,8 @@ export default defineNuxtConfig({
   ],
   routeRules: {
     '/v2/**': { redirect: { to: '/', statusCode: 301 } },
-    '/front/**': { redirect: { to: '/', statusCode: 301 } }
+    '/front/**': { redirect: { to: '/', statusCode: 301 } },
+    '/permohonan-informasi': { redirect: { to: '/laporan/permohonan/create', statusCode: 301 } }
   },
   css: [
     '~/assets/css/index.css',
