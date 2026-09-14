@@ -26,7 +26,9 @@
                  class="absolute inset-0 glightbox cursor-pointer"
                  data-gallery="galeri-ppid"
                  :data-title="item.title"
-                 :data-description="item.description || ''">
+                 :data-description="item.description || ''"
+                 :data-id="item.id"
+                 :data-type="item.type === 'foto' || !item.type ? 'image' : 'video'">
                 <template v-if="item.type === 'foto' || !item.type">
                   <img :src="getStorageUrl(item.image)" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" @error="(e) => e.target.src = '/placeholder.jpg'" />
                   <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full w-8 h-8 flex items-center justify-center">
@@ -125,9 +127,28 @@ onMounted(async () => {
         const GLightbox = m.default || m;
         GLightbox({
           selector: '.glightbox',
-      touchNavigation: true,
-      loop: true,
-      autoplayVideos: true
+          touchNavigation: true,
+          loop: true,
+          autoplayVideos: true
+        }).on('slide_after_load', (data) => {
+          const { slideNode, slideConfig } = data;
+          const trigger = slideConfig.node;
+          if (!trigger) return;
+          
+          const galeriId = trigger.getAttribute('data-id');
+          const isFoto = trigger.getAttribute('data-type') === 'image';
+          
+          if (isFoto && galeriId && slideNode) {
+            let innerContainer = slideNode.querySelector('.ginner-container');
+            if (innerContainer && !innerContainer.querySelector('.custom-download-btn')) {
+              const btn = document.createElement('a');
+              btn.href = `${api.defaults.baseURL}/galeri/${galeriId}/download`;
+              btn.target = '_blank';
+              btn.className = 'custom-download-btn absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 hover:bg-blue-700 font-semibold text-sm flex items-center transition-colors';
+              btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Download Asli (JPG)';
+              innerContainer.appendChild(btn);
+            }
+          }
         })
       })
     }
