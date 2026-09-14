@@ -32,11 +32,21 @@
                     </div>
                     #{{ result.unique_code }}
                 </h2>
-                <div class="flex items-center gap-2 w-full lg:w-auto">
-                    <NuxtLink to="/laporan/permohonan" class="flex items-center justify-center px-3 py-2 text-xs md:text-sm font-semibold rounded-lg bg-white text-blue-700 hover:bg-blue-50 shadow-md transition-all">
-                        <i class="fas fa-arrow-left mr-1.5 md:mr-2"></i> Kembali ke Daftar
-                    </NuxtLink>
-                </div>
+                  <div class="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 w-full lg:w-auto">
+                      <button @click="downloadPdf('preview')"
+                         class="flex items-center justify-center px-3 py-2 text-xs md:text-sm font-semibold rounded-lg bg-blue-500/30 text-white hover:bg-blue-500/50 border border-white/30 backdrop-blur-sm transition-all disabled:opacity-50">
+                          <i v-if="downloadingPdf === 'preview'" class="fas fa-spinner fa-spin mr-1.5 md:mr-2"></i>
+                          <i v-else class="fas fa-eye mr-1.5 md:mr-2"></i> Preview
+                      </button>
+                      <button @click="downloadPdf('download')"
+                         class="flex items-center justify-center px-3 py-2 text-xs md:text-sm font-semibold rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 shadow-md transition-all disabled:opacity-50">
+                          <i v-if="downloadingPdf === 'download'" class="fas fa-spinner fa-spin mr-1.5 md:mr-2"></i>
+                          <i v-else class="fas fa-file-pdf mr-1.5 md:mr-2"></i> PDF
+                      </button>
+                      <NuxtLink to="/laporan/permohonan" class="col-span-2 sm:col-span-1 flex items-center justify-center px-3 py-2 text-xs md:text-sm font-semibold rounded-lg bg-white text-blue-700 hover:bg-blue-50 shadow-md transition-all">
+                          <i class="fas fa-arrow-left mr-1.5 md:mr-2"></i> Kembali ke Daftar
+                      </NuxtLink>
+                  </div>
             </div>
         </div>
 
@@ -212,12 +222,49 @@ const route = useRoute()
 const code = ref(route.params.code || '')
 const loading = ref(false)
 const result = ref(null)
+const downloadingPdf = ref(null)
 
 onMounted(() => {
   if (code.value) {
     checkStatus()
   }
 })
+
+const downloadPdf = async (action = 'download') => {
+  if (!result.value) return
+  
+  downloadingPdf.value = action
+  try {
+    const res = await api.get(`/permohonan/status/${result.value.unique_code}/pdf`, {
+      params: { action: action },
+      responseType: 'blob' // Penting untuk mengunduh file
+    })
+    
+    // Buat URL dari blob
+    const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+    
+    if (action === 'preview') {
+      // Buka di tab baru untuk preview
+      window.open(url, '_blank')
+    } else {
+      // Download
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `laporan-permohonan-${result.value.unique_code}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+    
+    // Revoke URL untuk menghemat memori setelah beberapa saat
+    setTimeout(() => window.URL.revokeObjectURL(url), 10000)
+  } catch (error) {
+    console.error('Error downloading PDF:', error)
+    alert('Gagal mengambil PDF. Pastikan Anda memiliki akses atau permohonan sudah selesai.')
+  } finally {
+    downloadingPdf.value = null
+  }
+}
 
 const checkStatus = async () => {
   if (!code.value.trim()) return
