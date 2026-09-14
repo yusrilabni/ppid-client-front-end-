@@ -55,6 +55,7 @@ export const getBreadcrumbs = {
   trackingPage: () => [home, { title: 'Lacak Permohonan', url: '/tracking', icon: 'fas fa-search-location' }],
   informasiPemkab: () => [home, { title: 'Transparansi', icon: 'fas fa-layer-group' }, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }],
   informasiPemkabDetail: (title) => [home, { title: 'Transparansi', icon: 'fas fa-layer-group' }, { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'fas fa-building' }, { title: title || 'Detail Informasi', icon: 'fas fa-eye' }],
+  laporanPermohonanSayaDetail: () => [home, { title: 'Permohonan Saya', url: '/laporan/permohonan', icon: 'fas fa-file-alt' }, { title: 'Detail', icon: 'fas fa-info-circle' }],
   manageTentangOpd: (options) => {
     const org = options?.organization;
     const name = org?.name || 'OPD';

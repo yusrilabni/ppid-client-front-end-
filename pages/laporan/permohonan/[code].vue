@@ -4,13 +4,7 @@
       <div class="max-w-6xl mx-auto">
         <!-- BREADCRUMBS (Matched with version2) -->
         <div class="mb-4">
-            <div class="flex items-center space-x-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap">
-                <NuxtLink to="/" class="hover:text-blue-600 flex items-center"><i class="fas fa-home mr-1"></i> Beranda</NuxtLink>
-                <span>/</span>
-                <NuxtLink to="/laporan/permohonan" class="hover:text-blue-600 flex items-center"><i class="fas fa-file-alt mr-1"></i> Permohonan Saya</NuxtLink>
-                <span>/</span>
-                <span class="text-gray-900 font-semibold flex items-center"><i class="fas fa-info-circle mr-1"></i> Detail</span>
-            </div>
+            <Breadcrumbs :breadcrumbs="getBreadcrumbs.laporanPermohonanSayaDetail()" />
         </div>
 
         <!-- BIG LOGO HEADER (Matched with version2) -->
@@ -210,7 +204,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
-import PageHeader from '@/components/PageHeader.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getBreadcrumbs } from '@/config/breadcrumbs'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
