@@ -301,6 +301,12 @@ const loading = computed(() => queryLoading.value || (isFetching.value && !query
 const error = computed(() => queryError.value)
 useGlobalLoader(loading)
 
+watch(error, (hasError) => {
+  if (hasError && process.client) {
+    window.location.href = '/'
+  }
+}, { immediate: true })
+
 watch(queryData, (newData) => {
   if (newData) {
     official.value = newData
