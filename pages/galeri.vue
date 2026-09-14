@@ -22,7 +22,11 @@
               </div>
               
               <!-- Media Content -->
-              <div class="absolute inset-0 cursor-default">
+              <a :href="item.type === 'foto' || !item.type ? getStorageUrl(item.image) : item.video"
+                 class="absolute inset-0 glightbox cursor-pointer"
+                 data-gallery="galeri-ppid"
+                 :data-title="item.title"
+                 :data-description="item.description || ''">
                 <template v-if="item.type === 'foto' || !item.type">
                   <img :src="getStorageUrl(item.image)" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" @error="(e) => e.target.src = '/placeholder.jpg'" />
                   <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full w-8 h-8 flex items-center justify-center">
@@ -38,7 +42,7 @@
                     <i class="fas fa-play-circle text-sm text-gray-700"></i>
                   </div>
                 </template>
-              </div>
+              </a>
             </div>
             
             <!-- Bottom Text Section -->
@@ -75,9 +79,11 @@
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import api, { getStorageUrl } from '@/services/api'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
+import GLightbox from 'glightbox'
+import 'glightbox/dist/css/glightbox.css'
 
 const items = ref([])
 const loading = ref(true)
@@ -108,6 +114,13 @@ onMounted(async () => {
     console.error('Error fetching gallery:', error)
   } finally {
     loading.value = false
+    await nextTick()
+    GLightbox({
+      selector: '.glightbox',
+      touchNavigation: true,
+      loop: true,
+      autoplayVideos: true
+    })
   }
 })
 </script>
