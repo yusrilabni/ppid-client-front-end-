@@ -4,13 +4,13 @@
       <div class="max-w-6xl mx-auto">
         <Breadcrumbs :breadcrumbs="getBreadcrumbs.permohonanPage()" class="mb-6" />
         
-        <div class="text-center mb-8 md:mb-10 mt-4 md:mt-6">
-            <div class="inline-flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 md:mb-6 shadow-lg overflow-hidden p-2">
-                <img src="/logo/ppid_v2.webp" alt="Logo PPID" class="w-full h-full object-contain drop-shadow-md">
+        <div class="text-center mb-6 md:mb-10 mt-4 md:mt-6">
+            <div class="inline-flex items-center justify-center w-28 h-28 md:w-40 md:h-40 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 md:mb-6 shadow-xl overflow-hidden border-4 border-white">
+                <img src="/logo/ppid.webp" alt="Logo PPID" class="w-24 h-24 md:w-36 md:h-36 object-contain">
             </div>
-            <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-3">Permohonan Informasi</h1>
-            <p class="text-sm md:text-base text-gray-600 max-w-2xl mx-auto px-2">
-                Lengkapi formulir di bawah ini untuk membuat permohonan informasi publik.
+            <h1 class="text-2xl md:text-4xl font-extrabold text-gray-800 mb-2 md:mb-3 tracking-tight">Permohonan Informasi</h1>
+            <p class="text-sm md:text-base text-gray-600 max-w-2xl mx-auto px-4 leading-relaxed">
+                Lengkapi formulir di bawah ini untuk mengajukan permohonan informasi publik secara resmi.
             </p>
         </div>
 
