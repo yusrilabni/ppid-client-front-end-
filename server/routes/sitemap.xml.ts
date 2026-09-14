@@ -16,6 +16,6 @@ export default defineEventHandler(async (event) => {
     
   } catch (err) {
     appendHeader(event, 'Content-Type', 'text/plain');
-    return "Terjadi kesalahan saat memuat sitemap dari backend.";
+    return "Terjadi kesalahan saat memuat sitemap dari backend. Error: " + err.message + "\nStack: " + err.stack;
   }
 });
