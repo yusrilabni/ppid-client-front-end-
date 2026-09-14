@@ -615,7 +615,7 @@ const informasiItems = [
           </div>
           <div v-if="homeData.gallery && homeData.gallery.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <div v-for="item in homeData.gallery" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
-              <div class="aspect-w-16 aspect-h-12 relative">
+              <div class="relative w-full pb-[75%] bg-gray-100">
                 <a :href="item.type === 'foto' || !item.type ? getStorageUrl(item.image) : item.video"
                    class="block glightbox cursor-pointer absolute inset-0"
                    data-gallery="home-galeri"
