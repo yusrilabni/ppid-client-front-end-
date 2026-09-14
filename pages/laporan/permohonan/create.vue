@@ -313,7 +313,9 @@ import PageHeader from '@/components/PageHeader.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 import api, { getStorageUrl } from '@/services/api'
+import { useAuthStore } from '@/stores/auth' // Import auth store
 
+const authStore = useAuthStore() // Inisialisasi auth store
 const loading = ref(false)
 const success = ref(false)
 const trackingCode = ref('')
@@ -336,6 +338,15 @@ const initialFormState = {
 const form = ref({ ...initialFormState })
 
 onMounted(async () => {
+  // Auto-fill dari data user yang login
+  if (authStore.user) {
+    form.value.nama_pemohon = authStore.user.name || ''
+    form.value.email_pemohon = authStore.user.email || ''
+    // Jika ada nomor HP dan NIP di objek user (misal hasil dari /profile)
+    form.value.nomor_telepon_pemohon = authStore.user.phone || authStore.user.nomor_hp || ''
+    form.value.pekerjaan = authStore.user.nip ? 'ASN / Pegawai Negeri' : ''
+  }
+
   try {
     const res = await api.get('/units')
     units.value = res.data?.data || res.data || []
@@ -370,7 +381,17 @@ const submitForm = async () => {
 
 const resetForm = () => {
   form.value = { ...initialFormState }
+  
+  if (authStore.user) {
+    form.value.nama_pemohon = authStore.user.name || ''
+    form.value.email_pemohon = authStore.user.email || ''
+    form.value.nomor_telepon_pemohon = authStore.user.phone || authStore.user.nomor_hp || ''
+    form.value.pekerjaan = authStore.user.nip ? 'ASN / Pegawai Negeri' : ''
+  }
+
   success.value = false
   trackingCode.value = ''
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
