@@ -167,9 +167,9 @@ const generateSitemap = async () => {
     for (let i = 0; i < urls.length; i += CHUNK_SIZE) {
       const chunk = urls.slice(i, i + CHUNK_SIZE)
       const isFirst = i === 0
-      const pushRes = await $fetch('/api/sitemap-push', {
+      const pushRes = await $fetch('/internal/sitemap-push', {
         method: 'POST',
-        body: { urls: chunk, reset: isFirst } // reset hanya di batch pertama
+        body: { urls: chunk, reset: isFirst }
       })
       if (!pushRes.success) throw new Error(pushRes.message)
       log(`  Batch ${Math.floor(i/CHUNK_SIZE)+1}/${Math.ceil(urls.length/CHUNK_SIZE)}: ${pushRes.total} URL tersimpan`)
