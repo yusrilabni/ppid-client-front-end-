@@ -1,6 +1,4 @@
-// Sitemap statis saja - untuk URL dinamis (dokumen, profil, dll) 
-// diarahkan langsung ke backend via robots.txt terpisah
-export default defineEventHandler(async (event) => {
+export default defineEventHandler((event) => {
   const staticUrls = [
     { loc: 'https://ppid.sinjaikab.go.id/', changefreq: 'daily', priority: 1.0 },
     { loc: 'https://ppid.sinjaikab.go.id/search', changefreq: 'weekly', priority: 0.8 },
@@ -30,16 +28,13 @@ export default defineEventHandler(async (event) => {
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Sitemap halaman statis (Nuxt) -->
-  <sitemap>
-    <loc>https://ppid.sinjaikab.go.id/sitemap-static.xml</loc>
-  </sitemap>
-  <!-- Sitemap dokumen dinamis (langsung dari backend Laravel) -->
-  <sitemap>
-    <loc>https://ppidkab.sinjaikab.go.id/api/v1/sitemap</loc>
-  </sitemap>
-</sitemapindex>`;
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticUrls.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
 
   appendHeader(event, 'Content-Type', 'application/xml');
   return xml;
