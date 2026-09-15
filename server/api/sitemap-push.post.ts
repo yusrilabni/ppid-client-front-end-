@@ -1,9 +1,10 @@
 // POST /api/sitemap-push
-// Gunakan globalThis agar data tersimpan di memory proses Node.js yang sama
+// Menerima batch URL dari browser secara bertahap
 
-declare global {
-  var __sitemapUrls: string[] | undefined
-}
+// Module-level variable - persist selama container warm
+let _sitemapUrls: string[] = [];
+
+export const getSitemapUrls = () => _sitemapUrls;
 
 export default defineEventHandler(async (event) => {
   try {
@@ -11,15 +12,21 @@ export default defineEventHandler(async (event) => {
 
     if (!Array.isArray(body?.urls)) {
       setResponseStatus(event, 400);
-      return { success: false, message: 'Invalid payload. Expected { urls: string[] }' };
+      return { success: false, message: 'Expected { urls: string[], reset?: boolean }' };
     }
 
-    // Simpan ke global memory - lebih andal dari useStorage di Vercel
-    globalThis.__sitemapUrls = body.urls;
+    // Jika reset=true, kosongkan dulu (batch pertama)
+    if (body.reset === true) {
+      _sitemapUrls = [];
+    }
+
+    // Append URL baru ke list
+    _sitemapUrls.push(...body.urls);
 
     return {
       success: true,
-      message: `Sitemap cache diperbarui: ${body.urls.length} URL tersimpan`
+      total: _sitemapUrls.length,
+      message: `Batch diterima: ${body.urls.length} URL. Total: ${_sitemapUrls.length}`
     };
   } catch (err: any) {
     setResponseStatus(event, 500);

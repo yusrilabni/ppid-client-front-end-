@@ -159,24 +159,26 @@ const generateSitemap = async () => {
     stats.total = urls.length
     log(`Total: ${urls.length} URL berhasil dikumpulkan`)
 
-    // 4. Kirim ke server Nuxt
-    log('Mengirim data ke server sitemap...')
-    status.value = { type: 'info', message: `Menyimpan ${urls.length} URL ke sitemap...` }
-    
-    const pushRes = await $fetch('/api/sitemap-push', {
-      method: 'POST',
-      body: { urls }
-    })
+    // 4. Kirim ke server Nuxt dalam batch kecil 50 URL
+    log('Mengirim data ke server sitemap (batch 50 URL)...')
+    status.value = { type: 'info', message: `Mengirim ${urls.length} URL dalam batch...` }
 
-    if (pushRes.success) {
-      status.value = { type: 'success', message: `✅ ${pushRes.message}` }
-      log('✅ Sitemap berhasil diperbarui!')
-      // Simpan waktu terakhir update
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('sitemap_last_update', new Date().toISOString())
-      }
-    } else {
-      throw new Error(pushRes.message)
+    const CHUNK_SIZE = 50
+    for (let i = 0; i < urls.length; i += CHUNK_SIZE) {
+      const chunk = urls.slice(i, i + CHUNK_SIZE)
+      const isFirst = i === 0
+      const pushRes = await $fetch('/api/sitemap-push', {
+        method: 'POST',
+        body: { urls: chunk, reset: isFirst } // reset hanya di batch pertama
+      })
+      if (!pushRes.success) throw new Error(pushRes.message)
+      log(`  Batch ${Math.floor(i/CHUNK_SIZE)+1}/${Math.ceil(urls.length/CHUNK_SIZE)}: ${pushRes.total} URL tersimpan`)
+    }
+
+    status.value = { type: 'success', message: `✅ Sitemap diperbarui! ${urls.length} URL berhasil dikirim` }
+    log('✅ Sitemap berhasil diperbarui!')
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('sitemap_last_update', new Date().toISOString())
     }
 
   } catch (err) {
