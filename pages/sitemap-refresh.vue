@@ -27,9 +27,9 @@
         {{ status.message }}
       </div>
 
-      <!-- Progress -->
+      <!-- Progress Log -->
       <div v-if="progress.length" class="mb-6 space-y-1 max-h-48 overflow-y-auto bg-gray-50 rounded-xl p-4">
-        <p v-for="(log, i) in progress" :key="i" class="text-xs text-gray-600">{{ log }}</p>
+        <p v-for="(log, i) in progress" :key="i" class="text-xs text-gray-600 font-mono">{{ log }}</p>
       </div>
 
       <!-- Stats -->
@@ -58,10 +58,18 @@
       </button>
 
       <p class="text-center text-xs text-gray-400 mt-4">
-        Setelah selesai, buka 
+        Setelah selesai, buka
         <a href="/sitemap.xml" target="_blank" class="text-blue-500 underline">/sitemap.xml</a>
         untuk melihat hasilnya.
       </p>
+
+      <!-- Auto-refresh info -->
+      <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-xs text-yellow-700 text-center">
+        <i class="fas fa-clock mr-1"></i>
+        Halaman ini otomatis memperbarui sitemap setiap kali dibuka.
+        Tambahkan ke bookmark dan buka sekali sehari/seminggu, atau
+        <strong>biarkan terbuka</strong> — auto-refresh tiap 24 jam.
+      </div>
     </div>
   </div>
 </template>
@@ -74,7 +82,10 @@ const status = ref(null)
 const progress = ref([])
 const stats = reactive({ informasi: 0, profil: 0, total: 0 })
 
-const log = (msg) => progress.value.push(`[${new Date().toLocaleTimeString('id-ID')}] ${msg}`)
+const log = (msg) => {
+  const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  progress.value.push(`[${time}] ${msg}`)
+}
 
 const generateSitemap = async () => {
   loading.value = true
@@ -88,14 +99,14 @@ const generateSitemap = async () => {
   const base = 'https://ppid.sinjaikab.go.id'
 
   try {
-    // 1. Ambil Informasi Publik (semua halaman)
+    // 1. Ambil Informasi Publik (semua halaman via paginasi)
     log('Mengambil data Informasi Publik...')
     let page = 1
     let hasMore = true
     while (hasMore) {
       const res = await api.get('/informasi', { params: { per_page: 100, page } })
-      const data = res.data?.data || res.data
-      const items = Array.isArray(data) ? data : (data?.data || [])
+      const payload = res.data?.data || res.data
+      const items = Array.isArray(payload) ? payload : (payload?.data || [])
       if (!items.length) { hasMore = false; break }
       items.forEach(item => {
         if (item.slug) urls.push(`${base}/informasi/detail/${item.slug}`)
@@ -106,23 +117,49 @@ const generateSitemap = async () => {
       page++
     }
 
-    // 2. Ambil Profil Pejabat
+    // 2. Ambil Profil Pejabat (endpoint: /officials)
     log('Mengambil data Profil Pejabat...')
-    const profilRes = await api.get('/pejabat', { params: { per_page: 500 } })
-    const profilData = profilRes.data?.data || profilRes.data || []
-    const profilItems = Array.isArray(profilData) ? profilData : (profilData?.data || [])
-    profilItems.forEach(item => {
-      if (item.slug) {
-        urls.push(`${base}/profil/${item.slug}`)
-        stats.profil++
+    try {
+      const officialsRes = await api.get('/officials', { params: { per_page: 500 } })
+      const officialsPayload = officialsRes.data?.data || officialsRes.data || []
+      const officials = Array.isArray(officialsPayload) ? officialsPayload : (officialsPayload?.data || [])
+      officials.forEach(item => {
+        if (item.slug) {
+          urls.push(`${base}/profil/${item.slug}`)
+          stats.profil++
+        }
+      })
+      log(`  ${stats.profil} profil pejabat ditemukan`)
+    } catch (e) {
+      log(`  ⚠️ Profil dilewati: ${e.message}`)
+    }
+
+    // 3. Ambil Berita (jika ada)
+    log('Mengambil data Berita...')
+    try {
+      let beritaPage = 1
+      let beritaHasMore = true
+      let beritaCount = 0
+      while (beritaHasMore) {
+        const res = await api.get('/berita', { params: { per_page: 100, page: beritaPage } })
+        const payload = res.data?.data || res.data
+        const items = Array.isArray(payload) ? payload : (payload?.data || [])
+        if (!items.length) { beritaHasMore = false; break }
+        items.forEach(item => {
+          if (item.slug) { urls.push(`${base}/berita/${item.slug}`); beritaCount++ }
+        })
+        if (items.length < 100) beritaHasMore = false
+        beritaPage++
       }
-    })
-    log(`  ${stats.profil} profil pejabat ditemukan`)
+      log(`  ${beritaCount} berita ditemukan`)
+    } catch (e) {
+      log(`  ⚠️ Berita dilewati: ${e.message}`)
+    }
 
     stats.total = urls.length
     log(`Total: ${urls.length} URL berhasil dikumpulkan`)
 
-    // 3. Kirim ke server Nuxt untuk disimpan
+    // 4. Kirim ke server Nuxt
     log('Mengirim data ke server sitemap...')
     status.value = { type: 'info', message: `Menyimpan ${urls.length} URL ke sitemap...` }
     
@@ -133,16 +170,48 @@ const generateSitemap = async () => {
 
     if (pushRes.success) {
       status.value = { type: 'success', message: `✅ ${pushRes.message}` }
-      log('Sitemap berhasil diperbarui!')
+      log('✅ Sitemap berhasil diperbarui!')
+      // Simpan waktu terakhir update
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('sitemap_last_update', new Date().toISOString())
+      }
     } else {
       throw new Error(pushRes.message)
     }
 
   } catch (err) {
-    log(`Error: ${err.message}`)
-    status.value = { type: 'error', message: `Gagal: ${err.message}` }
+    log(`❌ Error: ${err.message}`)
+    // Jika sudah ada data parsial, tetap submit
+    if (urls.length > 0) {
+      log(`Tetap mengirim ${urls.length} URL yang sudah berhasil dikumpulkan...`)
+      try {
+        await $fetch('/api/sitemap-push', { method: 'POST', body: { urls } })
+        stats.total = urls.length
+        status.value = { type: 'success', message: `✅ Sitemap diperbarui dengan ${urls.length} URL (parsial)` }
+        log('✅ Sitemap berhasil diperbarui (parsial)!')
+      } catch (e2) {
+        status.value = { type: 'error', message: `Gagal: ${e2.message}` }
+      }
+    } else {
+      status.value = { type: 'error', message: `Gagal: ${err.message}` }
+    }
   } finally {
     loading.value = false
   }
 }
+
+// Auto-run saat halaman dibuka
+onMounted(() => {
+  // Cek apakah sudah diupdate dalam 24 jam terakhir
+  const lastUpdate = localStorage.getItem('sitemap_last_update')
+  if (lastUpdate) {
+    const diffHours = (Date.now() - new Date(lastUpdate).getTime()) / 3600000
+    if (diffHours < 24) {
+      status.value = { type: 'success', message: `Sitemap masih fresh (terakhir update ${Math.round(diffHours)} jam lalu). Klik tombol untuk paksa update.` }
+      return
+    }
+  }
+  // Auto-generate jika belum update atau sudah > 24 jam
+  generateSitemap()
+})
 </script>
