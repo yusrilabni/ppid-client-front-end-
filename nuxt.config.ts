@@ -61,6 +61,9 @@ export default defineNuxtConfig({
   },
   ssr: true,
   nitro: {
-    sourceMap: false, // nonaktifkan sourcemap Nitro server (hemat waktu tambahan)
+    sourceMap: false,
+    storage: {
+      data: { driver: 'memory' }
+    }
   }
 })

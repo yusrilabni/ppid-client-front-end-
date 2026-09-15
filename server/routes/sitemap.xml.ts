@@ -1,4 +1,9 @@
-// sitemap.xml - baca dari Nitro storage (diisi oleh browser via /api/sitemap-push)
+// sitemap.xml - baca dari globalThis memory (diisi oleh browser via /api/sitemap-push)
+
+declare global {
+  var __sitemapUrls: string[] | undefined
+}
+
 const staticUrls = [
   { loc: 'https://ppid.sinjaikab.go.id/', changefreq: 'daily', priority: 1.0 },
   { loc: 'https://ppid.sinjaikab.go.id/search', changefreq: 'weekly', priority: 0.8 },
@@ -27,14 +32,8 @@ const staticUrls = [
   { loc: 'https://ppid.sinjaikab.go.id/pbj', changefreq: 'monthly', priority: 0.6 },
 ];
 
-export default defineEventHandler(async (event) => {
-  // Baca dari Nitro storage
-  let dynamicUrls: string[] = [];
-  try {
-    const storage = useStorage('data');
-    const stored = await storage.getItem<string[]>('sitemap:urls');
-    if (Array.isArray(stored)) dynamicUrls = stored;
-  } catch (e) {}
+export default defineEventHandler((event) => {
+  const dynamicUrls: string[] = globalThis.__sitemapUrls || [];
 
   const allUrlEntries = [
     ...staticUrls.map(u => `  <url>
