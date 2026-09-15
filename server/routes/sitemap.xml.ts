@@ -49,6 +49,9 @@ export default defineEventHandler((event) => {
 ${allUrlEntries.join('\n')}
 </urlset>`;
 
+  // Simpan di Edge Cache Vercel (CDN) selama 7 hari
   appendHeader(event, 'Content-Type', 'application/xml');
+  appendHeader(event, 'Cache-Control', 'public, s-maxage=604800, stale-while-revalidate=86400');
+  
   return xml;
 });
