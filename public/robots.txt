@@ -1,8 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /v2/
 
-# Sitemap halaman utama (Nuxt/Vercel)
-Sitemap: https://ppid.sinjaikab.go.id/sitemap-static.xml
-
-# Sitemap dokumen dinamis (Laravel backend - berisi seluruh dokumen, profil, berita)
-Sitemap: https://ppidkab.sinjaikab.go.id/api/v1/sitemap
+# Sitemap Utama (Berisi seluruh halaman menu statis dan dokumen dinamis dari database)
+Sitemap: https://ppid.sinjaikab.go.id/sitemap.xml
