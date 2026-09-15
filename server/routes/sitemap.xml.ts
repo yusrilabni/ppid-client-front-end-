@@ -1,5 +1,4 @@
-// sitemap.xml - baca dari module yang sama dengan sitemap-push
-import { getSitemapUrls } from '../api/sitemap-push.post';
+// sitemap.xml - sitemapStore auto-import dari server/utils/sitemap-store.ts
 
 const staticUrls = [
   { loc: 'https://ppid.sinjaikab.go.id/', changefreq: 'daily', priority: 1.0 },
@@ -30,7 +29,7 @@ const staticUrls = [
 ];
 
 export default defineEventHandler((event) => {
-  const dynamicUrls = getSitemapUrls();
+  const dynamicUrls = sitemapStore.urls;
 
   const allUrlEntries = [
     ...staticUrls.map(u => `  <url>

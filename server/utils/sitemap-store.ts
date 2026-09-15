@@ -1,10 +1,6 @@
-// Storage sederhana di memory server Nitro
-// Data ini akan diisi oleh halaman admin yang fetch dari browser
+// server/utils/sitemap-store.ts
+// Gunakan plain object (bukan reactive Vue) karena ini berjalan di Node.js server (Nitro)
 
-let cachedSitemapUrls: string[] = [];
-
-export const getSitemapCache = () => cachedSitemapUrls;
-
-export const setSitemapCache = (urls: string[]) => {
-  cachedSitemapUrls = urls;
+export const sitemapStore = {
+  urls: [] as string[]
 };
