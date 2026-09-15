@@ -10,7 +10,9 @@ export default defineNuxtConfig({
   routeRules: {
     '/v2/**': { redirect: { to: '/', statusCode: 301 } },
     '/front/**': { redirect: { to: '/', statusCode: 301 } },
-    '/permohonan-informasi': { redirect: { to: '/laporan/permohonan/create', statusCode: 301 } }
+    '/permohonan-informasi': { redirect: { to: '/laporan/permohonan/create', statusCode: 301 } },
+    // Proxy sitemap dokumen dinamis - Nitro langsung proxy ke backend
+    '/sitemap-docs.xml': { proxy: 'https://ppidkab.sinjaikab.go.id/api/v1/sitemap' },
   },
   css: [
     '~/assets/css/index.css',
