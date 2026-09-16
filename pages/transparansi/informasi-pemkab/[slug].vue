@@ -241,6 +241,9 @@ useGlobalLoader(loading)
 
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
+  if (dokumen.file_path && dokumen.file_path.toLowerCase().startsWith('http')) {
+      return dokumen.file_path;
+  }
   return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
 }
 
