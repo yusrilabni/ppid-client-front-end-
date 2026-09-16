@@ -432,7 +432,18 @@ const fetchInformasiPemkab = async () => {
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
   if (dokumen.file_path && dokumen.file_path.toLowerCase().startsWith('http')) {
-      return dokumen.file_path;
+      const url = dokumen.file_path;
+      if (url.includes('drive.google.com')) {
+          const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+          if (fileMatch) {
+              return `https://drive.google.com/uc?export=download&id=${fileMatch[1]}`;
+          }
+          const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+          if (idMatch && !url.includes('folderview') && !url.includes('/folders/')) {
+              return `https://drive.google.com/uc?export=download&id=${idMatch[1]}`;
+          }
+      }
+      return url;
   }
   return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
 }
@@ -441,15 +452,23 @@ const getDocumentActionInfo = (dokumen) => {
   if (!dokumen || !dokumen.file_path) return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh Dokumen' }
   
   const path = dokumen.file_path.toLowerCase()
+  
+  if (path.match(/\.pdf(\?.*)?$/)) {
+    return { icon: 'fas fa-file-pdf', text: 'Unduh PDF', title: 'Unduh PDF' }
+  } else if (path.match(/\.(doc|docx)(\?.*)?$/)) {
+    return { icon: 'fas fa-file-word', text: 'Unduh Word', title: 'Unduh Word Document' }
+  } else if (path.match(/\.(xls|xlsx)(\?.*)?$/)) {
+    return { icon: 'fas fa-file-excel', text: 'Unduh Excel', title: 'Unduh Excel Document' }
+  } else if (path.match(/\.(zip|rar)(\?.*)?$/)) {
+    return { icon: 'fas fa-file-archive', text: 'Unduh Arsip', title: 'Unduh File Arsip' }
+  }
+
   if (path.startsWith('http')) {
     if (path.includes('drive.google.com')) {
       if (path.includes('/folders/') || path.includes('folderview') || path.includes('drive/folders/')) {
-        return { icon: 'fas fa-folder-open', text: 'Buka Folder', title: 'Buka Folder Drive' }
+        return { icon: 'fab fa-google-drive', text: 'Buka Folder', title: 'Buka Folder Drive' }
       }
-      return { icon: 'fab fa-google-drive', text: 'Buka Drive', title: 'Buka di Google Drive' }
-    }
-    if (path.match(/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar)(\?.*)?$/)) {
-      return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh Dokumen' }
+      return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh dari Drive' }
     }
     return { icon: 'fas fa-external-link-alt', text: 'Buka Link', title: 'Buka Tautan' }
   }

@@ -111,9 +111,9 @@
                                                 <template v-if="dokumen.file_path">
                                                     <a :href="getDownloadUrl(dokumen)" target="_blank" 
                                                        class="w-full md:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r text-white font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                                                       :class="(isGoogleDriveFolder(dokumen.file_path) || isExternalWebpage(dokumen.file_path)) ? 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' : 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50'">
-                                                        <i :class="[(isGoogleDriveFolder(dokumen.file_path) || isExternalWebpage(dokumen.file_path)) ? 'fa-external-link-alt' : 'fa-cloud-download-alt', 'fas mr-2 text-xl']"></i> 
-                                                        {{ (isGoogleDriveFolder(dokumen.file_path) || isExternalWebpage(dokumen.file_path)) ? 'Kunjungi Tautan' : 'Unduh File Dokumen' }}
+                                                       :class="getDocumentActionInfo(dokumen).class">
+                                                        <i :class="[getDocumentActionInfo(dokumen).icon, 'mr-2 text-xl']"></i> 
+                                                        {{ getDocumentActionInfo(dokumen).text }}
                                                     </a>
                                                 </template>
                                                 <span v-else class="flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-500 font-bold rounded-xl cursor-not-allowed">
@@ -242,10 +242,50 @@ useGlobalLoader(loading)
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
   if (dokumen.file_path && dokumen.file_path.toLowerCase().startsWith('http')) {
-      return dokumen.file_path;
+      const url = dokumen.file_path;
+      if (url.includes('drive.google.com')) {
+          const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+          if (fileMatch) {
+              return `https://drive.google.com/uc?export=download&id=${fileMatch[1]}`;
+          }
+          const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+          if (idMatch && !url.includes('folderview') && !url.includes('/folders/')) {
+              return `https://drive.google.com/uc?export=download&id=${idMatch[1]}`;
+          }
+      }
+      return url;
   }
   return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
 }
+
+const getDocumentActionInfo = (dokumen) => {
+  if (!dokumen || !dokumen.file_path) return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh Dokumen', class: 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50' }
+  
+  const path = dokumen.file_path.toLowerCase()
+  
+  if (path.match(/\.pdf(\?.*)?$/)) {
+    return { icon: 'fas fa-file-pdf', text: 'Unduh PDF', title: 'Unduh PDF', class: 'from-red-500 to-red-600 shadow-red-500/30 hover:shadow-red-600/50' }
+  } else if (path.match(/\.(doc|docx)(\?.*)?$/)) {
+    return { icon: 'fas fa-file-word', text: 'Unduh Word', title: 'Unduh Word Document', class: 'from-blue-500 to-blue-600 shadow-blue-500/30 hover:shadow-blue-600/50' }
+  } else if (path.match(/\.(xls|xlsx)(\?.*)?$/)) {
+    return { icon: 'fas fa-file-excel', text: 'Unduh Excel', title: 'Unduh Excel Document', class: 'from-green-600 to-green-700 shadow-green-600/30 hover:shadow-green-700/50' }
+  } else if (path.match(/\.(zip|rar)(\?.*)?$/)) {
+    return { icon: 'fas fa-file-archive', text: 'Unduh Arsip', title: 'Unduh File Arsip', class: 'from-gray-500 to-gray-600 shadow-gray-500/30 hover:shadow-gray-600/50' }
+  }
+
+  if (path.startsWith('http')) {
+    if (path.includes('drive.google.com')) {
+      if (path.includes('/folders/') || path.includes('folderview') || path.includes('drive/folders/')) {
+        return { icon: 'fab fa-google-drive', text: 'Buka Folder', title: 'Buka Folder Drive', class: 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' }
+      }
+      return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh dari Drive', class: 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50' }
+    }
+    return { icon: 'fas fa-external-link-alt', text: 'Buka Link', title: 'Buka Tautan', class: 'from-blue-600 to-blue-700 shadow-blue-500/30 hover:shadow-blue-600/50' }
+  }
+  
+  return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh Dokumen', class: 'from-green-500 to-emerald-600 shadow-green-500/30 hover:shadow-green-600/50' }
+}
+
 
 const getEmbedUrl = (path) => {
   if (!path) return '';
