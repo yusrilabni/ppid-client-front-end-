@@ -218,8 +218,8 @@
                                             <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
                                             </NuxtLink>
-                                            <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Unduh">
-                                                <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i>
+                                            <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm transition-all duration-300" :title="getDocumentActionInfo(dokumen).title">
+                                                <i :class="getDocumentActionInfo(dokumen).icon"></i>
                                             </a>
                                             <template v-if="isAdmin && canEditOrDelete(dokumen)">
                                                 <NuxtLink :to="`/admin/informasi-pemkab/${dokumen.slug || dokumen.id}/edit`" class="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg text-sm transition-all duration-300" title="Edit">
@@ -277,8 +277,8 @@
                             </div>
       
                             <div class="mt-3 pt-3 border-t border-gray-100 flex justify-end space-x-2">
-                                <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-xs font-bold transition-colors">
-                                    <i :class="dokumen.file_path.startsWith('http') ? 'fas fa-external-link-alt' : 'fas fa-cloud-download-alt'"></i> <span class="hidden sm:inline sm:ml-1.5">Unduh</span>
+                                <a v-if="dokumen.file_path" :href="getDownloadUrl(dokumen)" target="_blank" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-xs font-bold transition-colors" :title="getDocumentActionInfo(dokumen).title">
+                                    <i :class="getDocumentActionInfo(dokumen).icon"></i> <span class="hidden sm:inline sm:ml-1.5">{{ getDocumentActionInfo(dokumen).text }}</span>
                                 </a>
                                 <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="inline-flex flex-1 sm:flex-none items-center justify-center h-9 px-3 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-colors">
                                     <i class="fas fa-eye sm:mr-1.5"></i> <span class="hidden sm:inline">Detail</span>
@@ -432,6 +432,26 @@ const fetchInformasiPemkab = async () => {
 const getDownloadUrl = (dokumen) => {
   if (!dokumen) return '#'
   return `${api.defaults.baseURL.replace('/api/v1', '')}/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}/download`
+}
+
+const getDocumentActionInfo = (dokumen) => {
+  if (!dokumen || !dokumen.file_path) return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh Dokumen' }
+  
+  const path = dokumen.file_path.toLowerCase()
+  if (path.startsWith('http')) {
+    if (path.includes('drive.google.com')) {
+      if (path.includes('/folders/') || path.includes('folderview') || path.includes('drive/folders/')) {
+        return { icon: 'fas fa-folder-open', text: 'Buka Folder', title: 'Buka Folder Drive' }
+      }
+      return { icon: 'fab fa-google-drive', text: 'Buka Drive', title: 'Buka di Google Drive' }
+    }
+    if (path.match(/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar)(\?.*)?$/)) {
+      return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh Dokumen' }
+    }
+    return { icon: 'fas fa-external-link-alt', text: 'Buka Link', title: 'Buka Tautan' }
+  }
+  
+  return { icon: 'fas fa-cloud-download-alt', text: 'Unduh', title: 'Unduh Dokumen' }
 }
 
 const formatDate = (dateStr) => {
