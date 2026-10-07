@@ -42,12 +42,12 @@ export default api
 // Helper for public file/image URLs (not API calls)
 export const getStorageUrl = (path) => {
   if (!path) return ''
-  if (path.startsWith('http')) return path
-  return `${API_BASE_URL}/storage/${path}`
+  if (path.startsWith('http')) return path.replace(/ /g, '%20')
+  return `${API_BASE_URL}/storage/${path}`.replace(/ /g, '%20')
 }
 
 export const getAssetUrl = (path) => {
   if (!path) return ''
-  if (path.startsWith('http')) return path
-  return `${API_BASE_URL}/${path}`
+  if (path.startsWith('http')) return path.replace(/ /g, '%20')
+  return `${API_BASE_URL}/${path}`.replace(/ /g, '%20')
 }
