@@ -192,11 +192,20 @@ const closeMenuOnOutsideClick = (e) => {
   }
 }
 
+const unlockTTS = () => {
+  if (process.client && 'speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance('');
+    u.volume = 0;
+    window.speechSynthesis.speak(u);
+  }
+}
+
 const toggleMasterSound = () => {
   isSoundEnabled.value = !isSoundEnabled.value
   if (process.client) {
     localStorage.setItem('acc_sound_enabled', isSoundEnabled.value.toString())
-    if (!isSoundEnabled.value) window.speechSynthesis.cancel()
+    if (!isSoundEnabled.value && 'speechSynthesis' in window) window.speechSynthesis.cancel()
+    if (isSoundEnabled.value) unlockTTS()
   }
 }
 
@@ -205,6 +214,7 @@ const toggleReader = () => {
   isHoverActive.value = false
   saveStates()
   if (isReaderActive.value && !isSoundEnabled.value) toggleMasterSound()
+  else unlockTTS()
 }
 
 const toggleHoverReader = () => {
@@ -212,6 +222,7 @@ const toggleHoverReader = () => {
   isReaderActive.value = false
   saveStates()
   if (isHoverActive.value && !isSoundEnabled.value) toggleMasterSound()
+  else unlockTTS()
 }
 
 const saveStates = () => {
@@ -280,7 +291,7 @@ const formatTextForTTS = (text) => {
 }
 
 const speak = (text) => {
-  if (!isSoundEnabled.value || !process.client) return
+  if (!isSoundEnabled.value || !process.client || !('speechSynthesis' in window)) return
   window.speechSynthesis.cancel()
   const utterance = new SpeechSynthesisUtterance(formatTextForTTS(text))
   utterance.lang = 'id-ID'
@@ -353,7 +364,9 @@ onMounted(() => {
   }
 
   speakingInterval = setInterval(() => {
-    isCurrentlySpeaking.value = window.speechSynthesis.speaking
+    if ('speechSynthesis' in window) {
+      isCurrentlySpeaking.value = window.speechSynthesis.speaking
+    }
   }, 200)
 
   document.addEventListener('click', onGlobalClick)

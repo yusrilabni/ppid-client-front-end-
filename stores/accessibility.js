@@ -43,6 +43,7 @@ export const useAccessibilityStore = defineStore('accessibility', () => {
     'acc-align-left': alignment.value === 'left',
     'acc-align-center': alignment.value === 'center',
     'acc-align-right': alignment.value === 'right',
+    'acc-keyboard-nav': keyboard.value,
   }))
 
   function setFontLevel(level) {
