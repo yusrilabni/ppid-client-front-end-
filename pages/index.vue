@@ -131,8 +131,40 @@ const initSwiper = () => {
   nextTick(() => {
     createIcons({ icons })
     
+    const a11yConfig = {
+      a11y: { enabled: true },
+      keyboard: { enabled: true, onlyInViewport: true },
+      on: {
+        init: function () {
+          const swiper = this;
+          setTimeout(() => {
+            swiper.el.querySelectorAll('.swiper-slide-duplicate, .swiper-slide:not(.swiper-slide-visible)').forEach(slide => {
+              slide.querySelectorAll('a, button, input, [tabindex]').forEach(el => {
+                el.setAttribute('tabindex', '-1');
+              });
+            });
+          }, 100);
+        },
+        slideChangeTransitionEnd: function () {
+          const swiper = this;
+          swiper.el.querySelectorAll('.swiper-slide').forEach(slide => {
+            const isVisible = slide.classList.contains('swiper-slide-visible') || slide.classList.contains('swiper-slide-active') || slide.classList.contains('swiper-slide-next') || slide.classList.contains('swiper-slide-prev');
+            slide.querySelectorAll('a, button, input, [tabindex]').forEach(el => {
+              if (isVisible && !slide.classList.contains('swiper-slide-duplicate')) {
+                el.removeAttribute('tabindex');
+              } else {
+                el.setAttribute('tabindex', '-1');
+              }
+            });
+          });
+        }
+      }
+    };
+
     const isMultiple = homeData.value.sliders?.length > 1;
     new Swiper('.hero-slider', {
+      ...a11yConfig,
+      watchSlidesProgress: true,
       loop: isMultiple,
       watchOverflow: true,
       observer: true,
@@ -145,6 +177,8 @@ const initSwiper = () => {
       navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' }
     })
     new Swiper('.latest-info-carousel', {
+      ...a11yConfig,
+      watchSlidesProgress: true,
       slidesPerView: 1,
       slidesPerGroup: 1,
       spaceBetween: 20,
@@ -163,6 +197,8 @@ const initSwiper = () => {
       pagination: { el: '.latest-info-pagination', clickable: true }
     })
     new Swiper('.news-carousel', {
+      ...a11yConfig,
+      watchSlidesProgress: true,
       slidesPerView: 1,
       slidesPerGroup: 1,
       spaceBetween: 20,
