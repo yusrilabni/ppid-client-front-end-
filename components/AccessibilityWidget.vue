@@ -441,5 +441,5 @@ onUnmounted(() => {
 .acc-reading-guide { position: fixed; left: 0; right: 0; height: 8px; background: #0052FF; z-index: 999998; pointer-events: none; display: none; transform: translateY(-50%); opacity: 0.5; }
 
 /* Custom cursor */
-body.acc-focus-cursor * { cursor: url('https://cdn.custom-cursor.com/db/8621/32/arrow124.png'), auto !important; }
+body.acc-focus-cursor, body.acc-focus-cursor * { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 24 36"><path fill="black" stroke="white" stroke-width="2" d="M1 1l16 16-7 2 5 9-3 2-5-9-5 6z"/></svg>'), auto !important; }
 </style>

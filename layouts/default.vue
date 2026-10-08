@@ -12,19 +12,17 @@ const accStore = useAccessibilityStore()
 const authStore = useAuthStore()
 const route = useRoute()
 
-useHead({
+useHead(() => ({
   link: [
     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap' }
   ],
   bodyAttrs: {
-    class: computed(() => {
-      return Object.entries(accStore.wrapperClasses)
-        .filter(([_, val]) => val)
-        .map(([key]) => key)
-        .join(' ')
-    })
+    class: Object.entries(accStore.wrapperClasses)
+      .filter(([_, val]) => val)
+      .map(([key]) => key)
+      .join(' ')
   }
-})
+}))
 
 const linkGoogleAccount = () => { 
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'
