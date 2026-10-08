@@ -170,6 +170,8 @@
         </div>
       </div>
     </transition>
+    <div id="reading-mask" class="acc-reading-mask" :style="{ display: accConfig.focus === 'mask' ? 'block' : 'none' }"></div>
+    <div id="reading-guide" class="acc-reading-guide" :style="{ display: accConfig.focus === 'guide' ? 'block' : 'none' }"></div>
   </div>
 </template>
 
@@ -319,10 +321,17 @@ const onGlobalMouseOver = (e) => {
 
 const onGlobalMouseMove = (e) => {
   if (process.client) {
-    const mask = document.getElementById('reading-mask')
-    if (mask && accConfig.focus === 'mask') {
-      const y = e.clientY
-      mask.style.clipPath = `polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%, 0% 0%, 0% ${y - 50}px, 100% ${y - 50}px, 100% ${y + 50}px, 0% ${y + 50}px, 0% ${y - 50}px)`
+    if (accConfig.focus === 'mask') {
+      const mask = document.getElementById('reading-mask')
+      if (mask) {
+        const y = e.clientY
+        mask.style.clipPath = `polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%, 0% 0%, 0% ${y - 50}px, 100% ${y - 50}px, 100% ${y + 50}px, 0% ${y + 50}px, 0% ${y - 50}px)`
+      }
+    } else if (accConfig.focus === 'guide') {
+      const guide = document.getElementById('reading-guide')
+      if (guide) {
+        guide.style.top = `${e.clientY}px`
+      }
     }
   }
 }
@@ -427,5 +436,10 @@ onUnmounted(() => {
 
 /* Reading mask (mode fokus) */
 .acc-reading-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999998; background: rgba(0,0,0,0.85); display: none; }
-body.acc-focus-mask .acc-reading-mask { display: block !important; }
+
+/* Reading guide */
+.acc-reading-guide { position: fixed; left: 0; right: 0; height: 8px; background: #0052FF; z-index: 999998; pointer-events: none; display: none; transform: translateY(-50%); opacity: 0.5; }
+
+/* Custom cursor */
+body.acc-focus-cursor * { cursor: url('https://cdn.custom-cursor.com/db/8621/32/arrow124.png'), auto !important; }
 </style>

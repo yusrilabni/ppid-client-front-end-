@@ -44,7 +44,25 @@ export const useAccessibilityStore = defineStore('accessibility', () => {
     'acc-align-center': alignment.value === 'center',
     'acc-align-right': alignment.value === 'right',
     'acc-keyboard-nav': keyboard.value,
+    'acc-focus-mask': focus.value === 'mask',
+    'acc-focus-cursor': focus.value === 'cursor',
+    'acc-focus-guide': focus.value === 'guide',
   }))
+
+  // Automatically sync to body classes in browser
+  if (typeof window !== 'undefined') {
+    import('vue').then(({ watchEffect }) => {
+      watchEffect(() => {
+        Object.keys(wrapperClasses.value).forEach(cls => {
+          if (wrapperClasses.value[cls]) {
+            document.body.classList.add(cls)
+          } else {
+            document.body.classList.remove(cls)
+          }
+        })
+      })
+    })
+  }
 
   function setFontLevel(level) {
     fontLevel.value = level
