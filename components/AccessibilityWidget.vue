@@ -194,11 +194,14 @@ const closeMenuOnOutsideClick = (e) => {
   }
 }
 
+let ttsUnlocked = false
 const unlockTTS = () => {
+  if (ttsUnlocked) return
   if (process.client && 'speechSynthesis' in window) {
     const u = new SpeechSynthesisUtterance('');
     u.volume = 0;
     window.speechSynthesis.speak(u);
+    ttsUnlocked = true;
   }
 }
 
@@ -378,8 +381,19 @@ onMounted(() => {
     }
   }, 200)
 
+  const unlockHandler = () => {
+    unlockTTS();
+    document.removeEventListener('click', unlockHandler, true);
+    document.removeEventListener('touchstart', unlockHandler, true);
+    document.removeEventListener('keydown', unlockHandler, true);
+  };
+  document.addEventListener('click', unlockHandler, true);
+  document.addEventListener('touchstart', unlockHandler, true);
+  document.addEventListener('keydown', unlockHandler, true);
+
   document.addEventListener('click', onGlobalClick)
   document.addEventListener('mouseover', onGlobalMouseOver)
+  document.addEventListener('touchstart', onGlobalMouseOver, { passive: true })
   document.addEventListener('mousemove', onGlobalMouseMove)
 })
 
@@ -389,6 +403,7 @@ onUnmounted(() => {
   clearTimeout(hoverTimeout)
   document.removeEventListener('click', onGlobalClick)
   document.removeEventListener('mouseover', onGlobalMouseOver)
+  document.removeEventListener('touchstart', onGlobalMouseOver)
   document.removeEventListener('mousemove', onGlobalMouseMove)
 })
 </script>
