@@ -286,11 +286,21 @@ const formatTextForTTS = (text) => {
     processedText = processedText.replace(item.p, item.r)
   })
 
+  // Kata-kata singkatan dari ppid_version2 (ditambahkan sesuai permintaan)
   const abbreviations = ['SOP', 'DIP', 'PPID', 'IPM', 'TPAK', 'RKPD', 'RPJMD', 'LKPJ', 'SPBU', 'ASN', 'OPD', 'TTS']
   abbreviations.forEach(abbr => { 
     const regex = new RegExp('\\b' + abbr + '\\b', 'gi') 
     processedText = processedText.replace(regex, abbr.split('').join(' ')) 
   })
+
+  // Fitur tambahan: Deteksi dinamis untuk semua singkatan berhuruf besar (2-8 karakter)
+  const excludeWords = ['DI', 'KE', 'DARI', 'DAN', 'ATAU', 'TAPI', 'INI', 'ITU', 'ADA', 'YANG', 'PADA', 'SAAT', 'BISA', 'AKAN', 'KAMI', 'SAYA', 'ANDA', 'KITA', 'HARI', 'BARU', 'BACA', 'MENU', 'TIDAK', 'YA', 'BELUM', 'SUDAH', 'UNTUK', 'DALAM', 'OLEH', 'TENTANG', 'BERITA', 'DOKUMEN', 'KABUPATEN', 'KECAMATAN', 'DESA', 'INFO']
+
+  
+  processedText = processedText.replace(/\b[A-Z]{2,8}\b/g, (match) => {
+    if (excludeWords.includes(match)) return match;
+    return match.split('').join(' ');
+  });
 
   return processedText
 }
@@ -307,7 +317,29 @@ const handleElementSource = (target) => {
   const el = target.closest('a, button, h1, h2, h3, h4, h5, h6, p, li, span, img, td, th, label, input')
   if (!el) return
   let text = el.tagName.toLowerCase() === 'img' ? (el.alt || 'Gambar') : (el.innerText || el.getAttribute('aria-label') || '')
-  if (text.trim().length > 1) speak(text.trim())
+  
+  let prefix = ''
+  const tag = el.tagName.toLowerCase()
+  
+  if (tag === 'a') {
+    if (el.closest('nav') || el.closest('.menu, .navbar')) prefix = 'Menu navigasi: '
+    else if (el.href && el.href.includes('/berita')) prefix = 'Tautan berita: '
+    else if (el.href && (el.href.includes('/download') || el.href.includes('/informasi/'))) prefix = 'Tautan dokumen: '
+    else prefix = 'Tautan: '
+  } else if (tag === 'button') {
+    prefix = 'Tombol: '
+  } else if (tag === 'input') {
+    const type = el.getAttribute('type') || 'text'
+    prefix = type === 'submit' ? 'Tombol: ' : 'Kolom input: '
+    if (el.value) text += ' isinya ' + el.value
+  } else if (tag === 'img') {
+    prefix = 'Gambar: '
+  } else if (tag.match(/^h[1-6]$/)) {
+    prefix = 'Judul: '
+  }
+  
+  let finalText = prefix + text
+  if (finalText.trim().length > 1) speak(finalText.trim())
 }
 
 const onGlobalClick = (e) => {
