@@ -17,7 +17,7 @@ useHead(() => ({
     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap' }
   ],
   bodyAttrs: {
-    class: Object.entries(accStore.wrapperClasses)
+    class: Object.entries(accStore.bodyClasses)
       .filter(([_, val]) => val)
       .map(([key]) => key)
       .join(' ')
@@ -52,7 +52,7 @@ const linkGoogleAccount = () => {
     </main>
     <FooterSection />
   </div>
-  <AccessibilityWidget />
+  <AccessibilityWidget :class="accStore.wrapperClasses" />
     <PedomanAdminModal />
   <SurveyModal />
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed z-[99999] acc-widget-container flex flex-col items-center" style="bottom: 24px; left: 24px;">
+  <div class="fixed z-[999999] acc-widget-container flex flex-col items-center" style="bottom: 24px; left: 24px;">
     
     <!-- MASTER SOUND TOGGLE -->
     <button @click.stop="toggleMasterSound()" 

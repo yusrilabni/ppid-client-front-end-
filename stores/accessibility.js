@@ -33,6 +33,9 @@ export const useAccessibilityStore = defineStore('accessibility', () => {
     'acc-sat-low': saturation.value === 'low',
     'acc-sat-high': saturation.value === 'high',
     'acc-sat-mono': saturation.value === 'mono',
+  }))
+
+  const bodyClasses = computed(() => ({
     'acc-highlight-links': links.value,
     'acc-highlight-headings': headings.value,
     'acc-text-spacing': textSpacing.value,
@@ -48,21 +51,6 @@ export const useAccessibilityStore = defineStore('accessibility', () => {
     'acc-focus-cursor': focus.value === 'cursor',
     'acc-focus-guide': focus.value === 'guide',
   }))
-
-  // Automatically sync to body classes in browser
-  if (typeof window !== 'undefined') {
-    import('vue').then(({ watchEffect }) => {
-      watchEffect(() => {
-        Object.keys(wrapperClasses.value).forEach(cls => {
-          if (wrapperClasses.value[cls]) {
-            document.body.classList.add(cls)
-          } else {
-            document.body.classList.remove(cls)
-          }
-        })
-      })
-    })
-  }
 
   function setFontLevel(level) {
     fontLevel.value = level
@@ -135,7 +123,7 @@ export const useAccessibilityStore = defineStore('accessibility', () => {
   return {
     isOpen, fontLevel, contrast, links, headings, focus, keyboard,
     textSpacing, hideImages, dyslexic, lineHeight, alignment, saturation,
-    fontSize, wrapperClasses,
+    fontSize, wrapperClasses, bodyClasses,
     setFontLevel, update, cycleContrast, cycleFocus, cycleDyslexic,
     cycleAlignment, cycleSaturation, cycleFont, toggleMenu, resetAll
   }
