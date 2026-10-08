@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useAccessibilityStore } from '@/stores/accessibility'
 import { useAuthStore } from '@/stores/auth'
 import NavBar from '@/components/NavBar.vue'
@@ -11,6 +11,20 @@ import SurveyModal from '@/components/SurveyModal.vue'
 const accStore = useAccessibilityStore()
 const authStore = useAuthStore()
 const route = useRoute()
+
+useHead({
+  link: [
+    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap' }
+  ],
+  bodyAttrs: {
+    class: computed(() => {
+      return Object.entries(accStore.wrapperClasses)
+        .filter(([_, val]) => val)
+        .map(([key]) => key)
+        .join(' ')
+    })
+  }
+})
 
 const linkGoogleAccount = () => { 
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ppidkab.sinjaikab.go.id'

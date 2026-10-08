@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap');
 
 @font-face {
   font-family: 'Open-Dyslexic';
@@ -104,13 +103,13 @@ main {
 .acc-highlight-headings h1, .acc-highlight-headings h2, .acc-highlight-headings h3 { background-color: #0000ff !important; color: #fff !important; padding: 8px !important; border-left: 12px solid #ffff00 !important; display: block !important; }
 .acc-text-spacing *:not(.acc-ignore) { letter-spacing: 2px !important; }
 .acc-hide-images img { visibility: hidden !important; opacity: 0 !important; }
-.acc-dyslexic-open *:not(.acc-ignore) { font-family: 'Open-Dyslexic', sans-serif !important; }
-.acc-dyslexic-lexend *:not(.acc-ignore) { font-family: 'Lexend', sans-serif !important; }
+.acc-dyslexic-open *:not(.acc-ignore):not(i):not([class*="fa-"]):not([class*="fas"]) { font-family: 'Open-Dyslexic', sans-serif !important; }
+.acc-dyslexic-lexend *:not(.acc-ignore):not(i):not([class*="fa-"]):not([class*="fas"]) { font-family: 'Lexend', sans-serif !important; }
 .acc-line-height *:not(.acc-ignore) { line-height: 2 !important; }
 .acc-align-left *:not(.acc-ignore) { text-align: left !important; }
 .acc-align-center *:not(.acc-ignore) { text-align: center !important; }
 .acc-align-right *:not(.acc-ignore) { text-align: right !important; }
-.acc-keyboard-nav *:focus, .acc-keyboard-nav a:focus, .acc-keyboard-nav button:focus, .acc-keyboard-nav input:focus { outline: 4px solid #0052FF !important; outline-offset: 2px !important; box-shadow: 0 0 0 4px rgba(0, 82, 255, 0.4) !important; }
+.acc-keyboard-nav *:focus-visible, .acc-keyboard-nav a:focus, .acc-keyboard-nav button:focus, .acc-keyboard-nav input:focus { outline: 4px solid #0052FF !important; outline-offset: 2px !important; box-shadow: 0 0 0 4px rgba(0, 82, 255, 0.4) !important; }
 
 /* Loading skeleton */
 .skeleton {
