@@ -15,7 +15,15 @@
       <div v-if="loading" class="flex justify-center items-center py-20">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-      <div v-else-if="error" class="bg-red-50 text-red-600 p-4 rounded-xl shadow-sm border border-red-100">{{ error }}</div>
+      <div v-else-if="error" class="bg-red-50 text-red-700 p-6 rounded-2xl shadow-sm border border-red-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+          <span class="font-bold text-sm">{{ error }}</span>
+        </div>
+        <NuxtLink v-if="error.includes('login') || error.includes('Sesi')" :to="`/login?redirect=${encodeURIComponent(route.fullPath)}`" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md shrink-0">
+          <i class="fas fa-sign-in-alt mr-1"></i> Login Sekarang
+        </NuxtLink>
+      </div>
 
       <div v-else-if="official" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <!-- Photo Upload -->
@@ -280,6 +288,7 @@ import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 const slug = route.params.slug
 
 const breadcrumbsList = computed(() => getBreadcrumbs.editProfilPejabat(official.value?.full_name, official.value?.slug))
@@ -338,9 +347,9 @@ const addItem = (key, template) => form.value[key].push({ ...template })
 const removeItem = (key, index) => form.value[key].splice(index, 1)
 
 onMounted(async () => {
-  // Cek auth di client-side (onMounted = selalu browser, tidak pernah SSR)
   if (!authStore.isAuthenticated) {
-    await router.push('/login')
+    loading.value = false
+    error.value = 'Anda harus login terlebih dahulu untuk mengakses halaman ini.'
     return
   }
 
@@ -365,13 +374,9 @@ onMounted(async () => {
   } catch (err) {
     const status = err.response?.status
     if (status === 401) {
-      // Token tidak valid — bersihkan sesi lalu arahkan ke login
-      await authStore.logout()
-      await router.push('/login')
+      error.value = 'Sesi login Anda telah berakhir atau belum terverifikasi. Silakan login kembali.'
     } else if (status === 403) {
-      loading.value = false
-      error.value = err.response?.data?.message || 'Anda tidak memiliki akses untuk mengelola profil pimpinan ini.'
-      return
+      error.value = err.response?.data?.message || 'Anda tidak memiliki hak akses untuk mengelola profil pimpinan ini.'
     } else {
       error.value = err.response?.data?.message || 'Gagal mengambil data pimpinan.'
     }
