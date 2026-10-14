@@ -271,8 +271,20 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
+
+definePageMeta({
+  middleware: [
+    function (to, from) {
+      const authStore = useAuthStore()
+      if (!authStore.isAuthenticated) {
+        return navigateTo('/login')
+      }
+    }
+  ]
+})
 
 const route = useRoute()
 const router = useRouter()
@@ -335,7 +347,7 @@ const removeItem = (key, index) => form.value[key].splice(index, 1)
 
 onMounted(async () => {
   try {
-    const res = await api.get(`/profil/pimpinan/${slug}/edit`)
+    const res = await api.get(`/profil/pimpinan/${slug}/edit`, { skipAuthRedirect: true })
     if (res.data.success) {
       official.value = res.data.official
       positions.value = res.data.positions || []
@@ -353,7 +365,15 @@ onMounted(async () => {
       form.value.awards = official.value.awards || []
     }
   } catch (err) {
-    error.value = err.response?.data?.message || 'Gagal mengambil data pimpinan.'
+    const status = err.response?.status
+    if (status === 401) {
+      error.value = 'Sesi Anda telah berakhir. Silakan login kembali.'
+      setTimeout(() => router.push('/login'), 2000)
+    } else if (status === 403) {
+      error.value = err.response?.data?.message || 'Anda tidak memiliki akses untuk mengelola profil pimpinan ini.'
+    } else {
+      error.value = err.response?.data?.message || 'Gagal mengambil data pimpinan.'
+    }
   } finally {
     loading.value = false
   }

@@ -28,6 +28,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Jika request di-set skipAuthRedirect = true, biarkan caller handle sendiri
+    if (error.config?.skipAuthRedirect) {
+      return Promise.reject(error)
+    }
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       localStorage.removeItem('ppid_token')
       localStorage.removeItem('ppid_user')
