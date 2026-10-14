@@ -275,16 +275,8 @@ import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
-definePageMeta({
-  middleware: [
-    function (to, from) {
-      const authStore = useAuthStore()
-      if (!authStore.isAuthenticated) {
-        return navigateTo('/login')
-      }
-    }
-  ]
-})
+// Auth dicek di onMounted (client-only) untuk menghindari masalah SSR
+// (SSR tidak punya localStorage sehingga authStore selalu kosong di server)
 
 const route = useRoute()
 const router = useRouter()
@@ -346,6 +338,12 @@ const addItem = (key, template) => form.value[key].push({ ...template })
 const removeItem = (key, index) => form.value[key].splice(index, 1)
 
 onMounted(async () => {
+  // Cek auth di client-side (onMounted = selalu browser, tidak pernah SSR)
+  if (!authStore.isAuthenticated) {
+    await router.push('/login')
+    return
+  }
+
   try {
     const res = await api.get(`/profil/pimpinan/${slug}/edit`, { skipAuthRedirect: true })
     if (res.data.success) {
@@ -367,10 +365,13 @@ onMounted(async () => {
   } catch (err) {
     const status = err.response?.status
     if (status === 401) {
-      error.value = 'Sesi Anda telah berakhir. Silakan login kembali.'
-      setTimeout(() => router.push('/login'), 2000)
+      // Token tidak valid — bersihkan sesi lalu arahkan ke login
+      await authStore.logout()
+      await router.push('/login')
     } else if (status === 403) {
+      loading.value = false
       error.value = err.response?.data?.message || 'Anda tidak memiliki akses untuk mengelola profil pimpinan ini.'
+      return
     } else {
       error.value = err.response?.data?.message || 'Gagal mengambil data pimpinan.'
     }
