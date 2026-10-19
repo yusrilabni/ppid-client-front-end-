@@ -1,7 +1,8 @@
 const home = { title: 'Beranda', url: '/', icon: 'fas fa-home' };
 
 export const getBreadcrumbs = {
-  dip: (year) => [home, { title: 'DIP', icon: 'fas fa-book' }, { title: 'Daftar Informasi Publik (DIP) ' + (year || ''), url: '/dip/' + (year || ''), icon: 'fas fa-book' }],
+  dipIndex: () => [home, { title: 'Daftar Informasi Publik (DIP)', icon: 'fas fa-book' }],
+  dip: (year) => [home, { title: 'DIP', url: '/dip', icon: 'fas fa-book' }, { title: 'DIP Tahun ' + (year || ''), icon: 'fas fa-calendar-alt' }],
   dipUnitDetail: (unitName) => [home, { title: 'DIP', icon: 'fas fa-book' }, { title: 'DIP Unit', url: '/dipunit', icon: 'fas fa-university' }, { title: unitName || 'Detail Unit', icon: 'fas fa-building' }],
   dipUnit: () => [home, { title: 'DIP', icon: 'fas fa-book' }, { title: 'Daftar Informasi Publik (DIP) Unit', url: '/dipunit', icon: 'fas fa-university' }],
   galeri: () => [home, { title: 'Galeri', url: '/galeri', icon: 'fas fa-images' }],

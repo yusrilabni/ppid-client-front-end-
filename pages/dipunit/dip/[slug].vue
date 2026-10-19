@@ -99,7 +99,7 @@
                                               </div>
 
                                               <div :class="viewMode === 'table' ? 'overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white' : ''">
-                                                   <DipInformasiTable :informasiList="informasiList" :unitMap="data.unitMap" :viewMode="viewMode" />
+                                                   <DipInformasiTable :informasiList="informasiList" :unitMap="data.unitMap"  />
                                                </div>
                                           </div>
                                       </div>
