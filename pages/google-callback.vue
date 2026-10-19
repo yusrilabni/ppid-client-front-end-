@@ -57,7 +57,18 @@ onMounted(async () => {
           authStore.token = response.data.token
           authStore.user = response.data.user
           
-                    if (state === 'link') {
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('ppid_session_greeted')
+            sessionStorage.removeItem('acc_greeted')
+            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE')
+            if ('caches' in window) {
+              try {
+                caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
+              } catch (e) {}
+            }
+          }
+
+          if (state === 'link') {
             router.push('/profile?linked=success')
           } else {
             const pending = localStorage.getItem('pending_download_twibbon');

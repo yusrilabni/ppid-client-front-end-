@@ -176,10 +176,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useAccessibilityStore } from '@/stores/accessibility'
+import { useAuthStore } from '@/stores/auth'
 
 const accConfig = useAccessibilityStore()
+const authStore = useAuthStore()
 
 const isSoundEnabled = ref(true)
 const isReaderActive = ref(false)
@@ -424,13 +426,6 @@ onMounted(() => {
   const fontMap = { 'kecil': 12, 'normal': 16, 'sedang': 20, 'besar': 24 }
   document.documentElement.style.fontSize = (fontMap[accConfig.fontLevel] || 16) + 'px'
 
-  const userRole = 'guest'
-  const userName = ''
-  const authStatus = false
-
-  const path = window.location.pathname.replace(/\/$/, "")
-  const isHome = path === "" || path === "/home"
-
   const savedSound = localStorage.getItem('acc_sound_enabled')
   isSoundEnabled.value = (savedSound !== null) ? (savedSound === 'true') : true
 
@@ -444,14 +439,36 @@ onMounted(() => {
     isHoverActive.value = true
   }
 
-  const curId = authStatus ? 'u_auth' : 'guest'
-  if (isHome && sessionStorage.getItem('acc_greeted') !== curId) {
-    sessionStorage.setItem('acc_greeted', curId)
-    setTimeout(() => {
-      if (!isSoundEnabled.value) return
-      speak("Selamat datang di website P P I D Kabupaten Sinjai.")
-    }, 1500)
+  const playWelcomeGreeting = () => {
+    if (!process.client || !isSoundEnabled.value) return
+    const currentIdentity = authStore.isAuthenticated && authStore.user?.name
+      ? `user_${authStore.user.id || authStore.user.name}`
+      : 'guest'
+
+    if (sessionStorage.getItem('ppid_session_greeted') === currentIdentity) return
+    sessionStorage.setItem('ppid_session_greeted', currentIdentity)
+
+    let greetingText = "Selamat Datang di PPID Kabupaten Sinjai"
+    if (authStore.isAuthenticated && authStore.user?.name) {
+      greetingText = `Hai ${authStore.user.name}, Selamat datang di PPID Kabupaten Sinjai`
+    }
+
+    speak(greetingText)
   }
+
+  // Coba putar sapaan otomatis saat pertama kali dibuka dalam sesi ini
+  setTimeout(() => {
+    playWelcomeGreeting()
+  }, 1200)
+
+  // Watcher jika status login berubah (misal user baru login)
+  watch(() => authStore.isAuthenticated, (isAuth) => {
+    if (isAuth && process.client) {
+      setTimeout(() => {
+        playWelcomeGreeting()
+      }, 800)
+    }
+  })
 
   speakingInterval = setInterval(() => {
     if ('speechSynthesis' in window) {
@@ -461,6 +478,13 @@ onMounted(() => {
 
   const unlockHandler = () => {
     unlockTTS();
+    // Jika autoplay browser sempat memblokir sapaan awal, putar saat interaksi pertama pengguna
+    const currentIdentity = authStore.isAuthenticated && authStore.user?.name
+      ? `user_${authStore.user.id || authStore.user.name}`
+      : 'guest'
+    if (sessionStorage.getItem('ppid_session_greeted') !== currentIdentity) {
+      playWelcomeGreeting()
+    }
     document.removeEventListener('click', unlockHandler, true);
     document.removeEventListener('touchstart', unlockHandler, true);
     document.removeEventListener('keydown', unlockHandler, true);

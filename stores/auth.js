@@ -33,6 +33,19 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('ppid_token', responseData.data.token)
         localStorage.setItem('ppid_user', JSON.stringify(responseData.data.user))
         localStorage.setItem('ppid_last_activity', Date.now().toString()) // FIX: Inisialisasi timer agar tidak auto-logout seketika
+
+        // Bersihkan cache browser & query agar data selalu segar dan ucapan sapaan login dapat terpicu
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('ppid_session_greeted')
+          sessionStorage.removeItem('acc_greeted')
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE')
+          if ('caches' in window) {
+            try {
+              caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
+            } catch (e) {}
+          }
+        }
+
         return { success: true }
       }
       throw new Error(responseData.message || 'Login gagal')
