@@ -18,19 +18,39 @@
                               <p class="text-blue-100 text-lg md:text-xl font-medium opacity-90">Tahun Anggaran {{ selectedYear }}</p>
                           </div>
                           
-                          <!-- Export & Year Filter -->
-                          <div class="flex flex-col md:flex-row gap-4 items-center">
-                              <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 order-1 md:order-2">
-                                  <div class="flex flex-col gap-2">
-                                      <label for="year" class="text-xs font-bold uppercase tracking-widest text-blue-100">Pilih Tahun DIP</label>
+                          <!-- Export & Year Filter & View Mode Switcher -->
+                          <div class="flex flex-wrap gap-3 items-center">
+                              <!-- Mode Switcher -->
+                              <div class="flex items-center bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/20 shadow-sm">
+                                  <button
+                                      type="button"
+                                      @click="viewMode = 'table'"
+                                      :class="viewMode === 'table' ? 'bg-white text-blue-700 shadow-md font-bold' : 'text-blue-100 hover:text-white font-medium'"
+                                      class="px-3 py-1.5 rounded-lg text-xs md:text-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                                      <i class="fas fa-table"></i>
+                                      <span>Tabel</span>
+                                  </button>
+                                  <button
+                                      type="button"
+                                      @click="viewMode = 'card'"
+                                      :class="viewMode === 'card' ? 'bg-white text-blue-700 shadow-md font-bold' : 'text-blue-100 hover:text-white font-medium'"
+                                      class="px-3 py-1.5 rounded-lg text-xs md:text-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                                      <i class="fas fa-th-large"></i>
+                                      <span>Kartu</span>
+                                  </button>
+                              </div>
+
+                              <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20">
+                                  <div class="flex items-center gap-2">
+                                      <label for="year" class="text-xs font-bold uppercase tracking-widest text-blue-100">Tahun</label>
                                       <div class="relative">
                                           <select v-model="selectedYear" id="year" @change="onYearChange"
-                                              class="appearance-none w-full md:w-40 bg-white text-gray-900 px-4 py-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 border-none shadow-sm cursor-pointer pr-10">
+                                              class="appearance-none w-32 bg-white text-gray-900 px-3 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 border-none shadow-sm cursor-pointer pr-8 text-xs md:text-sm">
                                               <option v-for="availYear in availableYears" :key="availYear" :value="availYear">
                                                   {{ availYear }}
                                               </option>
                                           </select>
-                                          <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-blue-600">
+                                          <div class="absolute inset-y-0 right-0 flex items-center px-2.5 pointer-events-none text-blue-600 text-xs">
                                               <i class="fas fa-chevron-down"></i>
                                           </div>
                                       </div>
@@ -78,9 +98,9 @@
                                                   <div class="h-px flex-grow bg-gray-200"></div>
                                               </div>
 
-                                              <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white">
-                                                  <DipInformasiTable :informasiList="informasiList" :unitMap="data.unitMap" />
-                                              </div>
+                                              <div :class="viewMode === 'table' ? 'overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white' : ''">
+                                                   <DipInformasiTable :informasiList="informasiList" :unitMap="data.unitMap" :viewMode="viewMode" />
+                                               </div>
                                           </div>
                                       </div>
                                   </div>
@@ -103,7 +123,7 @@
 <script setup>
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
@@ -115,6 +135,23 @@ const route = useRoute()
 const router = useRouter()
 const slug = computed(() => route.params.slug)
 const yearFromQuery = computed(() => route.query.year)
+
+const viewMode = ref('table')
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('dip_view_mode')
+    if (saved === 'card' || saved === 'table') {
+      viewMode.value = saved
+    }
+  }
+})
+
+watch(viewMode, (newVal) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('dip_view_mode', newVal)
+  }
+})
 
 const categories = {
   'Informasi Berkala': '1. Informasi Berkala',

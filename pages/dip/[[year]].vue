@@ -12,6 +12,44 @@
                       <h1 class="text-2xl md:text-3xl font-bold">Daftar Informasi Publik (DIP)</h1>
                       <p class="text-blue-100 mt-1 text-lg md:text-xl font-medium">Tahun {{ year }}</p>
                   </div>
+
+                  <!-- Controls: Year Selector & View Mode Switcher -->
+                  <div class="flex flex-wrap items-center justify-center md:justify-end gap-3">
+                      <!-- Year Selector Dropdown -->
+                      <div class="relative">
+                          <select v-model="selectedYear" @change="onYearChange"
+                              class="appearance-none bg-blue-900/50 hover:bg-blue-900/70 border border-white/20 text-white font-bold text-xs md:text-sm px-4 py-2 rounded-xl cursor-pointer pr-8 focus:outline-none focus:ring-2 focus:ring-white/30 backdrop-blur-sm shadow-sm transition-colors">
+                              <option v-for="y in availableYears" :key="y" :value="y" class="text-gray-900 bg-white">
+                                  Tahun {{ y }}
+                              </option>
+                          </select>
+                          <div class="absolute inset-y-0 right-0 flex items-center px-2.5 pointer-events-none text-blue-200 text-xs">
+                              <i class="fas fa-chevron-down"></i>
+                          </div>
+                      </div>
+
+                      <!-- View Mode Switcher (Table vs Card) -->
+                      <div class="flex items-center bg-blue-900/50 p-1 rounded-xl border border-white/20 backdrop-blur-sm shadow-sm">
+                          <button
+                              type="button"
+                              @click="viewMode = 'table'"
+                              :class="viewMode === 'table' ? 'bg-white text-blue-700 shadow-md font-bold' : 'text-blue-100 hover:text-white font-medium'"
+                              class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm transition-all flex items-center gap-2 cursor-pointer"
+                              title="Tampilkan dalam format tabel">
+                              <i class="fas fa-table"></i>
+                              <span class="hidden sm:inline">Mode Tabel</span>
+                          </button>
+                          <button
+                              type="button"
+                              @click="viewMode = 'card'"
+                              :class="viewMode === 'card' ? 'bg-white text-blue-700 shadow-md font-bold' : 'text-blue-100 hover:text-white font-medium'"
+                              class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm transition-all flex items-center gap-2 cursor-pointer"
+                              title="Tampilkan dalam format kartu / card">
+                              <i class="fas fa-th-large"></i>
+                              <span class="hidden sm:inline">Mode Kartu</span>
+                          </button>
+                      </div>
+                  </div>
               </div>
 
               <div class="p-4 md:p-8">
@@ -36,7 +74,7 @@
                                           {{ jenisDokumen || 'Lainnya' }}
                                       </h4>
                                       <div class="md:pl-9">
-                                          <DipInformasiTable :informasiList="informasiList" :unitMap="data.unitMap" />
+                                          <DipInformasiTable :informasiList="informasiList" :unitMap="data.unitMap" :viewMode="viewMode" />
                                       </div>
                                   </div>
                               </div>
@@ -61,9 +99,7 @@
 
 <script setup>
 import { getBreadcrumbs } from '@/config/breadcrumbs'
-
 import { ref, computed, watch, onMounted } from 'vue'
-
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
@@ -83,19 +119,55 @@ const categories = {
 const showNotification = ref(true)
 const fadeOutNotification = ref(false)
 
+const viewMode = ref('table')
+const availableYears = ref([2026, 2025, 2024, 2023, 2022])
+const selectedYear = ref(Number(yearParam.value) || 2026)
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('dip_view_mode')
+    if (saved === 'card' || saved === 'table') {
+      viewMode.value = saved
+    }
+  }
+
+  setTimeout(() => {
+      fadeOutNotification.value = true
+      setTimeout(() => {
+          showNotification.value = false
+      }, 500)
+  }, 8000)
+})
+
+watch(viewMode, (newVal) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('dip_view_mode', newVal)
+  }
+})
+
+const onYearChange = () => {
+  if (selectedYear.value) {
+    router.push(`/dip/${selectedYear.value}`)
+  }
+}
+
 const fetchDip = async ({ queryKey }) => {
-  const [_key, year] = queryKey
-  if (!year) {
+  const [_key, targetYear] = queryKey
+  if (!targetYear) {
       // Fetch latest year
       const res = await api.get('/dip')
-      if (res.data.success && res.data.data.latestYear) {
-          router.replace({ name: 'dip', params: { year: res.data.data.latestYear } })
-          throw new Error('Redirecting to latest year')
+      if (res.data?.success && res.data?.data?.latestYear) {
+          const lYear = res.data.data.latestYear
+          if (process.client) {
+              window.history.replaceState({}, '', `/dip/${lYear}`)
+          }
+          const detailRes = await api.get(`/dip/${lYear}`)
+          return detailRes.data
       }
       throw new Error('No data')
   }
   
-  const res = await api.get(`/dip/${year}`)
+  const res = await api.get(`/dip/${targetYear}`)
   return res.data
 }
 
@@ -112,17 +184,17 @@ useGlobalLoader(isLoading)
 const data = computed(() => response.value?.data)
 const year = computed(() => data.value?.year || yearParam.value)
 
-onMounted(() => {
-  setTimeout(() => {
-      fadeOutNotification.value = true
-      setTimeout(() => {
-          showNotification.value = false
-      }, 500)
-  }, 8000)
-})
+watch(() => year.value, (newY) => {
+  if (newY) {
+    selectedYear.value = Number(newY)
+    if (!availableYears.value.includes(Number(newY))) {
+      availableYears.value.unshift(Number(newY))
+      availableYears.value.sort((a, b) => b - a)
+    }
+  }
+}, { immediate: true })
 
 function getCharIndex(index) {
   return String.fromCharCode(97 + index) // 97 is 'a'
 }
 </script>
-
