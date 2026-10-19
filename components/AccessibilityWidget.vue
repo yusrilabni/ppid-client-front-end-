@@ -248,6 +248,40 @@ const resetAcc = () => {
 const formatTextForTTS = (text) => {
   if (!text) return ''
   
+  let processedText = text
+
+  // 1. Angka Romawi (Eselon I-V, Bab, Tingkat, dsb. atau berdiri sendiri) agar dibaca angka asli bahasa Indonesia
+  const romanReplacements = [
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+XII\b/gi, r: '$1 dua belas' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+XI\b/gi, r: '$1 sebelas' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+X\b/gi, r: '$1 sepuluh' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+IX\b/gi, r: '$1 sembilan' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+VIII\b/gi, r: '$1 delapan' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+VII\b/gi, r: '$1 tujuh' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+VI\b/gi, r: '$1 enam' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+V\b/gi, r: '$1 lima' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+IV\b/gi, r: '$1 empat' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+III\b/gi, r: '$1 tiga' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+II\b/gi, r: '$1 dua' },
+    { p: /\b(Eselon|Bab|Bagian|Tingkat|Kelas|Fase|Tahap|Volume|Vol\.?|Pasal)\s+I\b/gi, r: '$1 satu' },
+    // Bersihkan duplikasi kata angka dalam tanda kurung, misal "Eselon dua (dua)" -> "Eselon dua"
+    { p: /\b(Eselon\s+(?:satu|dua|tiga|empat|lima))\s*\((?:satu|dua|tiga|empat|lima)\)/gi, r: '$1' },
+    // Standalone multi-karakter Romawi agar tidak dieja "i i i"
+    { p: /\bXII\b/g, r: 'dua belas' },
+    { p: /\bXI\b/g, r: 'sebelas' },
+    { p: /\bIX\b/g, r: 'sembilan' },
+    { p: /\bVIII\b/g, r: 'delapan' },
+    { p: /\bVII\b/g, r: 'tujuh' },
+    { p: /\bVI\b/g, r: 'enam' },
+    { p: /\bIV\b/g, r: 'empat' },
+    { p: /\bIII\b/g, r: 'tiga' },
+    { p: /\bII\b/g, r: 'dua' },
+  ]
+  romanReplacements.forEach(item => {
+    processedText = processedText.replace(item.p, item.r)
+  })
+
+  // 2. Singkatan gelar & jabatan umum ke pengucapan utuh
   const replacements = [
     { p: /\bA\.\s/gi, r: "Andi' " },
     { p: /\bDra\./gi, r: 'Doktoranda' },
@@ -274,33 +308,45 @@ const formatTextForTTS = (text) => {
     { p: /\bS\.IP\b/gi, r: 'Sarjana Ilmu Politik' },
     { p: /\bS\.AP\b/gi, r: 'Sarjana Administrasi Publik' },
     { p: /\bA\.Md\b/gi, r: 'Ahli Madya' },
+    { p: /\bPlt\.?\b/gi, r: 'Pelaksana Tugas' },
+    { p: /\bPlh\.?\b/gi, r: 'Pelaksana Harian' },
+    { p: /\bPj\.?\b/gi, r: 'Penjabat' },
+    { p: /\bPjs\.?\b/gi, r: 'Pejabat Sementara' },
     { p: /\bNo\.\b/gi, r: 'Nomor' },
     { p: /\bKab\.\b/gi, r: 'Kabupaten' },
     { p: /\bKec\.\b/gi, r: 'Kecamatan' },
+    { p: /\bKel\.\b/gi, r: 'Kelurahan' },
     { p: /\bTtd\b/gi, r: 'Tertanda' }
   ]
-
-  let processedText = text
-  
   replacements.forEach(item => {
     processedText = processedText.replace(item.p, item.r)
   })
 
-  // Kata-kata singkatan dari ppid_version2 (ditambahkan sesuai permintaan)
-  const abbreviations = ['SOP', 'DIP', 'PPID', 'IPM', 'TPAK', 'RKPD', 'RPJMD', 'LKPJ', 'SPBU', 'ASN', 'OPD', 'TTS']
-  abbreviations.forEach(abbr => { 
+  // 3. Singkatan resmi lembaga / istilah teknis yang WAJIB dieja per huruf
+  const abbreviationsToSpell = [
+    'SOP', 'DIP', 'PPID', 'IPM', 'TPAK', 'RKPD', 'RPJMD', 'LKPJ', 'SPBU', 'ASN', 
+    'OPD', 'TTS', 'KTP', 'KK', 'SIM', 'SKPD', 'DPRD', 'DPR', 'APBD', 'APBN', 
+    'PAD', 'BPK', 'BPKP', 'KPK', 'LHKPN', 'PBJ', 'LPSE', 'PTSP', 'DPMPTSP', 
+    'DKIP', 'RSUD', 'BPS', 'TNI', 'SD', 'SMP', 'SMA', 'SMK', 'PNS', 'PPPK', 
+    'PDF', 'URL', 'API', 'FAQ', 'NIP', 'NIK', 'NPWP', 'BUMD', 'BUMN', 'CSIRT'
+  ]
+  abbreviationsToSpell.forEach(abbr => { 
     const regex = new RegExp('\\b' + abbr + '\\b', 'gi') 
-    processedText = processedText.replace(regex, abbr.split('').join(' ')) 
+    processedText = processedText.replace(regex, abbr.toUpperCase().split('').join(' ')) 
   })
 
-  // Fitur tambahan: Deteksi dinamis untuk semua singkatan berhuruf besar (2-8 karakter)
-  const excludeWords = ['DI', 'KE', 'DARI', 'DAN', 'ATAU', 'TAPI', 'INI', 'ITU', 'ADA', 'YANG', 'PADA', 'SAAT', 'BISA', 'AKAN', 'KAMI', 'SAYA', 'ANDA', 'KITA', 'HARI', 'BARU', 'BACA', 'MENU', 'TIDAK', 'YA', 'BELUM', 'SUDAH', 'UNTUK', 'DALAM', 'OLEH', 'TENTANG', 'BERITA', 'DOKUMEN', 'KABUPATEN', 'KECAMATAN', 'DESA', 'INFO']
-
-  
-  processedText = processedText.replace(/\b[A-Z]{2,8}\b/g, (match) => {
-    if (excludeWords.includes(match)) return match;
-    return match.split('').join(' ');
-  });
+  // 4. Deteksi akronim murni konsonan vs kata biasa:
+  // JANGAN mengeja kata biasa yang berhuruf kapital (seperti PROFIL, BERITA, LAYANAN, PEJABAT).
+  // Hanya singkatan yang murni konsonan (tanpa vokal sama sekali seperti BKD, BKPSDM, DPMD) yang dieja per huruf.
+  // Kata yang memiliki vokal diubah ke Titlecase agar TTS membacanya lancar sebagai kata utuh.
+  processedText = processedText.replace(/\b[A-Z]{2,10}\b/g, (match) => {
+    // Jika kata tidak memiliki huruf vokal (murni konsonan), eja per huruf
+    if (!/[AEIOUY]/i.test(match)) {
+      return match.split('').join(' ');
+    }
+    // Jika kata memiliki vokal, kembalikan sebagai kata normal (Titlecase) agar tidak dieja per huruf
+    return match.charAt(0).toUpperCase() + match.slice(1).toLowerCase();
+  })
 
   return processedText
 }

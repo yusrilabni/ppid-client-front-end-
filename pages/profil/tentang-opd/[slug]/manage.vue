@@ -103,11 +103,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useQueryClient } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 const route = useRoute()
 const router = useRouter()
+const queryClient = useQueryClient()
 const slug = route.params.slug
 
 const loading = ref(true)
@@ -175,6 +177,21 @@ const handleSave = async () => {
         })
 
         if (res.data.success) {
+            // Invalidate queries so user sees updated structure & profile immediately
+            try {
+                await queryClient.invalidateQueries({ queryKey: ['opd_detail'] })
+                await queryClient.invalidateQueries({ queryKey: ['tentang_opd'] })
+                await queryClient.invalidateQueries({ queryKey: ['pejabat_daerah'] })
+                await queryClient.invalidateQueries({ queryKey: ['unit_lokal'] })
+                await queryClient.invalidateQueries({ queryKey: ['home'] })
+                queryClient.removeQueries({ queryKey: ['opd_detail', slug] })
+                if (organization.value?.slug && organization.value.slug !== slug) {
+                    queryClient.removeQueries({ queryKey: ['opd_detail', organization.value.slug] })
+                }
+            } catch (e) {
+                console.warn('Cache invalidation error:', e)
+            }
+
             alert('Profil OPD berhasil diperbarui!')
             router.push(`/profil/tentang-opd/${organization.value.slug}`)
         }

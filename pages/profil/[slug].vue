@@ -293,7 +293,8 @@ const { isLoading: queryLoading, data: queryData, isError: queryError, isFetchin
     const res = await api.get(`/profil/${slug}`)
     return res.data.official || res.data.data
   },
-  staleTime: 60000,
+  staleTime: 10000,
+  refetchOnMount: true,
   enabled: computed(() => !!route.params.slug)
 })
 

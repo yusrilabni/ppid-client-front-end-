@@ -279,6 +279,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useQueryClient } from '@tanstack/vue-query'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
@@ -289,6 +290,7 @@ import { getBreadcrumbs } from '@/config/breadcrumbs'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const queryClient = useQueryClient()
 const slug = route.params.slug
 
 const breadcrumbsList = computed(() => getBreadcrumbs.editProfilPejabat(official.value?.full_name, official.value?.slug))
@@ -403,6 +405,21 @@ const handleSave = async () => {
     })
     const res = await api.post(`/profil/pimpinan/${slug}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
     if (res.data.success) {
+      // Invalidate and remove queries from TanStack Vue Query cache (including localStorage)
+      try {
+        await queryClient.invalidateQueries({ queryKey: ['official_profile'] })
+        await queryClient.invalidateQueries({ queryKey: ['pejabat_daerah'] })
+        await queryClient.invalidateQueries({ queryKey: ['unit_lokal'] })
+        await queryClient.invalidateQueries({ queryKey: ['tentang_opd'] })
+        await queryClient.invalidateQueries({ queryKey: ['home'] })
+        queryClient.removeQueries({ queryKey: ['official_profile', slug] })
+        if (official.value?.slug && official.value.slug !== slug) {
+          queryClient.removeQueries({ queryKey: ['official_profile', official.value.slug] })
+        }
+      } catch (e) {
+        console.warn('Cache invalidation error:', e)
+      }
+
       alert('Data Profil beserta semua riwayat berhasil diperbarui!')
       router.push(`/profil/${official.value.slug}`)
     }

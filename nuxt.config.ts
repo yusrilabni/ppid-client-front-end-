@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '/sitemap-docs.xml': { proxy: 'https://ppidkab.sinjaikab.go.id/api/v1/sitemap' },
   },
   css: [
+    'lenis/dist/lenis.css',
     '~/assets/css/index.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
     'swiper/css/bundle'
@@ -30,6 +31,7 @@ export default defineNuxtConfig({
             'vendor-vue': ['vue', 'pinia'],
             'vendor-query': ['@tanstack/vue-query'],
             'vendor-swiper': ['swiper'],
+            'vendor-lenis': ['lenis'],
           }
         }
       }

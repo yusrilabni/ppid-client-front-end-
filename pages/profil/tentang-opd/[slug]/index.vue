@@ -116,7 +116,8 @@ const { isLoading: queryLoading, data: queryData, isFetching, isError: error } =
     const res = await api.get(`/profil/tentang-opd/${slug}`)
     return res.data
   },
-  staleTime: 60000,
+  staleTime: 10000,
+  refetchOnMount: true,
   enabled: computed(() => !!route.params.slug)
 })
 
