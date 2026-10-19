@@ -22,13 +22,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* When Lenis is active, let Lenis manage smooth momentum */
-html.lenis,
-html.lenis body {
-  height: auto;
-  scroll-behavior: auto !important;
-}
-
 /* Accessibility: Disable smooth scrolling animations if user prefers reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html,
