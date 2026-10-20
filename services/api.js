@@ -50,12 +50,32 @@ export default api
 // Helper for public file/image URLs (not API calls)
 export const getStorageUrl = (path) => {
   if (!path) return ''
-  if (path.startsWith('http')) return path.replace(/ /g, '%20')
-  return `${API_BASE_URL}/storage/${path}`.replace(/ /g, '%20')
+  let url = String(path).trim()
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    let clean = url.replace(/\\/g, '/').replace(/^\/+/, '')
+    if (clean.startsWith('storage/')) {
+      clean = clean.substring('storage/'.length)
+    }
+    url = `${API_BASE_URL}/storage/${clean}`
+  }
+  // Enforce HTTPS on production to prevent Mixed Content blocking by browsers
+  url = url.replace(/^http:\/\/ppidkab\.sinjaikab\.go\.id/i, 'https://ppidkab.sinjaikab.go.id')
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    url = url.replace(/^http:\/\//i, 'https://')
+  }
+  return url.replace(/ /g, '%20')
 }
 
 export const getAssetUrl = (path) => {
   if (!path) return ''
-  if (path.startsWith('http')) return path.replace(/ /g, '%20')
-  return `${API_BASE_URL}/${path}`.replace(/ /g, '%20')
+  let url = String(path).trim()
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    let clean = url.replace(/\\/g, '/').replace(/^\/+/, '')
+    url = `${API_BASE_URL}/${clean}`
+  }
+  url = url.replace(/^http:\/\/ppidkab\.sinjaikab\.go\.id/i, 'https://ppidkab.sinjaikab.go.id')
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    url = url.replace(/^http:\/\//i, 'https://')
+  }
+  return url.replace(/ /g, '%20')
 }

@@ -129,14 +129,18 @@ let pageFlipInstance = null
 let updateInterval = null
 
 // Fetch list of laporan to find title and file storage URL
-const { data: laporanList } = await useAsyncData('preview-laporan-meta', async () => {
+const { data: laporanList } = useAsyncData('preview-laporan-meta', async () => {
   try {
     const res = await api.get('/laporan')
     return Array.isArray(res.data) ? res.data : (res.data?.data || [])
   } catch {
     return []
   }
-}, { default: () => [] })
+}, {
+  server: false,
+  lazy: true,
+  default: () => []
+})
 
 const currentLaporan = computed(() => {
   const list = laporanList.value || []

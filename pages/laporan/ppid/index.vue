@@ -56,7 +56,7 @@
         </div>
       </div>
 
-      <!-- Loading State -->
+      <!-- Loading State (Skeleton) -->
       <div v-if="loading && items.length === 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         <LoadingSkeleton v-for="i in 8" :key="i" class="h-96 w-full rounded-[2.5rem]" />
       </div>
@@ -75,19 +75,43 @@
             <!-- Cover Preview Image / Fallback -->
             <div class="relative h-80 overflow-hidden m-4 rounded-[2rem] shadow-inner bg-gray-50 flex-shrink-0">
               <img
-                v-if="item.cover"
+                v-if="item.cover && !failedImages.has(item.id || item.encoded_id)"
                 class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                 :src="getStorageUrl(item.cover)"
                 :alt="item.title"
-                loading="lazy"
+                @error="handleImageError(item.id || item.encoded_id)"
               />
-              <div v-else class="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <i class="fas fa-file-pdf text-blue-200 text-7xl mb-4"></i>
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">No Preview Cover</span>
+              <!-- Official Book-style Cover Fallback -->
+              <div
+                v-else
+                class="w-full h-full flex flex-col items-center justify-between p-6 text-center bg-gradient-to-br from-blue-700 via-indigo-800 to-blue-900 text-white relative overflow-hidden"
+              >
+                <!-- Watermark icon -->
+                <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+                  <i class="fas fa-file-invoice text-9xl text-white"></i>
+                </div>
+                
+                <div class="w-full flex justify-between items-center text-[10px] font-black tracking-widest text-blue-200 uppercase">
+                  <span>PPID SINJAI</span>
+                  <span>TAHUN {{ item.tahun || item.year }}</span>
+                </div>
+
+                <div class="my-auto py-3">
+                  <div class="w-14 h-14 mx-auto rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mb-3 border border-white/20 shadow-inner">
+                    <i class="fas fa-book-open text-2xl text-blue-200"></i>
+                  </div>
+                  <h4 class="text-xs font-black uppercase tracking-wider text-white line-clamp-3 leading-snug px-2">
+                    {{ item.title }}
+                  </h4>
+                </div>
+
+                <div class="text-[9px] font-bold text-blue-200/90 uppercase tracking-widest border-t border-white/10 w-full pt-2">
+                  Laporan Layanan Informasi
+                </div>
               </div>
 
               <!-- Year Badge -->
-              <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-blue-700 px-3.5 py-1.5 rounded-full text-[11px] font-black shadow-md border border-blue-100 flex items-center gap-1.5">
+              <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-blue-700 px-3.5 py-1.5 rounded-full text-[11px] font-black shadow-md border border-blue-100 flex items-center gap-1.5 z-10">
                 <i class="fas fa-calendar-alt text-[10px] text-blue-500"></i>
                 <span>TAHUN {{ item.tahun || item.year }}</span>
               </div>
@@ -173,8 +197,9 @@ import api, { getStorageUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 
-// SSR Data Fetching via useAsyncData
-const { data: itemsData, pending: loading, refresh } = await useAsyncData('laporan-ppid-list', async () => {
+// Gunakan server: false karena IP server Vercel (luar negeri) diblokir oleh firewall Pemkab Sinjai.
+// Dengan server: false, browser client lokal langsung mengeksekusi fetch secara cepat tanpa timeout atau perlu menekan tombol muat ulang saat hard refresh.
+const { data: itemsData, pending: loading, refresh } = useAsyncData('laporan-ppid-list', async () => {
   try {
     const res = await api.get('/laporan')
     const list = Array.isArray(res.data) ? res.data : (res.data?.data || [])
@@ -184,12 +209,20 @@ const { data: itemsData, pending: loading, refresh } = await useAsyncData('lapor
     return []
   }
 }, {
+  server: false,
+  lazy: true,
   default: () => []
 })
 
 const items = computed(() => itemsData.value || [])
 
-// Fallback refetch on client if empty
+// Fallback tracker untuk gambar sampul yang gagal dimuat
+const failedImages = ref(new Set())
+const handleImageError = (id) => {
+  if (id) failedImages.value.add(id)
+}
+
+// Otomatis fetch saat client mount jika data masih kosong
 onMounted(() => {
   if (!items.value || items.value.length === 0) {
     refresh()
