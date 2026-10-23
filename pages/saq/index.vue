@@ -105,7 +105,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted, h } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import { useElementVisibility } from '@vueuse/core'
@@ -131,7 +131,7 @@ const avgProgress = computed(() => {
   return Math.round(opds.value.reduce((s, o) => s + o.progres.persen, 0) / opds.value.length)
 })
 
-// Komponen angka animasi
+// Komponen angka animasi (render function — template string tidak ter-compile di production)
 const AnimatedNumber = {
   props: { value: { type: Number, default: 0 }, suffix: { type: String, default: '' } },
   setup(props) {
@@ -155,23 +155,23 @@ const AnimatedNumber = {
     watch(visible, (v) => { if (v) animate() })
     watch(() => props.value, () => { if (visible.value) animate() })
     onUnmounted(() => cancelAnimationFrame(raf))
-    return { display, el }
+    return () => h('span', { ref: el }, `${display.value}${props.suffix}`)
   },
-  template: `<span ref="el">{{ display }}{{ suffix }}</span>`,
 }
 
-// Komponen reveal saat scroll
+// Komponen reveal saat scroll (render function)
 const RevealCard = {
   setup(_, { slots }) {
     const el = ref(null)
     const visible = useElementVisibility(el, { threshold: 0.1 })
-    return { el, visible, slots }
+    return () => h('div', {
+      ref: el,
+      class: [
+        'transition-all duration-700',
+        visible.value ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8',
+      ],
+    }, slots.default ? slots.default() : [])
   },
-  template: `
-    <div ref="el" :class="[
-      'transition-all duration-700',
-      visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-    ]"><slot /></div>`,
 }
 </script>
 
