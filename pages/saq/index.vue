@@ -116,6 +116,15 @@ import { useElementVisibility } from '@vueuse/core'
 
 definePageMeta({ layout: 'default' })
 useHead({ title: 'SAQ E-Monev — PPID Kabupaten Sinjai' })
+useSeoMeta({
+  ogTitle: 'SAQ E-Monev — PPID Kabupaten Sinjai',
+  description: 'Self Assessment Questionnaire E-Monev Komisi Informasi untuk OPD Kabupaten Sinjai.',
+  ogDescription: 'Self Assessment Questionnaire E-Monev Komisi Informasi untuk OPD Kabupaten Sinjai.',
+  ogImage: 'https://ppid.sinjaikab.go.id/logo/ppid_og.jpg',
+  ogUrl: 'https://ppid.sinjaikab.go.id/saq',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
 
 const search = ref('')
 

@@ -257,6 +257,14 @@ const authStore = useAuthStore()
 const queryClient = useQueryClient()
 
 useHead({ title: 'SAQ OPD — PPID Kabupaten Sinjai' })
+useSeoMeta({
+  ogTitle: 'SAQ OPD — PPID Kabupaten Sinjai',
+  description: 'Pengisian Self Assessment Questionnaire E-Monev per OPD Kabupaten Sinjai.',
+  ogDescription: 'Pengisian Self Assessment Questionnaire E-Monev per OPD Kabupaten Sinjai.',
+  ogImage: 'https://ppid.sinjaikab.go.id/logo/ppid_og.jpg',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
 
 const activeTab = ref(0)
 const openSections = ref([])
