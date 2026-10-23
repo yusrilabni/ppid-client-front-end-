@@ -130,7 +130,7 @@ onMounted(async () => {
 const submitPesan = async () => {
   submitting.value = true
   try {
-    await api.post('/pesan', form.value)
+    await api.post('/contact', form.value)
     success.value = true
     form.value = { name: '', email: '', subject: '', message: '' }
     setTimeout(() => success.value = false, 5000)

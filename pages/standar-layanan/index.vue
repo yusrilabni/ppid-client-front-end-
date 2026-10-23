@@ -10,7 +10,7 @@
         <NuxtLink 
           v-for="item in items" 
           :key="item.id" 
-          :to="`/layanan/standar-layanan/${item.slug}`"
+          :to="'/standar-layanan/'+item.slug"
           class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-600 hover:shadow-xl transition flex items-start space-x-4 group"
         >
           <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition">
@@ -40,7 +40,7 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await api.get('/layanan/standar-layanan')
+    const res = await api.get('/standar-layanan')
     items.value = res.data.data.data || res.data.data
   } catch (error) {
     console.error('Error fetching standar layanan:', error)

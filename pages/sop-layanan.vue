@@ -42,7 +42,7 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await api.get('/layanan/sop')
+    const res = await api.get('/sop')
     items.value = res.data.data.data || res.data.data
   } catch (error) {
     console.error('Error fetching SOP:', error)

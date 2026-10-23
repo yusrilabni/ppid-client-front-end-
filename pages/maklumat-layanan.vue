@@ -40,7 +40,7 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await api.get('/layanan/maklumat')
+    const res = await api.get('/maklumat-layanan')
     content.value = res.data.data
   } catch (error) {
     console.error('Error fetching maklumat:', error)

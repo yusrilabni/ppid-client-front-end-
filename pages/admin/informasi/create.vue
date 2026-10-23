@@ -486,11 +486,7 @@ const submitForm = async () => {
       formData.append('target_unit', userUnitId.value)
     }
 
-    const res = await api.post('/informasi-crud', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
+    const res = await api.post('/informasi-crud', formData)
 
     if (res.data.success || res.status === 200 || res.status === 201) {
       success.value = 'Informasi berhasil ditambahkan.'
