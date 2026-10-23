@@ -16,7 +16,7 @@
           Self Assessment<br class="hidden md:block" /> Questionnaire <span class="text-cyan-300">SAQ</span>
         </h1>
         <p class="mt-4 text-blue-100 max-w-2xl text-sm md:text-base">
-          Penilaian mandiri keterbukaan informasi publik per OPD Kabupaten Sinjai — 203 pertanyaan dalam 5 tab indikator.
+          Penilaian mandiri keterbukaan informasi publik per OPD Kabupaten Sinjai — {{ totalPertanyaan }} pertanyaan dalam 5 tab indikator.
         </p>
         <!-- STATS -->
         <div class="mt-8 grid grid-cols-3 gap-3 md:gap-6 max-w-2xl">
@@ -25,7 +25,7 @@
             <div class="text-[11px] md:text-xs text-blue-200 mt-1">OPD Terdaftar</div>
           </div>
           <div class="bg-white/10 backdrop-blur rounded-2xl p-4 border border-white/15">
-            <div class="text-2xl md:text-4xl font-extrabold text-white"><AnimatedNumber :value="203" /></div>
+            <div class="text-2xl md:text-4xl font-extrabold text-white"><AnimatedNumber :value="totalPertanyaan" /></div>
             <div class="text-[11px] md:text-xs text-blue-200 mt-1">Pertanyaan</div>
           </div>
           <div class="bg-white/10 backdrop-blur rounded-2xl p-4 border border-white/15">
@@ -144,6 +144,10 @@ const filtered = computed(() => {
 const avgProgress = computed(() => {
   if (!opds.value.length) return 0
   return Math.round(opds.value.reduce((s, o) => s + o.progres.persen, 0) / opds.value.length)
+})
+const totalPertanyaan = computed(() => {
+  if (!opds.value.length) return 0
+  return Math.max(...opds.value.map(o => o.progres?.total || 0))
 })
 
 // Komponen angka animasi (render function — template string tidak ter-compile di production)
