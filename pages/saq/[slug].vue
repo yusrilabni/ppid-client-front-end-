@@ -274,7 +274,7 @@
               </div>
               <button type="button" @click="form.links.push({ judul: '', link: '', deskripsi: '' })"
                 class="w-full py-2.5 rounded-2xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-sm font-bold hover:bg-blue-50 transition-all">
-                <i class="fas fa-plus mr-2"></i>Tambah Link Dokumen
+                <i class="fas fa-plus mr-2"></i>Tambah {{ modal.question?.input_type === 'situs' ? 'Link Situs' : modal.question?.input_type === 'foto' ? 'Link Foto' : 'Link Dokumen' }}
               </button>
               <p v-if="syncMsg" class="text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
             </div>
@@ -445,7 +445,8 @@ const submitAnswer = async () => {
     ? form.value.links.filter(l => l.link.trim() && (inputType === 'dokumen' ? l.judul.trim() : true))
     : []
   if (form.value.jawaban === 'ya' && !links.length) {
-    formError.value = 'Jawaban "Ya" wajib disertai minimal satu link dokumen.'
+    const tipeLabel = inputType === 'situs' ? 'link situs' : inputType === 'foto' ? 'link foto' : 'link dokumen'
+    formError.value = `Jawaban "Ya" wajib disertai minimal satu ${tipeLabel}.`
     return
   }
   submitting.value = true
