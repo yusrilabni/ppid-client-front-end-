@@ -71,7 +71,7 @@
         </div>
 
         <!-- SECTIONS -->
-        <div v-if="tabs[activeTab]?.scope === 'ppid_utama'"
+        <div v-if="tabs[activeTab]?.kode === '1'"
           class="mb-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
           <span class="text-amber-500 text-lg leading-none mt-0.5">★</span>
           <p class="text-sm text-amber-800">
