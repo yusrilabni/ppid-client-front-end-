@@ -145,10 +145,7 @@ const avgProgress = computed(() => {
   if (!opds.value.length) return 0
   return Math.round(opds.value.reduce((s, o) => s + o.progres.persen, 0) / opds.value.length)
 })
-const totalPertanyaan = computed(() => {
-  if (!opds.value.length) return 0
-  return Math.max(...opds.value.map(o => o.progres?.total || 0))
-})
+const totalPertanyaan = ref(151)
 
 // Komponen angka animasi (render function — template string tidak ter-compile di production)
 const AnimatedNumber = {
