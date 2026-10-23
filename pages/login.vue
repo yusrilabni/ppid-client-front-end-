@@ -158,6 +158,11 @@ const handleLogin = async () => {
   try {
     const res = await authStore.login(form.value)
     if (!res.success) throw new Error(res.message)
+    // Jika harus ganti password (login via ituji), paksa ke halaman ganti password
+    if (authStore.user?.must_change_password) {
+      router.push('/ganti-password');
+      return;
+    }
     const pending = localStorage.getItem('pending_download_twibbon');
     if (pending) {
       localStorage.removeItem('pending_download_twibbon');
