@@ -71,7 +71,11 @@
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-[#0052FF] transition-colors">{{ opd.name }}</h3>
-                <p class="text-xs text-gray-500 mt-1">{{ opd.progres.terisi }}/{{ opd.progres.total }} pertanyaan terisi</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <p class="text-xs text-gray-500">{{ opd.progres.terisi }}/{{ opd.progres.total }} pertanyaan terisi</p>
+                  <span v-if="opd.is_ppid_utama"
+                    class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 uppercase tracking-wide">PPID Utama</span>
+                </div>
               </div>
             </div>
             <!-- Pimpinan -->

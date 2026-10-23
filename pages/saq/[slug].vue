@@ -75,8 +75,8 @@
           class="mb-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
           <span class="text-amber-500 text-lg leading-none mt-0.5">★</span>
           <p class="text-sm text-amber-800">
-            <strong>Khusus PPID Utama.</strong> Indikator Sarana dan Prasarana hanya diisi oleh Dinas Komunikasi
-            Informatika dan Persandian selaku PPID Utama Kabupaten Sinjai.
+            <strong>Khusus PPID Utama.</strong> Indikator Sarana dan Prasarana hanya diisi oleh
+            PPID Utama Kabupaten Sinjai.
           </p>
         </div>
         <div class="mt-4 space-y-4">
@@ -107,6 +107,8 @@
                 <div class="flex-1 min-w-0">
                   <p class="text-sm text-gray-800 leading-relaxed"><span class="font-mono text-xs text-[#0052FF] font-bold mr-2">{{ q.kode }}</span>{{ q.pertanyaan }}</p>
                   <p v-if="q.dokumen_upload" class="mt-1 text-xs text-gray-500"><i class="fas fa-paperclip mr-1"></i>{{ q.dokumen_upload }}</p>
+                  <span v-if="q.jawaban === 'ya'" class="inline-block mt-1.5 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wide">Ya</span>
+                  <span v-else-if="q.jawaban === 'tidak'" class="inline-block mt-1.5 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 uppercase tracking-wide">Tidak</span>
                 </div>
                 <button @click="openAnswerModal(q)"
                   class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
@@ -147,25 +149,67 @@
           </div>
 
           <form v-else @submit.prevent="submitAnswer" class="space-y-4">
+            <!-- YA / TIDAK -->
             <div>
-              <label class="block text-xs font-bold text-gray-700 mb-1.5">Judul Dokumen *</label>
-              <input v-model="form.judul" required type="text" placeholder="cth. Renja Diskominfo 2026"
-                class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-gray-700 mb-1.5">Link (Drive / dokumen)</label>
-              <div class="flex gap-2">
-                <input v-model="form.link" type="url" placeholder="https://drive.google.com/..."
-                  class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                <button type="button" @click="syncFromPpid" :disabled="syncing || !form.link"
-                  class="shrink-0 px-3 py-2.5 rounded-xl bg-cyan-50 text-cyan-700 text-xs font-bold hover:bg-cyan-100 disabled:opacity-40 transition-all"
-                  title="Sinkronkan dari data PPID bila link sudah ada">
-                  <i :class="syncing ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Apakah OPD memiliki/memenuhi ini? *</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" @click="form.jawaban = 'ya'"
+                  class="py-3 rounded-2xl font-bold text-sm border-2 transition-all"
+                  :class="form.jawaban === 'ya'
+                    ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/25'
+                    : 'bg-white border-gray-200 text-gray-500 hover:border-emerald-300'">
+                  <i class="fas fa-check mr-2"></i>Ya, Ada
+                </button>
+                <button type="button" @click="form.jawaban = 'tidak'"
+                  class="py-3 rounded-2xl font-bold text-sm border-2 transition-all"
+                  :class="form.jawaban === 'tidak'
+                    ? 'bg-gray-500 border-gray-500 text-white shadow-lg shadow-gray-500/25'
+                    : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'">
+                  <i class="fas fa-times mr-2"></i>Tidak Ada
                 </button>
               </div>
-              <p v-if="syncMsg" class="mt-1.5 text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
             </div>
-            <div>
+
+            <!-- DAFTAR LINK (hanya bila Ya) -->
+            <div v-if="form.jawaban === 'ya'" class="space-y-3">
+              <div v-for="(l, idx) in form.links" :key="idx"
+                class="p-3 rounded-2xl border-2 border-blue-100 bg-blue-50/40 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-[#0052FF]">Dokumen {{ idx + 1 }}</span>
+                  <button v-if="form.links.length > 1" type="button" @click="form.links.splice(idx, 1)"
+                    class="text-xs font-bold text-rose-500 hover:text-rose-700">
+                    <i class="fas fa-trash-alt mr-1"></i>Hapus
+                  </button>
+                </div>
+                <input v-model="l.judul" required type="text" placeholder="Judul dokumen *"
+                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                <div class="flex gap-2">
+                  <input v-model="l.link" required type="url" placeholder="https://drive.google.com/... *"
+                    class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                  <button type="button" @click="syncFromPpid(idx)" :disabled="syncing || !l.link"
+                    class="shrink-0 px-3 py-2.5 rounded-xl bg-cyan-50 text-cyan-700 text-xs font-bold hover:bg-cyan-100 disabled:opacity-40 transition-all"
+                    title="Sinkronkan dari data PPID bila link sudah ada">
+                    <i :class="syncing ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i>
+                  </button>
+                </div>
+                <input v-model="l.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
+                  class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
+              </div>
+              <button type="button" @click="form.links.push({ judul: '', link: '', deskripsi: '' })"
+                class="w-full py-2.5 rounded-2xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-sm font-bold hover:bg-blue-50 transition-all">
+                <i class="fas fa-plus mr-2"></i>Tambah Link Dokumen
+              </button>
+              <p v-if="syncMsg" class="text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
+            </div>
+
+            <!-- INFO (bila Tidak) -->
+            <div v-if="form.jawaban === 'tidak'"
+              class="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-sm text-gray-600">
+              <i class="fas fa-info-circle mr-2 text-gray-400"></i>
+              OPD dinyatakan <strong>tidak memiliki</strong> indikator ini — tidak perlu mengisi link dokumen.
+            </div>
+
+            <div v-if="form.jawaban === 'ya'">
               <label class="block text-xs font-bold text-gray-700 mb-1.5">Klasifikasi Informasi <span class="font-normal text-gray-400">(opsional — catat sbg dokumen)</span></label>
               <select v-model="form.klasifikasi"
                 class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm bg-white">
@@ -175,11 +219,6 @@
                 <option>Informasi Serta Merta</option>
                 <option>Informasi Dikecualikan</option>
               </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-gray-700 mb-1.5">Deskripsi</label>
-              <textarea v-model="form.deskripsi" rows="2" placeholder="Deskripsi singkat dokumen..."
-                class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm"></textarea>
             </div>
             <div v-if="formError" class="p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-600">{{ formError }}</div>
             <button type="submit" :disabled="submitting"
@@ -254,30 +293,33 @@ const openAnswerModal = async (q) => {
   formError.value = ''
   syncMsg.value = ''
   modal.value = { open: true, question: q, existing: null }
-  form.value = { judul: '', link: '', klasifikasi: '', deskripsi: '' }
+  form.value = { jawaban: null, links: [{ judul: '', link: '', deskripsi: '' }], klasifikasi: '' }
   if (q.terisi && opd.value) {
     try {
       const res = await api.get('/saq/answers', { params: { organization_id: opd.value.id } })
       const found = (res.data.data || []).find(a => a.indicator_id === q.id)
       if (found) {
         modal.value.existing = found
-        form.value.judul = found.judul || ''
-        form.value.link = found.link || ''
+        form.value.jawaban = found.jawaban || null
+        form.value.links = (found.links && found.links.length)
+          ? found.links.map(l => ({ judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '' }))
+          : [{ judul: found.judul || '', link: found.link || '', deskripsi: '' }]
       }
     } catch (e) { /* abaikan */ }
   }
 }
 
-const syncFromPpid = async () => {
-  if (!form.value.link) return
+const syncFromPpid = async (idx = 0) => {
+  const target = form.value.links[idx]
+  if (!target || !target.link) return
   syncing.value = true
   syncMsg.value = ''
   try {
-    const res = await api.get('/saq/sync', { params: { url: form.value.link }, skipAuthRedirect: true })
+    const res = await api.get('/saq/sync', { params: { url: target.link }, skipAuthRedirect: true })
     if (res.data.found) {
       const d = res.data.data
-      form.value.judul = form.value.judul || d.judul || ''
-      form.value.deskripsi = d.deskripsi || ''
+      target.judul = target.judul || d.judul || ''
+      target.deskripsi = d.deskripsi || ''
       syncFound.value = true
       syncMsg.value = `Ditemukan di PPID: "${d.judul}" — diupload ${d.pengupload || 'admin'}${d.opd ? ` (${d.opd})` : ''}.`
     } else {
@@ -294,16 +336,26 @@ const syncFromPpid = async () => {
 
 const submitAnswer = async () => {
   if (!opd.value || !modal.value.question) return
+  if (!form.value.jawaban) {
+    formError.value = 'Pilih dulu: Ya atau Tidak.'
+    return
+  }
+  const links = form.value.jawaban === 'ya'
+    ? form.value.links.filter(l => l.judul.trim() && l.link.trim())
+    : []
+  if (form.value.jawaban === 'ya' && !links.length) {
+    formError.value = 'Jawaban "Ya" wajib disertai minimal satu link dokumen.'
+    return
+  }
   submitting.value = true
   formError.value = ''
   try {
     await api.post('/saq/answers', {
       organization_id: opd.value.id,
       indicator_id: modal.value.question.id,
-      judul: form.value.judul,
-      link: form.value.link || null,
+      jawaban: form.value.jawaban,
+      links: links.map(l => ({ judul: l.judul.trim(), link: l.link.trim(), deskripsi: (l.deskripsi || '').trim() || null })),
       klasifikasi: form.value.klasifikasi || null,
-      deskripsi: form.value.deskripsi || null,
     }, { skipAuthRedirect: true })
     modal.value.open = false
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
