@@ -272,6 +272,8 @@ const syncFound = ref(false)
 const { data: opdsResponse } = useQuery({
   queryKey: ['saq-opds'],
   queryFn: async () => (await api.get('/saq/opds')).data,
+  staleTime: 0,
+  refetchOnWindowFocus: true,
 })
 const opd = computed(() =>
   (opdsResponse.value?.data || []).find(o => o.slug === route.params.slug)

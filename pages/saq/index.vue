@@ -122,6 +122,8 @@ const search = ref('')
 const { data: opdsResponse, isLoading } = useQuery({
   queryKey: ['saq-opds'],
   queryFn: async () => (await api.get('/saq/opds')).data,
+  staleTime: 0,
+  refetchOnWindowFocus: true,
 })
 
 const opds = computed(() => opdsResponse.value?.data || [])
