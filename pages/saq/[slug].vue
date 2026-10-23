@@ -173,14 +173,22 @@
               <span class="text-gray-500">Kantor/OPD</span>
               <span class="font-bold text-gray-900 text-right">{{ opd?.name || '-' }}</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-500">Kategori Informasi</span>
-              <span class="font-bold text-[#0052FF]">{{ modal.question?.klasifikasi_otomatis || '-' }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-500">Target Upload</span>
-              <span class="font-bold text-gray-900">{{ modal.question?.target_upload === 'pemkab' ? 'Informasi Pemkab' : 'PPID' }}</span>
-            </div>
+            <template v-if="modal.question?.input_type === 'dokumen' || !modal.question?.input_type">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Kategori Informasi</span>
+                <span class="font-bold text-[#0052FF]">{{ modal.question?.klasifikasi_otomatis || '-' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Target Upload</span>
+                <span class="font-bold text-gray-900">{{ modal.question?.target_upload === 'pemkab' ? 'Informasi Pemkab' : 'PPID' }}</span>
+              </div>
+            </template>
+            <template v-else>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Jenis Bukti</span>
+                <span class="font-bold text-[#0052FF]">{{ modal.question?.input_type === 'situs' ? 'Link Situs/Web' : 'Link Foto' }}</span>
+              </div>
+            </template>
             <div class="flex justify-between">
               <span class="text-gray-500">Status</span>
               <span class="font-bold" :class="modal.existing ? 'text-emerald-600' : 'text-amber-600'">{{ modal.existing ? 'Sudah Terisi' : 'Belum Diisi' }}</span>
