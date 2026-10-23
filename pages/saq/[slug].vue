@@ -194,30 +194,49 @@
               </div>
             </div>
 
-            <!-- DAFTAR LINK (hanya bila Ya) -->
+            <!-- DAFTAR LINK (hanya bila Ya) - dinamis per input_type -->
             <div v-if="form.jawaban === 'ya'" class="space-y-3">
               <div v-for="(l, idx) in form.links" :key="idx"
                 class="p-3 rounded-2xl border-2 border-blue-100 bg-blue-50/40 space-y-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-extrabold text-[#0052FF]">Dokumen {{ idx + 1 }}</span>
+                  <span class="text-xs font-extrabold text-[#0052FF]">
+                    {{ modal.question?.input_type === 'foto' ? 'Foto ' : modal.question?.input_type === 'situs' ? 'Situs ' : 'Dokumen ' }}{{ idx + 1 }}
+                  </span>
                   <button v-if="form.links.length > 1" type="button" @click="form.links.splice(idx, 1)"
                     class="text-xs font-bold text-rose-500 hover:text-rose-700">
                     <i class="fas fa-trash-alt mr-1"></i>Hapus
                   </button>
                 </div>
-                <input v-model="l.judul" required type="text" placeholder="Judul dokumen *"
-                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                <div class="flex gap-2">
-                  <input v-model="l.link" required type="url" placeholder="https://drive.google.com/... *"
-                    class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                  <button type="button" @click="syncFromPpid(idx)" :disabled="syncing || !l.link"
-                    class="shrink-0 px-3 py-2.5 rounded-xl bg-cyan-50 text-cyan-700 text-xs font-bold hover:bg-cyan-100 disabled:opacity-40 transition-all"
-                    title="Sinkronkan dari data PPID bila link sudah ada">
-                    <i :class="syncing ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i>
-                  </button>
-                </div>
-                <input v-model="l.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
-                  class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
+                <!-- Tipe DOKUMEN: judul + link -->
+                <template v-if="modal.question?.input_type === 'dokumen' || !modal.question?.input_type">
+                  <input v-model="l.judul" required type="text" placeholder="Judul dokumen *"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                  <div class="flex gap-2">
+                    <input v-model="l.link" required type="url" placeholder="https://drive.google.com/... *"
+                      class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                    <button type="button" @click="syncFromPpid(idx)" :disabled="syncing || !l.link"
+                      class="shrink-0 px-3 py-2.5 rounded-xl bg-cyan-50 text-cyan-700 text-xs font-bold hover:bg-cyan-100 disabled:opacity-40 transition-all"
+                      title="Sinkronkan dari data PPID bila link sudah ada">
+                      <i :class="syncing ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i>
+                    </button>
+                  </div>
+                  <input v-model="l.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
+                    class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
+                </template>
+                <!-- Tipe FOTO: link foto langsung (tanpa judul wajib) -->
+                <template v-else-if="modal.question?.input_type === 'foto'">
+                  <input v-model="l.link" required type="url" placeholder="Link foto (https://...) *"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                  <input v-model="l.judul" type="text" placeholder="Keterangan foto (opsional)"
+                    class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
+                  <p class="text-xs text-gray-500"><i class="fas fa-info-circle mr-1"></i>Bisa link Google Drive, atau URL gambar langsung</p>
+                </template>
+                <!-- Tipe SITUS: URL saja (tanpa judul) -->
+                <template v-else-if="modal.question?.input_type === 'situs'">
+                  <input v-model="l.link" required type="url" placeholder="https://situs-pemkab.go.id *"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                  <p class="text-xs text-gray-500"><i class="fas fa-globe mr-1"></i>Masukkan alamat situs/web langsung</p>
+                </template>
               </div>
               <button type="button" @click="form.links.push({ judul: '', link: '', deskripsi: '' })"
                 class="w-full py-2.5 rounded-2xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-sm font-bold hover:bg-blue-50 transition-all">
