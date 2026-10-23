@@ -432,8 +432,9 @@ const submitAnswer = async () => {
     formError.value = 'Pilih dulu: Ya atau Tidak.'
     return
   }
+  const inputType = modal.value.question?.input_type || 'dokumen'
   const links = form.value.jawaban === 'ya'
-    ? form.value.links.filter(l => l.judul.trim() && l.link.trim())
+    ? form.value.links.filter(l => l.link.trim() && (inputType === 'dokumen' ? l.judul.trim() : true))
     : []
   if (form.value.jawaban === 'ya' && !links.length) {
     formError.value = 'Jawaban "Ya" wajib disertai minimal satu link dokumen.'
