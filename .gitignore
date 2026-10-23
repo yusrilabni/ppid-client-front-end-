@@ -32,3 +32,8 @@ dist-ssr
 
 # File temporary
 out.html
+
+# Environment
+.env
+.env.local
+.env.*.local
