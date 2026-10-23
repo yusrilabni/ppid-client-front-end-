@@ -56,6 +56,11 @@
               <span v-if="activeTab === i" class="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0052FF] to-[#0041CC]"></span>
               <span class="relative flex items-center gap-2">
                 {{ tab.tab }}
+                <span v-if="tab.scope === 'ppid_utama'"
+                  class="text-[10px] px-1.5 py-0.5 rounded-full font-extrabold uppercase tracking-wide"
+                  :class="activeTab === i ? 'bg-amber-300 text-amber-900' : 'bg-amber-100 text-amber-700'">
+                  PPID Utama
+                </span>
                 <span class="text-[10px] px-1.5 py-0.5 rounded-full"
                   :class="activeTab === i ? 'bg-white/25 text-white' : 'bg-blue-50 text-[#0052FF]'">
                   {{ tabDone(tab) }}/{{ tabTotal(tab) }}
@@ -66,6 +71,14 @@
         </div>
 
         <!-- SECTIONS -->
+        <div v-if="tabs[activeTab]?.scope === 'ppid_utama'"
+          class="mb-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+          <span class="text-amber-500 text-lg leading-none mt-0.5">★</span>
+          <p class="text-sm text-amber-800">
+            <strong>Khusus PPID Utama.</strong> Indikator Sarana dan Prasarana hanya diisi oleh Dinas Komunikasi
+            Informatika dan Persandian selaku PPID Utama Kabupaten Sinjai.
+          </p>
+        </div>
         <div class="mt-4 space-y-4">
           <div v-for="sec in tabs[activeTab].sections" :key="sec.kode"
             class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
