@@ -114,6 +114,20 @@
                   </label>
                 </div>
               </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Visibilitas <span class="text-red-500">*</span></label>
+                <div class="flex space-x-4">
+                  <label class="inline-flex items-center">
+                    <input type="radio" v-model="form.visibility" value="public" class="form-radio h-4 w-4 text-blue-600">
+                    <span class="ml-2 text-gray-700">Publik <span class="text-xs text-gray-500">(dapat dilihat semua orang)</span></span>
+                  </label>
+                  <label class="inline-flex items-center">
+                    <input type="radio" v-model="form.visibility" value="private" class="form-radio h-4 w-4 text-blue-600">
+                    <span class="ml-2 text-gray-700">Privat <span class="text-xs text-gray-500">(hanya internal)</span></span>
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div class="mb-8 mt-4">
@@ -248,6 +262,7 @@ const form = ref({
   jenis_dokumen: '',
   tahun: '',
   status: 'BERLAKU',
+  visibility: 'public',
   file_type: 'upload',
   file_url: ''
 })
