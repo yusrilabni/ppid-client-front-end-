@@ -135,7 +135,31 @@
               <i class="fas fa-times"></i>
             </button>
           </div>
-          <p class="text-xs text-gray-500 mb-5"><span class="font-mono text-[#0052FF] font-bold">{{ modal.question?.kode }}</span> — {{ modal.question?.pertanyaan }}</p>
+          <p class="text-xs text-gray-500 mb-3"><span class="font-mono text-[#0052FF] font-bold">{{ modal.question?.kode }}</span> — {{ modal.question?.pertanyaan }}</p>
+
+          <!-- Info otomatis (read-only) -->
+          <div class="mb-5 p-3 rounded-2xl bg-gray-50 border border-gray-200 text-xs space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Pengguna</span>
+              <span class="font-bold text-gray-900">{{ authStore.userName || '-' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Kantor/OPD</span>
+              <span class="font-bold text-gray-900 text-right">{{ opd?.name || '-' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Kategori Informasi</span>
+              <span class="font-bold text-[#0052FF]">{{ modal.question?.klasifikasi_otomatis || '-' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Target Upload</span>
+              <span class="font-bold text-gray-900">{{ modal.question?.target_upload === 'pemkab' ? 'Informasi Pemkab' : 'PPID' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Status</span>
+              <span class="font-bold" :class="modal.existing ? 'text-emerald-600' : 'text-amber-600'">{{ modal.existing ? 'Sudah Terisi' : 'Belum Diisi' }}</span>
+            </div>
+          </div>
 
           <div v-if="!authStore.isAuthenticated" class="text-center py-6">
             <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4">
