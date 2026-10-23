@@ -210,15 +210,27 @@
             </div>
 
             <div v-if="form.jawaban === 'ya'">
-              <label class="block text-xs font-bold text-gray-700 mb-1.5">Klasifikasi Informasi <span class="font-normal text-gray-400">(opsional — catat sbg dokumen)</span></label>
-              <select v-model="form.klasifikasi"
-                class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm bg-white">
-                <option value="">— Tidak dicatat sebagai dokumen —</option>
-                <option>Informasi Berkala</option>
-                <option>Informasi Tersedia Setiap Saat</option>
-                <option>Informasi Serta Merta</option>
-                <option>Informasi Dikecualikan</option>
-              </select>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Visibilitas Dokumen *</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" @click="form.visibility = 'public'"
+                  class="py-2.5 rounded-xl font-bold text-xs border-2 transition-all"
+                  :class="form.visibility === 'public'
+                    ? 'bg-[#0052FF] border-[#0052FF] text-white shadow-md shadow-blue-600/25'
+                    : 'bg-white border-gray-200 text-gray-500 hover:border-blue-300'">
+                  <i class="fas fa-globe mr-1.5"></i>Public
+                </button>
+                <button type="button" @click="form.visibility = 'private'"
+                  class="py-2.5 rounded-xl font-bold text-xs border-2 transition-all"
+                  :class="form.visibility === 'private'
+                    ? 'bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-500/25'
+                    : 'bg-white border-gray-200 text-gray-500 hover:border-amber-300'">
+                  <i class="fas fa-lock mr-1.5"></i>Private
+                </button>
+              </div>
+              <p class="mt-1.5 text-[11px] text-gray-500">
+                <span v-if="form.visibility === 'public'">Dokumen tampil di daftar informasi publik.</span>
+                <span v-else>Dokumen hanya terlihat oleh unit OPD penyedia (tidak tampil publik).</span>
+              </p>
             </div>
             <div v-if="formError" class="p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-600">{{ formError }}</div>
             <button type="submit" :disabled="submitting"
@@ -293,7 +305,7 @@ const openAnswerModal = async (q) => {
   formError.value = ''
   syncMsg.value = ''
   modal.value = { open: true, question: q, existing: null }
-  form.value = { jawaban: null, links: [{ judul: '', link: '', deskripsi: '' }], klasifikasi: '' }
+  form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '' }] }
   if (q.terisi && opd.value) {
     try {
       const res = await api.get('/saq/answers', { params: { organization_id: opd.value.id } })
@@ -301,6 +313,7 @@ const openAnswerModal = async (q) => {
       if (found) {
         modal.value.existing = found
         form.value.jawaban = found.jawaban || null
+        form.value.visibility = found.visibility || 'public'
         form.value.links = (found.links && found.links.length)
           ? found.links.map(l => ({ judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '' }))
           : [{ judul: found.judul || '', link: found.link || '', deskripsi: '' }]
@@ -354,8 +367,8 @@ const submitAnswer = async () => {
       organization_id: opd.value.id,
       indicator_id: modal.value.question.id,
       jawaban: form.value.jawaban,
+      visibility: form.value.visibility,
       links: links.map(l => ({ judul: l.judul.trim(), link: l.link.trim(), deskripsi: (l.deskripsi || '').trim() || null })),
-      klasifikasi: form.value.klasifikasi || null,
     }, { skipAuthRedirect: true })
     modal.value.open = false
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
