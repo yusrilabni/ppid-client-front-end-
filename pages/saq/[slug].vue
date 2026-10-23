@@ -81,42 +81,67 @@
         </div>
         <div class="mt-4 space-y-4">
           <div v-for="sec in tabs[activeTab].sections" :key="sec.kode"
-            class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            class="bg-white rounded-3xl border border-gray-200/70 shadow-[0_2px_12px_rgba(0,82,255,0.04)] overflow-hidden transition-shadow hover:shadow-[0_4px_20px_rgba(0,82,255,0.08)]">
             <button @click="toggleSection(sec.kode)"
-              class="w-full flex items-center justify-between px-5 py-4 hover:bg-blue-50/50 transition-colors text-left">
-              <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-xl bg-[#0052FF]/10 text-[#0052FF] flex items-center justify-center text-xs font-extrabold">{{ sec.kode }}</span>
-                <span class="font-bold text-gray-800 text-sm md:text-base">{{ sec.section }}</span>
+              class="w-full flex items-center justify-between px-5 py-4 hover:bg-gradient-to-r hover:from-blue-50/60 hover:to-transparent transition-all text-left">
+              <div class="flex items-center gap-3.5">
+                <span class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0052FF] to-[#0041CC] text-white flex items-center justify-center text-xs font-extrabold shadow-md shadow-blue-600/20">{{ sec.kode }}</span>
+                <div>
+                  <span class="font-bold text-gray-800 text-sm md:text-base block leading-snug">{{ sec.section }}</span>
+                  <!-- progress bar mini -->
+                  <div class="mt-1.5 w-32 md:w-48 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500"
+                      :class="sec.terisi === sec.total ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-[#0052FF] to-cyan-400'"
+                      :style="{ width: (sec.total ? (sec.terisi / sec.total * 100) : 0) + '%' }"></div>
+                  </div>
+                </div>
               </div>
               <div class="flex items-center gap-3">
-                <span class="text-xs font-semibold px-2.5 py-1 rounded-full"
-                  :class="sec.terisi === sec.total ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'">
+                <span class="text-xs font-extrabold px-3 py-1.5 rounded-full"
+                  :class="sec.terisi === sec.total ? 'bg-emerald-100 text-emerald-700' : sec.terisi > 0 ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'">
                   {{ sec.terisi }}/{{ sec.total }}
                 </span>
-                <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"
-                  :class="{ 'rotate-180': openSections.includes(sec.kode) }"></i>
+                <span class="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center">
+                  <i class="fas fa-chevron-down text-gray-400 text-xs transition-transform duration-300"
+                    :class="{ 'rotate-180': openSections.includes(sec.kode) }"></i>
+                </span>
               </div>
             </button>
-            <div v-show="openSections.includes(sec.kode)" class="border-t border-gray-100">
+            <div v-show="openSections.includes(sec.kode)" class="border-t border-gray-100 p-3 space-y-2.5 bg-slate-50/50">
               <div v-for="q in sec.questions" :key="q.id"
-                class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 last:border-0 hover:bg-slate-50/60 transition-colors">
-                <span class="mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0"
-                  :class="q.terisi ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'">
-                  <i :class="q.terisi ? 'fas fa-check' : 'fas fa-circle text-[6px]'"></i>
-                </span>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-800 leading-relaxed"><span class="font-mono text-xs text-[#0052FF] font-bold mr-2">{{ q.kode }}</span>{{ q.pertanyaan }}</p>
-                  <p v-if="q.dokumen_upload" class="mt-1 text-xs text-gray-500"><i class="fas fa-paperclip mr-1"></i>{{ q.dokumen_upload }}</p>
-                  <span v-if="q.jawaban === 'ya'" class="inline-block mt-1.5 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wide">Ya</span>
-                  <span v-else-if="q.jawaban === 'tidak'" class="inline-block mt-1.5 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 uppercase tracking-wide">Tidak</span>
+                class="group bg-white rounded-2xl border p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                :class="q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30'">
+                <div class="flex items-start gap-3">
+                  <!-- Status icon -->
+                  <span class="mt-1 w-7 h-7 rounded-xl flex items-center justify-center text-xs shrink-0 transition-transform group-hover:scale-110"
+                    :class="q.terisi ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25' : 'bg-gray-100 text-gray-400'">
+                    <i :class="q.terisi ? 'fas fa-check' : 'fas fa-pen text-[10px]'"></i>
+                  </span>
+                  <div class="flex-1 min-w-0">
+                    <!-- Kode + badges -->
+                    <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                      <span class="font-mono text-[11px] font-extrabold text-[#0052FF] bg-blue-50 px-2 py-0.5 rounded-lg">{{ q.kode }}</span>
+                      <span v-if="q.input_type === 'foto'" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700"><i class="fas fa-camera mr-1"></i>Foto</span>
+                      <span v-else-if="q.input_type === 'situs'" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700"><i class="fas fa-globe mr-1"></i>Situs</span>
+                      <span v-else class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700"><i class="fas fa-file-alt mr-1"></i>Dokumen</span>
+                      <span v-if="q.target_upload === 'pemkab'" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700"><i class="fas fa-landmark mr-1"></i>Pemkab</span>
+                      <span v-if="q.jawaban === 'ya'" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wide">Ya</span>
+                      <span v-else-if="q.jawaban === 'tidak'" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 uppercase tracking-wide">Tidak</span>
+                    </div>
+                    <!-- Pertanyaan -->
+                    <p class="text-sm text-gray-800 leading-relaxed font-medium">{{ q.pertanyaan }}</p>
+                    <p v-if="q.dokumen_upload" class="mt-1.5 text-xs text-gray-500 flex items-center gap-1.5"><i class="fas fa-paperclip text-gray-400"></i><span class="line-clamp-1">{{ q.dokumen_upload }}</span></p>
+                    <p v-if="q.klasifikasi_otomatis" class="mt-1 text-[11px] text-gray-400"><i class="fas fa-tag mr-1"></i>{{ q.klasifikasi_otomatis }}</p>
+                  </div>
+                  <!-- Tombol aksi -->
+                  <button @click="openAnswerModal(q)"
+                    class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
+                    :class="q.terisi
+                      ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
+                      : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg'">
+                    <i :class="q.terisi ? 'fas fa-eye mr-1.5' : 'fas fa-pen mr-1.5'"></i>{{ q.terisi ? 'Lihat' : 'Isi' }}
+                  </button>
                 </div>
-                <button @click="openAnswerModal(q)"
-                  class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
-                  :class="q.terisi
-                    ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                    : 'bg-[#0052FF] text-white shadow-md shadow-blue-600/25 hover:bg-[#0041CC]'">
-                  {{ q.terisi ? 'Lihat' : 'Isi' }}
-                </button>
               </div>
             </div>
           </div>
