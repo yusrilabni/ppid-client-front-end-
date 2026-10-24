@@ -4,7 +4,7 @@
       <div class="max-w-4xl mx-auto">
         <Breadcrumbs :breadcrumbs="breadcrumbData" class="mb-6" />
 
-        <div v-if="pending" class="bg-white rounded-xl shadow-lg p-12 text-center">
+        <div v-if="pending || clientLoading" class="bg-white rounded-xl shadow-lg p-12 text-center">
           <p class="text-gray-500">Memuat foto...</p>
         </div>
 
@@ -58,21 +58,43 @@ const itemId = computed(() => String(route.params.id || ''))
 
 // API Galeri tidak punya endpoint per-id (GET /galeri/{id} = 404) dan
 // list-nya paginasi (12/halaman), jadi pindai halaman list sampai id ketemu.
+const fetchItem = async (id) => {
+  for (let page = 1; page <= 10; page++) {
+    const res = await api.get('/galeri', { params: { page } })
+    const payload = res.data || {}
+    const list = payload.data || []
+    const found = list.find((x) => String(x.id) === id)
+    if (found) return found
+    if (!payload.next_page_url) break
+  }
+  return null
+}
+
 // Dijalankan lewat useAsyncData agar ikut SSR dan dibaca crawler.
+// CATATAN INFRASTRUKTUR: fetch SSR berjalan dari server Vercel (egress luar
+// negeri) yang diblokir firewall backend — terbukti proxy sitemap Vercel 502
+// padahal endpoint sitemap backend 200 dari jaringan server. Karena itu,
+// bila SSR gagal, halaman mengambil ulang dari browser pengguna (yang
+// jaringannya bisa mencapai API backend) lewat onMounted di bawah.
 const { data: item, pending } = await useAsyncData(
   () => `galeri-detail-${itemId.value}`,
-  async () => {
-    for (let page = 1; page <= 10; page++) {
-      const res = await api.get('/galeri', { params: { page } })
-      const payload = res.data || {}
-      const list = payload.data || []
-      const found = list.find((x) => String(x.id) === itemId.value)
-      if (found) return found
-      if (!payload.next_page_url) break
-    }
-    return null
-  }
+  () => fetchItem(itemId.value)
 )
+
+const clientLoading = ref(false)
+onMounted(async () => {
+  if (!item.value) {
+    clientLoading.value = true
+    try {
+      item.value = await fetchItem(itemId.value)
+    } catch (e) {
+      // Biarkan state "Tidak Ditemukan" tampil; error sudah dicatat di console.
+      console.error('Gagal memuat detail Galeri dari browser:', e)
+    } finally {
+      clientLoading.value = false
+    }
+  }
+})
 
 const isFoto = computed(() => !item.value || item.value.type === 'foto' || !item.value.type)
 const imageUrl = computed(() => (item.value ? getStorageUrl(item.value.image) : ''))
