@@ -52,9 +52,21 @@
 <script setup>
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import api, { getStorageUrl } from '@/services/api'
+import { encodeGaleriId, decodeGaleriHash } from '@/utils/galeriHash'
 
 const route = useRoute()
-const itemId = computed(() => String(route.params.id || ''))
+const rawParam = computed(() => String(route.params.id || ''))
+const isNumericParam = computed(() => /^\d+$/.test(rawParam.value))
+// Param bisa hash (link baru) atau id numerik mentah (link lama).
+// Link lama di-redirect ke hash di bawah, sebelum fetch/render.
+const resolvedId = computed(() => {
+  if (isNumericParam.value) return Number(rawParam.value)
+  return decodeGaleriHash(rawParam.value)
+})
+const hashParam = computed(() => (resolvedId.value ? encodeGaleriId(resolvedId.value) : null))
+if (isNumericParam.value && hashParam.value) {
+  await navigateTo(`/galeri/${hashParam.value}`, { replace: true, redirectCode: 301 })
+}
 
 // API Galeri tidak punya endpoint per-id (GET /galeri/{id} = 404) dan
 // list-nya paginasi (12/halaman), jadi pindai halaman list sampai id ketemu.
@@ -77,8 +89,8 @@ const fetchItem = async (id) => {
 // bila SSR gagal, halaman mengambil ulang dari browser pengguna (yang
 // jaringannya bisa mencapai API backend) lewat onMounted di bawah.
 const { data: item, pending } = await useAsyncData(
-  () => `galeri-detail-${itemId.value}`,
-  () => fetchItem(itemId.value)
+  () => `galeri-detail-${resolvedId.value ?? 'invalid'}`,
+  () => fetchItem(resolvedId.value ? String(resolvedId.value) : '')
 )
 
 const clientLoading = ref(false)
@@ -86,7 +98,7 @@ onMounted(async () => {
   if (!item.value) {
     clientLoading.value = true
     try {
-      item.value = await fetchItem(itemId.value)
+      item.value = await fetchItem(resolvedId.value ? String(resolvedId.value) : '')
     } catch (e) {
       // Biarkan state "Tidak Ditemukan" tampil; error sudah dicatat di console.
       console.error('Gagal memuat detail Galeri dari browser:', e)
@@ -98,7 +110,7 @@ onMounted(async () => {
 
 const isFoto = computed(() => !item.value || item.value.type === 'foto' || !item.value.type)
 const imageUrl = computed(() => (item.value ? getStorageUrl(item.value.image) : ''))
-const detailUrl = computed(() => `https://ppid.sinjaikab.go.id/galeri/${itemId.value}`)
+const detailUrl = computed(() => (hashParam.value ? `https://ppid.sinjaikab.go.id/galeri/${hashParam.value}` : 'https://ppid.sinjaikab.go.id/galeri'))
 const pageTitle = computed(() => (item.value ? `${item.value.title} | PPID Kabupaten Sinjai` : 'Galeri Tidak Ditemukan | PPID Kabupaten Sinjai'))
 const pageDescription = computed(() => item.value?.description || item.value?.title || 'Galeri PPID Kabupaten Sinjai')
 
@@ -117,6 +129,8 @@ useSeoMeta({
   twitterDescription: pageDescription,
   twitterImage: imageUrl
 })
+
+useHead(() => ({ link: [{ rel: 'canonical', href: detailUrl.value }] }))
 
 const breadcrumbData = computed(() => [
   { title: 'Beranda', url: '/', icon: 'fas fa-home' },
