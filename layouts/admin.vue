@@ -13,6 +13,7 @@ const menuItems = computed(() => {
     { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin-dashboard' },
   ]
   if (authStore.isSuperAdmin) {
+    items.push({ name: 'SAQ', icon: 'fas fa-clipboard-list', route: 'admin-saq' })
     items.push({ name: 'Twibbon', icon: 'fas fa-camera-retro', route: 'admin-twibbon' })
   }
   return items
