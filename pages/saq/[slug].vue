@@ -143,6 +143,38 @@
                     <i :class="q.terisi ? 'fas fa-eye mr-1.5' : 'fas fa-pen mr-1.5'"></i>{{ q.terisi ? 'Lihat' : 'Isi' }}
                   </button>
                 </div>
+                <!-- DAFTAR JAWABAN KONSOLIDASI (mode full, superadmin) -->
+                <div v-if="isFullMode" class="mt-3 pt-3 border-t border-gray-100">
+                  <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">
+                    <i class="fas fa-reply-all mr-1"></i> Jawaban OPD ({{ getQuestionAnswers(q.id).length }})
+                  </p>
+                  <div v-if="getQuestionAnswers(q.id).length === 0" class="text-xs text-gray-400 italic">
+                    Belum ada jawaban
+                  </div>
+                  <div v-else class="space-y-1.5">
+                    <div v-for="ans in getQuestionAnswers(q.id)" :key="ans.id"
+                      class="flex items-center gap-2 text-xs bg-gray-50 rounded-xl px-3 py-2">
+                      <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0">
+                        <i class="fas fa-building"></i>
+                      </span>
+                      <div class="flex-1 min-w-0">
+                        <p class="font-bold text-gray-800 truncate">{{ ans.opd_name }}</p>
+                        <p v-if="ans.penulis" class="text-[10px] text-gray-500 truncate">
+                          oleh {{ ans.penulis }}
+                          <span :class="ans.jawaban === 'ya' ? 'text-emerald-600 font-bold' : 'text-gray-500 font-bold'">
+                            · {{ ans.jawaban === 'ya' ? 'Ya' : 'Tidak' }}
+                          </span>
+                        </p>
+                      </div>
+                      <a v-for="lnk in ans.links" :key="lnk.id" :href="lnk.link" target="_blank" rel="noopener"
+                        class="shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-[#0052FF] hover:bg-blue-50 hover:border-blue-300 transition-all"
+                        :title="lnk.judul || lnk.link">
+                        <i class="fas fa-external-link-alt mr-1"></i>{{ lnk.judul ? (lnk.judul.length > 20 ? lnk.judul.substring(0, 20) + '…' : lnk.judul) : 'Lihat' }}
+                      </a>
+                      <span v-if="!ans.links?.length" class="text-[10px] text-gray-400 italic shrink-0">tanpa link</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -364,16 +396,39 @@ const opd = computed(() =>
   (opdsResponse.value?.data || []).find(o => o.slug === route.params.slug)
 )
 
+// Mode full: halaman kabupaten-sinjai menampilkan SEMUA pertanyaan, khusus superadmin
+const isFullMode = computed(() => route.params.slug === 'kabupaten-sinjai')
+
+// Guard: kabupaten-sinjai hanya untuk superadmin
+watch([opd, isFullMode], ([o, full]) => {
+  if (full && o && !authStore.isSuperAdmin) {
+    router.push('/login')
+  }
+}, { immediate: true })
+
 // Struktur SAQ + jawaban
 const { data: structResponse, isLoading, refetch: refetchStruct } = useQuery({
-  queryKey: ['saq-structure', computed(() => opd.value?.id)],
+  queryKey: ['saq-structure', computed(() => opd.value?.id), isFullMode],
   queryFn: async () => {
     if (!opd.value) return null
-    return (await api.get('/saq/structure', { params: { organization_id: opd.value.id } })).data
+    const params = isFullMode.value
+      ? { full: 1 }
+      : { organization_id: opd.value.id }
+    return (await api.get('/saq/structure', { params })).data
   },
-  enabled: computed(() => !!opd.value),
+  enabled: computed(() => !!opd.value && (!isFullMode.value || authStore.isSuperAdmin)),
 })
 const tabs = computed(() => structResponse.value?.data || [])
+
+// Konsolidasi jawaban semua OPD (hanya mode full)
+const { data: allAnswersResponse } = useQuery({
+  queryKey: ['saq-all-answers'],
+  queryFn: async () => (await api.get('/saq/all-answers')).data,
+  enabled: computed(() => isFullMode.value && authStore.isSuperAdmin),
+  staleTime: 0,
+})
+const allAnswers = computed(() => allAnswersResponse.value?.data || {})
+const getQuestionAnswers = (questionId) => allAnswers.value[questionId] || []
 
 watch(tabs, (t) => {
   if (t.length && t[0].sections.length) openSections.value = [t[0].sections[0].kode]
