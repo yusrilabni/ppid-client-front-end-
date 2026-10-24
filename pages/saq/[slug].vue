@@ -176,7 +176,96 @@
                   </div>
                 </div>
               </div>
-            </div>
+            
+              <!-- PARENT GROUPS (level 4 - induk non-answerable) -->
+              <div v-for="g in sec.groups" :key="'group-'+g.id" class="mt-1">
+                <!-- Header induk (tidak bisa diisi) -->
+                <div class="bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border border-blue-200/50 rounded-2xl px-4 py-3 mb-2">
+                  <div class="flex items-start gap-2.5">
+                    <span class="mt-0.5 w-7 h-7 rounded-xl bg-[#0052FF] text-white flex items-center justify-center text-xs shrink-0 shadow-md shadow-blue-600/20">
+                      <i class="fas fa-layer-group text-[10px]"></i>
+                    </span>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                        <span class="font-mono text-[11px] font-extrabold text-[#0052FF] bg-white px-2 py-0.5 rounded-lg border border-blue-200">{{ g.kode }}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Induk</span>
+                      </div>
+                      <p class="text-sm text-gray-800 leading-relaxed font-semibold">{{ g.pertanyaan }}</p>
+                    </div>
+                    <span class="shrink-0 text-xs font-extrabold px-2.5 py-1 rounded-full"
+                      :class="g.terisi === g.total ? 'bg-emerald-100 text-emerald-700' : g.terisi > 0 ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'">
+                      {{ g.terisi }}/{{ g.total }}
+                    </span>
+                  </div>
+                </div>
+                <!-- Pertanyaan anak di dalam grup -->
+                <div class="ml-3 md:ml-5 pl-3 border-l-2 border-blue-200/60 space-y-2.5">
+                  <div v-for="q in g.questions" :key="q.id"
+                    class="group bg-white rounded-2xl border p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                    :class="q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30'">
+                    <div class="flex items-start gap-3">
+                      <span class="mt-1 w-7 h-7 rounded-xl flex items-center justify-center text-xs shrink-0 transition-transform group-hover:scale-110"
+                        :class="q.terisi ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25' : 'bg-gray-100 text-gray-400'">
+                        <i :class="q.terisi ? 'fas fa-check' : 'fas fa-pen text-[10px]'"></i>
+                      </span>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                          <span class="font-mono text-[11px] font-extrabold text-[#0052FF] bg-blue-50 px-2 py-0.5 rounded-lg">{{ q.kode }}</span>
+                          <span v-if="q.input_type === 'foto'" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700"><i class="fas fa-camera mr-1"></i>Foto</span>
+                          <span v-else-if="q.input_type === 'situs'" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700"><i class="fas fa-globe mr-1"></i>Situs</span>
+                          <span v-else class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700"><i class="fas fa-file-alt mr-1"></i>Dokumen</span>
+                          <span v-if="q.target_upload === 'pemkab'" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700"><i class="fas fa-landmark mr-1"></i>Pemkab</span>
+                          <span v-if="q.bagian" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-700"><i class="fas fa-sitemap mr-1"></i>{{ q.bagian }}</span>
+                          <span v-if="q.jawaban === 'ya'" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wide">Ya</span>
+                          <span v-else-if="q.jawaban === 'tidak'" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 uppercase tracking-wide">Tidak</span>
+                        </div>
+                        <p class="text-sm text-gray-800 leading-relaxed font-medium">{{ q.pertanyaan }}</p>
+                        <p v-if="q.dokumen_upload" class="mt-1.5 text-xs text-gray-500 flex items-center gap-1.5"><i class="fas fa-paperclip text-gray-400"></i><span class="line-clamp-1">{{ q.dokumen_upload }}</span></p>
+                        <p v-if="q.klasifikasi_otomatis" class="mt-1 text-[11px] text-gray-400"><i class="fas fa-tag mr-1"></i>{{ q.klasifikasi_otomatis }}</p>
+                      </div>
+                      <button @click="openAnswerModal(q)"
+                        class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
+                        :class="q.terisi
+                          ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
+                          : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg'">
+                        <i :class="q.terisi ? 'fas fa-eye mr-1.5' : 'fas fa-pen mr-1.5'"></i>{{ q.terisi ? 'Lihat' : 'Isi' }}
+                      </button>
+                    </div>
+                    <div v-if="isFullMode" class="mt-3 pt-3 border-t border-gray-100">
+                      <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">
+                        <i class="fas fa-reply-all mr-1"></i> Jawaban OPD ({{ getQuestionAnswers(q.id).length }})
+                      </p>
+                      <div v-if="getQuestionAnswers(q.id).length === 0" class="text-xs text-gray-400 italic">
+                        Belum ada jawaban
+                      </div>
+                      <div v-else class="space-y-1.5">
+                        <div v-for="ans in getQuestionAnswers(q.id)" :key="ans.id"
+                          class="flex items-center gap-2 text-xs bg-gray-50 rounded-xl px-3 py-2">
+                          <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0">
+                            <i class="fas fa-building"></i>
+                          </span>
+                          <div class="flex-1 min-w-0">
+                            <p class="font-bold text-gray-800 truncate">{{ ans.opd_name }}</p>
+                            <p v-if="ans.penulis" class="text-[10px] text-gray-500 truncate">
+                              oleh {{ ans.penulis }}
+                              <span :class="ans.jawaban === 'ya' ? 'text-emerald-600 font-bold' : 'text-gray-500 font-bold'">
+                                · {{ ans.jawaban === 'ya' ? 'Ya' : 'Tidak' }}
+                              </span>
+                            </p>
+                          </div>
+                          <a v-for="lnk in ans.links" :key="lnk.id" :href="lnk.link" target="_blank" rel="noopener"
+                            class="shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-[#0052FF] hover:bg-blue-50 hover:border-blue-300 transition-all"
+                            :title="lnk.judul || lnk.link">
+                            <i class="fas fa-external-link-alt mr-1"></i>{{ lnk.judul ? (lnk.judul.length > 20 ? lnk.judul.substring(0, 20) + '…' : lnk.judul) : 'Lihat' }}
+                          </a>
+                          <span v-if="!ans.links?.length" class="text-[10px] text-gray-400 italic shrink-0">tanpa link</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+</div>
           </div>
         </div>
       </template>
