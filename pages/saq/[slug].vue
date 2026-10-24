@@ -573,27 +573,21 @@ const opd = computed(() =>
   (opdsResponse.value?.data || []).find(o => o.slug === route.params.slug)
 )
 
-// Mode full: halaman kabupaten-sinjai menampilkan SEMUA pertanyaan, khusus superadmin
-const isFullMode = computed(() => route.params.slug === 'kabupaten-sinjai')
-
-// Guard: kabupaten-sinjai hanya untuk superadmin
-watch([opd, isFullMode], ([o, full]) => {
-  if (full && o && !authStore.isSuperAdmin) {
-    router.push('/login')
-  }
-}, { immediate: true })
+// Kabupaten-sinjai adalah halaman OPD 127 biasa (19 pertanyaan OPD-nya sendiri),
+// BUKAN mode full 203 khusus superadmin: tidak ada guard login di sini, agar
+// pengunjung publik melihat daftar pertanyaan Kabupaten seperti OPD lain.
+// (Perbaikan 24 Okt 2026: guard lama memanggil router.push tanpa useRouter(),
+// sehingga halaman kosong dengan ReferenceError: router is not defined.)
+const isFullMode = computed(() => false)
 
 // Struktur SAQ + jawaban
 const { data: structResponse, isLoading, refetch: refetchStruct } = useQuery({
-  queryKey: ['saq-structure', computed(() => opd.value?.id), isFullMode],
+  queryKey: ['saq-structure', computed(() => opd.value?.id)],
   queryFn: async () => {
     if (!opd.value) return null
-    const params = isFullMode.value
-      ? { full: 1 }
-      : { organization_id: opd.value.id }
-    return (await api.get('/saq/structure', { params })).data
+    return (await api.get('/saq/structure', { params: { organization_id: opd.value.id } })).data
   },
-  enabled: computed(() => !!opd.value && (!isFullMode.value || authStore.isSuperAdmin)),
+  enabled: computed(() => !!opd.value),
 })
 const tabs = computed(() => structResponse.value?.data || [])
 
@@ -601,7 +595,7 @@ const tabs = computed(() => structResponse.value?.data || [])
 const { data: allAnswersResponse } = useQuery({
   queryKey: ['saq-all-answers'],
   queryFn: async () => (await api.get('/saq/all-answers')).data,
-  enabled: computed(() => isFullMode.value && authStore.isSuperAdmin),
+  enabled: computed(() => false), // mode full dinonaktifkan: tidak ada halaman full 203 lagi
   staleTime: 0,
 })
 const allAnswers = computed(() => allAnswersResponse.value?.data || {})
