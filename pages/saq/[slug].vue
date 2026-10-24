@@ -397,6 +397,28 @@
                 class="w-full py-2.5 rounded-2xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-sm font-bold hover:bg-blue-50 transition-all">
                 <i class="fas fa-plus mr-2"></i>Tambah {{ modal.question?.input_type === 'situs' ? 'Link Situs' : modal.question?.input_type === 'foto' ? 'Link Foto' : 'Link Dokumen' }}
               </button>
+              <!-- Tipe FOTO jalur 2: upload foto ke Galeri publik -->
+              <div v-if="modal.question?.input_type === 'foto'"
+                class="p-3 rounded-2xl border-2 border-violet-200 bg-violet-50/50 space-y-2">
+                <p class="text-xs font-extrabold text-violet-700"><i class="fas fa-cloud-upload-alt mr-1"></i>Upload Foto ke Galeri</p>
+                <p class="text-xs text-gray-500">Opsional: foto diunggah ke Galeri publik web (halaman Galeri), dan link-nya otomatis tersimpan sebagai bukti jawaban ini. Bisa dipakai sendiri tanpa link, atau digabung dengan link di atas.</p>
+                <input type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" @change="onFotoFileChange"
+                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                <div v-if="fotoPreview" class="flex items-center gap-3">
+                  <img :src="fotoPreview" class="w-20 h-20 object-cover rounded-xl border border-gray-200" alt="Pratinjau foto" />
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold truncate">{{ fotoFile?.name }}</p>
+                    <p class="text-[11px] text-gray-500">{{ fotoFile ? (fotoFile.size / 1024).toFixed(0) + ' KB' : '' }}</p>
+                  </div>
+                  <button type="button" @click="removeFotoFile" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
+                </div>
+                <input v-model="form.fotoJudul" :required="!!fotoFile" type="text" placeholder="Judul foto * (wajib bila mengunggah foto)"
+                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                <label class="block text-xs font-bold text-gray-700">Tanggal upload</label>
+                <input v-model="form.fotoTanggal" type="date"
+                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                <p class="text-xs text-gray-500">Tanggal upload bisa diubah; berbeda dari tanggal simpan jawaban (created_at). Default: hari ini.</p>
+              </div>
               <p v-if="syncMsg" class="text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
             </div>
 
@@ -470,6 +492,32 @@ const modal = ref({ open: false, question: null, existing: null })
 const form = ref({ judul: '', link: '', klasifikasi: '', deskripsi: '' })
 const submitting = ref(false)
 const formError = ref('')
+const fotoFile = ref(null)
+const fotoPreview = ref('')
+const todayLocal = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+const onFotoFileChange = (e) => {
+  const f = e.target.files && e.target.files[0]
+  formError.value = ''
+  if (!f) { fotoFile.value = null; fotoPreview.value = ''; return }
+  if (!f.type.startsWith('image/')) {
+    formError.value = 'File harus berupa gambar.'
+    e.target.value = ''; fotoFile.value = null; fotoPreview.value = ''; return
+  }
+  if (f.size > 2 * 1024 * 1024) {
+    formError.value = 'Ukuran foto maksimal 2 MB.'
+    e.target.value = ''; fotoFile.value = null; fotoPreview.value = ''; return
+  }
+  fotoFile.value = f
+  if (fotoPreview.value) URL.revokeObjectURL(fotoPreview.value)
+  fotoPreview.value = URL.createObjectURL(f)
+}
+const removeFotoFile = () => {
+  fotoFile.value = null
+  if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
+}
 const syncing = ref(false)
 const syncMsg = ref('')
 const syncFound = ref(false)
@@ -536,7 +584,9 @@ const openAnswerModal = async (q) => {
   formError.value = ''
   syncMsg.value = ''
   modal.value = { open: true, question: q, existing: null }
-  form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '' }] }
+  form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '' }], fotoJudul: '', fotoTanggal: todayLocal() }
+  fotoFile.value = null
+  if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
   if (q.terisi && opd.value) {
     try {
       const res = await api.get('/saq/answers', { params: { organization_id: opd.value.id } })
@@ -588,30 +638,62 @@ const submitAnswer = async () => {
   const links = form.value.jawaban === 'ya'
     ? form.value.links.filter(l => l.link.trim() && (inputType === 'dokumen' ? l.judul.trim() : true))
     : []
-  if (form.value.jawaban === 'ya' && !links.length) {
+  const isFotoUpload = form.value.jawaban === 'ya' && inputType === 'foto' && !!fotoFile.value
+  if (form.value.jawaban === 'ya' && !links.length && !isFotoUpload) {
     const tipeLabel = inputType === 'situs' ? 'link situs' : inputType === 'foto' ? 'link foto' : 'link dokumen'
-    formError.value = `Jawaban "Ya" wajib disertai minimal satu ${tipeLabel}.`
+    formError.value = `Jawaban "Ya" wajib disertai minimal satu ${tipeLabel} atau satu foto upload.`
+    return
+  }
+  if (isFotoUpload && !form.value.fotoJudul.trim()) {
+    formError.value = 'Judul foto wajib diisi bila mengunggah foto.'
     return
   }
   submitting.value = true
   formError.value = ''
   try {
-    await api.post('/saq/answers', {
-      organization_id: opd.value.id,
-      indicator_id: modal.value.question.id,
-      jawaban: form.value.jawaban,
-      visibility: form.value.visibility,
-      links: links.map(l => ({ judul: l.judul.trim(), link: l.link.trim(), deskripsi: (l.deskripsi || '').trim() || null })),
-    }, { skipAuthRedirect: true })
+    if (isFotoUpload) {
+      // Multipart: axios instance memaksa Content-Type application/json,
+      // jadi pakai fetch agar browser menyetel boundary multipart sendiri.
+      const fd = new FormData()
+      fd.append('organization_id', String(opd.value.id))
+      fd.append('indicator_id', String(modal.value.question.id))
+      fd.append('jawaban', form.value.jawaban)
+      fd.append('visibility', form.value.visibility)
+      links.forEach((l, i) => {
+        fd.append(`links[${i}][judul]`, l.judul.trim())
+        fd.append(`links[${i}][link]`, l.link.trim())
+        fd.append(`links[${i}][deskripsi]`, (l.deskripsi || '').trim())
+      })
+      fd.append('foto', fotoFile.value)
+      fd.append('judul_foto', form.value.fotoJudul.trim())
+      if (form.value.fotoTanggal) fd.append('tanggal_upload', form.value.fotoTanggal)
+      const token = localStorage.getItem('ppid_token')
+      const res = await fetch(`${api.defaults.baseURL}/saq/answers`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: fd,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Gagal menyimpan jawaban.')
+    } else {
+      await api.post('/saq/answers', {
+        organization_id: opd.value.id,
+        indicator_id: modal.value.question.id,
+        jawaban: form.value.jawaban,
+        visibility: form.value.visibility,
+        links: links.map(l => ({ judul: l.judul.trim(), link: l.link.trim(), deskripsi: (l.deskripsi || '').trim() || null })),
+      }, { skipAuthRedirect: true })
+    }
     modal.value.open = false
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
   } catch (e) {
-    formError.value = e.response?.data?.message || 'Gagal menyimpan jawaban.'
+    formError.value = e.response?.data?.message || e.message || 'Gagal menyimpan jawaban.'
   } finally {
     submitting.value = false
   }
 }
+
 </script>
 
 <style scoped>
