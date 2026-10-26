@@ -27,12 +27,12 @@
               <svg viewBox="0 0 80 80" class="w-20 h-20 -rotate-90">
                 <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8"/>
                 <circle cx="40" cy="40" r="34" fill="none" stroke="#22d3ee" stroke-width="8" stroke-linecap="round"
-                  :stroke-dasharray="`${(opd.progres.persen / 100) * 213.6} 213.6`" class="transition-all duration-700"/>
+                  :stroke-dasharray="`${(headerProgres.persen / 100) * 213.6} 213.6`" class="transition-all duration-700"/>
               </svg>
-              <span class="absolute inset-0 flex items-center justify-center text-white font-extrabold">{{ opd.progres.persen }}%</span>
+              <span class="absolute inset-0 flex items-center justify-center text-white font-extrabold">{{ headerProgres.persen }}%</span>
             </div>
             <div class="text-white">
-              <p class="text-2xl font-extrabold">{{ opd.progres.terisi }}<span class="text-base text-blue-200">/{{ opd.progres.total }}</span></p>
+              <p class="text-2xl font-extrabold">{{ headerProgres.terisi }}<span class="text-base text-blue-200">/{{ headerProgres.total }}</span></p>
               <p class="text-xs text-blue-200">pertanyaan terisi</p>
             </div>
           </div>
@@ -573,19 +573,18 @@ const opd = computed(() =>
   (opdsResponse.value?.data || []).find(o => o.slug === route.params.slug)
 )
 
-// Kabupaten-sinjai adalah halaman OPD 127 biasa (19 pertanyaan OPD-nya sendiri),
-// BUKAN mode full 203 khusus superadmin: tidak ada guard login di sini, agar
-// pengunjung publik melihat daftar pertanyaan Kabupaten seperti OPD lain.
-// (Perbaikan 24 Okt 2026: guard lama memanggil router.push tanpa useRouter(),
-// sehingga halaman kosong dengan ReferenceError: router is not defined.)
-const isFullMode = computed(() => false)
+// Mode full Kabupaten (perintah Yusril 26 Okt 2026): halaman kabupaten-sinjai
+// menampilkan SEMUA 203 pertanyaan, dan di bawah tiap soal tampil list jawaban
+// semua OPD yang menjawab soal itu. Tanpa guard login: publik bisa melihat
+// konsolidasi ini, sama seperti halaman OPD lain.
+const isFullMode = computed(() => route.params.slug === 'kabupaten-sinjai')
 
 // Struktur SAQ + jawaban
 const { data: structResponse, isLoading, refetch: refetchStruct } = useQuery({
   queryKey: ['saq-structure', computed(() => opd.value?.id)],
   queryFn: async () => {
     if (!opd.value) return null
-    return (await api.get('/saq/structure', { params: { organization_id: opd.value.id } })).data
+    return (await api.get('/saq/structure', { params: isFullMode.value ? { full: 1 } : { organization_id: opd.value.id } })).data
   },
   enabled: computed(() => !!opd.value),
   // SAQ tidak boleh pakai cache: selalu fetch ulang tiap buka halaman
@@ -594,11 +593,20 @@ const { data: structResponse, isLoading, refetch: refetchStruct } = useQuery({
 })
 const tabs = computed(() => structResponse.value?.data || [])
 
+// Header progres: mode full memakai total/terisi dari struktur full (203 soal,
+// terisi = soal yang punya minimal satu jawaban OPD), bukan progres OPD 127 (19).
+const headerProgres = computed(() => {
+  if (!isFullMode.value) return opd.value?.progres || { terisi: 0, total: 0, persen: 0 }
+  const total = tabs.value.reduce((s, t) => s + t.sections.reduce((a, x) => a + x.total, 0), 0)
+  const terisi = tabs.value.reduce((s, t) => s + t.sections.reduce((a, x) => a + x.terisi, 0), 0)
+  return { terisi, total, persen: total > 0 ? Math.round(terisi / total * 100) : 0 }
+})
+
 // Konsolidasi jawaban semua OPD (hanya mode full)
 const { data: allAnswersResponse } = useQuery({
   queryKey: ['saq-all-answers'],
   queryFn: async () => (await api.get('/saq/all-answers')).data,
-  enabled: computed(() => false), // mode full dinonaktifkan: tidak ada halaman full 203 lagi
+  enabled: computed(() => isFullMode.value),
   staleTime: 0,
 })
 const allAnswers = computed(() => allAnswersResponse.value?.data || {})
