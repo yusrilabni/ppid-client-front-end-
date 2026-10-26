@@ -26,6 +26,14 @@ export default defineNuxtPlugin((nuxtApp) => {
       queryClient,
       persister: localStoragePersister,
       maxAge: 1000 * 60 * 60 * 24,
+      // SAQ dikecualikan dari cache localStorage: datanya harus selalu segar,
+      // jangan pernah menampilkan total/progres SAQ lama dari penyimpanan lokal
+      dehydrateOptions: {
+        shouldDehydrateQuery: (query) => {
+          const key = query.queryKey[0]
+          return typeof key !== 'string' || !key.startsWith('saq-')
+        },
+      },
     })
   }
 

@@ -588,6 +588,9 @@ const { data: structResponse, isLoading, refetch: refetchStruct } = useQuery({
     return (await api.get('/saq/structure', { params: { organization_id: opd.value.id } })).data
   },
   enabled: computed(() => !!opd.value),
+  // SAQ tidak boleh pakai cache: selalu fetch ulang tiap buka halaman
+  staleTime: 0,
+  refetchOnWindowFocus: true,
 })
 const tabs = computed(() => structResponse.value?.data || [])
 

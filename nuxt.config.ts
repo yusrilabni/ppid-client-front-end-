@@ -13,6 +13,9 @@ export default defineNuxtConfig({
     '/permohonan-informasi': { redirect: { to: '/laporan/permohonan/create', statusCode: 301 } },
     // Proxy sitemap dokumen dinamis - Nitro langsung proxy ke backend
     '/sitemap-docs.xml': { proxy: 'https://ppidkab.sinjaikab.go.id/api/v1/sitemap' },
+    // SAQ tidak boleh di-cache browser/CDN: selalu ambil data terbaru
+    '/saq': { headers: { 'cache-control': 'no-store, no-cache, must-revalidate' } },
+    '/saq/**': { headers: { 'cache-control': 'no-store, no-cache, must-revalidate' } },
   },
   css: [
     '~/assets/css/index.css',
