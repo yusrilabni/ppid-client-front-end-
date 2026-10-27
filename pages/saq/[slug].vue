@@ -273,7 +273,7 @@
 
     <!-- MODAL JAWABAN -->
     <Transition name="modal">
-      <div v-if="modal.open" class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-6">
+      <div v-if="modal.open" class="fixed inset-0 z-[1000] flex items-end md:items-center justify-center p-0 md:p-6">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="modal.open = false"></div>
         <div class="relative bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-3xl p-6 md:p-8 shadow-2xl max-h-[92vh] overflow-y-auto">
           <div class="flex items-start justify-between mb-1">
@@ -349,94 +349,102 @@
               </div>
             </div>
 
-            <!-- DAFTAR LINK (hanya bila Ya) - dinamis per input_type -->
+            <!-- 2 TAB BUKTI (hanya bila Ya): Upload Dokumen / Link -->
             <div v-if="form.jawaban === 'ya'" class="space-y-3">
-              <div v-for="(l, idx) in form.links" :key="idx"
-                class="p-3 rounded-2xl border-2 border-blue-100 bg-blue-50/40 space-y-2">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-extrabold text-[#0052FF]">
-                    {{ modal.question?.input_type === 'foto' ? 'Foto ' : modal.question?.input_type === 'situs' ? 'Situs ' : 'Dokumen ' }}{{ idx + 1 }}
-                  </span>
-                  <button v-if="form.links.length > 1" type="button" @click="form.links.splice(idx, 1)"
-                    class="text-xs font-bold text-rose-500 hover:text-rose-700">
-                    <i class="fas fa-trash-alt mr-1"></i>Hapus
-                  </button>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" @click="answerTab = 'dokumen'"
+                  class="py-2.5 rounded-2xl font-bold text-sm border-2 transition-all"
+                  :class="answerTab === 'dokumen' ? 'bg-[#0052FF] border-[#0052FF] text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-blue-300'">
+                  <i class="fas fa-cloud-upload-alt mr-1.5"></i>Upload Dokumen
+                </button>
+                <button type="button" @click="answerTab = 'link'"
+                  class="py-2.5 rounded-2xl font-bold text-sm border-2 transition-all"
+                  :class="answerTab === 'link' ? 'bg-[#0052FF] border-[#0052FF] text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-blue-300'">
+                  <i class="fas fa-link mr-1.5"></i>Link
+                </button>
+              </div>
+              <p class="text-xs text-gray-500">Cukup isi salah satu tab saja: dokumen saja atau link saja. Bisa juga diisi keduanya.</p>
+
+              <!-- TAB UPLOAD DOKUMEN -->
+              <div v-if="answerTab === 'dokumen'" class="space-y-3">
+                <div v-for="(u, uidx) in docUploads" :key="uidx"
+                  class="p-3 rounded-2xl border-2 border-blue-100 bg-blue-50/40 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-[#0052FF]"><i class="fas fa-file-alt mr-1"></i>Dokumen {{ uidx + 1 }} — {{ u.file?.name || u.name || '' }}</span>
+                    <button type="button" @click="docUploads.splice(uidx, 1)"
+                      class="text-xs font-bold text-rose-500 hover:text-rose-700"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>
+                  </div>
+                  <p class="text-[11px] text-gray-500">{{ u.file ? (u.file.size / 1024).toFixed(0) + ' KB' : '' }} · PDF / DOC / DOCX / XLS / XLSX / PPT, maks 10 MB per file.</p>
+                  <input v-model="u.judul" required type="text" placeholder="Judul dokumen *"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                  <input v-model="u.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
+                    class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
+                  <label v-if="modal.question?.input_type === 'dokumen' || !modal.question?.input_type"
+                    class="flex items-start gap-2 text-xs text-gray-700 cursor-pointer">
+                    <input type="checkbox" v-model="u.jadikanInformasi" class="mt-0.5 w-4 h-4 accent-[#0052FF]" />
+                    <span><strong>Jadikan Informasi {{ modal.question?.target_upload === 'pemkab' ? 'Pemkab' : '' }}</strong> — bila dimatikan (default), file ini hanya lampiran jawaban, <strong>tidak</strong> masuk daftar Informasi / Informasi Pemkab.</span>
+                  </label>
+                  <p v-else class="text-xs text-gray-500">File ini hanya lampiran jawaban, tidak masuk daftar Informasi.</p>
                 </div>
-                <!-- Tipe DOKUMEN: hybrid — dokumen baru ATAU pakai dokumen PPID yang sudah ada -->
-                <template v-if="modal.question?.input_type === 'dokumen' || !modal.question?.input_type">
-                  <div class="grid grid-cols-2 gap-2">
-                    <button type="button" @click="l.mode = 'baru'; l.sync = null; l.syncError = ''"
-                      class="py-2 rounded-xl font-bold text-xs border-2 transition-all"
-                      :class="l.mode !== 'sync_ppid' ? 'bg-[#0052FF] border-[#0052FF] text-white' : 'bg-white border-gray-200 text-gray-500'">
-                      <i class="fas fa-file-alt mr-1"></i>Buat dokumen baru
-                    </button>
-                    <button type="button" @click="l.mode = 'sync_ppid'; l.sync = null; l.syncError = ''"
-                      class="py-2 rounded-xl font-bold text-xs border-2 transition-all"
-                      :class="l.mode === 'sync_ppid' ? 'bg-cyan-600 border-cyan-600 text-white' : 'bg-white border-gray-200 text-gray-500'">
-                      <i class="fas fa-sync-alt mr-1"></i>Pakai dokumen PPID
+                <input type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" @change="onDocFilesChange"
+                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                <p class="text-xs text-gray-500">Boleh lebih dari 1 file. File lampiran tidak masuk Informasi kecuali toggle di atas diaktifkan.</p>
+              </div>
+
+              <!-- TAB LINK -->
+              <div v-if="answerTab === 'link'" class="space-y-3">
+                <div v-for="(l, idx) in form.links" :key="idx"
+                  class="p-3 rounded-2xl border-2 border-blue-100 bg-blue-50/40 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-[#0052FF]">
+                      {{ modal.question?.input_type === 'foto' ? 'Foto ' : modal.question?.input_type === 'situs' ? 'Situs ' : 'Link ' }}{{ idx + 1 }}
+                    </span>
+                    <button v-if="form.links.length > 1" type="button" @click="form.links.splice(idx, 1)"
+                      class="text-xs font-bold text-rose-500 hover:text-rose-700">
+                      <i class="fas fa-trash-alt mr-1"></i>Hapus
                     </button>
                   </div>
-                  <!-- Mode SYNC: hanya link detail PPID, judul dari data asli (read-only) -->
-                  <template v-if="l.mode === 'sync_ppid'">
-                    <div class="flex gap-2">
-                      <input v-model="l.link" required type="url" placeholder="https://ppid.sinjaikab.go.id/informasi/... *"
-                        class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                      <button type="button" @click="syncFromPpid(idx)" :disabled="syncing || !l.link"
-                        class="shrink-0 px-3 py-2.5 rounded-xl bg-cyan-600 text-white text-xs font-bold hover:bg-cyan-700 disabled:opacity-40 transition-all"
-                        title="Sinkronisasi dari web PPID">
-                        <i :class="syncing ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i> Sinkronisasi
-                      </button>
-                    </div>
-                    <p class="text-xs text-gray-500">Hanya link detail PPID yang diterima di mode ini. Dokumen tidak dibuat ulang di Informasi — hanya link detail ini yang disimpan sebagai bukti jawaban SAQ.</p>
-                    <input :value="l.sync?.judul || ''" readonly type="text" placeholder="Judul terisi otomatis setelah sinkronisasi"
-                      class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 outline-none transition-all text-sm" />
-                    <div v-if="l.sync?.found" class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-gray-700 space-y-1">
-                      <p class="font-bold text-emerald-700"><i class="fas fa-check-circle mr-1"></i>Ditemukan di PPID ({{ l.sync.sumber === 'informasi_pemkab' ? 'Informasi Pemkab' : 'Informasi PPID' }})</p>
-                      <p><span class="text-gray-500">Judul:</span> {{ l.sync.judul }}</p>
-                      <p v-if="l.sync.kategori"><span class="text-gray-500">Kategori:</span> {{ l.sync.kategori }}</p>
-                      <p v-if="l.sync.tanggal"><span class="text-gray-500">Tanggal:</span> {{ l.sync.tanggal }}</p>
-                      <p v-if="l.sync.pengupload"><span class="text-gray-500">Pengupload:</span> {{ l.sync.pengupload }}<span v-if="l.sync.opd"> ({{ l.sync.opd }})</span></p>
-                      <p v-if="l.sync.file_url"><a :href="l.sync.file_url" target="_blank" class="text-[#0052FF] font-bold underline">Lihat file dokumen</a></p>
-                      <p><a :href="l.link" target="_blank" class="text-[#0052FF] font-bold underline">Buka halaman detail PPID</a></p>
-                    </div>
-                    <p v-if="l.syncError" class="text-xs text-rose-600">{{ l.syncError }}</p>
-                  </template>
-                  <!-- Mode BARU: perilaku lama (judul + link, tetap membuat dokumen saat simpan) -->
-                  <template v-else>
-                    <input v-model="l.judul" required type="text" placeholder="Judul dokumen *"
-                      class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                    <div class="flex gap-2">
-                      <input v-model="l.link" required type="url" placeholder="https://drive.google.com/... *"
-                        class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                      <button type="button" @click="syncFromPpid(idx)" :disabled="syncing || !l.link"
-                        class="shrink-0 px-3 py-2.5 rounded-xl bg-cyan-50 text-cyan-700 text-xs font-bold hover:bg-cyan-100 disabled:opacity-40 transition-all"
-                        title="Isi otomatis judul/deskripsi dari data PPID bila link sudah ada (tetap membuat dokumen baru saat simpan)">
-                        <i :class="syncing ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i>
-                      </button>
-                    </div>
-                    <input v-model="l.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
-                      class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
-                  </template>
-                </template>
-                <!-- Tipe FOTO: link foto langsung (tanpa judul wajib) -->
-                <template v-else-if="modal.question?.input_type === 'foto'">
-                  <input v-model="l.link" required type="url" placeholder="Link foto (https://...) *"
+                  <div class="flex gap-2">
+                    <input v-model="l.link" required type="url" placeholder="https://... * (medsos, situs, Drive, atau link detail PPID)"
+                      class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                    <button v-if="isPpidDetailUrl(l.link)" type="button" @click="syncFromPpid(idx)" :disabled="syncing || !l.link"
+                      class="shrink-0 px-3 py-2.5 rounded-xl bg-cyan-600 text-white text-xs font-bold hover:bg-cyan-700 disabled:opacity-40 transition-all"
+                      title="Sinkronisasi dari web PPID">
+                      <i :class="syncing ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i> Sinkronisasi
+                    </button>
+                  </div>
+                  <p v-if="l.link && !isPpidDetailUrl(l.link)" class="text-xs text-gray-500">Link apa saja boleh (medsos, situs, Drive, dll) — disimpan sebagai link biasa, tanpa wajib sinkronisasi.</p>
+                  <p v-if="l.link && isPpidDetailUrl(l.link)" class="text-xs text-cyan-700">Link detail PPID terdeteksi — tekan Sinkronisasi untuk mengisi judul otomatis tanpa membuat dokumen baru.</p>
+                  <input v-model="l.judul" :required="!!l.jadikanInformasi" type="text" :placeholder="l.mode === 'sync_ppid' ? 'Judul terisi otomatis setelah sinkronisasi' : 'Judul / keterangan (opsional, wajib bila dijadikan Informasi)'"
+                    :readonly="l.mode === 'sync_ppid'"
                     class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                  <input v-model="l.judul" type="text" placeholder="Keterangan foto (opsional)"
+                  <input v-model="l.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
                     class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
-                  <p class="text-xs text-gray-500"><i class="fas fa-info-circle mr-1"></i>Bisa link Google Drive, atau URL gambar langsung</p>
-                </template>
-                <!-- Tipe SITUS: URL saja (tanpa judul) -->
-                <template v-else-if="modal.question?.input_type === 'situs'">
-                  <input v-model="l.link" required type="url" placeholder="https://situs-pemkab.go.id *"
-                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                  <p class="text-xs text-gray-500"><i class="fas fa-globe mr-1"></i>Masukkan alamat situs/web langsung</p>
-                </template>
+                  <div v-if="l.sync?.found" class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-gray-700 space-y-1">
+                    <p class="font-bold text-emerald-700"><i class="fas fa-check-circle mr-1"></i>Ditemukan di PPID ({{ l.sync.sumber === 'informasi_pemkab' ? 'Informasi Pemkab' : 'Informasi PPID' }})</p>
+                    <p><span class="text-gray-500">Judul:</span> {{ l.sync.judul }}</p>
+                    <p v-if="l.sync.kategori"><span class="text-gray-500">Kategori:</span> {{ l.sync.kategori }}</p>
+                    <p v-if="l.sync.tanggal"><span class="text-gray-500">Tanggal:</span> {{ l.sync.tanggal }}</p>
+                    <p v-if="l.sync.pengupload"><span class="text-gray-500">Pengupload:</span> {{ l.sync.pengupload }}<span v-if="l.sync.opd"> ({{ l.sync.opd }})</span></p>
+                    <p v-if="l.sync.file_url"><a :href="l.sync.file_url" target="_blank" class="text-[#0052FF] font-bold underline">Lihat file dokumen</a></p>
+                    <p><a :href="l.link" target="_blank" class="text-[#0052FF] font-bold underline">Buka halaman detail PPID</a></p>
+                  </div>
+                  <p v-if="l.syncError" class="text-xs text-rose-600">{{ l.syncError }}</p>
+                  <label v-if="(modal.question?.input_type === 'dokumen' || !modal.question?.input_type) && l.mode !== 'sync_ppid'"
+                    class="flex items-start gap-2 text-xs text-gray-700 cursor-pointer">
+                    <input type="checkbox" v-model="l.jadikanInformasi" class="mt-0.5 w-4 h-4 accent-[#0052FF]" />
+                    <span><strong>Jadikan Informasi {{ modal.question?.target_upload === 'pemkab' ? 'Pemkab' : '' }}</strong> — bila dimatikan (default), link ini hanya bukti jawaban, <strong>tidak</strong> masuk daftar Informasi / Informasi Pemkab.</span>
+                  </label>
+                </div>
+                <button type="button" @click="form.links.push({ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false })"
+                  class="w-full py-2.5 rounded-2xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-sm font-bold hover:bg-blue-50 transition-all">
+                  <i class="fas fa-plus mr-2"></i>Tambah {{ modal.question?.input_type === 'situs' ? 'Link Situs' : modal.question?.input_type === 'foto' ? 'Link Foto' : 'Link' }}
+                </button>
               </div>
-              <button type="button" @click="form.links.push({ judul: '', link: '', deskripsi: '', mode: 'baru', sync: null, syncError: '' })"
-                class="w-full py-2.5 rounded-2xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-sm font-bold hover:bg-blue-50 transition-all">
-                <i class="fas fa-plus mr-2"></i>Tambah {{ modal.question?.input_type === 'situs' ? 'Link Situs' : modal.question?.input_type === 'foto' ? 'Link Foto' : 'Link Dokumen' }}
-              </button>
+              <p v-if="syncMsg" class="text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
+            </div>
+
+            <div v-if="form.jawaban === 'ya'" class="space-y-3">
               <!-- Tipe FOTO jalur 2: upload foto ke Galeri publik -->
               <div v-if="modal.question?.input_type === 'foto'"
                 class="p-3 rounded-2xl border-2 border-violet-200 bg-violet-50/50 space-y-2">
@@ -459,7 +467,6 @@
                   class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
                 <p class="text-xs text-gray-500">Tanggal upload bisa diubah; berbeda dari tanggal simpan jawaban (created_at). Default: hari ini.</p>
               </div>
-              <p v-if="syncMsg" class="text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
             </div>
 
             <!-- INFO (bila Tidak) -->
@@ -469,7 +476,7 @@
               OPD dinyatakan <strong>tidak memiliki</strong> indikator ini — tidak perlu mengisi link dokumen.
             </div>
 
-            <div v-if="form.jawaban === 'ya'">
+            <div v-if="form.jawaban === 'ya' && showVisibility">
               <label class="block text-xs font-bold text-gray-700 mb-1.5">Visibilitas Dokumen *</label>
               <div class="grid grid-cols-2 gap-2">
                 <button type="button" @click="form.visibility = 'public'"
@@ -492,6 +499,7 @@
                 <span v-else>Dokumen hanya terlihat oleh unit OPD penyedia (tidak tampil publik).</span>
               </p>
             </div>
+            <p v-if="form.jawaban === 'ya' && !showVisibility" class="text-[11px] text-gray-500">Visibilitas publik tidak berlaku untuk link / lampiran saja — hanya berlaku bila ada bukti yang dijadikan Informasi.</p>
             <div v-if="formError" class="p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-600">{{ formError }}</div>
             <button type="submit" :disabled="submitting"
               class="w-full py-3 rounded-2xl bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white font-bold text-sm shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 disabled:opacity-50 transition-all">
@@ -529,6 +537,8 @@ useSeoMeta({
 const activeTab = ref(0)
 const openSections = ref([])
 const modal = ref({ open: false, question: null, existing: null })
+const answerTab = ref('dokumen')
+const docUploads = ref([])
 const form = ref({ judul: '', link: '', klasifikasi: '', deskripsi: '' })
 const submitting = ref(false)
 const formError = ref('')
@@ -557,6 +567,28 @@ const onFotoFileChange = (e) => {
 const removeFotoFile = () => {
   fotoFile.value = null
   if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
+}
+const showVisibility = computed(() => {
+  if (form.value.jawaban !== 'ya') return false
+  const qt = modal.value.question?.input_type || 'dokumen'
+  if (qt !== 'dokumen') return false
+  const linkInfo = form.value.links.some(l => l.mode === 'sync_ppid' ? false : (l.jadikanInformasi && l.link.trim()))
+  const uploadInfo = docUploads.value.some(u => u.jadikanInformasi && u.file)
+  // Legacy: link lama yang dulu mode 'baru' tetap dihitung bila toggle-nya hidup (diisi saat open).
+  return linkInfo || uploadInfo
+})
+const DOC_EXTS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+const onDocFilesChange = (e) => {
+  const files = Array.from(e.target.files || [])
+  formError.value = ''
+  for (const f of files) {
+    const ext = (f.name.split('.').pop() || '').toLowerCase()
+    if (!DOC_EXTS.includes(ext)) { formError.value = `File ${f.name} ditolak: hanya PDF / DOC / DOCX / XLS / XLSX / PPT.`; continue }
+    if (f.size > 10 * 1024 * 1024) { formError.value = `File ${f.name} ditolak: maks 10 MB per file.`; continue }
+    const base = f.name.replace(/\.[^.]+$/, '')
+    docUploads.value.push({ file: f, judul: base, deskripsi: '', jadikanInformasi: false })
+  }
+  e.target.value = ''
 }
 const syncing = ref(false)
 const syncMsg = ref('')
@@ -629,7 +661,9 @@ const openAnswerModal = async (q) => {
   formError.value = ''
   syncMsg.value = ''
   modal.value = { open: true, question: q, existing: null }
-  form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '', mode: 'baru', sync: null, syncError: '' }], fotoJudul: '', fotoTanggal: todayLocal() }
+  answerTab.value = 'dokumen'
+  docUploads.value = []
+  form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }], fotoJudul: '', fotoTanggal: todayLocal() }
   fotoFile.value = null
   if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
   if (q.terisi && opd.value) {
@@ -641,8 +675,8 @@ const openAnswerModal = async (q) => {
         form.value.jawaban = found.jawaban || null
         form.value.visibility = found.visibility || 'public'
         form.value.links = (found.links && found.links.length)
-          ? found.links.map(l => ({ judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', mode: l.sumber_informasi ? 'sync_ppid' : 'baru', sync: l.sumber_informasi ? { found: true, judul: l.judul || '', sumber: l.sumber_informasi, kategori: '', tanggal: '', pengupload: '', opd: '', file_url: '' } : null, syncError: '' }))
-          : [{ judul: found.judul || '', link: found.link || '', deskripsi: '', mode: 'baru', sync: null, syncError: '' }]
+          ? found.links.map(l => ({ judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', mode: (l.sumber_informasi === 'informasi' || l.sumber_informasi === 'informasi_pemkab') ? 'sync_ppid' : 'link', sync: (l.sumber_informasi === 'informasi' || l.sumber_informasi === 'informasi_pemkab') ? { found: true, judul: l.judul || '', sumber: l.sumber_informasi, kategori: '', tanggal: '', pengupload: '', opd: '', file_url: '' } : null, syncError: '', jadikanInformasi: (modal.value.question?.input_type || 'dokumen') === 'dokumen' && !(l.sumber_informasi === 'informasi' || l.sumber_informasi === 'informasi_pemkab' || l.sumber_informasi === 'link' || l.sumber_informasi === 'lampiran') }))
+          : [{ judul: found.judul || '', link: found.link || '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }]
       }
     } catch (e) { /* abaikan */ }
   }
@@ -660,13 +694,15 @@ const isPpidDetailUrl = (raw) => {
 const syncFromPpid = async (idx = 0) => {
   const target = form.value.links[idx]
   if (!target || !target.link) return
-  // Mode sync hanya menerima link detail PPID; domain lain ditolak di frontend.
-  if (target.mode === 'sync_ppid' && !isPpidDetailUrl(target.link)) {
+  // Sinkronisasi hanya untuk link detail PPID; link lain tetap disimpan sebagai link biasa.
+  if (!isPpidDetailUrl(target.link)) {
     target.sync = null
-    target.syncError = 'Link harus berupa link detail PPID: https://ppid.sinjaikab.go.id/informasi/... (domain lain ditolak di mode ini).'
+    target.syncError = 'Sinkronisasi hanya untuk link detail PPID: https://ppid.sinjaikab.go.id/informasi/... Link lain tetap bisa disimpan sebagai link biasa.'
     syncFound.value = false
     return
   }
+  target.mode = 'sync_ppid'
+  target.jadikanInformasi = false
   target.syncError = ''
   syncing.value = true
   syncMsg.value = ''
@@ -709,17 +745,34 @@ const submitAnswer = async () => {
     return
   }
   const inputType = modal.value.question?.input_type || 'dokumen'
+  const isDokumen = inputType === 'dokumen'
+  // Link tab: mode efektif — sync bila sudah tersync, 'baru' bila toggle Informasi hidup (dokumen saja), sisanya 'link' (link biasa, tanpa Informasi).
   const links = form.value.jawaban === 'ya'
-    ? form.value.links.filter(l => l.link.trim() && (inputType === 'dokumen' ? (l.mode === 'sync_ppid' ? !!(l.sync && l.sync.found) : l.judul.trim()) : true))
+    ? form.value.links.filter(l => l.link.trim()).map(l => ({
+        judul: l.judul.trim(),
+        link: l.link.trim(),
+        deskripsi: (l.deskripsi || '').trim(),
+        mode: (l.mode === 'sync_ppid' && l.sync && l.sync.found) ? 'sync_ppid' : ((isDokumen && l.jadikanInformasi) ? 'baru' : 'link'),
+        sync_url: (l.mode === 'sync_ppid' && l.sync && l.sync.found) ? l.link.trim() : null,
+        raw: l,
+      }))
     : []
+  const uploads = form.value.jawaban === 'ya' ? docUploads.value.filter(u => u.file) : []
   const isFotoUpload = form.value.jawaban === 'ya' && inputType === 'foto' && !!fotoFile.value
-  if (form.value.jawaban === 'ya' && inputType === 'dokumen' && form.value.links.some(l => l.link.trim() && l.mode === 'sync_ppid' && !(l.sync && l.sync.found))) {
-    formError.value = 'Ada baris dokumen PPID yang belum tersinkronisasi: tempel link detail PPID lalu tekan Sinkronisasi sampai detailnya muncul.'
+  if (form.value.jawaban === 'ya' && form.value.links.some(l => l.link.trim() && l.mode === 'sync_ppid' && !(l.sync && l.sync.found))) {
+    formError.value = 'Ada baris link PPID yang belum tersinkronisasi: tekan Sinkronisasi sampai detailnya muncul.'
     return
   }
-  if (form.value.jawaban === 'ya' && !links.length && !isFotoUpload) {
-    const tipeLabel = inputType === 'situs' ? 'link situs' : inputType === 'foto' ? 'link foto' : 'link dokumen'
-    formError.value = `Jawaban "Ya" wajib disertai minimal satu ${tipeLabel} atau satu foto upload.`
+  if (form.value.jawaban === 'ya' && links.some(l => l.mode === 'baru' && !l.judul)) {
+    formError.value = 'Judul wajib diisi untuk link yang dijadikan Informasi.'
+    return
+  }
+  if (form.value.jawaban === 'ya' && uploads.some(u => !u.judul.trim())) {
+    formError.value = 'Judul wajib diisi untuk setiap dokumen yang diunggah.'
+    return
+  }
+  if (form.value.jawaban === 'ya' && !links.length && !uploads.length && !isFotoUpload) {
+    formError.value = 'Jawaban "Ya" wajib disertai minimal satu dokumen upload, satu link, atau satu foto upload.'
     return
   }
   if (isFotoUpload && !form.value.fotoJudul.trim()) {
@@ -729,22 +782,30 @@ const submitAnswer = async () => {
   submitting.value = true
   formError.value = ''
   try {
-    if (isFotoUpload) {
-      // Multipart: axios instance memaksa Content-Type application/json,
-      // jadi pakai fetch agar browser menyetel boundary multipart sendiri.
+    if (uploads.length || isFotoUpload) {
       const fd = new FormData()
       fd.append('organization_id', String(opd.value.id))
       fd.append('indicator_id', String(modal.value.question.id))
       fd.append('jawaban', form.value.jawaban)
       fd.append('visibility', form.value.visibility)
       links.forEach((l, i) => {
-        fd.append(`links[${i}][judul]`, l.judul.trim())
-        fd.append(`links[${i}][link]`, l.link.trim())
-        fd.append(`links[${i}][deskripsi]`, (l.deskripsi || '').trim())
+        fd.append(`links[${i}][judul]`, l.judul)
+        fd.append(`links[${i}][link]`, l.link)
+        fd.append(`links[${i}][deskripsi]`, l.deskripsi)
+        fd.append(`links[${i}][mode]`, l.mode)
+        if (l.sync_url) fd.append(`links[${i}][sync_url]`, l.sync_url)
       })
-      fd.append('foto', fotoFile.value)
-      fd.append('judul_foto', form.value.fotoJudul.trim())
-      if (form.value.fotoTanggal) fd.append('tanggal_upload', form.value.fotoTanggal)
+      uploads.forEach((u, i) => {
+        fd.append('dokumen_files[]', u.file)
+        fd.append('dokumen_judul[]', u.judul.trim())
+        fd.append('dokumen_deskripsi[]', (u.deskripsi || '').trim())
+        fd.append('dokumen_jadikan[]', (isDokumen && u.jadikanInformasi) ? '1' : '0')
+      })
+      if (isFotoUpload) {
+        fd.append('foto', fotoFile.value)
+        fd.append('judul_foto', form.value.fotoJudul.trim())
+        if (form.value.fotoTanggal) fd.append('tanggal_upload', form.value.fotoTanggal)
+      }
       const token = localStorage.getItem('ppid_token')
       const res = await fetch(`${api.defaults.baseURL}/saq/answers`, {
         method: 'POST',
@@ -759,10 +820,11 @@ const submitAnswer = async () => {
         indicator_id: modal.value.question.id,
         jawaban: form.value.jawaban,
         visibility: form.value.visibility,
-        links: links.map(l => ({ judul: l.judul.trim(), link: l.link.trim(), deskripsi: (l.deskripsi || '').trim() || null, mode: l.mode || 'baru', sync_url: l.mode === 'sync_ppid' ? l.link.trim() : null })),
+        links: links.map(l => ({ judul: l.judul, link: l.link, deskripsi: l.deskripsi || null, mode: l.mode, sync_url: l.sync_url })),
       }, { skipAuthRedirect: true })
     }
     modal.value.open = false
+    docUploads.value = []
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
   } catch (e) {
