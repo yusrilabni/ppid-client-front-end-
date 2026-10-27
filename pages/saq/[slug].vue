@@ -349,9 +349,9 @@
               </div>
             </div>
 
-            <!-- 2 TAB BUKTI (hanya bila Ya): Upload Dokumen / Link -->
+            <!-- TAB BUKTI (hanya bila Ya): Upload Dokumen / Link / Galeri (Galeri hanya soal foto) -->
             <div v-if="form.jawaban === 'ya'" class="space-y-3">
-              <div class="grid grid-cols-2 gap-2">
+              <div :class="modal.question?.input_type === 'foto' ? 'grid grid-cols-3 gap-2' : 'grid grid-cols-2 gap-2'">
                 <button type="button" @click="answerTab = 'dokumen'"
                   class="py-2.5 rounded-2xl font-bold text-sm border-2 transition-all"
                   :class="answerTab === 'dokumen' ? 'bg-[#0052FF] border-[#0052FF] text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-blue-300'">
@@ -362,8 +362,13 @@
                   :class="answerTab === 'link' ? 'bg-[#0052FF] border-[#0052FF] text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-blue-300'">
                   <i class="fas fa-link mr-1.5"></i>Link
                 </button>
+                <button v-if="modal.question?.input_type === 'foto'" type="button" @click="answerTab = 'galeri'"
+                  class="py-2.5 rounded-2xl font-bold text-sm border-2 transition-all"
+                  :class="answerTab === 'galeri' ? 'bg-[#0052FF] border-[#0052FF] text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-blue-300'">
+                  <i class="fas fa-images mr-1.5"></i>Galeri
+                </button>
               </div>
-              <p class="text-xs text-gray-500">Cukup isi salah satu tab saja: dokumen saja atau link saja. Bisa juga diisi keduanya.</p>
+              <p class="text-xs text-gray-500">Cukup isi salah satu tab saja: dokumen saja, link saja<span v-if="modal.question?.input_type === 'foto'">, atau galeri saja</span>. Bisa juga diisi lebih dari satu.</p>
 
               <!-- TAB UPLOAD DOKUMEN -->
               <div v-if="answerTab === 'dokumen'" class="space-y-3">
@@ -486,32 +491,44 @@
                   <i class="fas fa-plus mr-2"></i>Tambah {{ modal.question?.input_type === 'situs' ? 'Link Situs' : modal.question?.input_type === 'foto' ? 'Link Foto' : 'Link' }}
                 </button>
               </div>
-              <p v-if="syncMsg" class="text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
-            </div>
-
-            <div v-if="form.jawaban === 'ya'" class="space-y-3">
-              <!-- Tipe FOTO jalur 2: upload foto ke Galeri publik -->
-              <div v-if="modal.question?.input_type === 'foto'"
-                class="p-3 rounded-2xl border-2 border-violet-200 bg-violet-50/50 space-y-2">
-                <p class="text-xs font-extrabold text-violet-700"><i class="fas fa-cloud-upload-alt mr-1"></i>Upload Foto ke Galeri</p>
-                <p class="text-xs text-gray-500">Opsional: foto diunggah ke Galeri publik web (halaman Galeri), dan link-nya otomatis tersimpan sebagai bukti jawaban ini. Bisa dipakai sendiri tanpa link, atau digabung dengan link di atas.</p>
-                <input type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" @change="onFotoFileChange"
-                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
-                <div v-if="fotoPreview" class="flex items-center gap-3">
-                  <img :src="fotoPreview" class="w-20 h-20 object-cover rounded-xl border border-gray-200" alt="Pratinjau foto" />
-                  <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold truncate">{{ fotoFile?.name }}</p>
-                    <p class="text-[11px] text-gray-500">{{ fotoFile ? (fotoFile.size / 1024).toFixed(0) + ' KB' : '' }}</p>
+              <!-- TAB GALERI (hanya soal foto; tombolnya hanya tampil untuk soal foto) -->
+              <div v-if="answerTab === 'galeri'" class="space-y-3">
+                <div class="p-3 rounded-2xl border-2 border-violet-200 bg-violet-50/50 space-y-2">
+                  <p class="text-xs font-extrabold text-violet-700"><i class="fas fa-images mr-1"></i>Upload Foto ke Galeri</p>
+                  <p class="text-xs text-gray-500">Foto diunggah ke Galeri publik web (halaman Galeri), dan link-nya otomatis tersimpan sebagai bukti jawaban ini. Bisa dipakai sendiri tanpa dokumen/link, atau digabung dengan tab lain. Foto Galeri tidak masuk daftar Informasi / Informasi Pemkab.</p>
+                  <div v-if="savedFoto && !fotoPreview" class="space-y-2">
+                    <div class="flex items-center gap-3">
+                      <img :src="savedFoto.link" class="w-20 h-20 object-cover rounded-xl border border-gray-200" alt="Foto Galeri tersimpan" />
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold truncate">{{ savedFoto.judul || savedFoto.name }}</p>
+                        <a :href="savedFoto.link" target="_blank" rel="noopener" class="text-[11px] text-[#0052FF] font-bold underline break-all">{{ savedFoto.link }}</a>
+                      </div>
+                      <button type="button" @click="removeSavedFoto" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
+                    </div>
+                    <input v-model="savedFoto.judul" type="text" placeholder="Judul foto"
+                      class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                    <p class="text-xs text-gray-500">Foto tersimpan ini dipertahankan apa adanya bila disimpan ulang tanpa diubah. Hapus untuk menghilangkan bukti foto ini (record Galeri publik tetap ada). Unggah foto baru di bawah untuk menggantinya.</p>
                   </div>
-                  <button type="button" @click="removeFotoFile" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
+                  <input type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" @change="onFotoFileChange"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                  <div v-if="fotoPreview" class="flex items-center gap-3">
+                    <img :src="fotoPreview" class="w-20 h-20 object-cover rounded-xl border border-gray-200" alt="Pratinjau foto" />
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-bold truncate">{{ fotoFile?.name }}</p>
+                      <p class="text-[11px] text-gray-500">{{ fotoFile ? (fotoFile.size / 1024).toFixed(0) + ' KB' : '' }}</p>
+                    </div>
+                    <button type="button" @click="removeFotoFile" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
+                  </div>
+                  <p v-if="fotoPreview && savedFoto" class="text-xs text-amber-700">Foto baru ini akan mengganti foto tersimpan saat Simpan.</p>
+                  <input v-model="form.fotoJudul" :required="!!fotoFile" type="text" placeholder="Judul foto * (wajib bila mengunggah foto)"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
+                  <label class="block text-xs font-bold text-gray-700">Tanggal upload</label>
+                  <input v-model="form.fotoTanggal" type="date"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                  <p class="text-xs text-gray-500">Tanggal upload bisa diubah; berbeda dari tanggal simpan jawaban (created_at). Default: hari ini.</p>
                 </div>
-                <input v-model="form.fotoJudul" :required="!!fotoFile" type="text" placeholder="Judul foto * (wajib bila mengunggah foto)"
-                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
-                <label class="block text-xs font-bold text-gray-700">Tanggal upload</label>
-                <input v-model="form.fotoTanggal" type="date"
-                  class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
-                <p class="text-xs text-gray-500">Tanggal upload bisa diubah; berbeda dari tanggal simpan jawaban (created_at). Default: hari ini.</p>
               </div>
+              <p v-if="syncMsg" class="text-xs" :class="syncFound ? 'text-emerald-600' : 'text-gray-500'">{{ syncMsg }}</p>
             </div>
 
             <!-- INFO (bila Tidak) -->
@@ -591,6 +608,7 @@ const submitting = ref(false)
 const formError = ref('')
 const fotoFile = ref(null)
 const fotoPreview = ref('')
+const savedFoto = ref(null)
 const todayLocal = () => {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -614,6 +632,9 @@ const onFotoFileChange = (e) => {
 const removeFotoFile = () => {
   fotoFile.value = null
   if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
+}
+const removeSavedFoto = () => {
+  savedFoto.value = null
 }
 const showVisibility = computed(() => {
   if (form.value.jawaban !== 'ya') return false
@@ -717,6 +738,7 @@ const openAnswerModal = async (q) => {
   form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }], fotoJudul: '', fotoTanggal: todayLocal() }
   fotoFile.value = null
   if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
+  savedFoto.value = null
   if (q.terisi && opd.value) {
     try {
       const res = await api.get('/saq/answers', { params: { organization_id: opd.value.id } })
@@ -730,6 +752,17 @@ const openAnswerModal = async (q) => {
           const ns = []
           for (const l of found.links) {
             const src = l.sumber_informasi
+            // Round-trip Tab Galeri: link foto baru (sumber 'galeri') maupun
+            // link foto lama (sumber kosong + URL /storage/galeri/) kembali
+            // ke tab Galeri sebagai foto tersimpan, bukan ke tab Link.
+            // Foto pertama saja yang jadi savedFoto; bila ada lebih dari
+            // satu, sisanya jatuh ke tab Link agar URL-nya tidak hilang.
+            const isGaleriLink = modal.value.question?.input_type === 'foto' && (src === 'galeri' || (!src && (l.link || '').includes('/storage/galeri/')))
+            if (isGaleriLink && !savedFoto.value) {
+              const nm = (l.link || '').split('/').filter(Boolean).pop() || l.link || ''
+              savedFoto.value = { judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', name: nm }
+              continue
+            }
             if (src === 'lampiran') {
               const nm = (l.link || '').split('/').filter(Boolean).pop() || l.link || ''
               ns.push({ kind: 'file', judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', jadikanInformasi: false, name: nm })
@@ -844,6 +877,13 @@ const submitAnswer = async () => {
       : ((isDokumen && sv.jadikanInformasi) ? 'baru' : 'drive')
     links.push({ judul: sv.judul.trim(), link: sv.link.trim(), deskripsi: (sv.deskripsi || '').trim(), mode: modeSv, sync_url: null, raw: sv })
   }
+  // Foto Galeri tersimpan yang tidak diganti: kirim lagi sebagai mode
+  // 'galeri' supaya backend mempertahankannya (bukan jadi link biasa /
+  // Informasi). Bila ada file foto baru, file baru yang dipakai.
+  const isSavedFoto = form.value.jawaban === 'ya' && inputType === 'foto' && !!savedFoto.value && !fotoFile.value
+  if (isSavedFoto) {
+    links.push({ judul: (savedFoto.value.judul || '').trim(), link: savedFoto.value.link.trim(), deskripsi: '', mode: 'galeri', sync_url: null, raw: savedFoto.value })
+  }
   const isFotoUpload = form.value.jawaban === 'ya' && inputType === 'foto' && !!fotoFile.value
   if (form.value.jawaban === 'ya' && form.value.links.some(l => l.link.trim() && l.mode === 'sync_ppid' && !(l.sync && l.sync.found))) {
     formError.value = 'Ada baris link PPID yang belum tersinkronisasi: tekan Sinkronisasi sampai detailnya muncul.'
@@ -869,8 +909,8 @@ const submitAnswer = async () => {
     formError.value = 'Judul wajib diisi untuk setiap dokumen yang diunggah.'
     return
   }
-  if (form.value.jawaban === 'ya' && !links.length && !uploads.length && !driveList.length && !savedList.length && !isFotoUpload) {
-    formError.value = 'Jawaban "Ya" wajib disertai minimal satu dokumen upload, satu link, atau satu foto upload.'
+  if (form.value.jawaban === 'ya' && !links.length && !uploads.length && !driveList.length && !savedList.length && !isFotoUpload && !isSavedFoto) {
+    formError.value = 'Jawaban "Ya" wajib disertai minimal satu bukti: dokumen upload, link, atau foto Galeri.'
     return
   }
   if (isFotoUpload && !form.value.fotoJudul.trim()) {
@@ -925,6 +965,7 @@ const submitAnswer = async () => {
     docUploads.value = []
     driveRows.value = []
     savedUploads.value = []
+    savedFoto.value = null
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
   } catch (e) {
