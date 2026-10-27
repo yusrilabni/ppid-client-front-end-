@@ -374,7 +374,7 @@
                     <button type="button" @click="docUploads.splice(uidx, 1)"
                       class="text-xs font-bold text-rose-500 hover:text-rose-700"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>
                   </div>
-                  <p class="text-[11px] text-gray-500">{{ u.file ? (u.file.size / 1024).toFixed(0) + ' KB' : '' }} · PDF / DOC / DOCX / XLS / XLSX / PPT, maks 10 MB per file.</p>
+                  <p class="text-[11px] text-gray-500">{{ u.file ? (u.file.size / 1024).toFixed(0) + ' KB' : '' }} · PDF / DOC / DOCX / XLS / XLSX / PPT / JPG / PNG, maks 10 MB per file. JPG/PNG otomatis di-convert jadi WebP di server.</p>
                   <input v-model="u.judul" required type="text" placeholder="Judul dokumen *"
                     class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10 outline-none transition-all text-sm" />
                   <input v-model="u.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
@@ -386,9 +386,54 @@
                   </label>
                   <p v-else class="text-xs text-gray-500">File ini hanya lampiran jawaban, tidak masuk daftar Informasi.</p>
                 </div>
-                <input type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" @change="onDocFilesChange"
+                <input type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" @change="onDocFilesChange"
                   class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
-                <p class="text-xs text-gray-500">Boleh lebih dari 1 file. File lampiran tidak masuk Informasi kecuali toggle di atas diaktifkan.</p>
+                <p class="text-xs text-gray-500">Boleh lebih dari 1 file. File lampiran tidak masuk Informasi kecuali toggle di atas diaktifkan. JPG/PNG otomatis di-convert jadi WebP.</p>
+                <div v-for="(sv, svidx) in savedUploads" :key="'sv'+svidx"
+                  class="p-3 rounded-2xl border-2 border-amber-200 bg-amber-50/50 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-amber-800"><i class="fas fa-file-alt mr-1"></i>{{ sv.kind === 'drive' ? 'Link Drive Tersimpan' : 'File Tersimpan' }} — {{ sv.name || sv.link }}</span>
+                    <button type="button" @click="savedUploads.splice(svidx, 1)"
+                      class="text-xs font-bold text-rose-500 hover:text-rose-700"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>
+                  </div>
+                  <p class="text-[11px] text-gray-500">File tersimpan tidak bisa diisi ulang otomatis oleh browser — baris ini dipertahankan apa adanya bila disimpan ulang tanpa diubah. Hapus untuk menggantinya.</p>
+                  <a v-if="sv.link" :href="sv.link" target="_blank" rel="noopener" class="text-xs text-[#0052FF] font-bold underline break-all">{{ sv.link }}</a>
+                  <input v-model="sv.judul" :required="!!sv.jadikanInformasi" type="text" placeholder="Judul dokumen * (wajib bila dijadikan Informasi)"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                  <input v-model="sv.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
+                    class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
+                  <label v-if="modal.question?.input_type === 'dokumen' || !modal.question?.input_type"
+                    class="flex items-start gap-2 text-xs text-gray-700 cursor-pointer">
+                    <input type="checkbox" v-model="sv.jadikanInformasi" class="mt-0.5 w-4 h-4 accent-[#0052FF]" />
+                    <span><strong>Jadikan Informasi {{ modal.question?.target_upload === 'pemkab' ? 'Pemkab' : '' }}</strong> — bila dimatikan (default), bukti ini hanya lampiran/link jawaban, <strong>tidak</strong> masuk daftar Informasi / Informasi Pemkab.</span>
+                  </label>
+                  <p v-else class="text-xs text-gray-500">Bukti ini hanya lampiran jawaban, tidak masuk daftar Informasi.</p>
+                </div>
+                <div v-for="(dr, dridx) in driveRows" :key="'dr'+dridx"
+                  class="p-3 rounded-2xl border-2 border-cyan-200 bg-cyan-50/50 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-cyan-800"><i class="fab fa-google-drive mr-1"></i>Link Google Drive {{ dridx + 1 }}</span>
+                    <button type="button" @click="driveRows.splice(dridx, 1)"
+                      class="text-xs font-bold text-rose-500 hover:text-rose-700"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>
+                  </div>
+                  <p class="text-xs text-gray-500">Hanya link Google Drive (drive.google.com / docs.google.com) yang diterima di sini. Tanpa upload file — cukup judul + link Drive.</p>
+                  <input v-model="dr.judul" :required="!!dr.jadikanInformasi" type="text" placeholder="Judul dokumen * (wajib bila dijadikan Informasi)"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                  <input v-model="dr.link" required type="url" placeholder="https://drive.google.com/... *"
+                    class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-sm" />
+                  <input v-model="dr.deskripsi" type="text" placeholder="Deskripsi singkat (opsional)"
+                    class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none transition-all text-xs" />
+                  <label v-if="modal.question?.input_type === 'dokumen' || !modal.question?.input_type"
+                    class="flex items-start gap-2 text-xs text-gray-700 cursor-pointer">
+                    <input type="checkbox" v-model="dr.jadikanInformasi" class="mt-0.5 w-4 h-4 accent-[#0052FF]" />
+                    <span><strong>Jadikan Informasi {{ modal.question?.target_upload === 'pemkab' ? 'Pemkab' : '' }}</strong> — bila dimatikan (default), link Drive ini hanya bukti jawaban, <strong>tidak</strong> masuk daftar Informasi / Informasi Pemkab.</span>
+                  </label>
+                  <p v-else class="text-xs text-gray-500">Link Drive ini hanya bukti jawaban, tidak masuk daftar Informasi.</p>
+                </div>
+                <button type="button" @click="driveRows.push({ judul: '', link: '', deskripsi: '', jadikanInformasi: false })"
+                  class="w-full py-2.5 rounded-2xl border-2 border-dashed border-cyan-600/40 text-cyan-700 text-sm font-bold hover:bg-cyan-50 transition-all">
+                  <i class="fab fa-google-drive mr-2"></i>Tambah Link Google Drive
+                </button>
               </div>
 
               <!-- TAB LINK -->
@@ -539,6 +584,8 @@ const openSections = ref([])
 const modal = ref({ open: false, question: null, existing: null })
 const answerTab = ref('dokumen')
 const docUploads = ref([])
+const driveRows = ref([])
+const savedUploads = ref([])
 const form = ref({ judul: '', link: '', klasifikasi: '', deskripsi: '' })
 const submitting = ref(false)
 const formError = ref('')
@@ -574,16 +621,18 @@ const showVisibility = computed(() => {
   if (qt !== 'dokumen') return false
   const linkInfo = form.value.links.some(l => l.mode === 'sync_ppid' ? false : (l.jadikanInformasi && l.link.trim()))
   const uploadInfo = docUploads.value.some(u => u.jadikanInformasi && u.file)
+  const driveInfo = driveRows.value.some(dr => dr.jadikanInformasi && dr.link.trim())
+  const savedInfo = savedUploads.value.some(sv => sv.jadikanInformasi && sv.link.trim())
   // Legacy: link lama yang dulu mode 'baru' tetap dihitung bila toggle-nya hidup (diisi saat open).
-  return linkInfo || uploadInfo
+  return linkInfo || uploadInfo || driveInfo || savedInfo
 })
-const DOC_EXTS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+const DOC_EXTS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png']
 const onDocFilesChange = (e) => {
   const files = Array.from(e.target.files || [])
   formError.value = ''
   for (const f of files) {
     const ext = (f.name.split('.').pop() || '').toLowerCase()
-    if (!DOC_EXTS.includes(ext)) { formError.value = `File ${f.name} ditolak: hanya PDF / DOC / DOCX / XLS / XLSX / PPT.`; continue }
+    if (!DOC_EXTS.includes(ext)) { formError.value = `File ${f.name} ditolak: hanya PDF / DOC / DOCX / XLS / XLSX / PPT / JPG / PNG.`; continue }
     if (f.size > 10 * 1024 * 1024) { formError.value = `File ${f.name} ditolak: maks 10 MB per file.`; continue }
     const base = f.name.replace(/\.[^.]+$/, '')
     docUploads.value.push({ file: f, judul: base, deskripsi: '', jadikanInformasi: false })
@@ -663,6 +712,8 @@ const openAnswerModal = async (q) => {
   modal.value = { open: true, question: q, existing: null }
   answerTab.value = 'dokumen'
   docUploads.value = []
+  driveRows.value = []
+  savedUploads.value = []
   form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }], fotoJudul: '', fotoTanggal: todayLocal() }
   fotoFile.value = null
   if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
@@ -674,9 +725,26 @@ const openAnswerModal = async (q) => {
         modal.value.existing = found
         form.value.jawaban = found.jawaban || null
         form.value.visibility = found.visibility || 'public'
-        form.value.links = (found.links && found.links.length)
-          ? found.links.map(l => ({ judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', mode: (l.sumber_informasi === 'informasi' || l.sumber_informasi === 'informasi_pemkab') ? 'sync_ppid' : 'link', sync: (l.sumber_informasi === 'informasi' || l.sumber_informasi === 'informasi_pemkab') ? { found: true, judul: l.judul || '', sumber: l.sumber_informasi, kategori: '', tanggal: '', pengupload: '', opd: '', file_url: '' } : null, syncError: '', jadikanInformasi: (modal.value.question?.input_type || 'dokumen') === 'dokumen' && !(l.sumber_informasi === 'informasi' || l.sumber_informasi === 'informasi_pemkab' || l.sumber_informasi === 'link' || l.sumber_informasi === 'lampiran') }))
-          : [{ judul: found.judul || '', link: found.link || '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }]
+        if (found.links && found.links.length) {
+          const nl = []
+          const ns = []
+          for (const l of found.links) {
+            const src = l.sumber_informasi
+            if (src === 'lampiran') {
+              const nm = (l.link || '').split('/').filter(Boolean).pop() || l.link || ''
+              ns.push({ kind: 'file', judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', jadikanInformasi: false, name: nm })
+            } else if (src === 'drive') {
+              ns.push({ kind: 'drive', judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', jadikanInformasi: false, name: l.link || '' })
+            } else {
+              const isSync = src === 'informasi' || src === 'informasi_pemkab'
+              nl.push({ judul: l.judul || '', link: l.link || '', deskripsi: l.deskripsi || '', mode: isSync ? 'sync_ppid' : 'link', sync: isSync ? { found: true, judul: l.judul || '', sumber: src, kategori: '', tanggal: '', pengupload: '', opd: '', file_url: '' } : null, syncError: '', jadikanInformasi: (modal.value.question?.input_type || 'dokumen') === 'dokumen' && !isSync && src !== 'link' })
+            }
+          }
+          form.value.links = nl.length ? nl : [{ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }]
+          savedUploads.value = ns
+        } else {
+          form.value.links = [{ judul: found.judul || '', link: found.link || '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }]
+        }
       }
     } catch (e) { /* abaikan */ }
   }
@@ -688,6 +756,13 @@ const isPpidDetailUrl = (raw) => {
     if (!['ppid.sinjaikab.go.id', 'www.ppid.sinjaikab.go.id'].includes(u.hostname)) return false
     const parts = u.pathname.replace(/^\/+|\/+$/g, '').split('/')
     return parts.length >= 2 && parts[0] === 'informasi' && !!parts[1]
+  } catch { return false }
+}
+
+const isDriveUrl = (raw) => {
+  try {
+    const u = new URL((raw || '').trim())
+    return ['drive.google.com', 'www.drive.google.com', 'docs.google.com', 'www.docs.google.com'].includes(u.hostname)
   } catch { return false }
 }
 
@@ -758,6 +833,17 @@ const submitAnswer = async () => {
       }))
     : []
   const uploads = form.value.jawaban === 'ya' ? docUploads.value.filter(u => u.file) : []
+  const driveList = form.value.jawaban === 'ya' ? driveRows.value.filter(dr => dr.link.trim()) : []
+  const savedList = form.value.jawaban === 'ya' ? savedUploads.value.filter(sv => sv.link.trim()) : []
+  for (const dr of driveList) {
+    links.push({ judul: dr.judul.trim(), link: dr.link.trim(), deskripsi: (dr.deskripsi || '').trim(), mode: (isDokumen && dr.jadikanInformasi) ? 'baru' : 'drive', sync_url: null, raw: dr })
+  }
+  for (const sv of savedList) {
+    const modeSv = sv.kind === 'file'
+      ? ((isDokumen && sv.jadikanInformasi) ? 'baru' : 'lampiran')
+      : ((isDokumen && sv.jadikanInformasi) ? 'baru' : 'drive')
+    links.push({ judul: sv.judul.trim(), link: sv.link.trim(), deskripsi: (sv.deskripsi || '').trim(), mode: modeSv, sync_url: null, raw: sv })
+  }
   const isFotoUpload = form.value.jawaban === 'ya' && inputType === 'foto' && !!fotoFile.value
   if (form.value.jawaban === 'ya' && form.value.links.some(l => l.link.trim() && l.mode === 'sync_ppid' && !(l.sync && l.sync.found))) {
     formError.value = 'Ada baris link PPID yang belum tersinkronisasi: tekan Sinkronisasi sampai detailnya muncul.'
@@ -767,11 +853,23 @@ const submitAnswer = async () => {
     formError.value = 'Judul wajib diisi untuk link yang dijadikan Informasi.'
     return
   }
+  if (form.value.jawaban === 'ya' && driveList.some(dr => !isDriveUrl(dr.link))) {
+    formError.value = 'Link Drive harus berupa link Google Drive (drive.google.com / docs.google.com). Domain lain ditolak di sub-mode Drive.'
+    return
+  }
+  if (form.value.jawaban === 'ya' && driveList.some(dr => isDokumen && dr.jadikanInformasi && !dr.judul.trim())) {
+    formError.value = 'Judul wajib diisi untuk link Drive yang dijadikan Informasi.'
+    return
+  }
+  if (form.value.jawaban === 'ya' && savedList.some(sv => isDokumen && sv.jadikanInformasi && !sv.judul.trim())) {
+    formError.value = 'Judul wajib diisi untuk bukti tersimpan yang dijadikan Informasi.'
+    return
+  }
   if (form.value.jawaban === 'ya' && uploads.some(u => !u.judul.trim())) {
     formError.value = 'Judul wajib diisi untuk setiap dokumen yang diunggah.'
     return
   }
-  if (form.value.jawaban === 'ya' && !links.length && !uploads.length && !isFotoUpload) {
+  if (form.value.jawaban === 'ya' && !links.length && !uploads.length && !driveList.length && !savedList.length && !isFotoUpload) {
     formError.value = 'Jawaban "Ya" wajib disertai minimal satu dokumen upload, satu link, atau satu foto upload.'
     return
   }
@@ -825,6 +923,8 @@ const submitAnswer = async () => {
     }
     modal.value.open = false
     docUploads.value = []
+    driveRows.value = []
+    savedUploads.value = []
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
   } catch (e) {
