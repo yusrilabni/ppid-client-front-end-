@@ -1,7 +1,44 @@
 <template>
   <div class="detail-page bg-gray-50 min-h-screen pb-24 lg:pb-8">
     <div class="container mx-auto py-4 px-4 max-w-7xl">
-      <div v-if="item">
+      <!-- Loading Skeleton State -->
+      <div v-if="isLoading || (!item && isFetching)" class="space-y-6 py-2">
+        <div class="h-6 w-64 bg-gray-200 rounded-xl animate-pulse mb-6"></div>
+        <div class="flex flex-col lg:flex-row gap-8">
+          <div class="flex-1 min-w-0">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-6 sm:p-10 text-white relative">
+                <div class="h-4 w-28 bg-white/30 rounded mb-4 animate-pulse"></div>
+                <div class="h-8 w-3/4 bg-white/40 rounded animate-pulse mb-2"></div>
+                <div class="h-8 w-1/2 bg-white/40 rounded animate-pulse"></div>
+              </div>
+              <div class="p-6 sm:p-10 space-y-8">
+                <div>
+                  <div class="h-5 w-32 bg-gray-200 rounded animate-pulse mb-4"></div>
+                  <div class="h-24 bg-gray-100 rounded-2xl animate-pulse"></div>
+                </div>
+                <div>
+                  <div class="h-5 w-44 bg-gray-200 rounded animate-pulse mb-4"></div>
+                  <div class="h-96 bg-gray-100 rounded-2xl animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="hidden lg:block w-80 flex-shrink-0">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 space-y-6 sticky top-24">
+              <div class="h-6 w-36 bg-gray-200 rounded animate-pulse"></div>
+              <div class="space-y-4">
+                <div class="h-16 bg-gray-100 rounded-2xl animate-pulse"></div>
+                <div class="h-16 bg-gray-100 rounded-2xl animate-pulse"></div>
+                <div class="h-16 bg-gray-100 rounded-2xl animate-pulse"></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Loaded Document State -->
+      <div v-else-if="item">
         <!-- Breadcrumbs -->
         <div class="mb-4">
           <Breadcrumbs :breadcrumbs="getBreadcrumbs.detailInformasi(item.category, getCategorySlug(item.category), getCategoryIcon(item.category), item.title)" />
@@ -154,57 +191,55 @@
           </div>
 
           <!-- DESKTOP SIDEBAR -->
-          <aside class="hidden lg:block w-80 shrink-0">
-            <div class="sticky top-24 space-y-6">
-              <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-8">Metadata Dokumen</h3>
+          <aside class="hidden lg:block w-80 shrink-0 text-left">
+            <div class="sticky top-24 space-y-6 text-left">
+              <div class="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm text-left">
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 pb-3 border-b border-gray-100 text-left flex items-center gap-2">
+                  <i class="fas fa-info-circle text-blue-600"></i> Metadata Dokumen
+                </h3>
                 
-                <div class="space-y-8">
-                  <div>
-                    <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                            <i class="fas fa-building text-blue-600 text-sm"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ item.organization_name }}</p>
-                        </div>
+                <div class="space-y-6 text-left">
+                  <!-- Unit Kerja -->
+                  <div class="flex items-start gap-3.5 text-left">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                      <i class="fas fa-building text-sm"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 text-left">
+                      <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Unit Kerja</p>
+                      <p class="text-sm font-bold text-gray-800 leading-tight text-left break-words">{{ item.organization_name }}</p>
                     </div>
                   </div>
 
-                  <div>
-                    <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
-                            <i class="fas fa-file-signature text-orange-600 text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ item.jenis_dokumen || 'Informasi Publik' }}</p>
-                        </div>
+                  <!-- Jenis Dokumen -->
+                  <div class="flex items-start gap-3.5 text-left">
+                    <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                      <i class="fas fa-file-signature text-sm"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 text-left">
+                      <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Jenis Dokumen</p>
+                      <p class="text-sm font-bold text-gray-800 leading-tight text-left break-words">{{ item.jenis_dokumen || 'Informasi Publik' }}</p>
                     </div>
                   </div>
 
-                  <div>
-                    <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
-                            <i class="fas fa-user-check text-emerald-600 text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ item.uploader_name }}</p>
-                        </div>
+                  <!-- Pengunggah -->
+                  <div class="flex items-start gap-3.5 text-left">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                      <i class="fas fa-user-check text-sm"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 text-left">
+                      <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Pengunggah</p>
+                      <p class="text-sm font-bold text-gray-800 leading-tight text-left break-words">{{ item.uploader_name }}</p>
                     </div>
                   </div>
 
-                  <div>
-                    <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
-                            <i class="fas fa-calendar-alt text-purple-600 text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
-                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ formatDate(item.tanggal_upload) }}</p>
-                        </div>
+                  <!-- Tanggal -->
+                  <div class="flex items-start gap-3.5 text-left">
+                    <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                      <i class="fas fa-calendar-alt text-sm"></i>
+                    </div>
+                    <div class="min-w-0 flex-1 text-left">
+                      <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Tanggal</p>
+                      <p class="text-sm font-bold text-gray-800 leading-tight text-left">{{ formatDate(item.tanggal_upload) }}</p>
                     </div>
                   </div>
 
@@ -230,7 +265,8 @@
           </aside>
         </div>
       </div>
-      <div v-else class="py-20 text-center">
+      <!-- Real Not Found / Error State -->
+      <div v-else-if="!isLoading && (!item || isError)" class="py-20 text-center bg-white rounded-3xl shadow-sm border border-gray-100 p-8 my-8">
         <i class="fas fa-exclamation-triangle text-4xl text-yellow-400 mb-4"></i>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Dokumen Tidak Ditemukan</h2>
         <p class="text-gray-500">Dokumen yang Anda cari tidak tersedia atau telah dihapus.</p>
@@ -272,48 +308,48 @@
                   </button>
               </div>
 
-              <div class="flex-1 overflow-y-auto p-6 space-y-8">
+              <div class="flex-1 overflow-y-auto p-6 space-y-4 text-left">
                   <!-- Unit Kerja -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-100">
+                  <div class="flex items-start gap-3.5 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+                      <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-100 mt-0.5">
                           <i class="fas fa-building text-sm"></i>
                       </div>
-                      <div class="min-w-0">
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Kerja</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight break-words">{{ item?.organization_name }}</p>
+                      <div class="min-w-0 flex-1 text-left">
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Unit Kerja</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight text-left break-words">{{ item?.organization_name }}</p>
                       </div>
                   </div>
 
                   <!-- Jenis Dokumen -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-orange-100">
+                  <div class="flex items-start gap-3.5 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+                      <div class="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-orange-100 mt-0.5">
                           <i class="fas fa-file-signature text-sm"></i>
                       </div>
-                      <div>
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jenis Dokumen</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item?.jenis_dokumen || 'Informasi Publik' }}</p>
+                      <div class="min-w-0 flex-1 text-left">
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Jenis Dokumen</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight text-left break-words">{{ item?.jenis_dokumen || 'Informasi Publik' }}</p>
                       </div>
                   </div>
 
                   <!-- Pengunggah -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-100">
+                  <div class="flex items-start gap-3.5 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+                      <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-100 mt-0.5">
                           <i class="fas fa-user-shield text-sm"></i>
                       </div>
-                      <div>
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pengunggah</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ item?.uploader_name }}</p>
+                      <div class="min-w-0 flex-1 text-left">
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Pengunggah</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight text-left break-words">{{ item?.uploader_name }}</p>
                       </div>
                   </div>
 
                   <!-- Tanggal -->
-                  <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <div class="w-10 h-10 bg-purple-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-100">
+                  <div class="flex items-start gap-3.5 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+                      <div class="w-10 h-10 bg-purple-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-100 mt-0.5">
                           <i class="fas fa-calendar-day text-sm"></i>
                       </div>
-                      <div>
-                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tanggal</p>
-                          <p class="text-sm font-bold text-slate-800 leading-tight">{{ formatDate(item?.tanggal_upload) }}</p>
+                      <div class="min-w-0 flex-1 text-left">
+                          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Tanggal</p>
+                          <p class="text-sm font-bold text-slate-800 leading-tight text-left">{{ formatDate(item?.tanggal_upload) }}</p>
                       </div>
                   </div>
 
@@ -360,7 +396,7 @@ const fetchDetail = async () => {
   return res.data.data
 }
 
-const { data: item, isLoading, isError } = useQuery({
+const { data: item, isLoading, isFetching, isError } = useQuery({
   queryKey: computed(() => ['informasi-detail', route.params.slug]),
   queryFn: fetchDetail,
 })
