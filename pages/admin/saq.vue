@@ -40,6 +40,71 @@
       </div>
     </div>
 
+    <!-- PENGATURAN PENGUNCIAN PENGISIAN SAQ -->
+    <div
+      :class="[
+        'p-5 lg:p-6 rounded-3xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm',
+        isSubmissionsLocked
+          ? 'bg-amber-500/10 border-amber-300'
+          : 'bg-emerald-500/10 border-emerald-300'
+      ]"
+    >
+      <div class="flex items-start sm:items-center gap-4">
+        <div
+          :class="[
+            'w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0 shadow-md',
+            isSubmissionsLocked
+              ? 'bg-amber-500 text-white shadow-amber-500/30'
+              : 'bg-emerald-600 text-white shadow-emerald-600/30'
+          ]"
+        >
+          <i :class="isSubmissionsLocked ? 'fas fa-lock' : 'fas fa-lock-open'"></i>
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="text-sm lg:text-base font-black text-gray-900 tracking-tight">
+              Status Pengisian SAQ:
+              <span :class="isSubmissionsLocked ? 'text-amber-700' : 'text-emerald-700'">
+                {{ isSubmissionsLocked ? 'TERKUNCI (HANYA SUPERADMIN)' : 'TERBUKA UNTUK ADMIN OPD' }}
+              </span>
+            </h2>
+            <span
+              :class="[
+                'text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider',
+                isSubmissionsLocked ? 'bg-amber-200 text-amber-900' : 'bg-emerald-200 text-emerald-900'
+              ]"
+            >
+              {{ isSubmissionsLocked ? 'Terkunci' : 'Terbuka' }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-600 mt-1 leading-relaxed max-w-3xl">
+            {{ isSubmissionsLocked
+              ? 'Saat ini seluruh pengisian dan perubahan jawaban SAQ dikunci untuk Admin OPD. Hanya Superadmin yang dapat mengisi atau mengubah jawaban di tingkat Kabupaten maupun seluruh OPD.'
+              : 'Seluruh Admin OPD saat ini diizinkan untuk mengisi dan mengubah jawaban SAQ OPD masing-masing.'
+            }}
+          </p>
+        </div>
+      </div>
+
+      <div class="shrink-0 self-end sm:self-center">
+        <button
+          type="button"
+          @click="toggleLock"
+          :disabled="togglingLock"
+          :class="[
+            'px-5 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 disabled:opacity-50 text-white',
+            isSubmissionsLocked
+              ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
+              : 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/20'
+          ]"
+        >
+          <i v-if="togglingLock" class="fas fa-spinner fa-spin"></i>
+          <i v-else :class="isSubmissionsLocked ? 'fas fa-unlock' : 'fas fa-lock'"></i>
+          <span>{{ isSubmissionsLocked ? 'Buka Pengisian untuk Admin OPD' : 'Kunci Pengisian untuk Admin OPD' }}</span>
+        </button>
+      </div>
+    </div>
+
     <!-- FILTER & SELEKTOR OPD (DASHBOARD STYLE) -->
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 lg:p-5 space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-center">
@@ -575,6 +640,38 @@ const movingId = ref(null)
 const detachingId = ref(null)
 const toast = ref(null)
 
+// Status Penguncian Pengisian SAQ
+const isSubmissionsLocked = ref(true)
+const togglingLock = ref(false)
+
+async function fetchLockStatus() {
+  try {
+    const res = await api.get('/saq-admin/lock-status')
+    isSubmissionsLocked.value = !!res.data?.data?.locked
+  } catch (e) {
+    console.error('Gagal memuat status penguncian:', e)
+  }
+}
+
+async function toggleLock() {
+  const target = !isSubmissionsLocked.value
+  const confirmMsg = target
+    ? 'Kunci pengisian jawaban SAQ? Seluruh Admin OPD tidak akan bisa mengisi atau mengubah jawaban, hanya Superadmin yang memiliki hak akses isi.'
+    : 'Buka pengisian jawaban SAQ? Seluruh Admin OPD akan dapat mengisi dan mengubah jawaban SAQ masing-masing.'
+  if (!confirm(confirmMsg)) return
+
+  togglingLock.value = true
+  try {
+    const res = await api.post('/saq-admin/toggle-lock', { locked: target })
+    isSubmissionsLocked.value = !!res.data?.data?.locked
+    showToast(res.data?.message || 'Status penguncian berhasil diubah.')
+  } catch (e) {
+    showToast(e.response?.data?.message || 'Gagal mengubah status penguncian.', 'error')
+  } finally {
+    togglingLock.value = false
+  }
+}
+
 function showToast(message, type = 'success') {
   toast.value = { message, type }
   setTimeout(() => (toast.value = null), 3500)
@@ -841,6 +938,7 @@ async function doDeleteMaster() {
 }
 
 onMounted(() => {
+  fetchLockStatus()
   fetchTabs()
   fetchOpds()
   fetchAllData()

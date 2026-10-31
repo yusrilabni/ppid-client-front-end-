@@ -70,6 +70,34 @@
           </div>
         </div>
 
+                <!-- BANNER STATUS PENGUNCIAN SAQ -->
+        <div v-if="isLocked && !authStore.isSuperAdmin"
+          class="mb-4 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-2xl p-4 shadow-sm">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 text-sm shadow">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div>
+            <p class="font-bold text-sm text-amber-950 mb-0.5">Pengisian SAQ Sedang Dikunci</p>
+            <p class="text-xs text-amber-800 leading-relaxed">
+              Pengisian dan perubahan jawaban SAQ saat ini sedang dikunci oleh Superadmin. Hanya Superadmin yang memiliki hak akses untuk mengisi atau memperbarui jawaban.
+            </p>
+          </div>
+        </div>
+        <div v-else-if="authStore.isSuperAdmin && isLocked"
+          class="mb-4 flex flex-wrap items-center justify-between gap-3 bg-indigo-50 border border-indigo-200 rounded-2xl px-4 py-3 shadow-sm text-xs text-indigo-900">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+              <i class="fas fa-user-shield"></i>
+            </span>
+            <div>
+              <span class="font-bold">Mode Superadmin:</span> Pengisian SAQ dikunci untuk admin OPD, namun Anda memiliki hak akses penuh untuk mengisi/mengubah jawaban baik OPD maupun Kabupaten.
+            </div>
+          </div>
+          <NuxtLink to="/admin/saq" class="text-indigo-600 hover:text-indigo-800 font-bold underline shrink-0">
+            Kelola di Admin Panel &rarr;
+          </NuxtLink>
+        </div>
+
         <!-- SECTIONS -->
         <div v-if="tabs[activeTab]?.kode === '1'"
           class="mb-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
@@ -139,8 +167,10 @@
                     class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
                     :class="q.terisi
                       ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
-                      : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg'">
-                    <i :class="q.terisi ? 'fas fa-eye mr-1.5' : 'fas fa-pen mr-1.5'"></i>{{ q.terisi ? 'Lihat' : 'Isi' }}
+                      : (!canAnswer
+                          ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg')">
+                    <i :class="q.terisi ? 'fas fa-eye mr-1.5' : (!canAnswer ? 'fas fa-lock mr-1.5' : 'fas fa-pen mr-1.5')"></i>{{ q.terisi ? (canAnswer ? 'Ubah' : 'Lihat') : (canAnswer ? 'Isi' : 'Terkunci') }}
                   </button>
                 </div>
                 <!-- DAFTAR JAWABAN KONSOLIDASI (mode full, superadmin) -->
@@ -227,8 +257,10 @@
                         class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
                         :class="q.terisi
                           ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
-                          : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg'">
-                        <i :class="q.terisi ? 'fas fa-eye mr-1.5' : 'fas fa-pen mr-1.5'"></i>{{ q.terisi ? 'Lihat' : 'Isi' }}
+                          : (!canAnswer
+                              ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                              : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg')">
+                        <i :class="q.terisi ? 'fas fa-eye mr-1.5' : (!canAnswer ? 'fas fa-lock mr-1.5' : 'fas fa-pen mr-1.5')"></i>{{ q.terisi ? (canAnswer ? 'Ubah' : 'Lihat') : (canAnswer ? 'Isi' : 'Terkunci') }}
                       </button>
                     </div>
                     <div v-if="isFullMode" class="mt-3 pt-3 border-t border-gray-100">
@@ -563,7 +595,11 @@
             </div>
             <p v-if="form.jawaban === 'ya' && !showVisibility" class="text-[11px] text-gray-500">Visibilitas publik tidak berlaku untuk link / lampiran saja — hanya berlaku bila ada bukti yang dijadikan Informasi.</p>
             <div v-if="formError" class="p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-600">{{ formError }}</div>
-            <button type="submit" :disabled="submitting"
+            <div v-if="!canAnswer" class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center gap-2.5">
+              <i class="fas fa-lock text-amber-600 text-sm"></i>
+              <span>Pengisian dan perubahan jawaban SAQ saat ini sedang dikunci oleh Superadmin (Hanya dapat dilihat).</span>
+            </div>
+            <button v-else type="submit" :disabled="submitting"
               class="w-full py-3 rounded-2xl bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white font-bold text-sm shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 disabled:opacity-50 transition-all">
               <i :class="submitting ? 'fas fa-spinner fa-spin' : 'fas fa-save'" class="mr-2"></i>
               {{ submitting ? 'Menyimpan...' : 'Simpan Jawaban' }}
@@ -674,6 +710,27 @@ const { data: opdsResponse } = useQuery({
 const opd = computed(() =>
   (opdsResponse.value?.data || []).find(o => o.slug === route.params.slug)
 )
+
+// Status Penguncian SAQ
+const { data: lockStatusResponse } = useQuery({
+  queryKey: ['saq-lock-status'],
+  queryFn: async () => (await api.get('/saq/lock-status')).data,
+  staleTime: 0,
+})
+const isLocked = computed(() => {
+  return lockStatusResponse.value?.data?.locked ?? true
+})
+
+const canAnswer = computed(() => {
+  // Superadmin SELALU bisa isi (baik di OPD maupun Kabupaten)
+  if (authStore.isSuperAdmin) return true
+  // Jika terkunci, admin OPD diblokir
+  if (isLocked.value) return false
+  // Jika terbuka, cek apakah user admin yang login adalah admin OPD ini
+  if (!authStore.user) return false
+  const uUnit = authStore.user?.unit_id
+  return !!uUnit && (opd.value?.remote_id == uUnit || opd.value?.id == uUnit)
+})
 
 // Mode full Kabupaten (perintah Yusril 26 Okt 2026): halaman kabupaten-sinjai
 // menampilkan SEMUA 203 pertanyaan, dan di bawah tiap soal tampil list jawaban
@@ -848,6 +905,10 @@ const syncFromPpid = async (idx = 0) => {
 
 const submitAnswer = async () => {
   if (!opd.value || !modal.value.question) return
+  if (!canAnswer.value) {
+    formError.value = 'Pengisian SAQ saat ini sedang dikunci oleh Superadmin. Hanya Superadmin yang dapat mengisi jawaban.'
+    return
+  }
   if (!form.value.jawaban) {
     formError.value = 'Pilih dulu: Ya atau Tidak.'
     return
