@@ -381,8 +381,137 @@
               </div>
             </div>
 
-            <!-- TAB BUKTI (hanya bila Ya): Upload Dokumen / Link / Galeri (Galeri hanya soal foto) -->
-            <div v-if="form.jawaban === 'ya'" class="space-y-3">
+            <!-- KHUSUS INDIKATOR DIGITALISASI (TANPA TAB: LANGSUNG LINK + BUKTI DUKUNG DOKUMENTASI/PDF OPSIONAL) -->
+            <div v-if="form.jawaban === 'ya' && isDigitalQuestion" class="space-y-4">
+              <!-- Info Box Penjelasan Digitalisasi -->
+              <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-2xl flex items-start gap-3 text-xs text-blue-900">
+                <i class="fas fa-info-circle text-blue-600 text-sm mt-0.5 shrink-0"></i>
+                <div class="space-y-0.5">
+                  <p class="font-bold">Format Pengisian Indikator Digitalisasi</p>
+                  <p class="text-blue-800 leading-relaxed">
+                    Untuk indikator Digitalisasi, silakan masukkan tautan langsung website / portal / aplikasi resmi. Anda juga dapat melampirkan file dokumen/tangkapan layar (PDF) sebagai bukti dukung dokumentasi.
+                  </p>
+                </div>
+              </div>
+
+              <!-- BAGIAN 1: INPUT LINK WEBSITE / PORTAL / APLIKASI (WAJIB) -->
+              <div class="p-4 rounded-2xl border-2 border-blue-100 bg-white space-y-3 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fas fa-link text-[#0052FF]"></i>
+                    Link Website / Portal / Aplikasi <span class="text-rose-500">*</span>
+                  </span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-[#0052FF]">
+                    Wajib Diisi
+                  </span>
+                </div>
+
+                <div v-for="(l, idx) in form.links" :key="'digi-link-'+idx" class="space-y-2 pb-3 border-b border-gray-100 last:border-b-0 last:pb-0">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-gray-500">Tautan {{ idx + 1 }}</span>
+                    <button v-if="form.links.length > 1" type="button" @click="form.links.splice(idx, 1)"
+                      class="text-xs font-bold text-rose-500 hover:text-rose-700">
+                      <i class="fas fa-trash-alt mr-1"></i>Hapus
+                    </button>
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <input v-model="l.link" required type="url"
+                      placeholder="https://... (contoh: https://sinjaikab.go.id, portal layanan, atau Play Store)"
+                      :class="[
+                        'w-full px-4 py-2.5 rounded-xl border-2 bg-white outline-none transition-all text-sm',
+                        isDriveUrl(l.link)
+                          ? 'border-rose-400 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
+                          : 'border-gray-200 focus:border-[#0052FF] focus:ring-4 focus:ring-[#0052FF]/10'
+                      ]" />
+
+                    <!-- PERINGATAN LINK GOOGLE DRIVE DITOLAK -->
+                    <div v-if="isDriveUrl(l.link)" class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
+                      <i class="fas fa-exclamation-triangle mt-0.5 shrink-0 text-rose-600"></i>
+                      <span>
+                        <strong>Link Google Drive tidak diterima di sini!</strong> Untuk indikator Digitalisasi, harap masukkan tautan langsung website/portal/aplikasi. Bukti dokumen atau tangkapan layar diunggah pada bagian file PDF di bawah.
+                      </span>
+                    </div>
+                  </div>
+
+                  <input v-model="l.judul" type="text"
+                    placeholder="Judul / Keterangan link (opsional, misal: Portal PPID Resmi Sinjai)"
+                    class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs" />
+                </div>
+
+                <button type="button" @click="form.links.push({ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false })"
+                  class="w-full py-2 rounded-xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-xs font-bold hover:bg-blue-50 transition-all flex items-center justify-center gap-1.5">
+                  <i class="fas fa-plus"></i> Tambah Tautan Lain
+                </button>
+              </div>
+
+              <!-- BAGIAN 2: UPLOAD BUKTI DUKUNG DOKUMENTASI (PDF / GAMBAR) - OPSIONAL -->
+              <div class="p-4 rounded-2xl border-2 border-indigo-100 bg-white space-y-3 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fas fa-file-pdf text-indigo-600"></i>
+                    Bukti Dukung Dokumentasi (PDF / Tangkapan Layar)
+                  </span>
+                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                    Opsional
+                  </span>
+                </div>
+
+                <!-- CATATAN DOKUMENTASI DARI USER -->
+                <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
+                  <i class="fas fa-lightbulb text-amber-600 text-sm mt-0.5 shrink-0"></i>
+                  <div class="space-y-1">
+                    <p class="font-bold text-amber-950">Catatan Penguatan Bukti Dukung:</p>
+                    <p class="leading-relaxed">
+                      Untuk memperkuat link yang di-upload, tambahkan dokumentasi pendukung pada jawaban yang dimaksud (bisa berupa file PDF hasil tangkapan layar/dokumen pendukung). 
+                      <strong>Disarankan menandai/menyoroti bagian yang relevan pada gambar/lampiran yang diunggah</strong> (misal: tanda panah atau kotak penunjuk pada menu/fitur yang bersangkutan).
+                    </p>
+                  </div>
+                </div>
+
+                <!-- List File Baru Dipilih -->
+                <div v-for="(u, uidx) in docUploads" :key="'digi-doc-'+uidx"
+                  class="p-3 rounded-xl border border-indigo-100 bg-indigo-50/30 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-indigo-700">
+                      <i class="fas fa-file-alt mr-1"></i>File {{ uidx + 1 }}: {{ u.file?.name }}
+                    </span>
+                    <button type="button" @click="docUploads.splice(uidx, 1)"
+                      class="text-xs font-bold text-rose-500 hover:text-rose-700">
+                      <i class="fas fa-trash-alt mr-1"></i>Hapus
+                    </button>
+                  </div>
+                  <input v-model="u.judul" type="text" placeholder="Keterangan dokumen bukti (opsional)"
+                    class="w-full px-3.5 py-2 rounded-lg border border-gray-200 bg-white focus:border-indigo-600 outline-none text-xs" />
+                </div>
+
+                <!-- List File Tersimpan Sebelumnya -->
+                <div v-for="(sv, svidx) in savedUploads" :key="'digi-sv-'+svidx"
+                  class="p-3 rounded-xl border border-amber-200 bg-amber-50/40 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-amber-900">
+                      <i class="fas fa-check-circle text-emerald-600 mr-1"></i>Bukti Tersimpan: {{ sv.name || sv.link }}
+                    </span>
+                    <button type="button" @click="savedUploads.splice(svidx, 1)"
+                      class="text-xs font-bold text-rose-500 hover:text-rose-700">
+                      <i class="fas fa-trash-alt mr-1"></i>Hapus
+                    </button>
+                  </div>
+                  <a v-if="sv.link" :href="sv.link" target="_blank" rel="noopener" class="text-xs text-blue-600 font-bold underline break-all block">
+                    Lihat Bukti PDF/Lampiran
+                  </a>
+                </div>
+
+                <!-- Input File Uploader -->
+                <input type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf"
+                  @change="onDocFilesChange"
+                  class="w-full px-3.5 py-2 rounded-xl border border-gray-200 bg-white focus:border-indigo-500 outline-none text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
+                <p class="text-[11px] text-gray-500">Menerima format PDF, JPG, PNG (maks. 10 MB). Boleh lebih dari satu file.</p>
+              </div>
+            </div>
+
+            <!-- JIKA JAWABAN YA: NON-DIGITALISASI (TAB DOKUMEN / LINK / GALERI SEPERTI BIASA) -->
+            <div v-else-if="form.jawaban === 'ya'" class="space-y-3">
               <div :class="modal.question?.input_type === 'foto' ? 'grid grid-cols-3 gap-2' : 'grid grid-cols-2 gap-2'">
                 <button type="button" @click="answerTab = 'dokumen'"
                   class="py-2.5 rounded-2xl font-bold text-sm border-2 transition-all"
@@ -721,6 +850,16 @@ const isLocked = computed(() => {
   return lockStatusResponse.value?.data?.locked ?? true
 })
 
+const isDigitalQuestion = computed(() => {
+  const q = modal.value?.question
+  if (!q) return false
+  if (q.kode && q.kode.startsWith('2.')) return true
+  if (q.tab && q.tab.toLowerCase().includes('digital')) return true
+  const currentTab = tabs.value[activeTab.value]
+  if (currentTab && currentTab.tab && currentTab.tab.toLowerCase().includes('digital')) return true
+  return false
+})
+
 const canAnswer = computed(() => {
   // Superadmin SELALU bisa isi (baik di OPD maupun Kabupaten)
   if (authStore.isSuperAdmin) return true
@@ -912,6 +1051,26 @@ const submitAnswer = async () => {
   if (!form.value.jawaban) {
     formError.value = 'Pilih dulu: Ya atau Tidak.'
     return
+  }
+  // Validasi Khusus Indikator Digitalisasi
+  if (isDigitalQuestion.value && form.value.jawaban === 'ya') {
+    const filledLinks = form.value.links.filter(l => l.link && l.link.trim())
+    if (!filledLinks.length) {
+      formError.value = 'Untuk indikator Digitalisasi, silakan masukkan minimal satu link website / portal / aplikasi.'
+      return
+    }
+    for (const l of filledLinks) {
+      if (isDriveUrl(l.link)) {
+        formError.value = 'Link Google Drive tidak diterima untuk indikator Digitalisasi. Harap masukkan tautan website/portal langsung atau unggah dokumen bukti PDF di bawah.'
+        return
+      }
+    }
+    // Beri judul default otomatis pada dokumen upload jika dikosongkan
+    docUploads.value.forEach(u => {
+      if (!u.judul || !u.judul.trim()) {
+        u.judul = u.file ? u.file.name.replace(/\.[^.]+$/, '') : 'Dokumentasi Digitalisasi'
+      }
+    })
   }
   const inputType = modal.value.question?.input_type || 'dokumen'
   const isDokumen = inputType === 'dokumen'

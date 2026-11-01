@@ -31,6 +31,13 @@
           <i class="fas fa-plus"></i> Tambah Pertanyaan
         </button>
         <button
+          @click="showResetModal = true"
+          class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl transition-all shadow-sm flex items-center gap-2 text-xs lg:text-sm font-bold"
+          title="Reset / Hapus Jawaban SAQ"
+        >
+          <i class="fas fa-trash-alt text-rose-500"></i> Reset Jawaban
+        </button>
+        <button
           @click="fetchAllData"
           class="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-2xl transition-colors flex items-center justify-center text-sm"
           title="Muat Ulang Data"
@@ -538,6 +545,15 @@
       @saved="onAttachSaved"
     />
 
+    <!-- MODAL RESET JAWABAN SAQ -->
+    <SaqResetAnswersModal
+      v-if="showResetModal"
+      :opds="opdsList"
+      :default-opd-id="selectedOpdId"
+      @close="showResetModal = false"
+      @done="onResetAnswersDone"
+    />
+
     <!-- MODAL KONFIRMASI HAPUS MASTER -->
     <div v-if="deleteTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="deleteTarget = null"></div>
@@ -633,6 +649,7 @@ const showSimilarModal = ref(false)
 const similarTargetItem = ref(null)
 
 const showAttachModal = ref(false)
+const showResetModal = ref(false)
 
 const deleteTarget = ref(null)
 const deleting = ref(false)
@@ -869,6 +886,12 @@ function onAttachSaved(data) {
   fetchAllData()
   fetchOpds()
   showToast(`${data?.attached_count || 'Beberapa'} pertanyaan berhasil ditambahkan ke OPD ini.`)
+}
+
+function onResetAnswersDone(message) {
+  showToast(message || 'Jawaban SAQ berhasil direset.')
+  fetchAllData()
+  fetchOpds()
 }
 
 // Similar Questions Modal
