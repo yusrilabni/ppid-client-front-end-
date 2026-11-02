@@ -182,36 +182,104 @@
                 </div>
                 <!-- DAFTAR JAWABAN KONSOLIDASI (mode full, superadmin) -->
                 <div v-if="isFullMode" class="mt-3 pt-3 border-t border-gray-100">
-                  <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">
-                    <i class="fas fa-reply-all mr-1"></i> Jawaban OPD ({{ getQuestionAnswers(q.id).length }})
-                  </p>
-                  <div v-if="getQuestionAnswers(q.id).length === 0" class="text-xs text-gray-400 italic">
-                    Belum ada jawaban
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-[11px] font-bold text-gray-700 uppercase tracking-wide flex items-center gap-1.5">
+                      <i class="fas fa-reply-all text-[#0052FF]"></i> Jawaban OPD ({{ getQuestionAnswers(q.id).length }})
+                    </p>
+                    <span v-if="getQuestionAnswers(q.id).length" class="text-[10px] text-gray-400">
+                      Gunakan tombol <span class="font-bold text-gray-600">Salin</span> untuk meng-copy URL
+                    </span>
                   </div>
-                  <div v-else class="space-y-1.5">
+                  <div v-if="getQuestionAnswers(q.id).length === 0" class="text-xs text-gray-400 italic bg-gray-50/70 p-3 rounded-xl border border-dashed border-gray-200">
+                    Belum ada jawaban dari OPD manapun.
+                  </div>
+                  <div v-else class="space-y-2">
                     <div v-for="ans in getQuestionAnswers(q.id)" :key="ans.id"
-                      class="flex items-center gap-2 text-xs bg-gray-50 rounded-xl px-3 py-2">
-                      <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0">
-                        <i class="fas fa-building"></i>
-                      </span>
-                      <div class="flex-1 min-w-0">
-                        <p class="font-bold text-gray-800 truncate">{{ ans.opd_name }}</p>
-                        <p v-if="ans.penulis" class="text-[10px] text-gray-500 truncate">
-                          oleh {{ ans.penulis }}
-                          <span :class="ans.jawaban === 'ya' ? 'text-emerald-600 font-bold' : 'text-gray-500 font-bold'">
-                            · {{ ans.jawaban === 'ya' ? 'Ya' : 'Tidak' }}
+                      class="p-3 bg-gray-50/90 hover:bg-gray-50 rounded-2xl border border-gray-200/90 transition-all space-y-2.5">
+                      <!-- Baris Atas: Info OPD & Status Ya/Tidak -->
+                      <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <span class="w-7 h-7 rounded-lg bg-blue-100 text-[#0052FF] flex items-center justify-center text-xs font-bold shrink-0">
+                            <i class="fas fa-building"></i>
                           </span>
-                        </p>
-                        <p v-if="ans.jawaban === 'tidak' && ans.alasan" class="text-[11px] text-amber-900 bg-amber-50/90 px-2 py-1 rounded-lg border border-amber-200 mt-1 italic">
-                          <strong class="font-semibold text-amber-950 not-italic">Alasan:</strong> {{ ans.alasan }}
-                        </p>
+                          <div class="min-w-0">
+                            <p class="font-bold text-gray-900 text-xs truncate">{{ ans.opd_name }}</p>
+                            <p v-if="ans.penulis" class="text-[10px] text-gray-500 truncate">
+                              Pengisi: <span class="font-medium text-gray-700">{{ ans.penulis }}</span>
+                            </p>
+                          </div>
+                        </div>
+                        <span class="shrink-0 text-[10px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wide flex items-center gap-1"
+                          :class="ans.jawaban === 'ya' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-gray-200 text-gray-700 border border-gray-300'">
+                          <i :class="ans.jawaban === 'ya' ? 'fas fa-check-circle text-emerald-600' : 'fas fa-times-circle text-gray-500'"></i>
+                          {{ ans.jawaban === 'ya' ? 'Ya, Ada' : 'Tidak Ada' }}
+                        </span>
                       </div>
-                      <a v-for="lnk in ans.links" :key="lnk.id" :href="lnk.link" target="_blank" rel="noopener"
-                        class="shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-[#0052FF] hover:bg-blue-50 hover:border-blue-300 transition-all"
-                        :title="lnk.judul || lnk.link">
-                        <i class="fas fa-external-link-alt mr-1"></i>{{ lnk.judul ? (lnk.judul.length > 20 ? lnk.judul.substring(0, 20) + '…' : lnk.judul) : 'Lihat' }}
-                      </a>
-                      <span v-if="!ans.links?.length" class="text-[10px] text-gray-400 italic shrink-0">tanpa link</span>
+
+                      <!-- Alasan jika Tidak Ada -->
+                      <div v-if="ans.jawaban === 'tidak' && ans.alasan" class="p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs text-amber-950 flex items-start gap-2">
+                        <i class="fas fa-comment-dots text-amber-600 mt-0.5 shrink-0"></i>
+                        <div class="min-w-0 flex-1">
+                          <span class="font-bold text-amber-900 block text-[10px] uppercase tracking-wide">Alasan Tidak Ada:</span>
+                          <span class="italic text-gray-800 leading-relaxed">{{ ans.alasan }}</span>
+                        </div>
+                      </div>
+
+                      <!-- DAFTAR BUKTI DUKUNG & LINK (DIBEDAKAN SECARA JELAS + TOMBOL SALIN) -->
+                      <div v-if="ans.links && ans.links.length" class="space-y-1.5 pt-0.5">
+                        <div v-for="lnk in ans.links" :key="lnk.id"
+                          class="flex items-center justify-between gap-2 p-2.5 rounded-xl border text-xs transition-all shadow-xs"
+                          :class="getLinkBadge(lnk).containerClass">
+                          <!-- Sisi Kiri: Ikon, Tipe, Judul/Nama Link -->
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs shrink-0 shadow-xs"
+                              :class="getLinkBadge(lnk).iconBg">
+                              <i :class="getLinkBadge(lnk).icon"></i>
+                            </span>
+                            <div class="min-w-0 flex-1">
+                              <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded shadow-xs"
+                                  :class="getLinkBadge(lnk).badgeClass">
+                                  {{ getLinkBadge(lnk).label }}
+                                </span>
+                                <span class="font-bold text-gray-900 truncate text-[11px]">
+                                  {{ lnk.judul || getLinkBadge(lnk).defaultTitle(lnk) }}
+                                </span>
+                              </div>
+                              <p class="text-[10px] text-gray-500 truncate font-mono mt-0.5" :title="lnk.link">
+                                {{ lnk.link }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <!-- Sisi Kanan: Tombol Salin & Tombol Buka -->
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <!-- Tombol Salin Link -->
+                            <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
+                              class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                              :class="copiedLinkId === (lnk.id || lnk.link)
+                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
+                                : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
+                              :title="copiedLinkId === (lnk.id || lnk.link) ? 'Link Berhasil Disalin!' : 'Salin URL Link ke Clipboard'">
+                              <i :class="copiedLinkId === (lnk.id || lnk.link) ? 'fas fa-check' : 'fas fa-copy text-gray-500'"></i>
+                              <span class="text-[10px]">{{ copiedLinkId === (lnk.id || lnk.link) ? 'Tersalin!' : 'Salin' }}</span>
+                            </button>
+
+                            <!-- Tombol Buka Tautan / File -->
+                            <a :href="lnk.link" target="_blank" rel="noopener"
+                              class="px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
+                              :class="getLinkBadge(lnk).buttonClass"
+                              :title="'Buka ' + getLinkBadge(lnk).label">
+                              <span class="text-[10px]">{{ getLinkBadge(lnk).buttonText }}</span>
+                              <i class="fas fa-external-link-alt text-[9px]"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else-if="ans.jawaban === 'ya'" class="text-[11px] text-gray-400 italic pt-1">
+                        <i class="fas fa-info-circle mr-1"></i>Belum ada link atau berkas yang dilampirkan.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -280,37 +348,106 @@
                         <i :class="q.terisi ? 'fas fa-eye mr-1.5' : (!canAnswer ? 'fas fa-lock mr-1.5' : 'fas fa-pen mr-1.5')"></i>{{ q.terisi ? (canAnswer ? 'Ubah' : 'Lihat') : (canAnswer ? 'Isi' : 'Terkunci') }}
                       </button>
                     </div>
+                    <!-- DAFTAR JAWABAN KONSOLIDASI (mode full, superadmin) -->
                     <div v-if="isFullMode" class="mt-3 pt-3 border-t border-gray-100">
-                      <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">
-                        <i class="fas fa-reply-all mr-1"></i> Jawaban OPD ({{ getQuestionAnswers(q.id).length }})
-                      </p>
-                      <div v-if="getQuestionAnswers(q.id).length === 0" class="text-xs text-gray-400 italic">
-                        Belum ada jawaban
+                      <div class="flex items-center justify-between mb-2">
+                        <p class="text-[11px] font-bold text-gray-700 uppercase tracking-wide flex items-center gap-1.5">
+                          <i class="fas fa-reply-all text-[#0052FF]"></i> Jawaban OPD ({{ getQuestionAnswers(q.id).length }})
+                        </p>
+                        <span v-if="getQuestionAnswers(q.id).length" class="text-[10px] text-gray-400">
+                          Gunakan tombol <span class="font-bold text-gray-600">Salin</span> untuk meng-copy URL
+                        </span>
                       </div>
-                      <div v-else class="space-y-1.5">
+                      <div v-if="getQuestionAnswers(q.id).length === 0" class="text-xs text-gray-400 italic bg-gray-50/70 p-3 rounded-xl border border-dashed border-gray-200">
+                        Belum ada jawaban dari OPD manapun.
+                      </div>
+                      <div v-else class="space-y-2">
                         <div v-for="ans in getQuestionAnswers(q.id)" :key="ans.id"
-                          class="flex items-center gap-2 text-xs bg-gray-50 rounded-xl px-3 py-2">
-                          <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0">
-                            <i class="fas fa-building"></i>
-                          </span>
-                          <div class="flex-1 min-w-0">
-                            <p class="font-bold text-gray-800 truncate">{{ ans.opd_name }}</p>
-                            <p v-if="ans.penulis" class="text-[10px] text-gray-500 truncate">
-                              oleh {{ ans.penulis }}
-                              <span :class="ans.jawaban === 'ya' ? 'text-emerald-600 font-bold' : 'text-gray-500 font-bold'">
-                                · {{ ans.jawaban === 'ya' ? 'Ya' : 'Tidak' }}
+                          class="p-3 bg-gray-50/90 hover:bg-gray-50 rounded-2xl border border-gray-200/90 transition-all space-y-2.5">
+                          <!-- Baris Atas: Info OPD & Status Ya/Tidak -->
+                          <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                              <span class="w-7 h-7 rounded-lg bg-blue-100 text-[#0052FF] flex items-center justify-center text-xs font-bold shrink-0">
+                                <i class="fas fa-building"></i>
                               </span>
-                            </p>
-                            <p v-if="ans.jawaban === 'tidak' && ans.alasan" class="text-[11px] text-amber-900 bg-amber-50/90 px-2 py-1 rounded-lg border border-amber-200 mt-1 italic">
-                              <strong class="font-semibold text-amber-950 not-italic">Alasan:</strong> {{ ans.alasan }}
-                            </p>
+                              <div class="min-w-0">
+                                <p class="font-bold text-gray-900 text-xs truncate">{{ ans.opd_name }}</p>
+                                <p v-if="ans.penulis" class="text-[10px] text-gray-500 truncate">
+                                  Pengisi: <span class="font-medium text-gray-700">{{ ans.penulis }}</span>
+                                </p>
+                              </div>
+                            </div>
+                            <span class="shrink-0 text-[10px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wide flex items-center gap-1"
+                              :class="ans.jawaban === 'ya' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-gray-200 text-gray-700 border border-gray-300'">
+                              <i :class="ans.jawaban === 'ya' ? 'fas fa-check-circle text-emerald-600' : 'fas fa-times-circle text-gray-500'"></i>
+                              {{ ans.jawaban === 'ya' ? 'Ya, Ada' : 'Tidak Ada' }}
+                            </span>
                           </div>
-                          <a v-for="lnk in ans.links" :key="lnk.id" :href="lnk.link" target="_blank" rel="noopener"
-                            class="shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-[#0052FF] hover:bg-blue-50 hover:border-blue-300 transition-all"
-                            :title="lnk.judul || lnk.link">
-                            <i class="fas fa-external-link-alt mr-1"></i>{{ lnk.judul ? (lnk.judul.length > 20 ? lnk.judul.substring(0, 20) + '…' : lnk.judul) : 'Lihat' }}
-                          </a>
-                          <span v-if="!ans.links?.length" class="text-[10px] text-gray-400 italic shrink-0">tanpa link</span>
+
+                          <!-- Alasan jika Tidak Ada -->
+                          <div v-if="ans.jawaban === 'tidak' && ans.alasan" class="p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs text-amber-950 flex items-start gap-2">
+                            <i class="fas fa-comment-dots text-amber-600 mt-0.5 shrink-0"></i>
+                            <div class="min-w-0 flex-1">
+                              <span class="font-bold text-amber-900 block text-[10px] uppercase tracking-wide">Alasan Tidak Ada:</span>
+                              <span class="italic text-gray-800 leading-relaxed">{{ ans.alasan }}</span>
+                            </div>
+                          </div>
+
+                          <!-- DAFTAR BUKTI DUKUNG & LINK (DIBEDAKAN SECARA JELAS + TOMBOL SALIN) -->
+                          <div v-if="ans.links && ans.links.length" class="space-y-1.5 pt-0.5">
+                            <div v-for="lnk in ans.links" :key="lnk.id"
+                              class="flex items-center justify-between gap-2 p-2.5 rounded-xl border text-xs transition-all shadow-xs"
+                              :class="getLinkBadge(lnk).containerClass">
+                              <!-- Sisi Kiri: Ikon, Tipe, Judul/Nama Link -->
+                              <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                <span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs shrink-0 shadow-xs"
+                                  :class="getLinkBadge(lnk).iconBg">
+                                  <i :class="getLinkBadge(lnk).icon"></i>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                  <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded shadow-xs"
+                                      :class="getLinkBadge(lnk).badgeClass">
+                                      {{ getLinkBadge(lnk).label }}
+                                    </span>
+                                    <span class="font-bold text-gray-900 truncate text-[11px]">
+                                      {{ lnk.judul || getLinkBadge(lnk).defaultTitle(lnk) }}
+                                    </span>
+                                  </div>
+                                  <p class="text-[10px] text-gray-500 truncate font-mono mt-0.5" :title="lnk.link">
+                                    {{ lnk.link }}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <!-- Sisi Kanan: Tombol Salin & Tombol Buka -->
+                              <div class="flex items-center gap-1.5 shrink-0">
+                                <!-- Tombol Salin Link -->
+                                <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
+                                  class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                                  :class="copiedLinkId === (lnk.id || lnk.link)
+                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
+                                    : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
+                                  :title="copiedLinkId === (lnk.id || lnk.link) ? 'Link Berhasil Disalin!' : 'Salin URL Link ke Clipboard'">
+                                  <i :class="copiedLinkId === (lnk.id || lnk.link) ? 'fas fa-check' : 'fas fa-copy text-gray-500'"></i>
+                                  <span class="text-[10px]">{{ copiedLinkId === (lnk.id || lnk.link) ? 'Tersalin!' : 'Salin' }}</span>
+                                </button>
+
+                                <!-- Tombol Buka Tautan / File -->
+                                <a :href="lnk.link" target="_blank" rel="noopener"
+                                  class="px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
+                                  :class="getLinkBadge(lnk).buttonClass"
+                                  :title="'Buka ' + getLinkBadge(lnk).label">
+                                  <span class="text-[10px]">{{ getLinkBadge(lnk).buttonText }}</span>
+                                  <i class="fas fa-external-link-alt text-[9px]"></i>
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div v-else-if="ans.jawaban === 'ya'" class="text-[11px] text-gray-400 italic pt-1">
+                            <i class="fas fa-info-circle mr-1"></i>Belum ada link atau berkas yang dilampirkan.
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -870,6 +1007,118 @@ const formError = ref('')
 const fotoFile = ref(null)
 const fotoPreview = ref('')
 const savedFoto = ref(null)
+
+// Fitur Salin Link & Klasifikasi Tampilan Bukti Dukung vs Tautan
+const copiedLinkId = ref(null)
+const copyToClipboard = async (text, id) => {
+  if (!text) return
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(text)
+    } else if (typeof document !== 'undefined') {
+      const ta = document.createElement('textarea')
+      ta.value = text
+      ta.style.position = 'fixed'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      document.body.removeChild(ta)
+    }
+    copiedLinkId.value = id
+    setTimeout(() => {
+      if (copiedLinkId.value === id) copiedLinkId.value = null
+    }, 2000)
+  } catch (e) {
+    console.error('Gagal menyalin:', e)
+  }
+}
+
+const getLinkBadge = (lnk) => {
+  const src = lnk?.sumber_informasi
+  const rawUrl = (lnk?.link || '').toLowerCase()
+
+  // 1. Bukti Dokumen / File Lampiran (PDF, Tangkapan Layar, Dokumen Storage)
+  if (src === 'lampiran' || rawUrl.includes('/storage/saq/') || /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|png|jpg|jpeg|webp)($|\?)/i.test(rawUrl)) {
+    const isImage = /\.(png|jpg|jpeg|webp)($|\?)/i.test(rawUrl)
+    return {
+      type: 'file',
+      label: isImage ? 'Bukti Tangkapan Layar' : 'Bukti Dokumen PDF',
+      icon: isImage ? 'fas fa-file-image text-rose-600' : 'fas fa-file-pdf text-rose-600',
+      iconBg: 'bg-rose-100 text-rose-600',
+      containerClass: 'bg-rose-50/70 border-rose-200/90 hover:border-rose-300',
+      badgeClass: 'bg-rose-100 text-rose-800 border border-rose-300',
+      buttonClass: 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/25',
+      buttonText: 'Lihat Bukti',
+      defaultTitle: (l) => (l.link || '').split('/').filter(Boolean).pop() || 'Dokumentasi Bukti',
+    }
+  }
+
+  // 2. Google Drive
+  if (src === 'drive' || rawUrl.includes('drive.google.com') || rawUrl.includes('docs.google.com')) {
+    return {
+      type: 'drive',
+      label: 'Google Drive',
+      icon: 'fab fa-google-drive text-amber-600',
+      iconBg: 'bg-amber-100 text-amber-700',
+      containerClass: 'bg-amber-50/70 border-amber-200/90 hover:border-amber-300',
+      badgeClass: 'bg-amber-100 text-amber-800 border border-amber-300',
+      buttonClass: 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/25',
+      buttonText: 'Buka Drive',
+      defaultTitle: () => 'Berkas Google Drive',
+    }
+  }
+
+  // 3. Foto Galeri
+  if (src === 'galeri' || rawUrl.includes('/storage/galeri/')) {
+    return {
+      type: 'galeri',
+      label: 'Foto Galeri',
+      icon: 'fas fa-images text-purple-600',
+      iconBg: 'bg-purple-100 text-purple-700',
+      containerClass: 'bg-purple-50/70 border-purple-200/90 hover:border-purple-300',
+      badgeClass: 'bg-purple-100 text-purple-800 border border-purple-300',
+      buttonClass: 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/25',
+      buttonText: 'Lihat Foto',
+      defaultTitle: () => 'Dokumentasi Galeri',
+    }
+  }
+
+  // 4. Dokumen PPID
+  if (src === 'informasi' || src === 'informasi_pemkab') {
+    return {
+      type: 'ppid',
+      label: 'Dokumen PPID',
+      icon: 'fas fa-shield-alt text-emerald-600',
+      iconBg: 'bg-emerald-100 text-emerald-700',
+      containerClass: 'bg-emerald-50/70 border-emerald-200/90 hover:border-emerald-300',
+      badgeClass: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
+      buttonClass: 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/25',
+      buttonText: 'Buka PPID',
+      defaultTitle: () => 'Dokumen Terpublikasi PPID',
+    }
+  }
+
+  // 5. Link Website / Portal / Aplikasi
+  return {
+    type: 'web',
+    label: 'Link Website / Portal',
+    icon: 'fas fa-globe text-[#0052FF]',
+    iconBg: 'bg-blue-100 text-[#0052FF]',
+    containerClass: 'bg-blue-50/70 border-blue-200/90 hover:border-blue-300',
+    badgeClass: 'bg-blue-100 text-[#0052FF] border border-blue-300',
+    buttonClass: 'bg-[#0052FF] hover:bg-[#0041CC] shadow-blue-600/25',
+    buttonText: 'Kunjungi Web',
+    defaultTitle: (l) => {
+      try {
+        const u = new URL(l.link)
+        return u.hostname + (u.pathname !== '/' ? u.pathname : '')
+      } catch {
+        return 'Tautan Website'
+      }
+    },
+  }
+}
 const todayLocal = () => {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
