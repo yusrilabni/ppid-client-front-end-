@@ -161,6 +161,13 @@
                     <p class="text-sm text-gray-800 leading-relaxed font-medium">{{ q.pertanyaan }}</p>
                     <p v-if="q.dokumen_upload" class="mt-1.5 text-xs text-gray-500 flex items-center gap-1.5"><i class="fas fa-paperclip text-gray-400"></i><span class="line-clamp-1">{{ q.dokumen_upload }}</span></p>
                     <p v-if="q.klasifikasi_otomatis" class="mt-1 text-[11px] text-gray-400"><i class="fas fa-tag mr-1"></i>{{ q.klasifikasi_otomatis }}</p>
+                    <div v-if="q.jawaban === 'tidak' && q.alasan" class="mt-2.5 p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 flex items-start gap-2">
+                      <i class="fas fa-comment-dots text-amber-600 mt-0.5 shrink-0"></i>
+                      <div class="min-w-0 flex-1">
+                        <span class="font-bold text-amber-900 block text-[11px] uppercase tracking-wide">Alasan Tidak Ada:</span>
+                        <span class="italic text-gray-800 leading-relaxed">{{ q.alasan }}</span>
+                      </div>
+                    </div>
                   </div>
                   <!-- Tombol aksi -->
                   <button @click="openAnswerModal(q)"
@@ -194,6 +201,9 @@
                           <span :class="ans.jawaban === 'ya' ? 'text-emerald-600 font-bold' : 'text-gray-500 font-bold'">
                             · {{ ans.jawaban === 'ya' ? 'Ya' : 'Tidak' }}
                           </span>
+                        </p>
+                        <p v-if="ans.jawaban === 'tidak' && ans.alasan" class="text-[11px] text-amber-900 bg-amber-50/90 px-2 py-1 rounded-lg border border-amber-200 mt-1 italic">
+                          <strong class="font-semibold text-amber-950 not-italic">Alasan:</strong> {{ ans.alasan }}
                         </p>
                       </div>
                       <a v-for="lnk in ans.links" :key="lnk.id" :href="lnk.link" target="_blank" rel="noopener"
@@ -252,6 +262,13 @@
                         <p class="text-sm text-gray-800 leading-relaxed font-medium">{{ q.pertanyaan }}</p>
                         <p v-if="q.dokumen_upload" class="mt-1.5 text-xs text-gray-500 flex items-center gap-1.5"><i class="fas fa-paperclip text-gray-400"></i><span class="line-clamp-1">{{ q.dokumen_upload }}</span></p>
                         <p v-if="q.klasifikasi_otomatis" class="mt-1 text-[11px] text-gray-400"><i class="fas fa-tag mr-1"></i>{{ q.klasifikasi_otomatis }}</p>
+                    <div v-if="q.jawaban === 'tidak' && q.alasan" class="mt-2.5 p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 flex items-start gap-2">
+                      <i class="fas fa-comment-dots text-amber-600 mt-0.5 shrink-0"></i>
+                      <div class="min-w-0 flex-1">
+                        <span class="font-bold text-amber-900 block text-[11px] uppercase tracking-wide">Alasan Tidak Ada:</span>
+                        <span class="italic text-gray-800 leading-relaxed">{{ q.alasan }}</span>
+                      </div>
+                    </div>
                       </div>
                       <button @click="openAnswerModal(q)"
                         class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
@@ -284,6 +301,9 @@
                                 · {{ ans.jawaban === 'ya' ? 'Ya' : 'Tidak' }}
                               </span>
                             </p>
+                            <p v-if="ans.jawaban === 'tidak' && ans.alasan" class="text-[11px] text-amber-900 bg-amber-50/90 px-2 py-1 rounded-lg border border-amber-200 mt-1 italic">
+                              <strong class="font-semibold text-amber-950 not-italic">Alasan:</strong> {{ ans.alasan }}
+                            </p>
                           </div>
                           <a v-for="lnk in ans.links" :key="lnk.id" :href="lnk.link" target="_blank" rel="noopener"
                             class="shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-[#0052FF] hover:bg-blue-50 hover:border-blue-300 transition-all"
@@ -307,17 +327,50 @@
     <Transition name="modal">
       <div v-if="modal.open" class="fixed inset-0 z-[1000] flex items-end md:items-center justify-center p-0 md:p-6">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="modal.open = false"></div>
-        <div class="relative bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-3xl p-6 md:p-8 shadow-2xl max-h-[92vh] overflow-y-auto">
-          <div class="flex items-start justify-between mb-1">
-            <h3 class="font-extrabold text-lg text-gray-900">{{ modal.existing ? 'Jawaban Tersimpan' : 'Isi Jawaban' }}</h3>
-            <button @click="modal.open = false" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors">
-              <i class="fas fa-times"></i>
+        <div class="relative bg-white w-full md:max-w-xl rounded-t-3xl md:rounded-3xl p-6 md:p-8 shadow-2xl max-h-[92vh] overflow-y-auto">
+          <!-- HEADER MODAL -->
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Formulir SAQ Monev</span>
+              <h3 class="font-black text-xl text-gray-900">{{ modal.existing ? 'Detail / Ubah Jawaban' : 'Isi Jawaban Indikator' }}</h3>
+            </div>
+            <button @click="modal.open = false" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors shrink-0">
+              <i class="fas fa-times text-base"></i>
             </button>
           </div>
-          <p class="text-xs text-gray-500 mb-3"><span class="font-mono text-[#0052FF] font-bold">{{ modal.question?.kode }}</span> — {{ modal.question?.pertanyaan }}</p>
+
+          <!-- KOTAK PERTANYAAN (DITEGASKAN SANGAT JELAS) -->
+          <div class="mb-5 p-4 md:p-5 rounded-2xl bg-gradient-to-br from-blue-50/90 via-sky-50/40 to-white border-2 border-blue-200 shadow-sm relative overflow-hidden">
+            <div class="absolute -right-3 -top-3 w-16 h-16 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#0052FF] text-white text-xs font-mono font-black tracking-wide shadow-sm shadow-blue-500/25">
+                <i class="fas fa-hashtag text-[10px]"></i>
+                {{ modal.question?.kode }}
+              </span>
+              <span v-if="modal.question?.tab" class="px-2.5 py-0.5 rounded-lg bg-blue-100 text-[#0052FF] text-xs font-bold">
+                Tab: {{ modal.question?.tab }}
+              </span>
+              <span v-if="modal.question?.bagian" class="px-2.5 py-0.5 rounded-lg bg-teal-100 text-teal-800 text-xs font-bold">
+                {{ modal.question?.bagian }}
+              </span>
+              <span v-if="modal.question?.input_type" class="px-2.5 py-0.5 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold">
+                Bukti: {{ modal.question?.input_type === 'foto' ? 'Foto / Galeri' : (modal.question?.input_type === 'situs' ? 'Tautan Situs' : 'Dokumen / Berkas') }}
+              </span>
+            </div>
+            <p class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i class="fas fa-question-circle"></i> Pertanyaan / Indikator yang dinilai:
+            </p>
+            <h4 class="text-base md:text-lg font-black text-gray-900 leading-snug">
+              {{ modal.question?.pertanyaan }}
+            </h4>
+            <div v-if="modal.question?.dokumen_upload" class="mt-2.5 pt-2.5 border-t border-blue-200/60 flex items-start gap-2 text-xs text-blue-900/90">
+              <i class="fas fa-paperclip text-[#0052FF] mt-0.5 shrink-0"></i>
+              <span class="leading-relaxed"><strong>Contoh Bukti/Acuan:</strong> {{ modal.question?.dokumen_upload }}</span>
+            </div>
+          </div>
 
           <!-- Info otomatis (read-only) -->
-          <div class="mb-5 p-3 rounded-2xl bg-gray-50 border border-gray-200 text-xs space-y-1.5">
+          <div class="mb-5 p-3.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-500">Pengguna</span>
               <span class="font-bold text-gray-900">{{ authStore.userName || '-' }}</span>
@@ -342,9 +395,23 @@
                 <span class="font-bold text-[#0052FF]">{{ modal.question?.input_type === 'situs' ? 'Link Situs/Web' : 'Link Foto' }}</span>
               </div>
             </template>
-            <div class="flex justify-between">
+            <div class="flex justify-between items-center">
               <span class="text-gray-500">Status</span>
-              <span class="font-bold" :class="modal.existing ? 'text-emerald-600' : 'text-amber-600'">{{ modal.existing ? 'Sudah Terisi' : 'Belum Diisi' }}</span>
+              <span class="font-bold px-2 py-0.5 rounded text-[11px]" :class="modal.existing ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">
+                {{ modal.existing ? 'Sudah Terisi' : 'Belum Diisi' }}
+              </span>
+            </div>
+            <div v-if="modal.existing?.jawaban" class="flex justify-between items-center pt-1.5 border-t border-gray-200/70">
+              <span class="text-gray-500">Jawaban Terpilih</span>
+              <span class="font-bold px-2 py-0.5 rounded text-[11px]" :class="modal.existing.jawaban === 'ya' ? 'bg-emerald-500 text-white' : 'bg-gray-700 text-white'">
+                {{ modal.existing.jawaban === 'ya' ? 'Ya, Ada' : 'Tidak Ada' }}
+              </span>
+            </div>
+            <div v-if="modal.existing?.jawaban === 'tidak' && (modal.existing?.alasan || form.alasan)" class="pt-2 border-t border-gray-200 text-xs">
+              <span class="text-gray-500 block mb-0.5">Alasan Tersimpan:</span>
+              <span class="font-medium text-amber-900 bg-amber-50 p-2.5 rounded-xl border border-amber-200 block italic leading-relaxed">
+                {{ modal.existing?.alasan || form.alasan }}
+              </span>
             </div>
           </div>
 
@@ -362,7 +429,7 @@
           <form v-else @submit.prevent="submitAnswer" class="space-y-4">
             <!-- YA / TIDAK -->
             <div>
-              <label class="block text-xs font-bold text-gray-700 mb-1.5">Apakah OPD memiliki/memenuhi ini? *</label>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Apakah OPD memiliki/memenuhi indikator ini? *</label>
               <div class="grid grid-cols-2 gap-2">
                 <button type="button" @click="form.jawaban = 'ya'"
                   class="py-3 rounded-2xl font-bold text-sm border-2 transition-all"
@@ -374,11 +441,37 @@
                 <button type="button" @click="form.jawaban = 'tidak'"
                   class="py-3 rounded-2xl font-bold text-sm border-2 transition-all"
                   :class="form.jawaban === 'tidak'
-                    ? 'bg-gray-500 border-gray-500 text-white shadow-lg shadow-gray-500/25'
+                    ? 'bg-gray-700 border-gray-700 text-white shadow-lg shadow-gray-700/25'
                     : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'">
                   <i class="fas fa-times mr-2"></i>Tidak Ada
                 </button>
               </div>
+            </div>
+
+            <!-- FORM JIKA JAWABAN TIDAK ADA: ALASAN (WAJIB DIISI) -->
+            <div v-if="form.jawaban === 'tidak'" class="p-4 md:p-5 rounded-2xl bg-amber-50/90 border-2 border-amber-300 space-y-3 shadow-sm animate-fadeIn">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-black text-amber-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <i class="fas fa-exclamation-triangle text-amber-600"></i>
+                  Alasan Tidak Memiliki / Tidak Ada <span class="text-rose-600 font-bold">* (Wajib Diisi)</span>
+                </label>
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900">
+                  Harus Dijawab
+                </span>
+              </div>
+              <p class="text-xs text-amber-900 leading-relaxed">
+                Jelaskan secara jelas mengapa OPD Anda belum atau tidak memenuhi indikator <strong>{{ modal.question?.kode }}</strong> ini (misal: regulasi SOP masih dalam penyusunan, aplikasi masih dalam pengembangan, atau bukan merupakan tugas pokok & fungsi OPD). Alasan ini wajib dicatat untuk evaluasi Tim Monev.
+              </p>
+              <textarea
+                v-model="form.alasan"
+                rows="4"
+                required
+                placeholder="Tuliskan alasan mengapa indikator ini tidak ada / belum terpenuhi secara rinci..."
+                class="w-full text-xs md:text-sm rounded-xl border-2 border-amber-300 p-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-amber-500/20 bg-white shadow-sm leading-relaxed"
+              ></textarea>
+              <p v-if="!form.alasan?.trim()" class="text-xs text-rose-600 font-medium flex items-center gap-1.5">
+                <i class="fas fa-circle-exclamation"></i> Alasan tidak boleh kosong jika memilih "Tidak Ada".
+              </p>
             </div>
 
             <!-- KHUSUS INDIKATOR DIGITALISASI (TANPA TAB: LANGSUNG LINK + BUKTI DUKUNG DOKUMENTASI/PDF OPSIONAL) -->
@@ -728,10 +821,13 @@
               <i class="fas fa-lock text-amber-600 text-sm"></i>
               <span>Pengisian dan perubahan jawaban SAQ saat ini sedang dikunci oleh Superadmin (Hanya dapat dilihat).</span>
             </div>
-            <button v-else type="submit" :disabled="submitting"
-              class="w-full py-3 rounded-2xl bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white font-bold text-sm shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 disabled:opacity-50 transition-all">
-              <i :class="submitting ? 'fas fa-spinner fa-spin' : 'fas fa-save'" class="mr-2"></i>
-              {{ submitting ? 'Menyimpan...' : 'Simpan Jawaban' }}
+            <button v-else type="submit" :disabled="submitting || (form.jawaban === 'tidak' && !form.alasan?.trim())"
+              class="w-full py-3.5 rounded-2xl font-bold text-sm shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+              :class="form.jawaban === 'tidak'
+                ? 'bg-gradient-to-r from-gray-700 to-gray-900 text-white shadow-gray-700/25 hover:shadow-gray-700/40'
+                : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-blue-600/25 hover:shadow-blue-600/40'">
+              <i :class="submitting ? 'fas fa-spinner fa-spin' : (form.jawaban === 'tidak' ? 'fas fa-check-circle' : 'fas fa-save')"></i>
+              <span>{{ submitting ? 'Menyimpan...' : (form.jawaban === 'tidak' ? 'Simpan Jawaban (Tidak Ada)' : 'Simpan Jawaban') }}</span>
             </button>
           </form>
         </div>
@@ -931,7 +1027,7 @@ const openAnswerModal = async (q) => {
   docUploads.value = []
   driveRows.value = []
   savedUploads.value = []
-  form.value = { jawaban: null, visibility: 'public', links: [{ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }], fotoJudul: '', fotoTanggal: todayLocal() }
+  form.value = { jawaban: null, alasan: q.alasan || '', visibility: 'public', links: [{ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }], fotoJudul: '', fotoTanggal: todayLocal() }
   fotoFile.value = null
   if (fotoPreview.value) { URL.revokeObjectURL(fotoPreview.value); fotoPreview.value = '' }
   savedFoto.value = null
@@ -942,6 +1038,7 @@ const openAnswerModal = async (q) => {
       if (found) {
         modal.value.existing = found
         form.value.jawaban = found.jawaban || null
+        form.value.alasan = found.alasan || (found.judul && found.judul.startsWith('Tidak Ada: ') ? found.judul.replace('Tidak Ada: ', '') : '') || q.alasan || ''
         form.value.visibility = found.visibility || 'public'
         if (found.links && found.links.length) {
           const nl = []
@@ -1052,6 +1149,12 @@ const submitAnswer = async () => {
     formError.value = 'Pilih dulu: Ya atau Tidak.'
     return
   }
+  if (form.value.jawaban === 'tidak') {
+    if (!form.value.alasan || !form.value.alasan.trim()) {
+      formError.value = 'Alasan wajib diisi jika Anda memilih "Tidak Ada".'
+      return
+    }
+  }
   // Validasi Khusus Indikator Digitalisasi
   if (isDigitalQuestion.value && form.value.jawaban === 'ya') {
     const filledLinks = form.value.links.filter(l => l.link && l.link.trim())
@@ -1145,6 +1248,9 @@ const submitAnswer = async () => {
       fd.append('organization_id', String(opd.value.id))
       fd.append('indicator_id', String(modal.value.question.id))
       fd.append('jawaban', form.value.jawaban)
+      if (form.value.jawaban === 'tidak') {
+        fd.append('alasan', (form.value.alasan || '').trim())
+      }
       fd.append('visibility', form.value.visibility)
       links.forEach((l, i) => {
         fd.append(`links[${i}][judul]`, l.judul)
@@ -1177,6 +1283,7 @@ const submitAnswer = async () => {
         organization_id: opd.value.id,
         indicator_id: modal.value.question.id,
         jawaban: form.value.jawaban,
+        alasan: form.value.jawaban === 'tidak' ? (form.value.alasan || '').trim() : null,
         visibility: form.value.visibility,
         links: links.map(l => ({ judul: l.judul, link: l.link, deskripsi: l.deskripsi || null, mode: l.mode, sync_url: l.sync_url })),
       }, { skipAuthRedirect: true })
@@ -1188,6 +1295,7 @@ const submitAnswer = async () => {
     savedFoto.value = null
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
+    queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
   } catch (e) {
     formError.value = e.response?.data?.message || e.message || 'Gagal menyimpan jawaban.'
   } finally {
