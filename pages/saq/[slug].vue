@@ -252,11 +252,22 @@
                             </div>
                           </div>
 
-                          <!-- Sisi Kanan: Tombol Salin & Tombol Buka -->
+                          <!-- Sisi Kanan: Tombol Unduh, Salin & Buka -->
                           <div class="flex items-center gap-1.5 shrink-0">
+                            <!-- Tombol Unduh Berkas Bukti Dukung (Nama Otomatis Disesuaikan dengan Kode Soal & Nama OPD) -->
+                            <a v-if="isDownloadable(lnk)"
+                              :href="getDownloadEvidenceUrl(q, ans, lnk)"
+                              target="_blank"
+                              download
+                              class="px-2 py-1 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
+                              :title="'Unduh Berkas ' + (lnk.judul || 'Bukti Dukung')">
+                              <i class="fas fa-download text-[10px]"></i>
+                              <span class="text-[10px]">Unduh</span>
+                            </a>
+
                             <!-- Tombol Salin Link -->
                             <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
-                              class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                              class="px-2 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
                               :class="copiedLinkId === (lnk.id || lnk.link)
                                 ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
                                 : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
@@ -267,7 +278,7 @@
 
                             <!-- Tombol Buka Tautan / File -->
                             <a :href="lnk.link" target="_blank" rel="noopener"
-                              class="px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
+                              class="px-2 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
                               :class="getLinkBadge(lnk).buttonClass"
                               :title="'Buka ' + getLinkBadge(lnk).label">
                               <span class="text-[10px]">{{ getLinkBadge(lnk).buttonText }}</span>
@@ -420,11 +431,22 @@
                                 </div>
                               </div>
 
-                              <!-- Sisi Kanan: Tombol Salin & Tombol Buka -->
+                              <!-- Sisi Kanan: Tombol Unduh, Salin & Buka -->
                               <div class="flex items-center gap-1.5 shrink-0">
+                                <!-- Tombol Unduh Berkas Bukti Dukung (Nama Otomatis Disesuaikan dengan Kode Soal & Nama OPD) -->
+                                <a v-if="isDownloadable(lnk)"
+                                  :href="getDownloadEvidenceUrl(q, ans, lnk)"
+                                  target="_blank"
+                                  download
+                                  class="px-2 py-1 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
+                                  :title="'Unduh Berkas ' + (lnk.judul || 'Bukti Dukung')">
+                                  <i class="fas fa-download text-[10px]"></i>
+                                  <span class="text-[10px]">Unduh</span>
+                                </a>
+
                                 <!-- Tombol Salin Link -->
                                 <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
-                                  class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                                  class="px-2 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
                                   :class="copiedLinkId === (lnk.id || lnk.link)
                                     ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
                                     : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
@@ -435,7 +457,7 @@
 
                                 <!-- Tombol Buka Tautan / File -->
                                 <a :href="lnk.link" target="_blank" rel="noopener"
-                                  class="px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
+                                  class="px-2 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
                                   :class="getLinkBadge(lnk).buttonClass"
                                   :title="'Buka ' + getLinkBadge(lnk).label">
                                   <span class="text-[10px]">{{ getLinkBadge(lnk).buttonText }}</span>
@@ -1118,6 +1140,43 @@ const getLinkBadge = (lnk) => {
       }
     },
   }
+}
+
+// Cek apakah tautan dapat diunduh langsung sebagai file bukti fisik
+const isDownloadable = (lnk) => {
+  const badge = getLinkBadge(lnk)
+  const rawUrl = (lnk?.link || '').toLowerCase()
+  return badge.type === 'file' || badge.type === 'galeri' || rawUrl.includes('/storage/')
+}
+
+// Format nama file saat didownload (mengandung kode indikator dan nama OPD)
+const formatEvidenceFileName = (q, ans, lnk) => {
+  const qKode = (q?.kode || 'SOAL').replace(/[^a-zA-Z0-9_-]/g, '_')
+  const opdName = (ans?.opd_name || 'OPD')
+    .replace(/^Pemerintah Kabupaten Sinjai/i, 'Pemkab_Sinjai')
+    .replace(/[^a-zA-Z0-9\s_-]/g, '')
+    .trim()
+    .replace(/\s+/g, '_')
+    .substring(0, 40)
+
+  const rawUrl = lnk?.link || ''
+  const cleanUrl = rawUrl.split('?')[0].split('#')[0]
+  const ext = cleanUrl.includes('.') ? cleanUrl.split('.').pop().toLowerCase() : 'pdf'
+
+  let title = (lnk?.judul || '').trim()
+  if (!title || title === cleanUrl) {
+    const rawFileName = cleanUrl.split('/').filter(Boolean).pop() || 'Bukti_Dukung'
+    title = rawFileName.replace(/\.[^.]+$/, '')
+  }
+  const cleanTitle = title.replace(/[^a-zA-Z0-9\s_-]/g, '').trim().replace(/\s+/g, '_').substring(0, 50)
+
+  return `[${qKode}]_[${opdName}]_${cleanTitle || 'Bukti'}.${ext}`
+}
+
+const getDownloadEvidenceUrl = (q, ans, lnk) => {
+  const customFileName = formatEvidenceFileName(q, ans, lnk)
+  const baseApi = api.defaults.baseURL || 'https://ppidkab.sinjaikab.go.id/api/v1'
+  return `${baseApi}/saq/download-evidence?url=${encodeURIComponent(lnk.link)}&filename=${encodeURIComponent(customFileName)}`
 }
 const todayLocal = () => {
   const d = new Date()
