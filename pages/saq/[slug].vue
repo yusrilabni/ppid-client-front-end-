@@ -265,16 +265,26 @@
                               <span class="text-[10px]">Unduh</span>
                             </a>
 
-                            <!-- Tombol Salin Link -->
-                            <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
-                              class="px-2 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
-                              :class="copiedLinkId === (lnk.id || lnk.link)
-                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
-                                : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
-                              :title="copiedLinkId === (lnk.id || lnk.link) ? 'Link Berhasil Disalin!' : 'Salin URL Link ke Clipboard'">
-                              <i :class="copiedLinkId === (lnk.id || lnk.link) ? 'fas fa-check' : 'fas fa-copy text-gray-500'"></i>
-                              <span class="text-[10px]">{{ copiedLinkId === (lnk.id || lnk.link) ? 'Tersalin!' : 'Salin' }}</span>
-                            </button>
+                            <!-- Tombol Salin Link dengan Tooltip URL saat Pointer Diarahkan -->
+                            <div class="relative group/copy">
+                              <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
+                                class="px-2 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                                :class="copiedLinkId === (lnk.id || lnk.link)
+                                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
+                                  : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
+                                :title="'Salin: ' + lnk.link">
+                                <i :class="copiedLinkId === (lnk.id || lnk.link) ? 'fas fa-check' : 'fas fa-copy text-gray-500'"></i>
+                                <span class="text-[10px]">{{ copiedLinkId === (lnk.id || lnk.link) ? 'Tersalin!' : 'Salin' }}</span>
+                              </button>
+                              <!-- Popover / Tooltip URL yang diisi saat pointer diarahkan -->
+                              <div class="absolute bottom-full right-0 mb-1.5 hidden group-hover/copy:flex flex-col z-50 pointer-events-none w-max max-w-xs sm:max-w-sm">
+                                <div class="bg-gray-900 text-white text-[11px] font-mono px-3 py-1.5 rounded-xl shadow-xl border border-gray-700 break-all leading-snug">
+                                  <span class="text-amber-400 block text-[9px] font-sans font-bold uppercase tracking-wider mb-0.5">Tautan yang Diisi:</span>
+                                  <span class="text-white">{{ lnk.link }}</span>
+                                </div>
+                                <div class="w-2.5 h-2.5 bg-gray-900 rotate-45 self-end mr-4 -mt-1 border-r border-b border-gray-700"></div>
+                              </div>
+                            </div>
 
                             <!-- Tombol Buka Tautan / File -->
                             <a :href="lnk.link" target="_blank" rel="noopener"
@@ -444,16 +454,26 @@
                                   <span class="text-[10px]">Unduh</span>
                                 </a>
 
-                                <!-- Tombol Salin Link -->
-                                <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
-                                  class="px-2 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95"
-                                  :class="copiedLinkId === (lnk.id || lnk.link)
-                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
-                                    : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
-                                  :title="copiedLinkId === (lnk.id || lnk.link) ? 'Link Berhasil Disalin!' : 'Salin URL Link ke Clipboard'">
-                                  <i :class="copiedLinkId === (lnk.id || lnk.link) ? 'fas fa-check' : 'fas fa-copy text-gray-500'"></i>
-                                  <span class="text-[10px]">{{ copiedLinkId === (lnk.id || lnk.link) ? 'Tersalin!' : 'Salin' }}</span>
-                                </button>
+                                <!-- Tombol Salin Link dengan Tooltip URL saat Pointer Diarahkan -->
+                                <div class="relative group/copy">
+                                  <button type="button" @click.stop="copyToClipboard(lnk.link, lnk.id || lnk.link)"
+                                    class="px-2 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                                    :class="copiedLinkId === (lnk.id || lnk.link)
+                                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/30'
+                                      : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'"
+                                    :title="'Salin: ' + lnk.link">
+                                    <i :class="copiedLinkId === (lnk.id || lnk.link) ? 'fas fa-check' : 'fas fa-copy text-gray-500'"></i>
+                                    <span class="text-[10px]">{{ copiedLinkId === (lnk.id || lnk.link) ? 'Tersalin!' : 'Salin' }}</span>
+                                  </button>
+                                  <!-- Popover / Tooltip URL yang diisi saat pointer diarahkan -->
+                                  <div class="absolute bottom-full right-0 mb-1.5 hidden group-hover/copy:flex flex-col z-50 pointer-events-none w-max max-w-xs sm:max-w-sm">
+                                    <div class="bg-gray-900 text-white text-[11px] font-mono px-3 py-1.5 rounded-xl shadow-xl border border-gray-700 break-all leading-snug">
+                                      <span class="text-amber-400 block text-[9px] font-sans font-bold uppercase tracking-wider mb-0.5">Tautan yang Diisi:</span>
+                                      <span class="text-white">{{ lnk.link }}</span>
+                                    </div>
+                                    <div class="w-2.5 h-2.5 bg-gray-900 rotate-45 self-end mr-4 -mt-1 border-r border-b border-gray-700"></div>
+                                  </div>
+                                </div>
 
                                 <!-- Tombol Buka Tautan / File -->
                                 <a :href="lnk.link" target="_blank" rel="noopener"
@@ -1142,11 +1162,16 @@ const getLinkBadge = (lnk) => {
   }
 }
 
-// Cek apakah tautan dapat diunduh langsung sebagai file bukti fisik
+// Cek apakah tautan dapat diunduh langsung (file storage lokal, Google Drive dokumen/file, PDF/Office)
 const isDownloadable = (lnk) => {
+  const url = (lnk?.link || '').trim().toLowerCase()
+  if (!url) return false
+  if (url.includes('/storage/')) return true
+  if (url.includes('drive.google.com/file/d/') || url.includes('drive.google.com/open?id=') || url.includes('drive.google.com/uc?')) return true
+  if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/spreadsheets/d/') || url.includes('docs.google.com/presentation/d/')) return true
+  if (/\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|webp|zip|rar)($|\?|#)/i.test(url)) return true
   const badge = getLinkBadge(lnk)
-  const rawUrl = (lnk?.link || '').toLowerCase()
-  return badge.type === 'file' || badge.type === 'galeri' || rawUrl.includes('/storage/')
+  return badge.type === 'file' || badge.type === 'galeri' || badge.type === 'drive'
 }
 
 // Format nama file saat didownload (mengandung kode indikator dan nama OPD)
