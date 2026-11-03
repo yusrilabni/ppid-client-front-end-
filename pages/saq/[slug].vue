@@ -1128,7 +1128,7 @@
                         <span>Ketentuan Sinkronisasi Dokumen Terdaftar:</span>
                       </p>
                       <p class="text-[11px] leading-relaxed">
-                        Jika dokumen sudah pernah diunggah sebelumnya pada website PPID (<code>https://ppid.sinjaikab.go.id/informasi/...</code>) atau website Portal Pemkab Sinjai (<code>https://sinjaikab.go.id/informasi/...</code>), masukkan tautan dokumen tersebut di bawah. Sistem akan memverifikasi dan menyinkronkan dokumen dari database server tanpa menduplikasi data di server.
+                        Jika dokumen sudah pernah diunggah sebelumnya pada website PPID (<code>https://ppid.sinjaikab.go.id/informasi/detail/...</code>) atau website Portal Pemkab Sinjai (<code>https://sinjaikab.go.id/informasi/...</code>), masukkan tautan dokumen tersebut di bawah. Sistem akan memverifikasi dan menyinkronkan dokumen dari database server tanpa menduplikasi data di server.
                       </p>
                       <p class="text-[11px] text-amber-800 font-semibold">
                         <i class="fas fa-shield-alt mr-1"></i>Selain tautan resmi domain PPID atau Portal Pemkab Sinjai, tautan luar dibatasi dan wajib menggunakan <strong>Pilihan 1</strong> (Upload Berkas / Google Drive).
@@ -1140,7 +1140,7 @@
                       <label class="block text-xs font-bold text-gray-700">Tautan Dokumen PPID / Pemkab Sinjai *</label>
                       <div class="flex flex-col sm:flex-row gap-2">
                         <input v-model="syncUrl" type="url"
-                          placeholder="https://ppid.sinjaikab.go.id/informasi/... atau https://sinjaikab.go.id/informasi/..."
+                          placeholder="https://ppid.sinjaikab.go.id/informasi/detail/... atau https://sinjaikab.go.id/informasi/..."
                           class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-cyan-600 focus:ring-4 focus:ring-cyan-500/10 outline-none text-xs" />
                         <button type="button" @click="doSyncDocument" :disabled="syncLoading || !syncUrl"
                           class="px-4 py-2.5 rounded-xl bg-cyan-600 text-white font-bold text-xs hover:bg-cyan-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 shadow-sm shrink-0">
@@ -1777,8 +1777,9 @@ const openAnswerModal = async (q) => {
 
 const isPpidDetailUrl = (raw) => {
   try {
-    const u = new URL(raw.trim())
-    if (!['ppid.sinjaikab.go.id', 'www.ppid.sinjaikab.go.id'].includes(u.hostname)) return false
+    const u = new URL((raw || '').trim())
+    const host = u.hostname.replace(/^www\./, '').toLowerCase()
+    if (!['ppid.sinjaikab.go.id', 'sinjaikab.go.id'].includes(host)) return false
     const parts = u.pathname.replace(/^\/+|\/+$/g, '').split('/')
     return parts.length >= 2 && parts[0] === 'informasi' && !!parts[1]
   } catch { return false }
