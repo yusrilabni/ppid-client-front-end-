@@ -1218,30 +1218,6 @@
               OPD dinyatakan <strong>tidak memiliki</strong> indikator ini — tidak perlu mengisi link dokumen.
             </div>
 
-            <div v-if="form.jawaban === 'ya' && showVisibility">
-              <label class="block text-xs font-bold text-gray-700 mb-1.5">Visibilitas Dokumen *</label>
-              <div class="grid grid-cols-2 gap-2">
-                <button type="button" @click="form.visibility = 'public'"
-                  class="py-2.5 rounded-xl font-bold text-xs border-2 transition-all"
-                  :class="form.visibility === 'public'
-                    ? 'bg-[#0052FF] border-[#0052FF] text-white shadow-md shadow-blue-600/25'
-                    : 'bg-white border-gray-200 text-gray-500 hover:border-blue-300'">
-                  <i class="fas fa-globe mr-1.5"></i>Public
-                </button>
-                <button type="button" @click="form.visibility = 'private'"
-                  class="py-2.5 rounded-xl font-bold text-xs border-2 transition-all"
-                  :class="form.visibility === 'private'
-                    ? 'bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-500/25'
-                    : 'bg-white border-gray-200 text-gray-500 hover:border-amber-300'">
-                  <i class="fas fa-lock mr-1.5"></i>Private
-                </button>
-              </div>
-              <p class="mt-1.5 text-[11px] text-gray-500">
-                <span v-if="form.visibility === 'public'">Dokumen tampil di daftar informasi publik.</span>
-                <span v-else>Dokumen hanya terlihat oleh unit OPD penyedia (tidak tampil publik).</span>
-              </p>
-            </div>
-            <p v-if="form.jawaban === 'ya' && !showVisibility" class="text-[11px] text-gray-500">Visibilitas publik tidak berlaku untuk link / lampiran saja — hanya berlaku bila ada bukti yang dijadikan Informasi.</p>
             <div v-if="formError" class="p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-600">{{ formError }}</div>
             <div v-if="!canAnswer" class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center gap-2.5">
               <i class="fas fa-lock text-amber-600 text-sm"></i>
@@ -1338,7 +1314,37 @@ const getLinkBadge = (lnk) => {
   const src = lnk?.sumber_informasi
   const rawUrl = (lnk?.link || '').toLowerCase()
 
-  // 1. Bukti Dokumen / File Lampiran (PDF, Tangkapan Layar, Dokumen Storage)
+  // 1. Dokumen Resmi PPID Utama Sinjai
+  if (src === 'informasi' || (rawUrl.includes('ppid.sinjaikab.go.id/informasi') && !rawUrl.includes('/storage/'))) {
+    return {
+      type: 'ppid',
+      label: 'Dokumen PPID',
+      icon: 'fas fa-shield-alt text-emerald-600',
+      iconBg: 'bg-emerald-100 text-emerald-700',
+      containerClass: 'bg-emerald-50/70 border-emerald-200/90 hover:border-emerald-300',
+      badgeClass: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
+      buttonClass: 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/25',
+      buttonText: 'Buka PPID',
+      defaultTitle: () => 'Dokumen Terpublikasi PPID',
+    }
+  }
+
+  // 2. Dokumen Resmi Portal Pemkab Sinjai
+  if (src === 'informasi_pemkab' || (rawUrl.includes('sinjaikab.go.id/informasi') && !rawUrl.includes('ppid.sinjaikab.go.id') && !rawUrl.includes('/storage/'))) {
+    return {
+      type: 'pemkab',
+      label: 'Dokumen Pemkab Sinjai',
+      icon: 'fas fa-landmark text-teal-600',
+      iconBg: 'bg-teal-100 text-teal-700',
+      containerClass: 'bg-teal-50/70 border-teal-200/90 hover:border-teal-300',
+      badgeClass: 'bg-teal-100 text-teal-800 border border-teal-300',
+      buttonClass: 'bg-teal-600 hover:bg-teal-700 shadow-teal-600/25',
+      buttonText: 'Buka Pemkab',
+      defaultTitle: () => 'Dokumen Portal Pemkab Sinjai',
+    }
+  }
+
+  // 3. Bukti Dokumen / File Lampiran Mentah (PDF, Tangkapan Layar, Dokumen Storage)
   if (src === 'lampiran' || rawUrl.includes('/storage/saq/') || /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|png|jpg|jpeg|webp)($|\?)/i.test(rawUrl)) {
     const isImage = /\.(png|jpg|jpeg|webp)($|\?)/i.test(rawUrl)
     return {
@@ -1354,7 +1360,7 @@ const getLinkBadge = (lnk) => {
     }
   }
 
-  // 2. Google Drive
+  // 4. Google Drive
   if (src === 'drive' || rawUrl.includes('drive.google.com') || rawUrl.includes('docs.google.com')) {
     return {
       type: 'drive',
@@ -1369,7 +1375,7 @@ const getLinkBadge = (lnk) => {
     }
   }
 
-  // 3. Foto Galeri
+  // 5. Foto Galeri
   if (src === 'galeri' || rawUrl.includes('/storage/galeri/')) {
     return {
       type: 'galeri',
@@ -1384,22 +1390,7 @@ const getLinkBadge = (lnk) => {
     }
   }
 
-  // 4. Dokumen PPID
-  if (src === 'informasi' || src === 'informasi_pemkab') {
-    return {
-      type: 'ppid',
-      label: 'Dokumen PPID',
-      icon: 'fas fa-shield-alt text-emerald-600',
-      iconBg: 'bg-emerald-100 text-emerald-700',
-      containerClass: 'bg-emerald-50/70 border-emerald-200/90 hover:border-emerald-300',
-      badgeClass: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
-      buttonClass: 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/25',
-      buttonText: 'Buka PPID',
-      defaultTitle: () => 'Dokumen Terpublikasi PPID',
-    }
-  }
-
-  // 5. Link Website / Portal / Aplikasi
+  // 6. Link Website / Portal / Aplikasi
   return {
     type: 'web',
     label: 'Link Website / Portal',
@@ -1420,7 +1411,7 @@ const getLinkBadge = (lnk) => {
   }
 }
 
-// Cek apakah tautan dapat diunduh langsung (file storage lokal, Google Drive dokumen/file, PDF/Office)
+// Cek apakah tautan dapat diunduh langsung (file storage lokal, Google Drive dokumen/file, PDF/Office, dokumen PPID/Pemkab)
 const isDownloadable = (lnk) => {
   const url = (lnk?.link || '').trim().toLowerCase()
   if (!url) return false
@@ -1429,7 +1420,7 @@ const isDownloadable = (lnk) => {
   if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/spreadsheets/d/') || url.includes('docs.google.com/presentation/d/')) return true
   if (/\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|webp|zip|rar)($|\?|#)/i.test(url)) return true
   const badge = getLinkBadge(lnk)
-  return badge.type === 'file' || badge.type === 'galeri' || badge.type === 'drive'
+  return badge.type === 'file' || badge.type === 'galeri' || badge.type === 'drive' || badge.type === 'ppid' || badge.type === 'pemkab'
 }
 
 // Format nama file saat didownload (mengandung kode indikator dan nama OPD)
@@ -1444,7 +1435,8 @@ const formatEvidenceFileName = (q, ans, lnk) => {
 
   const rawUrl = lnk?.link || ''
   const cleanUrl = rawUrl.split('?')[0].split('#')[0]
-  const ext = cleanUrl.includes('.') ? cleanUrl.split('.').pop().toLowerCase() : 'pdf'
+  const hasExt = cleanUrl.includes('.') && /\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|webp|zip|rar)$/i.test(cleanUrl)
+  const ext = hasExt ? cleanUrl.split('.').pop().toLowerCase() : 'pdf'
 
   let title = (lnk?.judul || '').trim()
   if (!title || title === cleanUrl) {
