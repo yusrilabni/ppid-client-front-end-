@@ -1157,7 +1157,7 @@
                     </div>
 
                     <!-- KARTU HASIL SINKRONISASI JIKA DITEMUKAN DI SERVER -->
-                    <div v-if="syncResult && syncResult.found" class="p-4 rounded-xl bg-white border-2 border-emerald-300 shadow-sm space-y-2.5">
+                    <div v-if="syncResult && (syncResult.found || syncResult.judul)" class="p-4 rounded-xl bg-white border-2 border-emerald-300 shadow-sm space-y-2.5">
                       <div class="flex items-center justify-between border-b border-gray-100 pb-2">
                         <div class="flex items-center gap-1.5 text-xs font-black text-emerald-700">
                           <i class="fas fa-check-circle text-emerald-600"></i>
@@ -1572,12 +1572,14 @@ const doSyncDocument = async () => {
   try {
     const res = await api.get('/saq/sync', { params: { url }, skipAuthRedirect: true })
     if (res.data && res.data.found) {
-      syncResult.value = res.data.data
+      syncResult.value = { found: true, ...(res.data.data || {}) }
     } else {
+      syncResult.value = null
       syncError.value = res.data?.message || 'Dokumen tidak ditemukan di database server PPID maupun Pemkab Sinjai. Silakan periksa kembali tautan Anda atau gunakan Pilihan 1 untuk mengunggah berkas baru.'
     }
   } catch (err) {
-    syncError.value = err.response?.data?.message || 'Gagal menyinkronkan dokumen dari database server.'
+    syncResult.value = null
+    syncError.value = err.response?.data?.message || err.message || 'Gagal menyinkronkan dokumen dari database server.'
   } finally {
     syncLoading.value = false
   }
