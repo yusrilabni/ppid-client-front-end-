@@ -1173,12 +1173,7 @@
               </div>
             </div>
 
-            <!-- INFO (bila Tidak) -->
-            <div v-if="form.jawaban === 'tidak'"
-              class="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-sm text-gray-600">
-              <i class="fas fa-info-circle mr-2 text-gray-400"></i>
-              OPD dinyatakan <strong>tidak memiliki</strong> indikator ini — tidak perlu mengisi link dokumen.
-            </div>
+
 
             <div v-if="formError" class="p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-600">{{ formError }}</div>
             <div v-if="!canAnswer" class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center gap-2.5">
@@ -1557,6 +1552,7 @@ const { data: opdsResponse } = useQuery({
   queryFn: async () => (await api.get('/saq/opds')).data,
   staleTime: 0,
   refetchOnWindowFocus: true,
+  refetchOnMount: 'always',
 })
 const opd = computed(() =>
   (opdsResponse.value?.data || []).find(o => o.slug === route.params.slug)
@@ -1567,9 +1563,11 @@ const { data: lockStatusResponse } = useQuery({
   queryKey: ['saq-lock-status'],
   queryFn: async () => (await api.get('/saq/lock-status')).data,
   staleTime: 0,
+  refetchOnWindowFocus: true,
+  refetchOnMount: 'always',
 })
 const isLocked = computed(() => {
-  return lockStatusResponse.value?.data?.locked ?? true
+  return lockStatusResponse.value?.data?.locked ?? false
 })
 
 const isDigitalQuestion = computed(() => {
@@ -1583,14 +1581,39 @@ const isDigitalQuestion = computed(() => {
 })
 
 const canAnswer = computed(() => {
-  // Superadmin SELALU bisa isi (baik di OPD maupun Kabupaten)
-  if (authStore.isSuperAdmin) return true
-  // Jika terkunci, admin OPD diblokir
+  // 1. Superadmin SELALU bisa isi (baik di OPD maupun Kabupaten)
+  if (authStore.isSuperAdmin || authStore.user?.role === 'superadmin') return true
+
+  // 2. Jika penguncian sedang aktif (locked), admin OPD diblokir
   if (isLocked.value) return false
-  // Jika terbuka, cek apakah user admin yang login adalah admin OPD ini
+
+  // 3. Jika backend sudah mengonfirmasi hak edit (can_edit: true dari structure), langsung izinkan
+  if (structResponse.value?.can_edit === true) return true
+
+  // 4. Jika tidak login, tidak bisa isi
   if (!authStore.user) return false
-  const uUnit = authStore.user?.unit_id
-  return !!uUnit && (opd.value?.remote_id == uUnit || opd.value?.id == uUnit)
+
+  // 5. Cek kecocokan organization_slug langsung jika ada
+  if (authStore.user.organization_slug && authStore.user.organization_slug === route.params.slug) {
+    return true
+  }
+
+  // 6. Cek kecocokan unit_id user dengan remote_id, unit_id, atau id OPD
+  const uUnit = String(authStore.user.unit_id || '').trim()
+  const opdRemote = String(opd.value?.remote_id || '').trim()
+  const opdUnit = String(opd.value?.unit_id || '').trim()
+  const opdId = String(opd.value?.id || '').trim()
+
+  if (uUnit && (uUnit === opdRemote || uUnit === opdUnit || uUnit === opdId)) {
+    return true
+  }
+
+  // 7. Cek kecocokan organization_id
+  if (authStore.user.organization_id && String(authStore.user.organization_id) === opdId) {
+    return true
+  }
+
+  return false
 })
 
 // Mode full Kabupaten (perintah Yusril 26 Okt 2026): halaman kabupaten-sinjai
@@ -1610,6 +1633,7 @@ const { data: structResponse, isLoading, refetch: refetchStruct } = useQuery({
   // SAQ tidak boleh pakai cache: selalu fetch ulang tiap buka halaman
   staleTime: 0,
   refetchOnWindowFocus: true,
+  refetchOnMount: 'always',
 })
 const tabs = computed(() => structResponse.value?.data || [])
 
@@ -2061,6 +2085,12 @@ const quickDeleteAnswer = async (q) => {
     deletingId.value = null
   }
 }
+
+onMounted(() => {
+  if (authStore.isAuthenticated) {
+    authStore.fetchUser()
+  }
+})
 
 </script>
 
