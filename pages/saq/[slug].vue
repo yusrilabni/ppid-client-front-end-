@@ -50,7 +50,7 @@
         <!-- TAB NAV -->
         <div class="sticky top-0 z-20 bg-slate-50/95 backdrop-blur py-3">
           <div class="flex gap-2 overflow-x-auto pb-1" ref="tabBar">
-            <button v-for="(tab, i) in tabs" :key="tab.kode" @click="activeTab = i"
+            <button v-for="(tab, i) in tabs" :key="tab.kode" @click="selectTab(i)"
               class="relative shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300"
               :class="activeTab === i ? 'text-white shadow-lg shadow-blue-600/25' : 'text-gray-600 bg-white border border-gray-200 hover:border-[#0052FF]/40'">
               <span v-if="activeTab === i" class="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0052FF] to-[#0041CC]"></span>
@@ -140,8 +140,12 @@
                 <!-- Pertanyaan standalone -->
                 <template v-if="item.type === 'question'">
                   <div v-for="q in [item]" :key="'standalone-' + q.id"
-                    class="group bg-white rounded-2xl border p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-                    :class="q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30'">
+                    :id="'question-item-' + q.id"
+                    class="group bg-white rounded-2xl border p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                    :class="[
+                      q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30',
+                      lastExecutedQuestionId === q.id ? 'ring-2 ring-[#0052FF] bg-blue-50/20' : ''
+                    ]">
                 <div class="flex items-start gap-3">
                   <!-- Status icon -->
                   <span class="mt-1 w-7 h-7 rounded-xl flex items-center justify-center text-xs shrink-0 transition-transform group-hover:scale-110"
@@ -343,8 +347,12 @@
                 <!-- Pertanyaan anak di dalam grup -->
                 <div class="ml-3 md:ml-5 pl-3 border-l-2 border-blue-200/60 space-y-2.5">
                   <div v-for="q in g.questions" :key="q.id"
-                    class="group bg-white rounded-2xl border p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-                    :class="q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30'">
+                    :id="'question-item-' + q.id"
+                    class="group bg-white rounded-2xl border p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                    :class="[
+                      q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30',
+                      lastExecutedQuestionId === q.id ? 'ring-2 ring-[#0052FF] bg-blue-50/20' : ''
+                    ]">
                     <div class="flex items-start gap-3">
                       <span class="mt-1 w-7 h-7 rounded-xl flex items-center justify-center text-xs shrink-0 transition-transform group-hover:scale-110"
                         :class="q.terisi ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25' : 'bg-gray-100 text-gray-400'">
@@ -1470,13 +1478,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 
 definePageMeta({ layout: 'default' })
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 const queryClient = useQueryClient()
 
@@ -1491,6 +1501,7 @@ useSeoMeta({
 })
 
 const activeTab = ref(0)
+const lastExecutedQuestionId = ref(null)
 const openSections = ref([])
 const modal = ref({ open: false, question: null, existing: null })
 const answerTab = ref('dokumen')
@@ -2003,8 +2014,116 @@ const { data: allAnswersResponse } = useQuery({
 const allAnswers = computed(() => allAnswersResponse.value?.data || {})
 const getQuestionAnswers = (questionId) => allAnswers.value[questionId] || []
 
+// Navigasi Tab dengan persistensi URL query dan sessionStorage
+const selectTab = (i) => {
+  activeTab.value = i
+  const tab = tabs.value[i]
+  if (tab) {
+    const tabQuery = tab.kode || String(i)
+    router.replace({
+      query: { ...route.query, tab: tabQuery }
+    }).catch(() => {})
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(`saq_tab_${route.params.slug}`, tabQuery)
+    }
+    // Jika belum ada section yang dibuka pada tab ini, buka section pertamanya
+    if (tab.sections && tab.sections.length && !openSections.value.some(k => tab.sections.some(s => s.kode === k))) {
+      openSections.value.push(tab.sections[0].kode)
+    }
+  }
+}
+
+// Sinkronisasi Tab dari Query atau Session Storage (agar saat refresh tetap di tab yang sama)
+const syncActiveTabFromQueryOrStorage = () => {
+  if (!tabs.value || !tabs.value.length) return
+  const queryTab = route.query.tab
+  let storedTab = null
+  if (typeof window !== 'undefined') {
+    storedTab = sessionStorage.getItem(`saq_tab_${route.params.slug}`)
+  }
+  const target = (queryTab !== undefined && queryTab !== null && queryTab !== '') ? queryTab : storedTab
+  if (target !== null && target !== undefined) {
+    const idx = tabs.value.findIndex(t => String(t.kode) === String(target) || String(t.tab).toLowerCase() === String(target).toLowerCase())
+    if (idx !== -1) {
+      activeTab.value = idx
+      return
+    }
+    const num = parseInt(target, 10)
+    if (!isNaN(num) && num >= 0 && num < tabs.value.length) {
+      activeTab.value = num
+    }
+  }
+}
+
+// Fungsi auto-scroll dan visual highlight ke pertanyaan yang terakhir kali dieksekusi
+const scrollToQuestion = (questionId, highlight = true) => {
+  if (!questionId) return
+  const targetId = parseInt(questionId, 10) || questionId
+  lastExecutedQuestionId.value = targetId
+
+  // Temukan tab & section tempat questionId berada
+  for (let ti = 0; ti < tabs.value.length; ti++) {
+    const tab = tabs.value[ti]
+    for (const sec of tab.sections || []) {
+      const items = getSectionItems(sec)
+      let found = false
+      for (const it of items) {
+        if (it.type === 'question' && it.id === targetId) {
+          found = true
+          break
+        }
+        if (it.type === 'group' && it.questions?.some(gq => gq.id === targetId)) {
+          found = true
+          break
+        }
+      }
+      if (found) {
+        if (activeTab.value !== ti) {
+          activeTab.value = ti
+        }
+        if (!openSections.value.includes(sec.kode)) {
+          openSections.value.push(sec.kode)
+        }
+        const tabQuery = tab.kode || String(ti)
+        router.replace({
+          query: { ...route.query, tab: tabQuery, q: targetId }
+        }).catch(() => {})
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(`saq_tab_${route.params.slug}`, tabQuery)
+          sessionStorage.setItem(`saq_last_q_${route.params.slug}`, String(targetId))
+        }
+        break
+      }
+    }
+  }
+
+  // Scroll halus ke kartu pertanyaan di DOM
+  if (typeof window !== 'undefined') {
+    nextTick(() => {
+      setTimeout(() => {
+        const el = document.getElementById(`question-item-${targetId}`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          if (highlight) {
+            el.classList.add('ring-4', 'ring-[#0052FF]', 'ring-offset-2', 'bg-blue-50/40')
+            setTimeout(() => {
+              el.classList.remove('ring-4', 'ring-[#0052FF]', 'ring-offset-2', 'bg-blue-50/40')
+            }, 3000)
+          }
+        }
+      }, 350)
+    })
+  }
+}
+
 watch(tabs, (t) => {
-  if (t.length && t[0].sections.length) openSections.value = [t[0].sections[0].kode]
+  if (t.length) {
+    syncActiveTabFromQueryOrStorage()
+    const curTab = t[activeTab.value] || t[0]
+    if (curTab && curTab.sections && curTab.sections.length && !openSections.value.length) {
+      openSections.value = [curTab.sections[0].kode]
+    }
+  }
 }, { immediate: true })
 
 const tabTotal = (tab) => tab.sections.reduce((s, x) => s + x.total, 0)
@@ -2027,7 +2146,16 @@ const getSectionItems = (sec) => {
 const openAnswerModal = async (q) => {
   formError.value = ''
   syncMsg.value = ''
+  lastExecutedQuestionId.value = q.id
   modal.value = { open: true, question: q, existing: null }
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem(`saq_last_q_${route.params.slug}`, String(q.id))
+  }
+  const curTab = tabs.value[activeTab.value]
+  const tabQuery = curTab?.kode || String(activeTab.value)
+  router.replace({
+    query: { ...route.query, tab: tabQuery, q: q.id }
+  }).catch(() => {})
   answerTab.value = 'dokumen'
   docUploads.value = []
   driveRows.value = []
@@ -2208,6 +2336,7 @@ const syncFromPpid = async (idx = 0) => {
 
 const submitAnswer = async () => {
   if (!opd.value || !modal.value.question) return
+  const targetQuestionId = modal.value.question.id
   if (!canAnswer.value) {
     formError.value = 'Pengisian SAQ saat ini sedang dikunci oleh Superadmin. Hanya Superadmin yang dapat mengisi jawaban.'
     return
@@ -2499,6 +2628,7 @@ const submitAnswer = async () => {
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
     queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
+    scrollToQuestion(targetQuestionId, true)
   } catch (e) {
     formError.value = e.response?.data?.message || e.message || 'Gagal menyimpan jawaban.'
   } finally {
@@ -2511,6 +2641,7 @@ const deletingId = ref(null)
 
 const deleteExistingAnswer = async () => {
   if (!modal.value.existing || !canAnswer.value) return
+  const targetQuestionId = modal.value.question?.id
   const confirmDelete = typeof window !== 'undefined'
     ? window.confirm('Apakah Anda yakin ingin menghapus jawaban dan dokumen bukti untuk indikator ini? Dokumen terkait di sistem informasi publik juga akan dibersihkan.')
     : true
@@ -2528,6 +2659,7 @@ const deleteExistingAnswer = async () => {
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
     queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
+    scrollToQuestion(targetQuestionId, true)
   } catch (e) {
     formError.value = e.response?.data?.message || e.message || 'Gagal menghapus jawaban.'
   } finally {
@@ -2537,6 +2669,7 @@ const deleteExistingAnswer = async () => {
 
 const quickDeleteAnswer = async (q) => {
   if (!canAnswer.value) return
+  const targetQuestionId = q.id
   const kodeLabel = q.kode ? ` [${q.kode}]` : ''
   const confirmDelete = typeof window !== 'undefined'
     ? window.confirm(`Apakah Anda yakin ingin menghapus jawaban dan dokumen bukti untuk indikator${kodeLabel}? Dokumen terkait di sistem informasi publik juga akan dibersihkan.`)
@@ -2557,6 +2690,7 @@ const quickDeleteAnswer = async (q) => {
     queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
     queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
     queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
+    scrollToQuestion(targetQuestionId, true)
   } catch (e) {
     if (typeof window !== 'undefined') {
       window.alert(e.response?.data?.message || e.message || 'Gagal menghapus jawaban.')
@@ -2569,6 +2703,20 @@ const quickDeleteAnswer = async (q) => {
 onMounted(() => {
   if (authStore.isAuthenticated) {
     authStore.fetchUser()
+  }
+
+  // Auto-scroll ke pertanyaan yang terakhir kali dieksekusi saat refresh halaman
+  const qId = route.query.q || (typeof window !== 'undefined' ? sessionStorage.getItem(`saq_last_q_${route.params.slug}`) : null)
+  if (qId) {
+    let unwatch = null
+    unwatch = watch(tabs, (t) => {
+      if (t && t.length) {
+        setTimeout(() => {
+          scrollToQuestion(parseInt(qId, 10) || qId, true)
+        }, 400)
+        if (unwatch) unwatch()
+      }
+    }, { immediate: true })
   }
 })
 
