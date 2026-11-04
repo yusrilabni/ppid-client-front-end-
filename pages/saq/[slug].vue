@@ -805,79 +805,282 @@
               </div>
             </div>
 
-            <!-- JIKA JAWABAN YA: NON-DIGITALISASI (ALUR 2 PILIHAN DOKUMEN / FOTO GALERI / SITUS) -->
-            <div v-else-if="form.jawaban === 'ya'" class="space-y-4">
-              <!-- KHUSUS PERTANYAAN FOTO: MENYEDIAKAN OPSI GALERI & LINK -->
-              <div v-if="modal.question?.input_type === 'foto'" class="space-y-3">
-                <div class="grid grid-cols-2 gap-2">
-                  <button type="button" @click="answerTab = 'galeri'"
-                    class="py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 transition-all"
-                    :class="answerTab === 'galeri' ? 'bg-[#0052FF] border-[#0052FF] text-white shadow-md' : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300'">
-                    <i class="fas fa-images mr-1.5"></i>Upload ke Galeri
-                  </button>
-                  <button type="button" @click="answerTab = 'link'"
-                    class="py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 transition-all"
-                    :class="answerTab === 'link' ? 'bg-[#0052FF] border-[#0052FF] text-white shadow-md' : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300'">
-                    <i class="fas fa-link mr-1.5"></i>Tautan Foto Luar
-                  </button>
+            <!-- FORMAT BUKTI DUKUNG SERAGAM 2 OPSI (TAB SARANA & PRASARANA, KUALITAS INFORMASI, KOMITMEN ORGANISASI) -->
+            <div v-else-if="form.jawaban === 'ya' && isSimplifiedEvidenceTab" class="space-y-4">
+              <!-- Panduan Dua Pilihan Format -->
+              <div class="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 text-xs text-blue-950 space-y-1">
+                <div class="font-extrabold flex items-center gap-1.5 text-[#0052FF]">
+                  <i class="fas fa-layer-group"></i>
+                  <span>Pilih Format Bukti Dukung:</span>
                 </div>
+                <p class="text-gray-600 leading-relaxed text-[11px]">
+                  Silakan tentukan apakah bukti dukung berupa <strong>Isi Tautan / Link Langsung</strong> atau <strong>Upload Berkas / Foto</strong> (maksimal 2 MB).
+                </p>
+              </div>
 
-                <!-- TAB GALERI -->
-                <div v-if="answerTab === 'galeri'" class="space-y-3">
-                  <div class="p-4 rounded-2xl border-2 border-violet-200 bg-violet-50/50 space-y-3">
-                    <p class="text-xs font-extrabold text-violet-800"><i class="fas fa-images mr-1.5"></i>Upload Foto Dokumentasi ke Galeri Web</p>
-                    <p class="text-xs text-gray-600 leading-relaxed">Foto diunggah ke Galeri publik web dan tautannya otomatis tersimpan sebagai bukti pemenuhan indikator ini.</p>
-                    <div v-if="savedFoto && !fotoPreview" class="space-y-2">
-                      <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-gray-200">
-                        <img :src="savedFoto.link" class="w-16 h-16 object-cover rounded-xl border border-gray-200" alt="Foto Galeri tersimpan" />
-                        <div class="flex-1 min-w-0">
-                          <p class="text-xs font-bold truncate">{{ savedFoto.judul || savedFoto.name }}</p>
-                          <a :href="savedFoto.link" target="_blank" rel="noopener" class="text-[11px] text-[#0052FF] font-bold underline break-all">{{ savedFoto.link }}</a>
-                        </div>
-                        <button type="button" @click="removeSavedFoto" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
-                      </div>
-                      <input v-model="savedFoto.judul" type="text" placeholder="Judul foto"
-                        class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs" />
+              <!-- 2 Tombol Kartu Pilihan Format -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- OPSI 1: ISI LINK LANGSUNG -->
+                <button type="button" @click="simpleEvidenceMode = 'link'"
+                  class="p-4 rounded-2xl border-2 text-left transition-all flex flex-col justify-between"
+                  :class="simpleEvidenceMode === 'link'
+                    ? 'border-[#0052FF] bg-blue-50/70 shadow-md ring-2 ring-[#0052FF]/20 text-[#0052FF]'
+                    : 'border-gray-200 bg-white hover:border-blue-300 text-gray-700'">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      :class="simpleEvidenceMode === 'link' ? 'bg-[#0052FF] text-white shadow-sm' : 'bg-gray-100 text-gray-500'">
+                      <i class="fas fa-link text-sm"></i>
                     </div>
-                    <input type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" @change="onFotoFileChange"
-                      class="w-full px-3.5 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-100 file:text-violet-800 cursor-pointer" />
-                    <div v-if="fotoPreview" class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-violet-200">
-                      <img :src="fotoPreview" class="w-16 h-16 object-cover rounded-xl border border-gray-200" alt="Pratinjau foto" />
-                      <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold truncate">{{ fotoFile?.name }}</p>
-                        <p class="text-[11px] text-gray-500">{{ fotoFile ? (fotoFile.size / 1024).toFixed(0) + ' KB' : '' }}</p>
-                      </div>
-                      <button type="button" @click="removeFotoFile" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
+                    <div>
+                      <span class="text-[10px] font-black uppercase tracking-wider block opacity-80">PILIHAN 1</span>
+                      <p class="text-xs font-black">Isi Tautan / Link Langsung</p>
+                      <p class="text-[11px] text-gray-500 font-normal leading-snug mt-0.5">Tautan langsung tampil di rekap Pemkab.</p>
                     </div>
-                    <input v-model="form.fotoJudul" :required="!!fotoFile" type="text" placeholder="Judul foto * (wajib bila mengunggah foto)"
-                      class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs" />
-                    <label class="block text-xs font-bold text-gray-700">Tanggal upload</label>
-                    <input v-model="form.fotoTanggal" type="date"
-                      class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs" />
                   </div>
-                </div>
+                  <div v-if="simpleEvidenceMode === 'link'" class="mt-3 pt-2 border-t border-blue-200/60 flex items-center gap-1.5 text-[11px] font-bold">
+                    <i class="fas fa-check-circle"></i> Opsi Aktif
+                  </div>
+                </button>
 
-                <!-- TAB LINK FOTO -->
-                <div v-if="answerTab === 'link'" class="space-y-3">
-                  <div v-for="(l, idx) in form.links" :key="idx" class="p-3 rounded-2xl border-2 border-blue-100 bg-blue-50/40 space-y-2">
+                <!-- OPSI 2: UPLOAD DOKUMEN / FOTO -->
+                <button type="button" @click="simpleEvidenceMode = 'upload'"
+                  class="p-4 rounded-2xl border-2 text-left transition-all flex flex-col justify-between"
+                  :class="simpleEvidenceMode === 'upload'
+                    ? 'border-indigo-600 bg-indigo-50/70 shadow-md ring-2 ring-indigo-500/20 text-indigo-700'
+                    : 'border-gray-200 bg-white hover:border-indigo-300 text-gray-700'">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      :class="simpleEvidenceMode === 'upload' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 text-gray-500'">
+                      <i class="fas fa-cloud-upload-alt text-sm"></i>
+                    </div>
+                    <div>
+                      <span class="text-[10px] font-black uppercase tracking-wider block opacity-80">PILIHAN 2</span>
+                      <p class="text-xs font-black">Upload Berkas / Foto</p>
+                      <p class="text-[11px] text-gray-500 font-normal leading-snug mt-0.5">Pilih storage fisik, info publik, atau galeri.</p>
+                    </div>
+                  </div>
+                  <div v-if="simpleEvidenceMode === 'upload'" class="mt-3 pt-2 border-t border-indigo-200/60 flex items-center gap-1.5 text-[11px] font-bold">
+                    <i class="fas fa-check-circle"></i> Opsi Aktif
+                  </div>
+                </button>
+              </div>
+
+              <!-- KONTEN OPSI 1: INPUT LINK LANGSUNG -->
+              <div v-if="simpleEvidenceMode === 'link'" class="space-y-3 pt-1">
+                <div class="p-4 rounded-2xl border-2 border-blue-100 bg-white space-y-3 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <i class="fas fa-link text-[#0052FF]"></i>
+                      Tautan Bukti Dukung Langsung <span class="text-rose-500">*</span>
+                    </span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-[#0052FF]">
+                      Direct Link
+                    </span>
+                  </div>
+                  <p class="text-[11px] text-gray-600 leading-relaxed">
+                    Tautan yang Anda masukkan di sini akan langsung ditampilkan dan dibuka apa adanya pada rekap konsolidasi Pemkab Sinjai.
+                  </p>
+
+                  <div v-for="(l, idx) in form.links" :key="'simp-link-'+idx" class="space-y-2 pb-3 border-b border-gray-100 last:border-b-0 last:pb-0">
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-extrabold text-[#0052FF]">Tautan Foto {{ idx + 1 }}</span>
-                      <button v-if="form.links.length > 1" type="button" @click="form.links.splice(idx, 1)" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
+                      <span class="text-[11px] font-bold text-gray-500">Tautan {{ idx + 1 }}</span>
+                      <button v-if="form.links.length > 1" type="button" @click="form.links.splice(idx, 1)"
+                        class="text-xs font-bold text-rose-500 hover:text-rose-700">
+                        <i class="fas fa-trash-alt mr-1"></i>Hapus
+                      </button>
                     </div>
-                    <input v-model="l.link" required type="url" placeholder="https://... *"
-                      class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs" />
-                    <input v-model="l.judul" type="text" placeholder="Keterangan / judul foto"
-                      class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-white outline-none text-xs" />
+                    <input v-model="l.link" required type="url"
+                      placeholder="https://... (masukkan URL tautan bukti)"
+                      class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-[#0052FF] outline-none text-xs" />
+                    <input v-model="l.judul" type="text"
+                      placeholder="Judul / Keterangan tautan (opsional)"
+                      class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none text-xs" />
                   </div>
+
                   <button type="button" @click="form.links.push({ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false })"
-                    class="w-full py-2.5 rounded-2xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-xs font-bold hover:bg-blue-50 transition-all">
-                    <i class="fas fa-plus mr-1.5"></i>Tambah Tautan Foto Lain
+                    class="w-full py-2 rounded-xl border-2 border-dashed border-[#0052FF]/30 text-[#0052FF] text-xs font-bold hover:bg-blue-50 transition-all flex items-center justify-center gap-1.5">
+                    <i class="fas fa-plus"></i> Tambah Tautan Lain
                   </button>
                 </div>
               </div>
 
+              <!-- KONTEN OPSI 2: UPLOAD BERKAS / FOTO DENGAN 3 PILIHAN PENEMPATAN -->
+              <div v-if="simpleEvidenceMode === 'upload'" class="space-y-3 pt-1">
+                <div class="p-4 rounded-2xl border-2 border-indigo-100 bg-white space-y-4 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <i class="fas fa-cloud-upload-alt text-indigo-600"></i>
+                      Upload Berkas Dokumen / Foto Bukti (Maks. 2 MB) <span class="text-rose-500">*</span>
+                    </span>
+                  </div>
+
+                  <!-- File Input -->
+                  <div class="space-y-2">
+                    <input type="file"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp,application/pdf"
+                      @change="onSimpleFileChange"
+                      class="w-full px-3.5 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-indigo-600 outline-none text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
+                    <p class="text-[11px] text-gray-500">Mendukung PDF, Dokumen Office, atau Gambar JPG/PNG/WEBP (maks. 2 MB).</p>
+                  </div>
+
+                  <!-- Alert Error File Size jika > 2 MB -->
+                  <div v-if="docFileSizeError" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
+                    <i class="fas fa-exclamation-triangle mt-0.5 shrink-0 text-rose-600"></i>
+                    <span>{{ docFileSizeError }}</span>
+                  </div>
+
+                  <!-- Pratinjau Foto jika memilih gambar -->
+                  <div v-if="fotoPreview" class="p-3 rounded-xl border border-purple-200 bg-purple-50/40 flex items-center gap-3">
+                    <img :src="fotoPreview" class="w-16 h-16 object-cover rounded-xl border border-purple-200 shadow-xs" alt="Preview Gambar" />
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-bold text-purple-900 truncate">{{ fotoFile?.name }}</p>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">Foto / Dokumentasi Visual</span>
+                    </div>
+                    <button type="button" @click="removeFotoFile" class="text-xs font-bold text-rose-500 hover:text-rose-700">Hapus</button>
+                  </div>
+
+                  <!-- List Dokumen Baru Dipilih -->
+                  <div v-for="(u, uidx) in docUploads" :key="'simp-up-'+uidx" class="p-3 rounded-xl border border-indigo-200 bg-indigo-50/40 space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-indigo-950 flex items-center gap-1.5 truncate">
+                        <i class="fas fa-file-alt text-indigo-600"></i> {{ u.file?.name }}
+                      </span>
+                      <button type="button" @click="docUploads.splice(uidx, 1)" class="text-xs font-bold text-rose-500 hover:text-rose-700 shrink-0 ml-2">
+                        <i class="fas fa-trash-alt mr-1"></i>Hapus
+                      </button>
+                    </div>
+                    <p class="text-[11px] text-gray-500">Ukuran: {{ u.file ? (u.file.size / 1024).toFixed(0) + ' KB' : '' }}</p>
+                  </div>
+
+                  <!-- Berkas Tersimpan Sebelumnya (saat edit) -->
+                  <div v-for="(sv, svidx) in savedUploads" :key="'simp-sv-'+svidx" class="p-3 rounded-xl border border-amber-200 bg-amber-50/60 space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5 truncate">
+                        <i class="fas fa-check-circle text-emerald-600"></i> Tersimpan: {{ sv.name || sv.link }}
+                      </span>
+                      <button type="button" @click="savedUploads.splice(svidx, 1)" class="text-xs font-bold text-rose-500 hover:text-rose-700 shrink-0 ml-2">
+                        Hapus
+                      </button>
+                    </div>
+                    <a v-if="sv.link" :href="sv.link" target="_blank" rel="noopener" class="text-xs text-[#0052FF] font-bold underline break-all block">
+                      Buka Berkas Tersimpan
+                    </a>
+                  </div>
+
+                  <!-- PILIHAN TUJUAN INTEGRASI DOKUMEN / FOTO -->
+                  <div class="pt-3 border-t border-gray-100 space-y-3">
+                    <label class="block text-xs font-bold text-gray-700">Pilih Penempatan Berkas Yang Diunggah:</label>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <!-- Opsi A: Langsung Storage -->
+                      <button type="button" @click="uploadDestination = 'storage'"
+                        class="p-3 rounded-xl border-2 text-left transition-all flex flex-col justify-between"
+                        :class="uploadDestination === 'storage'
+                          ? 'border-emerald-600 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-500/20'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-emerald-300'">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-hdd text-sm" :class="uploadDestination === 'storage' ? 'text-emerald-600' : 'text-gray-400'"></i>
+                          <strong class="text-xs">Langsung Storage</strong>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1 leading-snug">
+                          Tautan fisik langsung ke berkas storage (tanpa kategori).
+                        </p>
+                      </button>
+
+                      <!-- Opsi B: Masuk Informasi Publik -->
+                      <button type="button" @click="uploadDestination = 'informasi'"
+                        class="p-3 rounded-xl border-2 text-left transition-all flex flex-col justify-between"
+                        :class="uploadDestination === 'informasi'
+                          ? 'border-blue-600 bg-blue-50 text-blue-900 ring-2 ring-blue-500/20'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300'">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-file-contract text-sm" :class="uploadDestination === 'informasi' ? 'text-blue-600' : 'text-gray-400'"></i>
+                          <strong class="text-xs">Informasi Publik</strong>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1 leading-snug">
+                          Masuk ke daftar dokumen resmi PPID / Pemkab Sinjai.
+                        </p>
+                      </button>
+
+                      <!-- Opsi C: Masuk Galeri Web -->
+                      <button type="button" @click="uploadDestination = 'galeri'"
+                        class="p-3 rounded-xl border-2 text-left transition-all flex flex-col justify-between"
+                        :class="uploadDestination === 'galeri'
+                          ? 'border-purple-600 bg-purple-50 text-purple-900 ring-2 ring-purple-500/20'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-images text-sm" :class="uploadDestination === 'galeri' ? 'text-purple-600' : 'text-gray-400'"></i>
+                          <strong class="text-xs">Masuk ke Galeri</strong>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1 leading-snug">
+                          Foto/gambar dokumentasi publik ke Galeri web.
+                        </p>
+                      </button>
+                    </div>
+
+                    <!-- FORM DETAIL JIKA MEMILIH INFORMASI PUBLIK -->
+                    <div v-if="uploadDestination === 'informasi'" class="p-3.5 rounded-xl bg-blue-50/50 border border-blue-200 space-y-3 text-xs">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label class="block text-[11px] font-bold text-gray-700 mb-1">Target Portal:</label>
+                          <select v-model="uploadTarget" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-xs outline-none focus:border-blue-500">
+                            <option value="ppid">Informasi Publik PPID Utama</option>
+                            <option value="pemkab">Portal Informasi Pemkab Sinjai</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-[11px] font-bold text-gray-700 mb-1">Kategori Informasi:</label>
+                          <select v-model="uploadKategori" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-xs outline-none focus:border-blue-500">
+                            <option value="Informasi Berkala">Informasi Berkala</option>
+                            <option value="Informasi Setiap Saat">Informasi Setiap Saat</option>
+                            <option value="Informasi Serta Merta">Informasi Serta Merta</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">Tanggal Mulai Berlaku Dokumen *</label>
+                        <input v-model="docTanggal" type="date" required
+                          class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-xs outline-none focus:border-blue-500" />
+                      </div>
+
+                      <div>
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">Visibilitas Dokumen *</label>
+                        <div class="grid grid-cols-2 gap-2">
+                          <button type="button" @click="form.visibility = 'public'"
+                            class="py-2 px-3 rounded-lg font-bold text-xs border transition-all flex items-center justify-center gap-1"
+                            :class="form.visibility === 'public' ? 'bg-[#0052FF] text-white border-[#0052FF]' : 'bg-white text-gray-700 border-gray-300'">
+                            <i class="fas fa-globe text-[11px]"></i> Publik (Tampil di Web)
+                          </button>
+                          <button type="button" @click="form.visibility = 'private'"
+                            class="py-2 px-3 rounded-lg font-bold text-xs border transition-all flex items-center justify-center gap-1"
+                            :class="form.visibility === 'private' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-gray-700 border-gray-300'">
+                            <i class="fas fa-lock text-[11px]"></i> Private (Khusus Admin)
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- FORM DETAIL JIKA MEMILIH GALERI -->
+                    <div v-if="uploadDestination === 'galeri'" class="p-3.5 rounded-xl bg-purple-50/50 border border-purple-200 space-y-2 text-xs">
+                      <p class="text-[11px] text-purple-900 leading-relaxed">
+                        <i class="fas fa-info-circle mr-1"></i>Foto akan diunggah ke Galeri Web resmi dan tautan foto galeri langsung ditampilkan di rekap Pemkab Sinjai.
+                      </p>
+                      <div>
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">Keterangan / Judul Foto (opsional):</label>
+                        <input v-model="form.fotoJudul" type="text" :placeholder="modal.question?.pertanyaan || 'Foto Dokumentasi'"
+                          class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-xs outline-none focus:border-purple-500" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- JIKA JAWABAN YA: KHUSUS TAB JENIS INFORMASI (2 PILIHAN DOKUMEN: UPLOAD BARU / DRIVE vs SINKRONISASI) -->
+            <div v-else-if="form.jawaban === 'ya'" class="space-y-4">
               <!-- ALUR UTAMA UNTUK JENIS DOKUMEN (2 PILIHAN DITERANGKAN DENGAN JELAS) -->
-              <div v-else class="space-y-4">
+              <div class="space-y-4">
                 <!-- PANDUAN DUA PILIHAN ALUR -->
                 <div class="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 text-xs text-blue-950 space-y-1">
                   <div class="font-extrabold flex items-center gap-1.5 text-[#0052FF]">
@@ -1301,7 +1504,7 @@ const fotoFile = ref(null)
 const fotoPreview = ref('')
 const savedFoto = ref(null)
 
-// State untuk Alur Dua Pilihan Dokumen SAQ
+// State untuk Alur Dua Pilihan Dokumen SAQ (Jenis Informasi)
 const docFlowMode = ref('new') // 'new' (Pilihan 1: Belum Diunggah) | 'sync' (Pilihan 2: Sudah Pernah Diunggah)
 const newDocMethod = ref('file') // 'file' (Upload File <= 2MB) | 'drive' (Google Drive > 2MB)
 const driveLinkInput = ref('')
@@ -1311,6 +1514,12 @@ const syncResult = ref(null)
 const syncLoading = ref(false)
 const syncError = ref('')
 const docFileSizeError = ref('')
+
+// State untuk Format Seragam Tab Sarana Prasarana, Kualitas Info, & Komitmen Organisasi
+const simpleEvidenceMode = ref('link') // 'link' (Isi Tautan Langsung) | 'upload' (Upload Dokumen / Berkas)
+const uploadDestination = ref('storage') // 'storage' (Langsung Storage) | 'informasi' (Masuk Informasi Publik) | 'galeri' (Masuk Galeri)
+const uploadKategori = ref('Informasi Berkala') // 'Informasi Berkala' | 'Informasi Setiap Saat' | 'Informasi Serta Merta'
+const uploadTarget = ref('ppid') // 'ppid' | 'pemkab'
 
 // Fitur Salin Link & Klasifikasi Tampilan Bukti Dukung vs Tautan
 const copiedLinkId = ref(null)
@@ -1564,6 +1773,47 @@ const onDocSingleFileChange = (e) => {
   e.target.value = ''
 }
 
+// Handler khusus single/multi berkas format 2 opsi (Sarana & Prasarana, Kualitas Info, Komitmen Org)
+const onSimpleFileChange = (e) => {
+  const files = Array.from(e.target.files || [])
+  docFileSizeError.value = ''
+  formError.value = ''
+  if (!files.length) return
+
+  for (const f of files) {
+    const ext = (f.name.split('.').pop() || '').toLowerCase()
+    const allowed = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'webp']
+    if (!allowed.includes(ext)) {
+      formError.value = `File "${f.name}" ditolak: hanya menerima berkas PDF / Dokumen Office / Gambar JPG/PNG/WEBP.`
+      continue
+    }
+    // Batas maksimal 2 MB
+    if (f.size > 2 * 1024 * 1024) {
+      const mbSize = (f.size / (1024 * 1024)).toFixed(2)
+      docFileSizeError.value = `Ukuran berkas "${f.name}" adalah ${mbSize} MB (melebihi batas maksimal 2 MB).`
+      e.target.value = ''
+      return
+    }
+
+    if (isImageFile(f)) {
+      fotoFile.value = f
+      if (fotoPreview.value) URL.revokeObjectURL(fotoPreview.value)
+      fotoPreview.value = URL.createObjectURL(f)
+      if (!form.value.fotoJudul) {
+        form.value.fotoJudul = modal.value.question?.pertanyaan || f.name.replace(/\.[^.]+$/, '')
+      }
+    }
+
+    docUploads.value.push({
+      file: f,
+      judul: modal.value.question?.pertanyaan || f.name.replace(/\.[^.]+$/, ''),
+      deskripsi: modal.value.question?.pertanyaan || '',
+      jadikanInformasi: uploadDestination.value === 'informasi',
+    })
+  }
+  e.target.value = ''
+}
+
 // Validasi domain tautan resmi sinkronisasi
 const isValidDomainForSync = (raw) => {
   try {
@@ -1641,6 +1891,41 @@ const isDigitalQuestion = computed(() => {
   if (currentTab && currentTab.tab && currentTab.tab.toLowerCase().includes('digital')) return true
   return false
 })
+
+const isSimplifiedEvidenceTab = computed(() => {
+  const q = modal.value?.question
+  if (!q) return false
+  if (q.kode && (q.kode.startsWith('1.') || q.kode.startsWith('4.') || q.kode.startsWith('5.'))) return true
+  const tabName = (q.tab || '').toLowerCase()
+  if (tabName.includes('sarana') || tabName.includes('kualitas') || tabName.includes('komitmen')) return true
+  const curTab = tabs.value[activeTab.value]
+  if (curTab && curTab.tab) {
+    const c = curTab.tab.toLowerCase()
+    if (c.includes('sarana') || c.includes('kualitas') || c.includes('komitmen')) return true
+  }
+  return false
+})
+
+const isJenisInformasiTab = computed(() => {
+  const q = modal.value?.question
+  if (!q) return false
+  if (q.kode && q.kode.startsWith('3.')) return true
+  const tabName = (q.tab || '').toLowerCase()
+  if (tabName.includes('jenis')) return true
+  const curTab = tabs.value[activeTab.value]
+  if (curTab && curTab.tab) {
+    const c = curTab.tab.toLowerCase()
+    if (c.includes('jenis')) return true
+  }
+  return false
+})
+
+const isImageFile = (file) => {
+  if (!file) return false
+  if (file.type && file.type.startsWith('image/')) return true
+  const name = file.name || ''
+  return /\.(jpg|jpeg|png|webp|gif)$/i.test(name)
+}
 
 const canAnswer = computed(() => {
   // 1. Superadmin SELALU bisa isi (baik di OPD maupun Kabupaten)
@@ -1762,6 +2047,12 @@ const openAnswerModal = async (q) => {
   syncError.value = ''
   docFileSizeError.value = ''
 
+  // Inisialisasi format 2 opsi bukti dukung (Sarana Prasarana, Kualitas Info, Komitmen Org)
+  simpleEvidenceMode.value = 'link'
+  uploadDestination.value = 'storage'
+  uploadKategori.value = q.klasifikasi_otomatis || 'Informasi Berkala'
+  uploadTarget.value = q.target_upload || 'ppid'
+
   form.value = {
     jawaban: null,
     alasan: q.alasan || '',
@@ -1825,6 +2116,25 @@ const openAnswerModal = async (q) => {
           } else if (ns.length) {
             docFlowMode.value = 'new'
             newDocMethod.value = 'file'
+          }
+
+          // Deteksi mode untuk format seragam 2 opsi (Sarana & Prasarana, Kualitas Info, Komitmen Org)
+          if (isSimplifiedEvidenceTab.value) {
+            const hasStorage = found.links.some(l => l.sumber_informasi === 'lampiran' || (l.link || '').includes('/storage/saq/')) || ns.some(s => s.kind === 'file')
+            const hasGaleri = found.links.some(l => l.sumber_informasi === 'galeri' || (l.link || '').includes('/storage/galeri/')) || !!savedFoto.value
+            const hasInfo = found.links.some(l => l.sumber_informasi === 'informasi' || l.sumber_informasi === 'informasi_pemkab')
+            if (hasStorage) {
+              simpleEvidenceMode.value = 'upload'
+              uploadDestination.value = 'storage'
+            } else if (hasGaleri) {
+              simpleEvidenceMode.value = 'upload'
+              uploadDestination.value = 'galeri'
+            } else if (hasInfo) {
+              simpleEvidenceMode.value = 'upload'
+              uploadDestination.value = 'informasi'
+            } else if (found.links.length) {
+              simpleEvidenceMode.value = 'link'
+            }
           }
         } else {
           form.value.links = [{ judul: found.judul || '', link: found.link || '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }]
@@ -1936,8 +2246,35 @@ const submitAnswer = async () => {
     })
   }
 
-  // Validasi Khusus Alur 2 Pilihan untuk Dokumen
-  if (!isDigitalQuestion.value && isDokumen && form.value.jawaban === 'ya') {
+  // Validasi Khusus Format Bukti Dukung Sederhana (Sarana & Prasarana, Kualitas Info, Komitmen Org)
+  if (isSimplifiedEvidenceTab.value && form.value.jawaban === 'ya') {
+    if (simpleEvidenceMode.value === 'link') {
+      const filledLinks = form.value.links.filter(l => l.link && l.link.trim())
+      if (!filledLinks.length) {
+        formError.value = 'Silakan masukkan minimal satu tautan / link bukti dukung.'
+        return
+      }
+    } else {
+      // simpleEvidenceMode === 'upload'
+      const hasNewUpload = docUploads.value.some(u => u.file) || !!fotoFile.value
+      const hasSaved = savedUploads.value.length > 0 || !!savedFoto.value
+      if (!hasNewUpload && !hasSaved) {
+        formError.value = 'Silakan pilih berkas dokumen atau foto yang akan diunggah.'
+        return
+      }
+      if (docFileSizeError.value) {
+        formError.value = docFileSizeError.value
+        return
+      }
+      if (uploadDestination.value === 'informasi' && !docTanggal.value) {
+        formError.value = 'Tanggal mulai berlaku dokumen wajib diisi jika memilih Informasi Publik.'
+        return
+      }
+    }
+  }
+
+  // Validasi Khusus Alur 2 Pilihan untuk Dokumen (Khusus Tab Jenis Informasi)
+  if (!isDigitalQuestion.value && !isSimplifiedEvidenceTab.value && isDokumen && form.value.jawaban === 'ya') {
     if (docFlowMode.value === 'new') {
       if (newDocMethod.value === 'file') {
         if (!docUploads.value.length && !savedUploads.value.some(s => s.kind === 'file')) {
@@ -1984,7 +2321,31 @@ const submitAnswer = async () => {
   // Kumpulkan links
   const links = []
   if (form.value.jawaban === 'ya') {
-    if (!isDigitalQuestion.value && isDokumen) {
+    if (isSimplifiedEvidenceTab.value) {
+      if (simpleEvidenceMode.value === 'link') {
+        for (const l of form.value.links.filter(l => l.link?.trim())) {
+          links.push({
+            judul: (l.judul || modal.value.question?.pertanyaan || 'Tautan Bukti').trim(),
+            link: l.link.trim(),
+            deskripsi: (l.deskripsi || '').trim(),
+            mode: 'link',
+            sync_url: null,
+          })
+        }
+      } else {
+        // Mode upload: jika ada file lama tersimpan dan tidak diganti
+        for (const sv of savedUploads.value.filter(s => s.link?.trim())) {
+          links.push({
+            judul: sv.judul || modal.value.question?.pertanyaan,
+            link: sv.link.trim(),
+            deskripsi: sv.deskripsi || '',
+            mode: sv.kind === 'file' ? 'lampiran' : 'drive',
+            sync_url: null,
+            raw: sv,
+          })
+        }
+      }
+    } else if (!isDigitalQuestion.value && isDokumen) {
       if (docFlowMode.value === 'sync') {
         links.push({
           judul: syncResult.value.judul,
@@ -2041,14 +2402,19 @@ const submitAnswer = async () => {
     }
   }
 
-  const uploads = (form.value.jawaban === 'ya' && (!isDokumen || docFlowMode.value !== 'new' || newDocMethod.value === 'file'))
-    ? docUploads.value.filter(u => u.file)
-    : []
+  const uploads = (form.value.jawaban === 'ya' && (
+    (isSimplifiedEvidenceTab.value && simpleEvidenceMode.value === 'upload') ||
+    (!isSimplifiedEvidenceTab.value && (!isDokumen || docFlowMode.value !== 'new' || newDocMethod.value === 'file'))
+  )) ? docUploads.value.filter(u => u.file) : []
+
   const isSavedFoto = form.value.jawaban === 'ya' && inputType === 'foto' && !!savedFoto.value && !fotoFile.value
   if (isSavedFoto) {
     links.push({ judul: (savedFoto.value.judul || '').trim(), link: savedFoto.value.link.trim(), deskripsi: '', mode: 'galeri', sync_url: null, raw: savedFoto.value })
   }
-  const isFotoUpload = form.value.jawaban === 'ya' && inputType === 'foto' && !!fotoFile.value
+  const isFotoUpload = form.value.jawaban === 'ya' && (
+    (isSimplifiedEvidenceTab.value && simpleEvidenceMode.value === 'upload' && uploadDestination.value === 'galeri' && (!!fotoFile.value || !!uploads[0]?.file)) ||
+    (inputType === 'foto' && !!fotoFile.value)
+  )
 
   if (form.value.jawaban === 'ya' && !links.length && !uploads.length && !isFotoUpload && !isSavedFoto) {
     formError.value = 'Jawaban "Ya" wajib disertai minimal satu dokumen upload, link, atau foto Galeri.'
@@ -2070,6 +2436,15 @@ const submitAnswer = async () => {
       if (docTanggal.value) {
         fd.append('tanggal_dokumen', docTanggal.value)
       }
+
+      if (isSimplifiedEvidenceTab.value && simpleEvidenceMode.value === 'upload') {
+        fd.append('upload_destination', uploadDestination.value)
+        if (uploadDestination.value === 'informasi') {
+          fd.append('kategori', uploadKategori.value)
+          fd.append('target_upload', uploadTarget.value)
+        }
+      }
+
       links.forEach((l, i) => {
         fd.append(`links[${i}][judul]`, l.judul)
         fd.append(`links[${i}][link]`, l.link)
@@ -2081,12 +2456,21 @@ const submitAnswer = async () => {
         fd.append('dokumen_files[]', u.file)
         fd.append('dokumen_judul[]', (modal.value.question.pertanyaan || 'Dokumen SAQ').trim())
         fd.append('dokumen_deskripsi[]', (modal.value.question.pertanyaan || '').trim())
-        fd.append('dokumen_jadikan[]', isDokumen ? '1' : (u.jadikanInformasi ? '1' : '0'))
+        if (isSimplifiedEvidenceTab.value) {
+          fd.append('dokumen_jadikan[]', uploadDestination.value === 'informasi' ? '1' : '0')
+        } else {
+          fd.append('dokumen_jadikan[]', isDokumen ? '1' : (u.jadikanInformasi ? '1' : '0'))
+        }
       })
       if (isFotoUpload) {
-        fd.append('foto', fotoFile.value)
-        fd.append('judul_foto', form.value.fotoJudul.trim())
-        if (form.value.fotoTanggal) fd.append('tanggal_upload', form.value.fotoTanggal)
+        const fileToUpload = fotoFile.value || uploads[0]?.file
+        if (fileToUpload) {
+          fd.append('foto', fileToUpload)
+          fd.append('judul_foto', (form.value.fotoJudul || modal.value.question.pertanyaan || 'Foto Galeri').trim())
+          if (docTanggal.value || form.value.fotoTanggal) {
+            fd.append('tanggal_upload', docTanggal.value || form.value.fotoTanggal)
+          }
+        }
       }
       const token = typeof window !== 'undefined' ? localStorage.getItem('ppid_token') : null
       const res = await fetch(`${api.defaults.baseURL}/saq/answers`, {
