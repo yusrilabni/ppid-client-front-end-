@@ -953,8 +953,29 @@
                 <!-- FORM PILIHAN 1: BELUM MENGUNGGAH DOKUMEN -->
                 <div v-if="docFlowMode === 'new'" class="space-y-3 pt-1">
                   <div class="p-4 rounded-2xl border-2 border-blue-200/80 bg-blue-50/30 space-y-3.5 shadow-sm">
-                    <!-- Ketentuan & Upload Berkas Langsung -->
-                    <div class="space-y-2.5">
+                    <!-- Format Pengunggahan Berkas: File Upload vs Google Drive -->
+                    <div class="space-y-2">
+                      <label class="block text-xs font-bold text-gray-700">Format Penyediaan Berkas:</label>
+                      <div class="grid grid-cols-2 gap-2">
+                        <button type="button" @click="newDocMethod = 'file'"
+                          class="py-2.5 px-3 rounded-xl font-bold text-xs border-2 transition-all flex items-center justify-center gap-1.5"
+                          :class="newDocMethod === 'file'
+                            ? 'bg-[#0052FF] border-[#0052FF] text-white shadow-md shadow-blue-600/25'
+                            : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300'">
+                          <i class="fas fa-file-upload"></i> Upload File (Maks. 2 MB)
+                        </button>
+                        <button type="button" @click="newDocMethod = 'drive'"
+                          class="py-2.5 px-3 rounded-xl font-bold text-xs border-2 transition-all flex items-center justify-center gap-1.5"
+                          :class="newDocMethod === 'drive'
+                            ? 'bg-amber-600 border-amber-600 text-white shadow-md shadow-amber-600/25'
+                            : 'bg-white border-gray-200 text-gray-600 hover:border-amber-300'">
+                          <i class="fab fa-google-drive"></i> Link Google Drive (&gt; 2 MB)
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- METODE 1: UPLOAD FILE LANGSUNG (<= 2 MB) -->
+                    <div v-if="newDocMethod === 'file'" class="space-y-2.5">
                       <div class="p-3 bg-white rounded-xl border border-blue-200 text-xs text-gray-600 space-y-1">
                         <p class="font-bold text-blue-900 flex items-center gap-1.5">
                           <i class="fas fa-file-upload text-blue-600"></i>
@@ -971,9 +992,15 @@
                         class="w-full px-3.5 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
 
                       <!-- Alert Error Ukuran File Melebihi 2 MB -->
-                      <div v-if="docFileSizeError" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
-                        <i class="fas fa-exclamation-triangle mt-0.5 shrink-0 text-rose-600"></i>
-                        <span class="leading-relaxed">{{ docFileSizeError }}</span>
+                      <div v-if="docFileSizeError" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 space-y-2">
+                        <div class="flex items-start gap-2">
+                          <i class="fas fa-exclamation-triangle mt-0.5 shrink-0 text-rose-600"></i>
+                          <span class="leading-relaxed">{{ docFileSizeError }}</span>
+                        </div>
+                        <button type="button" @click="newDocMethod = 'drive'; docFileSizeError = ''"
+                          class="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-bold text-xs hover:bg-amber-700 transition-all flex items-center gap-1.5 shadow-sm">
+                          <i class="fab fa-google-drive"></i> Gunakan Opsi Link Google Drive Sekarang
+                        </button>
                       </div>
 
                       <!-- Berkas yang Baru Dipilih -->
@@ -995,7 +1022,7 @@
                       </div>
 
                       <!-- Berkas Tersimpan Sebelumnya (saat edit) -->
-                      <div v-for="(sv, svidx) in savedUploads" :key="'sv-f-'+svidx"
+                      <div v-for="(sv, svidx) in savedUploads.filter(s => s.kind === 'file')" :key="'sv-f-'+svidx"
                         class="p-3 rounded-xl border border-amber-200 bg-amber-50/60 space-y-1">
                         <div class="flex items-center justify-between">
                           <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5 truncate">
@@ -1010,6 +1037,34 @@
                         <a v-if="sv.link" :href="sv.link" target="_blank" rel="noopener" class="text-xs text-[#0052FF] font-bold underline break-all block">
                           Lihat Berkas Tersimpan
                         </a>
+                      </div>
+                    </div>
+
+                    <!-- METODE 2: TAUTAN GOOGLE DRIVE (> 2 MB) -->
+                    <div v-else class="space-y-2.5">
+                      <div class="p-3 bg-white rounded-xl border border-amber-200 text-xs text-gray-600 space-y-1">
+                        <p class="font-bold text-amber-900 flex items-center gap-1.5">
+                          <i class="fab fa-google-drive text-amber-600"></i>
+                          <span>Tautan Berkas Google Drive (&gt; 2 MB):</span>
+                        </p>
+                        <p class="text-[11px] leading-relaxed">
+                          Gunakan opsi ini jika dokumen bukti berukuran lebih dari 2 MB. Masukkan tautan Google Drive / Cloud publik (Pastikan hak akses tautan disetel <strong>"Siapa saja yang memiliki link dapat melihat"</strong>).
+                        </p>
+                      </div>
+
+                      <div class="space-y-1">
+                        <input v-model="driveLinkInput" type="url" required
+                          placeholder="https://drive.google.com/file/d/... atau https://docs.google.com/..."
+                          class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 outline-none text-xs font-mono" />
+                        <p class="text-[11px] text-gray-500">
+                          Contoh link file Drive: <code>https://drive.google.com/file/d/1a2B3c.../view?usp=sharing</code>
+                        </p>
+                      </div>
+
+                      <!-- Berkas Drive Tersimpan Sebelumnya (saat edit) -->
+                      <div v-if="driveLinkInput && isDriveUrl(driveLinkInput)" class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 flex items-center gap-2 text-xs text-emerald-800">
+                        <i class="fas fa-check-circle text-emerald-600"></i>
+                        <span>Format tautan Google Drive valid dan siap dihubungkan ke sistem informasi publik.</span>
                       </div>
                     </div>
 
@@ -1884,18 +1939,31 @@ const submitAnswer = async () => {
   // Validasi Khusus Alur 2 Pilihan untuk Dokumen
   if (!isDigitalQuestion.value && isDokumen && form.value.jawaban === 'ya') {
     if (docFlowMode.value === 'new') {
-      if (!docUploads.value.length && !savedUploads.value.length) {
-        formError.value = 'Silakan pilih berkas dokumen bukti (PDF, DOCX, XLSX, PPT, atau Gambar maks. 2 MB).'
-        return
+      if (newDocMethod.value === 'file') {
+        if (!docUploads.value.length && !savedUploads.value.some(s => s.kind === 'file')) {
+          formError.value = 'Silakan pilih berkas dokumen bukti (PDF, DOCX, XLSX, PPT, atau Gambar maks. 2 MB).'
+          return
+        }
+        if (docFileSizeError.value) {
+          formError.value = docFileSizeError.value
+          return
+        }
+        docUploads.value.forEach(u => {
+          u.judul = modal.value.question?.pertanyaan || 'Dokumen SAQ'
+          u.jadikanInformasi = true
+        })
+      } else {
+        // newDocMethod === 'drive'
+        const dUrl = (driveLinkInput.value || '').trim()
+        if (!dUrl) {
+          formError.value = 'Silakan masukkan tautan Google Drive dokumen bukti Anda.'
+          return
+        }
+        if (!isDriveUrl(dUrl)) {
+          formError.value = 'Tautan harus berupa tautan resmi Google Drive (drive.google.com atau docs.google.com).'
+          return
+        }
       }
-      if (docFileSizeError.value) {
-        formError.value = docFileSizeError.value
-        return
-      }
-      docUploads.value.forEach(u => {
-        u.judul = modal.value.question?.pertanyaan || 'Dokumen SAQ'
-        u.jadikanInformasi = true
-      })
     } else if (docFlowMode.value === 'sync') {
       if (!syncUrl.value || !syncUrl.value.trim()) {
         formError.value = 'Silakan masukkan tautan dokumen PPID atau Portal Pemkab Sinjai.'
@@ -1925,9 +1993,20 @@ const submitAnswer = async () => {
           mode: 'sync_ppid',
           sync_url: syncUrl.value.trim(),
         })
+      } else if (docFlowMode.value === 'new' && newDocMethod.value === 'drive') {
+        links.push({
+          judul: modal.value.question?.pertanyaan || 'Dokumen SAQ',
+          link: driveLinkInput.value.trim(),
+          deskripsi: modal.value.question?.pertanyaan || '',
+          mode: 'drive',
+          sync_url: null,
+        })
       }
       // Sertakan juga berkas tersimpan jika ada
       for (const sv of savedUploads.value.filter(s => s.link?.trim())) {
+        if (docFlowMode.value === 'new' && newDocMethod.value === 'drive' && sv.link.trim() === driveLinkInput.value.trim()) {
+          continue
+        }
         links.push({
           judul: sv.judul || modal.value.question?.pertanyaan,
           link: sv.link.trim(),
@@ -1962,7 +2041,9 @@ const submitAnswer = async () => {
     }
   }
 
-  const uploads = form.value.jawaban === 'ya' ? docUploads.value.filter(u => u.file) : []
+  const uploads = (form.value.jawaban === 'ya' && (!isDokumen || docFlowMode.value !== 'new' || newDocMethod.value === 'file'))
+    ? docUploads.value.filter(u => u.file)
+    : []
   const isSavedFoto = form.value.jawaban === 'ya' && inputType === 'foto' && !!savedFoto.value && !fotoFile.value
   if (isSavedFoto) {
     links.push({ judul: (savedFoto.value.judul || '').trim(), link: savedFoto.value.link.trim(), deskripsi: '', mode: 'galeri', sync_url: null, raw: savedFoto.value })
