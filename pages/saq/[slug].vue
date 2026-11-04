@@ -136,9 +136,12 @@
               </div>
             </button>
             <div v-show="openSections.includes(sec.kode)" class="border-t border-gray-100 p-3 space-y-2.5 bg-slate-50/50">
-              <div v-for="q in sec.questions" :key="q.id"
-                class="group bg-white rounded-2xl border p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-                :class="q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30'">
+              <template v-for="item in getSectionItems(sec)" :key="item.type + '-' + item.id">
+                <!-- Pertanyaan standalone -->
+                <template v-if="item.type === 'question'">
+                  <div v-for="q in [item]" :key="'standalone-' + q.id"
+                    class="group bg-white rounded-2xl border p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                    :class="q.terisi ? 'border-emerald-200/60' : 'border-gray-200/80 hover:border-[#0052FF]/30'">
                 <div class="flex items-start gap-3">
                   <!-- Status icon -->
                   <span class="mt-1 w-7 h-7 rounded-xl flex items-center justify-center text-xs shrink-0 transition-transform group-hover:scale-110"
@@ -313,9 +316,11 @@
                   </div>
                 </div>
               </div>
+            </template>
             
-              <!-- PARENT GROUPS (level 4 - induk non-answerable) -->
-              <div v-for="g in sec.groups" :key="'group-'+g.id" class="mt-1">
+            <!-- PARENT GROUPS (level 4 - induk non-answerable) -->
+            <template v-else-if="item.type === 'group'">
+              <div v-for="g in [item]" :key="'group-'+g.id" class="mt-1">
                 <!-- Header induk (tidak bisa diisi) -->
                 <div class="bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border border-blue-200/50 rounded-2xl px-4 py-3 mb-2">
                   <div class="flex items-start gap-2.5">
@@ -512,11 +517,13 @@
                   </div>
                 </div>
               </div>
-</div>
-          </div>
+            </template>
+          </template>
         </div>
-      </template>
+      </div>
     </div>
+  </template>
+</div>
 
     <!-- MODAL JAWABAN -->
     <Transition name="modal">
@@ -1666,6 +1673,14 @@ const toggleSection = (kode) => {
   openSections.value = openSections.value.includes(kode)
     ? openSections.value.filter(k => k !== kode)
     : [...openSections.value, kode]
+}
+
+const getSectionItems = (sec) => {
+  if (sec?.items && sec.items.length) return sec.items
+  return [
+    ...(sec?.questions || []).map(q => ({ ...q, type: 'question' })),
+    ...(sec?.groups || []).map(g => ({ ...g, type: 'group' }))
+  ]
 }
 
 // Modal jawaban
