@@ -202,7 +202,7 @@
                     </td>
                     <td class="px-6 py-4">
                       <span class="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-tight inline-block border border-blue-100/50">
-                        {{ item.organization_name || 'Unit Tidak Terdaftar' }}
+                        {{ (item.organization_name && item.organization_name !== 'Unit Tidak Terdaftar') ? item.organization_name : 'Pemerintah Kabupaten Sinjai' }}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -281,7 +281,7 @@
                 </div>
                 <div class="mb-3">
                   <span class="inline-block px-2 py-1 rounded-lg bg-blue-50 text-blue-600 text-[8px] font-black uppercase tracking-widest mb-2 border border-blue-100">
-                    {{ item.organization_name || 'Unit Tidak Terdaftar' }}
+                    {{ (item.organization_name && item.organization_name !== 'Unit Tidak Terdaftar') ? item.organization_name : 'Pemerintah Kabupaten Sinjai' }}
                   </span>
                   <NuxtLink :to="getDetailLink(item)" class="block text-sm font-bold text-gray-900 leading-snug line-clamp-2">
                     {{ item.title }}

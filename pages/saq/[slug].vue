@@ -170,15 +170,23 @@
                     </div>
                   </div>
                   <!-- Tombol aksi -->
-                  <button @click="openAnswerModal(q)"
-                    class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
-                    :class="q.terisi
-                      ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
-                      : (!canAnswer
-                          ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg')">
-                    <i :class="q.terisi ? 'fas fa-eye mr-1.5' : (!canAnswer ? 'fas fa-lock mr-1.5' : 'fas fa-pen mr-1.5')"></i>{{ q.terisi ? (canAnswer ? 'Ubah' : 'Lihat') : (canAnswer ? 'Isi' : 'Terkunci') }}
-                  </button>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button @click="openAnswerModal(q)"
+                      class="px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
+                      :class="q.terisi
+                        ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
+                        : (!canAnswer
+                            ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg')">
+                      <i :class="q.terisi ? 'fas fa-eye mr-1.5' : (!canAnswer ? 'fas fa-lock mr-1.5' : 'fas fa-pen mr-1.5')"></i>{{ q.terisi ? (canAnswer ? 'Ubah' : 'Lihat') : (canAnswer ? 'Isi' : 'Terkunci') }}
+                    </button>
+                    <button v-if="q.terisi && canAnswer" @click.stop="quickDeleteAnswer(q)"
+                      :disabled="deletingId === q.id"
+                      class="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 border border-rose-200 transition-all active:scale-95 disabled:opacity-50"
+                      title="Hapus Jawaban & Dokumen Bukti">
+                      <i :class="deletingId === q.id ? 'fas fa-spinner fa-spin' : 'fas fa-trash-alt'"></i>
+                    </button>
+                  </div>
                 </div>
                 <!-- DAFTAR JAWABAN KONSOLIDASI (mode full, superadmin) -->
                 <div v-if="isFullMode" class="mt-3 pt-3 border-t border-gray-100">
@@ -359,15 +367,23 @@
                       </div>
                     </div>
                       </div>
-                      <button @click="openAnswerModal(q)"
-                        class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
-                        :class="q.terisi
-                          ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
-                          : (!canAnswer
-                              ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg')">
-                        <i :class="q.terisi ? 'fas fa-eye mr-1.5' : (!canAnswer ? 'fas fa-lock mr-1.5' : 'fas fa-pen mr-1.5')"></i>{{ q.terisi ? (canAnswer ? 'Ubah' : 'Lihat') : (canAnswer ? 'Isi' : 'Terkunci') }}
-                      </button>
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <button @click="openAnswerModal(q)"
+                          class="px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
+                          :class="q.terisi
+                            ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
+                            : (!canAnswer
+                                ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-md shadow-blue-600/25 hover:shadow-lg')">
+                          <i :class="q.terisi ? 'fas fa-eye mr-1.5' : (!canAnswer ? 'fas fa-lock mr-1.5' : 'fas fa-pen mr-1.5')"></i>{{ q.terisi ? (canAnswer ? 'Ubah' : 'Lihat') : (canAnswer ? 'Isi' : 'Terkunci') }}
+                        </button>
+                        <button v-if="q.terisi && canAnswer" @click.stop="quickDeleteAnswer(q)"
+                          :disabled="deletingId === q.id"
+                          class="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 border border-rose-200 transition-all active:scale-95 disabled:opacity-50"
+                          title="Hapus Jawaban & Dokumen Bukti">
+                          <i :class="deletingId === q.id ? 'fas fa-spinner fa-spin' : 'fas fa-trash-alt'"></i>
+                        </button>
+                      </div>
                     </div>
                     <!-- DAFTAR JAWABAN KONSOLIDASI (mode full, superadmin) -->
                     <div v-if="isFullMode" class="mt-3 pt-3 border-t border-gray-100">
@@ -1169,14 +1185,23 @@
               <i class="fas fa-lock text-amber-600 text-sm"></i>
               <span>Pengisian dan perubahan jawaban SAQ saat ini sedang dikunci oleh Superadmin (Hanya dapat dilihat).</span>
             </div>
-            <button v-else type="submit" :disabled="submitting || (form.jawaban === 'tidak' && !form.alasan?.trim())"
-              class="w-full py-3.5 rounded-2xl font-bold text-sm shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-              :class="form.jawaban === 'tidak'
-                ? 'bg-gradient-to-r from-gray-700 to-gray-900 text-white shadow-gray-700/25 hover:shadow-gray-700/40'
-                : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-blue-600/25 hover:shadow-blue-600/40'">
-              <i :class="submitting ? 'fas fa-spinner fa-spin' : (form.jawaban === 'tidak' ? 'fas fa-check-circle' : 'fas fa-save')"></i>
-              <span>{{ submitting ? 'Menyimpan...' : (form.jawaban === 'tidak' ? 'Simpan Jawaban (Tidak Ada)' : 'Simpan Jawaban') }}</span>
-            </button>
+            <div v-else class="space-y-3">
+              <button type="submit" :disabled="submitting || deleting || (form.jawaban === 'tidak' && !form.alasan?.trim())"
+                class="w-full py-3.5 rounded-2xl font-bold text-sm shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                :class="form.jawaban === 'tidak'
+                  ? 'bg-gradient-to-r from-gray-700 to-gray-900 text-white shadow-gray-700/25 hover:shadow-gray-700/40'
+                  : 'bg-gradient-to-r from-[#0052FF] to-[#0041CC] text-white shadow-blue-600/25 hover:shadow-blue-600/40'">
+                <i :class="submitting ? 'fas fa-spinner fa-spin' : (form.jawaban === 'tidak' ? 'fas fa-check-circle' : 'fas fa-save')"></i>
+                <span>{{ submitting ? 'Menyimpan...' : (form.jawaban === 'tidak' ? 'Simpan Jawaban (Tidak Ada)' : 'Simpan Jawaban') }}</span>
+              </button>
+
+              <button v-if="modal.existing && canAnswer" type="button" @click="deleteExistingAnswer"
+                :disabled="submitting || deleting"
+                class="w-full py-3 rounded-2xl font-bold text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 border border-rose-200 transition-all flex items-center justify-center gap-2 shadow-xs active:scale-95 disabled:opacity-50">
+                <i :class="deleting ? 'fas fa-spinner fa-spin' : 'fas fa-trash-alt'"></i>
+                <span>{{ deleting ? 'Menghapus Dokumen & Jawaban...' : 'Hapus Dokumen & Jawaban Ini' }}</span>
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -1974,6 +1999,66 @@ const submitAnswer = async () => {
     formError.value = e.response?.data?.message || e.message || 'Gagal menyimpan jawaban.'
   } finally {
     submitting.value = false
+  }
+}
+
+const deleting = ref(false)
+const deletingId = ref(null)
+
+const deleteExistingAnswer = async () => {
+  if (!modal.value.existing || !canAnswer.value) return
+  const confirmDelete = typeof window !== 'undefined'
+    ? window.confirm('Apakah Anda yakin ingin menghapus jawaban dan dokumen bukti untuk indikator ini? Dokumen terkait di sistem informasi publik juga akan dibersihkan.')
+    : true
+  if (!confirmDelete) return
+
+  deleting.value = true
+  formError.value = ''
+  try {
+    await api.delete(`/saq/answers/${modal.value.existing.id}`)
+    modal.value.open = false
+    docUploads.value = []
+    driveRows.value = []
+    savedUploads.value = []
+    savedFoto.value = null
+    queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
+    queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
+    queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
+  } catch (e) {
+    formError.value = e.response?.data?.message || e.message || 'Gagal menghapus jawaban.'
+  } finally {
+    deleting.value = false
+  }
+}
+
+const quickDeleteAnswer = async (q) => {
+  if (!canAnswer.value) return
+  const kodeLabel = q.kode ? ` [${q.kode}]` : ''
+  const confirmDelete = typeof window !== 'undefined'
+    ? window.confirm(`Apakah Anda yakin ingin menghapus jawaban dan dokumen bukti untuk indikator${kodeLabel}? Dokumen terkait di sistem informasi publik juga akan dibersihkan.`)
+    : true
+  if (!confirmDelete) return
+
+  deletingId.value = q.id
+  try {
+    let answerId = q.answer_id
+    if (!answerId && opd.value) {
+      const res = await api.get('/saq/answers', { params: { organization_id: opd.value.id } })
+      const found = (res.data?.data || []).find(a => a.indicator_id === q.id)
+      if (found) answerId = found.id
+    }
+    if (!answerId) throw new Error('Data jawaban tidak ditemukan di server.')
+
+    await api.delete(`/saq/answers/${answerId}`)
+    queryClient.invalidateQueries({ queryKey: ['saq-opds'] })
+    queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
+    queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
+  } catch (e) {
+    if (typeof window !== 'undefined') {
+      window.alert(e.response?.data?.message || e.message || 'Gagal menghapus jawaban.')
+    }
+  } finally {
+    deletingId.value = null
   }
 }
 
