@@ -930,38 +930,15 @@
                 <!-- FORM PILIHAN 1: BELUM MENGUNGGAH DOKUMEN -->
                 <div v-if="docFlowMode === 'new'" class="space-y-3 pt-1">
                   <div class="p-4 rounded-2xl border-2 border-blue-200/80 bg-blue-50/30 space-y-3.5 shadow-sm">
-                    <!-- Format Pilihan: File (<= 2MB) vs Google Drive (> 2MB) -->
-                    <div>
-                      <label class="block text-xs font-black text-gray-800 mb-1.5 uppercase tracking-wide">
-                        Format Pengunggahan Berkas:
-                      </label>
-                      <div class="grid grid-cols-2 gap-2">
-                        <button type="button" @click="newDocMethod = 'file'"
-                          class="py-2.5 px-3 rounded-xl text-xs font-bold border-2 transition-all flex items-center justify-center gap-1.5"
-                          :class="newDocMethod === 'file'
-                            ? 'bg-[#0052FF] border-[#0052FF] text-white shadow-sm'
-                            : 'bg-white border-gray-200 text-gray-600 hover:border-blue-200'">
-                          <i class="fas fa-file-upload"></i> Upload File (Maks. 2 MB)
-                        </button>
-                        <button type="button" @click="newDocMethod = 'drive'"
-                          class="py-2.5 px-3 rounded-xl text-xs font-bold border-2 transition-all flex items-center justify-center gap-1.5"
-                          :class="newDocMethod === 'drive'
-                            ? 'bg-amber-600 border-amber-600 text-white shadow-sm'
-                            : 'bg-white border-gray-200 text-gray-600 hover:border-amber-200'">
-                          <i class="fab fa-google-drive"></i> Link Google Drive (> 2 MB)
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- JIKA METODE: FILE (MAKS 2 MB) -->
-                    <div v-if="newDocMethod === 'file'" class="space-y-2.5">
+                    <!-- Ketentuan & Upload Berkas Langsung -->
+                    <div class="space-y-2.5">
                       <div class="p-3 bg-white rounded-xl border border-blue-200 text-xs text-gray-600 space-y-1">
                         <p class="font-bold text-blue-900 flex items-center gap-1.5">
-                          <i class="fas fa-info-circle text-blue-600"></i>
-                          <span>Ketentuan Upload Berkas Langsung:</span>
+                          <i class="fas fa-file-upload text-blue-600"></i>
+                          <span>Unggah Berkas Dokumen Bukti:</span>
                         </p>
                         <p class="text-[11px] leading-relaxed">
-                          Silakan unggah dokumen bukti (PDF, DOCX, XLSX, PPT, atau Gambar JPG/PNG) dengan ukuran maksimal <strong>2 MB</strong>. Jika ukuran berkas melebihi 2 MB, silakan gunakan opsi <strong>Link Google Drive</strong> di atas.
+                          Silakan unggah dokumen bukti (PDF, DOCX, XLSX, PPT, atau Gambar JPG/PNG) maksimal 2 MB. Berkas ini otomatis dihubungkan ke sistem informasi publik resmi.
                         </p>
                       </div>
 
@@ -1013,37 +990,19 @@
                       </div>
                     </div>
 
-                    <!-- JIKA METODE: LINK GOOGLE DRIVE (> 2 MB) -->
-                    <div v-if="newDocMethod === 'drive'" class="space-y-2.5">
-                      <div class="p-3 bg-white rounded-xl border border-amber-200 text-xs text-gray-600 space-y-1">
-                        <p class="font-bold text-amber-950 flex items-center gap-1.5">
-                          <i class="fab fa-google-drive text-amber-600"></i>
-                          <span>Ketentuan Tautan Google Drive (> 2 MB):</span>
-                        </p>
-                        <p class="text-[11px] leading-relaxed">
-                          Masukkan tautan Google Drive dokumen Anda. Pastikan hak akses berkas di Google Drive telah disetel ke <strong>"Siapa saja yang memiliki link" (Anyone with the link / Publik)</strong> agar verifikator dan publik dapat melihat dan mengunduh berkas.
-                        </p>
-                      </div>
-
-                      <div class="space-y-1">
-                        <label class="block text-xs font-bold text-gray-700">Tautan Berkas Google Drive *</label>
-                        <input v-model="driveLinkInput" type="url" placeholder="https://drive.google.com/file/d/... atau https://docs.google.com/..."
-                          class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 outline-none text-xs" />
-                      </div>
-
-                      <div v-if="driveLinkInput && !isDriveUrl(driveLinkInput)" class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
-                        <i class="fas fa-exclamation-triangle mt-0.5 shrink-0 text-rose-600"></i>
-                        <span>Tautan harus berupa link Google Drive (domain drive.google.com atau docs.google.com).</span>
-                      </div>
-                    </div>
-
-                    <!-- PENGATURAN MAPPING DOKUMEN & METADATA -->
+                    <!-- PENGATURAN MAPPING DOKUMEN & METADATA OTOMATIS -->
                     <div class="pt-3 border-t border-blue-200/80 space-y-3">
-                      <!-- Mapping Box Otomatis -->
-                      <div class="p-3 bg-white rounded-xl border border-blue-200 space-y-1.5 text-xs text-gray-700 shadow-sm">
+                      <!-- Mapping Box Otomatis Sesuai Pertanyaan -->
+                      <div class="p-3 bg-white rounded-xl border border-blue-200 space-y-2 text-xs text-gray-700 shadow-sm">
                         <div class="flex items-center gap-1.5 font-extrabold text-[#0052FF]">
                           <i class="fas fa-sitemap"></i>
-                          <span>Mapping Otomatis Berdasarkan Indikator Pertanyaan</span>
+                          <span>Pengaturan Otomatis Berdasarkan Pertanyaan Indikator</span>
+                        </div>
+                        <div class="space-y-1 text-[11px] bg-blue-50/50 p-2.5 rounded-lg border border-blue-100">
+                          <span class="text-gray-500 block">Judul & Deskripsi Dokumen:</span>
+                          <strong class="text-gray-900 font-bold leading-snug block">
+                            {{ modal.question?.pertanyaan }}
+                          </strong>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                           <div>
@@ -1061,28 +1020,15 @@
                         </div>
                       </div>
 
-                      <!-- Judul Dokumen (Otomatis dari Pertanyaan) -->
+                      <!-- Tanggal Dokumen Mulai Berlaku (Bukan created_at) -->
                       <div class="space-y-1">
                         <label class="block text-xs font-bold text-gray-700">
-                          Judul Dokumen (Otomatis Dibuat Berdasarkan Pertanyaan)
-                        </label>
-                        <input v-model="form.docJudul" type="text"
-                          :placeholder="modal.question?.pertanyaan"
-                          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs text-gray-800" />
-                        <p class="text-[11px] text-gray-500">
-                          Judul diambil langsung dari teks pertanyaan indikator SAQ. Anda dapat menyesuaikannya bila diperlukan.
-                        </p>
-                      </div>
-
-                      <!-- Tanggal Dokumen Dibuat / Ditetapkan -->
-                      <div class="space-y-1">
-                        <label class="block text-xs font-bold text-gray-700">
-                          Tanggal Dokumen Dibuat / Ditetapkan *
+                          Tanggal Mulai Berlaku Dokumen *
                         </label>
                         <input v-model="docTanggal" type="date" required
-                          class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs" />
+                          class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-[#0052FF] outline-none text-xs font-semibold" />
                         <p class="text-[11px] text-gray-500">
-                          Diterangkan sesuai tanggal resmi dokumen Anda dibuat/disahkan (bukan tanggal pengisian SAQ hari ini).
+                          Pilih tanggal resmi dokumen Anda mulai berlaku / disahkan (bukan tanggal pengisian SAQ hari ini).
                         </p>
                       </div>
 
@@ -1102,15 +1048,15 @@
                             :class="form.visibility === 'private'
                               ? 'bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-500/25'
                               : 'bg-white border-gray-200 text-gray-600 hover:border-amber-300'">
-                            <i class="fas fa-lock"></i> Private (Khusus Admin OPD)
+                            <i class="fas fa-lock"></i> Private (Khusus Admin)
                           </button>
                         </div>
                         <p class="text-[11px] text-gray-500">
                           <span v-if="form.visibility === 'public'">
-                            <i class="fas fa-check-circle text-emerald-600 mr-1"></i>Dokumen ini akan ditampilkan pada halaman daftar informasi publik website.
+                            <i class="fas fa-check-circle text-emerald-600 mr-1"></i>Dokumen ini akan ditampilkan pada halaman daftar informasi publik website untuk semua pengunjung.
                           </span>
                           <span v-else>
-                            <i class="fas fa-lock text-amber-600 mr-1"></i>Dokumen ini tidak tampil untuk publik, hanya dapat dilihat jika login sebagai Admin OPD bersangkutan atau Super Admin.
+                            <i class="fas fa-lock text-amber-600 mr-1"></i>Dokumen ini tidak tampil untuk publik umum, namun akan muncul di daftar dokumen saat Anda login sebagai Super Admin atau Admin OPD yang mengunggah (ditandai dengan warna berbeda).
                           </span>
                         </p>
                       </div>
@@ -1874,31 +1820,18 @@ const submitAnswer = async () => {
   // Validasi Khusus Alur 2 Pilihan untuk Dokumen
   if (!isDigitalQuestion.value && isDokumen && form.value.jawaban === 'ya') {
     if (docFlowMode.value === 'new') {
-      if (newDocMethod.value === 'file') {
-        if (!docUploads.value.length && !savedUploads.value.length) {
-          formError.value = 'Silakan pilih berkas dokumen bukti (maksimal 2 MB) atau pilih opsi Google Drive jika ukuran berkas lebih dari 2 MB.'
-          return
-        }
-        if (docFileSizeError.value) {
-          formError.value = docFileSizeError.value
-          return
-        }
-        docUploads.value.forEach(u => {
-          if (!u.judul || !u.judul.trim()) {
-            u.judul = form.value.docJudul?.trim() || modal.value.question?.pertanyaan || 'Dokumen SAQ'
-          }
-          u.jadikanInformasi = true
-        })
-      } else if (newDocMethod.value === 'drive') {
-        if (!driveLinkInput.value || !driveLinkInput.value.trim()) {
-          formError.value = 'Tautan Google Drive dokumen wajib diisi.'
-          return
-        }
-        if (!isDriveUrl(driveLinkInput.value)) {
-          formError.value = 'Tautan harus berupa link Google Drive (domain drive.google.com atau docs.google.com).'
-          return
-        }
+      if (!docUploads.value.length && !savedUploads.value.length) {
+        formError.value = 'Silakan pilih berkas dokumen bukti (PDF, DOCX, XLSX, PPT, atau Gambar maks. 2 MB).'
+        return
       }
+      if (docFileSizeError.value) {
+        formError.value = docFileSizeError.value
+        return
+      }
+      docUploads.value.forEach(u => {
+        u.judul = modal.value.question?.pertanyaan || 'Dokumen SAQ'
+        u.jadikanInformasi = true
+      })
     } else if (docFlowMode.value === 'sync') {
       if (!syncUrl.value || !syncUrl.value.trim()) {
         formError.value = 'Silakan masukkan tautan dokumen PPID atau Portal Pemkab Sinjai.'
@@ -1928,19 +1861,11 @@ const submitAnswer = async () => {
           mode: 'sync_ppid',
           sync_url: syncUrl.value.trim(),
         })
-      } else if (docFlowMode.value === 'new' && newDocMethod.value === 'drive') {
-        links.push({
-          judul: form.value.docJudul?.trim() || modal.value.question?.pertanyaan || 'Dokumen SAQ',
-          link: driveLinkInput.value.trim(),
-          deskripsi: modal.value.question?.pertanyaan || '',
-          mode: 'baru',
-          sync_url: null,
-        })
       }
       // Sertakan juga berkas tersimpan jika ada
       for (const sv of savedUploads.value.filter(s => s.link?.trim())) {
         links.push({
-          judul: sv.judul || form.value.docJudul || modal.value.question?.pertanyaan,
+          judul: sv.judul || modal.value.question?.pertanyaan,
           link: sv.link.trim(),
           deskripsi: sv.deskripsi || '',
           mode: sv.kind === 'file' ? 'baru' : 'drive',
@@ -2009,8 +1934,8 @@ const submitAnswer = async () => {
       })
       uploads.forEach((u, i) => {
         fd.append('dokumen_files[]', u.file)
-        fd.append('dokumen_judul[]', (u.judul || form.value.docJudul || modal.value.question.pertanyaan).trim())
-        fd.append('dokumen_deskripsi[]', (u.deskripsi || modal.value.question.pertanyaan || '').trim())
+        fd.append('dokumen_judul[]', (modal.value.question.pertanyaan || 'Dokumen SAQ').trim())
+        fd.append('dokumen_deskripsi[]', (modal.value.question.pertanyaan || '').trim())
         fd.append('dokumen_jadikan[]', isDokumen ? '1' : (u.jadikanInformasi ? '1' : '0'))
       })
       if (isFotoUpload) {

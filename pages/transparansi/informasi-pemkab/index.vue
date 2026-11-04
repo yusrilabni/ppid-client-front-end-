@@ -163,7 +163,13 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100/50">
-                                <tr v-for="(dokumen, index) in items" :key="dokumen.id" class="transition-colors group hover:bg-blue-50/60">
+                                <tr v-for="(dokumen, index) in items" :key="dokumen.id" 
+                                    :class="[
+                                        'transition-colors group',
+                                        (dokumen.visibility === 'private' || dokumen.status === 'draft')
+                                            ? 'bg-amber-50/70 hover:bg-amber-100/60 border-l-4 border-l-amber-500'
+                                            : 'hover:bg-blue-50/60'
+                                    ]">
                                     <td class="py-4 px-4 text-center align-middle font-medium text-gray-500">
                                         {{ (currentPage - 1) * Number(filters.per_page) + index + 1 }}
                                     </td>
@@ -178,6 +184,11 @@
                                                 <NuxtLink :to="`/transparansi/informasi-pemkab/${dokumen.slug || dokumen.id}`" class="block text-base font-bold text-gray-800 hover:text-blue-700 transition-all duration-300 leading-tight line-clamp-1 group-hover:line-clamp-none">
                                                     {{ dokumen.judul }}
                                                 </NuxtLink>
+                                                <div v-if="dokumen.visibility === 'private' || dokumen.status === 'draft'" class="mt-1">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black uppercase tracking-wider shadow-xs">
+                                                        <i class="fas fa-lock text-[9px] text-amber-700"></i> Private (Khusus Admin)
+                                                    </span>
+                                                </div>
                                                 <p v-if="dokumen.deskripsi" class="text-sm text-gray-500 mt-1 transition-all duration-300 line-clamp-1 group-hover:line-clamp-none">
                                                     {{ dokumen.deskripsi }}
                                                 </p>
@@ -237,7 +248,16 @@
                     </div>
       
                     <div class="block md:hidden relative z-10 p-3 sm:p-4 space-y-4 bg-gray-50/50">
-                          <div v-for="dokumen in items" :key="'mob-'+dokumen.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 relative flex flex-col group transition-all duration-300">
+                          <div v-for="dokumen in items" :key="'mob-'+dokumen.id" 
+                               :class="[
+                                   'rounded-2xl shadow-sm p-4 relative flex flex-col group transition-all duration-300',
+                                   (dokumen.visibility === 'private' || dokumen.status === 'draft')
+                                       ? 'bg-amber-50/60 border-2 border-amber-300 ring-2 ring-amber-400/20'
+                                       : 'bg-white border border-gray-100'
+                               ]">
+                              <div v-if="dokumen.visibility === 'private' || dokumen.status === 'draft'" class="absolute top-0 right-0 bg-amber-400 text-amber-950 font-black text-[8px] px-3 py-1 rounded-bl-xl uppercase tracking-widest flex items-center gap-1 shadow-xs">
+                                  <i class="fas fa-lock text-[8px]"></i> PRIVATE
+                              </div>
                               <div class="flex items-start">
                                   <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-100 to-indigo-50 text-blue-600 border-blue-100 flex items-center justify-center border shadow-sm mt-0.5">
                                       <i class="fas fa-file-pdf text-lg"></i>

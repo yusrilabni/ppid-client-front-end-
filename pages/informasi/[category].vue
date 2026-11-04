@@ -175,7 +175,13 @@
               </thead>
               <tbody class="divide-y divide-gray-50">
                 <template v-if="items.length > 0">
-                  <tr v-for="(item, index) in items" :key="item.id" :class="['hover:bg-blue-50/30 transition-colors', item.status?.toUpperCase() === 'ARSIP' ? 'bg-gray-50/50 opacity-70' : '']">
+                  <tr v-for="(item, index) in items" :key="item.id" 
+                      :class="[
+                        'transition-colors',
+                        (item.visibility === 'private' || item.status === 'draft')
+                          ? 'bg-amber-50/70 hover:bg-amber-100/60 border-l-4 border-l-amber-500'
+                          : (item.status?.toUpperCase() === 'ARSIP' ? 'bg-gray-50/50 opacity-70 hover:bg-blue-50/30' : 'hover:bg-blue-50/30')
+                      ]">
                     <td class="px-6 py-4 whitespace-nowrap text-xs font-bold text-gray-400 text-center">
                       {{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}
                     </td>
@@ -184,8 +190,11 @@
                         {{ item.title }}
                       </NuxtLink>
                       <div class="flex items-center gap-2 mt-1">
-                        <span v-if="item.status?.toUpperCase() === 'ARSIP'" class="inline-block px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">ARSIP</span>
-                        <span v-else-if="['BERLAKU', 'AKTIF'].includes(item.status?.toUpperCase())" class="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-[9px] font-black uppercase tracking-widest">BERLAKU</span>
+                        <span v-if="item.visibility === 'private' || item.status === 'draft'" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-black uppercase tracking-wider shadow-xs">
+                          <i class="fas fa-lock text-[8px] text-amber-700"></i> Private (Khusus Admin)
+                        </span>
+                        <span v-else-if="item.status?.toUpperCase() === 'ARSIP'" class="inline-block px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">ARSIP</span>
+                        <span v-else-if="['BERLAKU', 'AKTIF', 'PUBLISHED'].includes(item.status?.toUpperCase())" class="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-[9px] font-black uppercase tracking-widest">BERLAKU</span>
                       </div>
                     </td>
                     <td class="px-6 py-4 text-xs text-gray-500 leading-relaxed max-w-xs">
@@ -254,11 +263,20 @@
           <!-- Mobile Cards View -->
           <div class="md:hidden p-4 space-y-4">
             <template v-if="items.length > 0">
-              <div v-for="(item, index) in items" :key="item.id" :class="['bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative overflow-hidden', item.status?.toUpperCase() === 'ARSIP' ? 'bg-gray-50/50 opacity-70' : '']">
-                <div v-if="item.status?.toUpperCase() === 'ARSIP'" class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">
+              <div v-for="(item, index) in items" :key="item.id" 
+                   :class="[
+                     'rounded-2xl p-4 shadow-sm relative overflow-hidden transition-all duration-300',
+                     (item.visibility === 'private' || item.status === 'draft')
+                       ? 'bg-amber-50/60 border-2 border-amber-300 ring-2 ring-amber-400/20'
+                       : (item.status?.toUpperCase() === 'ARSIP' ? 'bg-gray-50/50 opacity-70 border border-gray-100' : 'bg-white border border-gray-100')
+                   ]">
+                <div v-if="item.visibility === 'private' || item.status === 'draft'" class="absolute top-0 right-0 bg-amber-400 text-amber-950 font-black text-[8px] px-3 py-1 rounded-bl-xl uppercase tracking-widest flex items-center gap-1 shadow-xs">
+                  <i class="fas fa-lock text-[8px]"></i> PRIVATE
+                </div>
+                <div v-else-if="item.status?.toUpperCase() === 'ARSIP'" class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">
                   ARSIP
                 </div>
-                <div v-else-if="['BERLAKU', 'AKTIF'].includes(item.status?.toUpperCase())" class="absolute top-0 right-0 bg-green-100 text-green-700 text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">
+                <div v-else-if="['BERLAKU', 'AKTIF', 'PUBLISHED'].includes(item.status?.toUpperCase())" class="absolute top-0 right-0 bg-green-100 text-green-700 text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">
                   BERLAKU
                 </div>
                 <div class="mb-3">
