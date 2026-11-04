@@ -1027,7 +1027,70 @@
                     </div>
 
                     <!-- FORM DETAIL JIKA MEMILIH INFORMASI PUBLIK -->
-                    <div v-if="uploadDestination === 'informasi'" class="p-3.5 rounded-xl bg-blue-50/50 border border-blue-200 space-y-3 text-xs">
+                    <div v-if="uploadDestination === 'informasi'" class="p-4 rounded-xl bg-gradient-to-br from-indigo-50/70 via-blue-50/50 to-purple-50/60 border-2 border-indigo-200 space-y-3.5 text-xs">
+                      <!-- KATA KUNCI DOKUMEN & AUTO AI GENERATOR -->
+                      <div class="p-3.5 rounded-xl bg-white border border-indigo-200 space-y-2.5 shadow-xs">
+                        <div class="flex items-start justify-between gap-2">
+                          <div>
+                            <label class="block text-xs font-black text-indigo-950 flex items-center gap-1.5">
+                              <i class="fas fa-magic text-indigo-600"></i>
+                              Kata Kunci Dokumen (Topik Berkas) <span class="text-rose-500">*</span>
+                            </label>
+                            <span class="text-[11px] text-gray-500 block mt-0.5">
+                              Wajib diisi sebagai dasar pembuatan judul & deskripsi informasi resmi oleh AI.
+                            </span>
+                          </div>
+                          <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 uppercase tracking-wider shrink-0">
+                            Auto AI
+                          </span>
+                        </div>
+
+                        <!-- Info Penjelasan Kata Kunci -->
+                        <div class="p-2.5 rounded-lg bg-indigo-50/50 border border-indigo-100 text-[11px] text-indigo-950 space-y-1">
+                          <p class="font-bold flex items-center gap-1 text-indigo-900">
+                            <i class="fas fa-lightbulb text-amber-500"></i> Apa itu Kata Kunci Dokumen?
+                          </p>
+                          <p class="text-gray-600 leading-relaxed">
+                            Kata kunci adalah nama singkat atau intisari dokumen resmi Anda (misal: <em>"Rencana Umum Pengadaan (RUP) Tahun 2026"</em>, <em>"Laporan Realisasi Anggaran (LRA) Triwulan II"</em>, <em>"SK Tim Pembina PPID"</em>).
+                          </p>
+                          <p class="text-indigo-700 font-semibold leading-relaxed">
+                            <i class="fas fa-robot text-indigo-500 mr-1"></i>
+                            Sistem AI resmi akan otomatis merumuskan ulang judul yang baku (dengan singkatan resmi), menyusun deskripsi detail, dan membuat konten dokumen formal <strong>(bukan berupa kalimat tanya indikator)</strong>.
+                          </p>
+                        </div>
+
+                        <!-- Input Kata Kunci & Tombol Generate AI -->
+                        <div class="space-y-2">
+                          <div class="flex flex-col sm:flex-row gap-2">
+                            <input v-model="kataKunciDokumen" type="text" required
+                              placeholder="Ketik kata kunci dokumen... (contoh: RUP SiRUP Pemkab Sinjai 2026)"
+                              class="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-gray-300 bg-white text-xs outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 font-semibold" />
+                            <button type="button" @click="triggerAiGeneration" :disabled="generatingAiTitle || !kataKunciDokumen?.trim()"
+                              class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-xs hover:from-indigo-700 hover:to-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 shadow-sm shadow-indigo-600/20 shrink-0">
+                              <i :class="generatingAiTitle ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles'"></i>
+                              <span>{{ generatingAiTitle ? 'Menyusun AI...' : 'Generate AI Sekarang' }}</span>
+                            </button>
+                          </div>
+
+                          <!-- Hasil AI (bisa disesuaikan/diedit bila perlu) -->
+                          <div v-if="form.docJudul && form.docJudul !== modal.question?.pertanyaan" class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-300 space-y-2 text-xs">
+                            <div class="flex items-center justify-between text-[11px] font-black text-emerald-800 border-b border-emerald-200/60 pb-1">
+                              <span class="flex items-center gap-1"><i class="fas fa-check-circle text-emerald-600"></i> Judul & Deskripsi Hasil AI (Baku & Siap Terbit)</span>
+                            </div>
+                            <div>
+                              <span class="text-[10px] font-bold text-gray-500 uppercase block">Judul Dokumen Publik:</span>
+                              <input v-model="form.docJudul" type="text"
+                                class="w-full mt-0.5 px-3 py-1.5 rounded-lg border border-emerald-300 bg-white text-xs font-bold text-gray-900 outline-none focus:border-emerald-500" />
+                            </div>
+                            <div>
+                              <span class="text-[10px] font-bold text-gray-500 uppercase block">Deskripsi Detail Dokumen:</span>
+                              <textarea v-model="form.docDeskripsi" rows="2"
+                                class="w-full mt-0.5 px-3 py-1.5 rounded-lg border border-emerald-300 bg-white text-xs text-gray-800 outline-none focus:border-emerald-500 leading-relaxed"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                           <label class="block text-[11px] font-bold text-gray-700 mb-1">Target Portal:</label>
@@ -1279,31 +1342,81 @@
                       </div>
                     </div>
 
-                    <!-- PENGATURAN MAPPING DOKUMEN & METADATA OTOMATIS -->
+                    <!-- PENGATURAN KATA KUNCI DOKUMEN & AUTO AI GENERATOR -->
                     <div class="pt-3 border-t border-blue-200/80 space-y-3">
-                      <!-- Mapping Box Otomatis Sesuai Pertanyaan -->
-                      <div class="p-3 bg-white rounded-xl border border-blue-200 space-y-2 text-xs text-gray-700 shadow-sm">
-                        <div class="flex items-center gap-1.5 font-extrabold text-[#0052FF]">
-                          <i class="fas fa-sitemap"></i>
-                          <span>Pengaturan Otomatis Berdasarkan Pertanyaan Indikator</span>
-                        </div>
-                        <div class="space-y-1 text-[11px] bg-blue-50/50 p-2.5 rounded-lg border border-blue-100">
-                          <span class="text-gray-500 block">Judul & Deskripsi Dokumen:</span>
-                          <strong class="text-gray-900 font-bold leading-snug block">
-                            {{ modal.question?.pertanyaan }}
-                          </strong>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                      <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-blue-50/50 to-purple-50/60 border-2 border-indigo-200 space-y-3.5 text-xs shadow-xs">
+                        <div class="flex items-start justify-between gap-2">
                           <div>
-                            <span class="text-gray-500">Target Sistem:</span>
-                            <strong class="text-gray-900 block font-bold">
+                            <label class="block text-xs font-black text-indigo-950 flex items-center gap-1.5">
+                              <i class="fas fa-magic text-indigo-600"></i>
+                              Kata Kunci Dokumen (Topik Berkas) <span class="text-rose-500">*</span>
+                            </label>
+                            <span class="text-[11px] text-gray-500 block mt-0.5">
+                              Wajib diisi sebagai dasar pembuatan judul & deskripsi informasi resmi oleh AI.
+                            </span>
+                          </div>
+                          <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 uppercase tracking-wider shrink-0">
+                            Auto AI
+                          </span>
+                        </div>
+
+                        <!-- Info Penjelasan Kata Kunci -->
+                        <div class="p-2.5 rounded-lg bg-white/90 border border-indigo-100 text-[11px] text-indigo-950 space-y-1">
+                          <p class="font-bold flex items-center gap-1 text-indigo-900">
+                            <i class="fas fa-lightbulb text-amber-500"></i> Apa itu Kata Kunci Dokumen?
+                          </p>
+                          <p class="text-gray-600 leading-relaxed">
+                            Kata kunci adalah nama singkat atau topik resmi dokumen Anda (misal: <em>"Rencana Umum Pengadaan (RUP) SiRUP Tahun 2026"</em>, <em>"Laporan Realisasi Anggaran (LRA) Triwulan II"</em>, <em>"Daftar Informasi Publik Tahun 2026"</em>).
+                          </p>
+                          <p class="text-indigo-700 font-semibold leading-relaxed">
+                            <i class="fas fa-robot text-indigo-500 mr-1"></i>
+                            Sistem AI resmi akan otomatis merumuskan ulang judul yang baku (dengan singkatan resmi), menyusun deskripsi detail, dan membuat konten dokumen formal <strong>(bukan berupa kalimat tanya indikator)</strong>.
+                          </p>
+                        </div>
+
+                        <!-- Input Kata Kunci & Tombol Generate AI -->
+                        <div class="space-y-2">
+                          <div class="flex flex-col sm:flex-row gap-2">
+                            <input v-model="kataKunciDokumen" type="text" required
+                              placeholder="Ketik kata kunci dokumen... (contoh: RUP SiRUP Pemkab Sinjai 2026)"
+                              class="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-gray-300 bg-white text-xs outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 font-semibold" />
+                            <button type="button" @click="triggerAiGeneration" :disabled="generatingAiTitle || !kataKunciDokumen?.trim()"
+                              class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-xs hover:from-indigo-700 hover:to-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 shadow-sm shadow-indigo-600/20 shrink-0">
+                              <i :class="generatingAiTitle ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles'"></i>
+                              <span>{{ generatingAiTitle ? 'Menyusun AI...' : 'Generate AI Sekarang' }}</span>
+                            </button>
+                          </div>
+
+                          <!-- Hasil AI (bisa disesuaikan/diedit bila perlu) -->
+                          <div v-if="form.docJudul && form.docJudul !== modal.question?.pertanyaan" class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-300 space-y-2 text-xs">
+                            <div class="flex items-center justify-between text-[11px] font-black text-emerald-800 border-b border-emerald-200/60 pb-1">
+                              <span class="flex items-center gap-1"><i class="fas fa-check-circle text-emerald-600"></i> Judul & Deskripsi Hasil AI (Baku & Siap Terbit)</span>
+                            </div>
+                            <div>
+                              <span class="text-[10px] font-bold text-gray-500 uppercase block">Judul Dokumen Publik:</span>
+                              <input v-model="form.docJudul" type="text"
+                                class="w-full mt-0.5 px-3 py-1.5 rounded-lg border border-emerald-300 bg-white text-xs font-bold text-gray-900 outline-none focus:border-emerald-500" />
+                            </div>
+                            <div>
+                              <span class="text-[10px] font-bold text-gray-500 uppercase block">Deskripsi Detail Dokumen:</span>
+                              <textarea v-model="form.docDeskripsi" rows="2"
+                                class="w-full mt-0.5 px-3 py-1.5 rounded-lg border border-emerald-300 bg-white text-xs text-gray-800 outline-none focus:border-emerald-500 leading-relaxed"></textarea>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Target & Klasifikasi Otomatis -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-2 border-t border-indigo-100">
+                          <div>
+                            <span class="text-gray-500 block">Target Sistem:</span>
+                            <strong class="text-gray-900 font-bold">
                               {{ modal.question?.target_upload === 'pemkab' ? 'Portal Informasi Pemkab Sinjai' : 'Informasi Publik PPID Utama' }}
                             </strong>
                           </div>
                           <div>
-                            <span class="text-gray-500">Klasifikasi Kategori:</span>
-                            <strong class="text-gray-900 block font-bold">
-                              {{ modal.question?.klasifikasi_otomatis || 'Informasi Berkala' }}
+                            <span class="text-gray-500 block">Klasifikasi Kategori:</span>
+                            <strong class="text-gray-900 font-bold">
+                              {{ uploadKategori || modal.question?.klasifikasi_otomatis || 'Informasi Berkala' }}
                             </strong>
                           </div>
                         </div>
@@ -1531,6 +1644,11 @@ const simpleEvidenceMode = ref('link') // 'link' (Isi Tautan Langsung) | 'upload
 const uploadDestination = ref('storage') // 'storage' (Langsung Storage) | 'informasi' (Masuk Informasi Publik) | 'galeri' (Masuk Galeri)
 const uploadKategori = ref('Informasi Berkala') // 'Informasi Berkala' | 'Informasi Setiap Saat' | 'Informasi Serta Merta'
 const uploadTarget = ref('ppid') // 'ppid' | 'pemkab'
+
+// State Integrasi AI Generator untuk Metadata Dokumen Publik SAQ
+const kataKunciDokumen = ref('')
+const generatingAiTitle = ref(false)
+const aiGeneratedData = ref(null)
 
 // Fitur Salin Link & Klasifikasi Tampilan Bukti Dukung vs Tautan
 const copiedLinkId = ref(null)
@@ -1823,6 +1941,48 @@ const onSimpleFileChange = (e) => {
     })
   }
   e.target.value = ''
+}
+
+// Fungsi Generate AI Resmi untuk Judul & Metadata Dokumen Informasi Publik
+const triggerAiGeneration = async () => {
+  const prompt = (kataKunciDokumen.value || '').trim() || modal.value.question?.pertanyaan || 'Dokumen SAQ'
+  generatingAiTitle.value = true
+  formError.value = ''
+  try {
+    const isPemkab = (modal.value.question?.target_upload === 'pemkab' || uploadTarget.value === 'pemkab')
+    const res = await api.post('/ai-settings/generate', {
+      prompt,
+      pertanyaan: modal.value.question?.pertanyaan || '',
+      context: isPemkab ? 'saq_pemkab' : 'saq'
+    })
+    if (res.data?.success && res.data?.data) {
+      const d = res.data.data
+      aiGeneratedData.value = d
+      form.value.docJudul = d.title || prompt
+      form.value.docDeskripsi = d.doc_desc || d.doc_content || prompt
+      form.value.docContent = d.doc_content || d.doc_desc || prompt
+      if (d.category) {
+        uploadKategori.value = d.category
+      }
+      if (d.tahun && !docTanggal.value) {
+        docTanggal.value = d.tahun
+      }
+      return d
+    }
+  } catch (err) {
+    console.error('AI Generation error:', err)
+    // Fallback: bersihkan kalimat tanya secara otomatis jika AI offline
+    const clean = prompt
+      .replace(/^(Apakah\s+Pemerintah\s+Kabupaten\/Kota\s+Saudara\s+mengumumkan\s+informasi\s+(tentang\s+)?|Mengumumkan\s+informasi\s+(tentang\s+)?|Apakah\s+OPD\s+memiliki\/memenuhi\s+indikator\s+ini\??\s*)/iu, '')
+      .replace(/\?+$/, '')
+      .trim()
+    const autoTitle = (clean.charAt(0).toUpperCase() + clean.slice(1)) + ' Kabupaten Sinjai'
+    form.value.docJudul = autoTitle
+    form.value.docDeskripsi = 'Dokumen resmi ' + autoTitle + ' Pemerintah Kabupaten Sinjai dalam rangka keterbukaan informasi publik.'
+    form.value.docContent = form.value.docDeskripsi
+  } finally {
+    generatingAiTitle.value = false
+  }
 }
 
 // Validasi domain tautan resmi sinkronisasi
@@ -2175,6 +2335,11 @@ const openAnswerModal = async (q) => {
   syncError.value = ''
   docFileSizeError.value = ''
 
+  // Reset state AI Generator Dokumen
+  kataKunciDokumen.value = ''
+  generatingAiTitle.value = false
+  aiGeneratedData.value = null
+
   // Inisialisasi format 2 opsi bukti dukung (Sarana Prasarana, Kualitas Info, Komitmen Org)
   simpleEvidenceMode.value = 'link'
   uploadDestination.value = 'storage'
@@ -2186,6 +2351,8 @@ const openAnswerModal = async (q) => {
     alasan: q.alasan || '',
     visibility: 'public',
     docJudul: q.pertanyaan || '',
+    docDeskripsi: '',
+    docContent: '',
     links: [{ judul: '', link: '', deskripsi: '', mode: 'link', sync: null, syncError: '', jadikanInformasi: false }],
     fotoJudul: '',
     fotoTanggal: todayLocal()
@@ -2201,6 +2368,9 @@ const openAnswerModal = async (q) => {
         form.value.alasan = found.alasan || (found.judul && found.judul.startsWith('Tidak Ada: ') ? found.judul.replace('Tidak Ada: ', '') : '') || q.alasan || ''
         form.value.visibility = found.visibility || 'public'
         form.value.docJudul = found.judul && !found.judul.startsWith('Tidak Ada: ') ? found.judul : (q.pertanyaan || '')
+        if (found.judul && !found.judul.startsWith('Tidak Ada: ') && found.judul !== q.pertanyaan) {
+          kataKunciDokumen.value = found.judul
+        }
 
         if (found.links && found.links.length) {
           const nl = []
@@ -2415,7 +2585,9 @@ const submitAnswer = async () => {
           return
         }
         docUploads.value.forEach(u => {
-          u.judul = modal.value.question?.pertanyaan || 'Dokumen SAQ'
+          u.judul = (form.value.docJudul && form.value.docJudul !== modal.value.question?.pertanyaan)
+            ? form.value.docJudul
+            : (modal.value.question?.pertanyaan || 'Dokumen SAQ')
           u.jadikanInformasi = true
         })
       } else {
@@ -2444,6 +2616,23 @@ const submitAnswer = async () => {
         return
       }
       form.value.visibility = 'public'
+    }
+  }
+
+  // Validasi Wajib Kata Kunci & Otomatisasi Generate AI untuk Publikasi Informasi Resmi
+  const isUploadToInfo = form.value.jawaban === 'ya' && (
+    (isSimplifiedEvidenceTab.value && simpleEvidenceMode.value === 'upload' && uploadDestination.value === 'informasi') ||
+    (!isSimplifiedEvidenceTab.value && !isDigitalQuestion.value && isDokumen && docFlowMode.value === 'new' && newDocMethod.value === 'file')
+  )
+
+  if (isUploadToInfo) {
+    if (!kataKunciDokumen.value || !kataKunciDokumen.value.trim()) {
+      formError.value = 'Kata kunci dokumen wajib diisi agar AI dapat membuat judul & deskripsi informasi publik yang baku dan profesional.'
+      return
+    }
+    // Jika belum di-generate oleh AI atau judul masih default pertanyaan indikator, susun via AI otomatis
+    if (!form.value.docJudul || form.value.docJudul === modal.value.question?.pertanyaan) {
+      await triggerAiGeneration()
     }
   }
 
@@ -2574,6 +2763,13 @@ const submitAnswer = async () => {
         }
       }
 
+      if (kataKunciDokumen.value?.trim()) {
+        fd.append('kata_kunci', kataKunciDokumen.value.trim())
+      }
+      if (form.value.docContent || form.value.docDeskripsi) {
+        fd.append('doc_content', (form.value.docContent || form.value.docDeskripsi).trim())
+      }
+
       links.forEach((l, i) => {
         fd.append(`links[${i}][judul]`, l.judul)
         fd.append(`links[${i}][link]`, l.link)
@@ -2582,9 +2778,14 @@ const submitAnswer = async () => {
         if (l.sync_url) fd.append(`links[${i}][sync_url]`, l.sync_url)
       })
       uploads.forEach((u, i) => {
+        const finalJudul = (form.value.docJudul && form.value.docJudul !== modal.value.question.pertanyaan)
+          ? form.value.docJudul.trim()
+          : (kataKunciDokumen.value?.trim() || modal.value.question.pertanyaan || 'Dokumen SAQ').trim()
+        const finalDeskripsi = (form.value.docDeskripsi || form.value.docContent || finalJudul).trim()
+
         fd.append('dokumen_files[]', u.file)
-        fd.append('dokumen_judul[]', (modal.value.question.pertanyaan || 'Dokumen SAQ').trim())
-        fd.append('dokumen_deskripsi[]', (modal.value.question.pertanyaan || '').trim())
+        fd.append('dokumen_judul[]', finalJudul)
+        fd.append('dokumen_deskripsi[]', finalDeskripsi)
         if (isSimplifiedEvidenceTab.value) {
           fd.append('dokumen_jadikan[]', uploadDestination.value === 'informasi' ? '1' : '0')
         } else {
@@ -2617,6 +2818,7 @@ const submitAnswer = async () => {
         alasan: form.value.jawaban === 'tidak' ? (form.value.alasan || '').trim() : null,
         visibility: form.value.visibility,
         tanggal_dokumen: docTanggal.value || todayLocal(),
+        kata_kunci: kataKunciDokumen.value?.trim() || null,
         links: links.map(l => ({ judul: l.judul, link: l.link, deskripsi: l.deskripsi || null, mode: l.mode, sync_url: l.sync_url })),
       }, { skipAuthRedirect: true })
     }
