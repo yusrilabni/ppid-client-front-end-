@@ -23,7 +23,7 @@
               Profil PPID & Pemerintah Kabupaten Sinjai
             </h1>
             <p class="text-base sm:text-lg md:text-xl font-light text-blue-100 leading-relaxed max-w-3xl">
-              Pejabat Pengelola Informasi dan Dokumentasi (PPID) Utama serta Informasi Resmi Alamat Lengkap, Tugas, Fungsi, dan Ruang Lingkup Kegiatan Pemerintah Kabupaten Sinjai, Provinsi Sulawesi Selatan.
+              Pejabat Pengelola Informasi dan Dokumentasi (PPID) Utama serta Informasi Resmi Alamat Lengkap, Tugas Pokok, Fungsi, Ruang Lingkup Kegiatan, dan Landasan Hukum Penyelenggaraan Pemerintah Kabupaten Sinjai, Provinsi Sulawesi Selatan.
             </p>
             
             <!-- Quick Anchor Buttons -->
@@ -63,14 +63,23 @@
             </button>
           </div>
           
-          <button
-            @click="handlePrint"
-            class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all shrink-0"
-            title="Cetak atau Simpan PDF Halaman Ini"
-          >
-            <i class="fas fa-print text-blue-600"></i>
-            <span>Cetak / PDF</span>
-          </button>
+          <div class="flex items-center gap-2 shrink-0">
+            <NuxtLink
+              to="/regulasi"
+              class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition-all"
+            >
+              <i class="fas fa-book text-emerald-600"></i>
+              <span>Regulasi Daerah</span>
+            </NuxtLink>
+            <button
+              @click="handlePrint"
+              class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
+              title="Cetak atau Simpan PDF Halaman Ini"
+            >
+              <i class="fas fa-print text-blue-600"></i>
+              <span>Cetak / PDF</span>
+            </button>
+          </div>
         </div>
 
         <!-- =================================================================== -->
@@ -396,11 +405,33 @@
         <div v-show="activeFilter === 'all' || activeFilter === 'tupoksi'" id="tupoksi-pemkab" class="border-t border-slate-200 transition-all duration-300">
           
           <div class="px-8 pt-10 pb-4 border-b border-slate-100 bg-slate-50/50">
-            <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">03</span>
-              <div>
-                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Tugas dan Fungsi Pemerintah Kabupaten Sinjai</h2>
-                <p class="text-xs sm:text-sm text-slate-500">Landasan Hukum, Kedudukan Tata Kelola, Tugas Pokok, dan 6 Fungsi Utama Pemerintahan Daerah</p>
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm">03</span>
+                <div>
+                  <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Tugas dan Fungsi Pemerintah Kabupaten Sinjai</h2>
+                  <p class="text-xs sm:text-sm text-slate-500">Landasan Hukum, Kedudukan Tata Kelola, Tugas Pokok, dan 6 Fungsi Utama Pemerintahan Daerah</p>
+                </div>
+              </div>
+
+              <!-- Tombol Pengarah Langsung ke Regulasi / JDIH -->
+              <div class="flex items-center gap-2">
+                <NuxtLink
+                  to="/regulasi"
+                  class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                >
+                  <i class="fas fa-file-contract"></i>
+                  <span>Dokumen Regulasi</span>
+                </NuxtLink>
+                <a
+                  href="https://jdih.sinjaikab.go.id"
+                  target="_blank"
+                  rel="noopener"
+                  class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-300 transition-all flex items-center gap-1.5"
+                >
+                  <i class="fas fa-external-link-alt text-emerald-600"></i>
+                  <span>JDIH Sinjai</span>
+                </a>
               </div>
             </div>
           </div>
@@ -409,54 +440,127 @@
             
             <!-- Dasar Hukum & Kedudukan -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="p-6 rounded-2xl bg-blue-50/80 border border-blue-200">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
-                    <i class="fas fa-gavel"></i>
+              
+              <!-- Card Landasan Hukum -->
+              <div class="p-6 rounded-3xl bg-blue-50/80 border-2 border-blue-200 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-4 pb-3 border-b border-blue-200">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
+                        <i class="fas fa-gavel"></i>
+                      </div>
+                      <h3 class="text-lg font-bold text-slate-900">Landasan Hukum Penyelenggaraan</h3>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-blue-200/80 text-blue-900 text-[10px] font-black uppercase">Regulasi</span>
                   </div>
-                  <h3 class="text-lg font-bold text-slate-900">Landasan Hukum Penyelenggaraan</h3>
+
+                  <ul class="text-xs sm:text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                    <li class="flex items-start gap-2.5">
+                      <i class="fas fa-check-circle text-blue-600 mt-0.5 shrink-0 text-sm"></i>
+                      <div>
+                        <strong>Undang-Undang Nomor 23 Tahun 2014</strong> tentang Pemerintahan Daerah (beserta perubahan dan peraturan pelaksanaannya).
+                        <a href="https://peraturan.bpk.go.id/Details/38685/uu-no-23-tahun-2014" target="_blank" rel="noopener" class="text-blue-600 hover:underline block text-[11px] font-semibold mt-0.5">
+                          Buka Salinan UU No. 23/2014 <i class="fas fa-external-link-alt text-[9px]"></i>
+                        </a>
+                      </div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                      <i class="fas fa-check-circle text-blue-600 mt-0.5 shrink-0 text-sm"></i>
+                      <div>
+                        <strong>Undang-Undang Nomor 14 Tahun 2008</strong> tentang Keterbukaan Informasi Publik (UU KIP).
+                        <NuxtLink to="/standar-layanan/dasar-hukum" class="text-blue-600 hover:underline block text-[11px] font-semibold mt-0.5">
+                          Buka Dasar Hukum KIP <i class="fas fa-arrow-right text-[9px]"></i>
+                        </NuxtLink>
+                      </div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                      <i class="fas fa-check-circle text-blue-600 mt-0.5 shrink-0 text-sm"></i>
+                      <div>
+                        <strong>Peraturan Daerah Kabupaten Sinjai</strong> tentang Pembentukan dan Susunan Perangkat Daerah Kabupaten Sinjai.
+                        <NuxtLink to="/regulasi" class="text-blue-600 hover:underline block text-[11px] font-semibold mt-0.5">
+                          Buka Daftar Perda di Portal PPID <i class="fas fa-arrow-right text-[9px]"></i>
+                        </NuxtLink>
+                      </div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                      <i class="fas fa-check-circle text-blue-600 mt-0.5 shrink-0 text-sm"></i>
+                      <div>
+                        <strong>Peraturan Bupati Sinjai</strong> tentang Kedudukan, Susunan Organisasi, Tugas dan Fungsi serta Tata Kerja Perangkat Daerah di Lingkungan Pemkab Sinjai.
+                        <a href="https://jdih.sinjaikab.go.id" target="_blank" rel="noopener" class="text-blue-600 hover:underline block text-[11px] font-semibold mt-0.5">
+                          Cari di JDIH Kabupaten Sinjai <i class="fas fa-external-link-alt text-[9px]"></i>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
-                <ul class="text-xs sm:text-sm text-slate-700 space-y-2 leading-relaxed">
-                  <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-blue-600 mt-1 shrink-0 text-xs"></i>
-                    <span><strong>Undang-Undang Nomor 23 Tahun 2014</strong> tentang Pemerintahan Daerah (beserta perubahan dan peraturan pelaksanaannya).</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-blue-600 mt-1 shrink-0 text-xs"></i>
-                    <span><strong>Undang-Undang Nomor 14 Tahun 2008</strong> tentang Keterbukaan Informasi Publik.</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-blue-600 mt-1 shrink-0 text-xs"></i>
-                    <span><strong>Peraturan Daerah Kabupaten Sinjai</strong> tentang Pembentukan dan Susunan Perangkat Daerah Kabupaten Sinjai.</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <i class="fas fa-check text-blue-600 mt-1 shrink-0 text-xs"></i>
-                    <span><strong>Peraturan Bupati Sinjai</strong> tentang Kedudukan, Susunan Organisasi, Tugas dan Fungsi, serta Tata Kerja Perangkat Daerah di Lingkungan Pemkab Sinjai.</span>
-                  </li>
-                </ul>
+
+                <div class="mt-4 pt-3 border-t border-blue-200 flex items-center justify-between text-xs">
+                  <span class="text-slate-500 font-medium">Kanal Hukum Terverifikasi</span>
+                  <NuxtLink to="/regulasi" class="text-blue-700 hover:underline font-bold flex items-center gap-1">
+                    Semua Regulasi Daerah <i class="fas fa-chevron-right text-[10px]"></i>
+                  </NuxtLink>
+                </div>
               </div>
 
-              <div class="p-6 rounded-2xl bg-emerald-50/80 border border-emerald-200">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                    <i class="fas fa-shield-alt"></i>
+              <!-- Card Kedudukan Pemerintahan Daerah -->
+              <div class="p-6 rounded-3xl bg-emerald-50/80 border-2 border-emerald-200 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-4 pb-3 border-b border-emerald-200">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
+                        <i class="fas fa-shield-alt"></i>
+                      </div>
+                      <h3 class="text-lg font-bold text-slate-900">Kedudukan Pemerintahan Daerah</h3>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900 text-[10px] font-black uppercase">Kedudukan</span>
                   </div>
-                  <h3 class="text-lg font-bold text-slate-900">Kedudukan Pemerintahan Daerah</h3>
+
+                  <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                    Pemerintah Kabupaten Sinjai merupakan unsur penyelenggara Pemerintahan Daerah otonom yang dipimpin oleh <strong>Bupati Sinjai</strong> bersama <strong>Wakil Bupati Sinjai</strong>, dibantu oleh Perangkat Daerah (Sekretariat Daerah, Sekretariat DPRD, Inspektorat, Dinas Daerah, Badan Daerah, dan Kecamatan).
+                  </p>
+                  <div class="p-3.5 bg-white/95 rounded-2xl border border-emerald-200 text-xs text-slate-700 font-medium space-y-1.5 shadow-sm">
+                    <div class="flex items-center gap-2 text-emerald-800 font-bold">
+                      <i class="fas fa-balance-scale"></i>
+                      <span>Rujukan: UU No. 23/2014 Pasal 208 jo. Pasal 65</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px] leading-relaxed">
+                      Kepala daerah dan DPRD berkedudukan sebagai mitra sejajar yang mempunyai fungsi yang berbeda dalam penyelenggaraan pemerintahan daerah sesuai asas desentralisasi dan tugas pembantuan.
+                    </p>
+                  </div>
                 </div>
-                <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-3">
-                  Pemerintah Kabupaten Sinjai merupakan unsur penyelenggara Pemerintahan Daerah otonom yang dipimpin oleh <strong>Bupati Sinjai</strong> bersama <strong>Wakil Bupati Sinjai</strong>, dibantu oleh Perangkat Daerah (Sekretariat Daerah, Sekretariat DPRD, Inspektorat, Dinas Daerah, Badan Daerah, dan Kecamatan).
-                </p>
-                <div class="p-3 bg-white/90 rounded-xl border border-emerald-200 text-xs text-slate-700 font-medium">
-                  <i class="fas fa-info-circle text-emerald-600 mr-1"></i> Berkedudukan di Kabupaten Sinjai, Provinsi Sulawesi Selatan, dan bertanggung jawab kepada masyarakat melalui Dewan Perwakilan Rakyat Daerah (DPRD) Kabupaten Sinjai.
+
+                <div class="mt-4 pt-3 border-t border-emerald-200 flex items-center justify-between text-xs">
+                  <span class="text-slate-500 font-medium">Wilayah: Sulawesi Selatan</span>
+                  <NuxtLink to="/profil/pejabat-daerah" class="text-emerald-700 hover:underline font-bold flex items-center gap-1">
+                    Profil Pejabat Daerah <i class="fas fa-chevron-right text-[10px]"></i>
+                  </NuxtLink>
                 </div>
               </div>
+
             </div>
 
-            <!-- Tugas Pokok Highlight Box -->
-            <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-8 text-white shadow-lg">
-              <div class="flex items-center gap-3 mb-4 text-cyan-300 font-bold text-xs tracking-wider uppercase">
-                <i class="fas fa-star"></i> Tugas Pokok Pemerintah Kabupaten Sinjai
+            <!-- Tugas Pokok Highlight Box with Dedicated Landasan Hukum -->
+            <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden">
+              <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b border-white/10">
+                <div class="flex items-center gap-2 text-cyan-300 font-extrabold text-xs tracking-wider uppercase">
+                  <i class="fas fa-star text-amber-300"></i> Tugas Pokok Pemerintah Kabupaten Sinjai
+                </div>
+                <!-- Landasan Hukum Badge & Link -->
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-cyan-200 text-[11px] font-bold">
+                    <i class="fas fa-balance-scale mr-1"></i> Rujukan: UU 23/2014 Pasal 65 ayat (1) & (2)
+                  </span>
+                  <a
+                    href="https://peraturan.bpk.go.id/Details/38685/uu-no-23-tahun-2014"
+                    target="_blank"
+                    rel="noopener"
+                    class="px-2.5 py-1 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold transition-all"
+                  >
+                    Buka UU <i class="fas fa-external-link-alt text-[8px] ml-1"></i>
+                  </a>
+                </div>
               </div>
+
               <h3 class="text-xl sm:text-2xl font-bold mb-4 leading-snug">
                 Menyelenggarakan Urusan Pemerintahan Daerah Otonom, Tugas Pembantuan, dan Urusan Pemerintahan Umum
               </h3>
@@ -465,80 +569,146 @@
               </p>
             </div>
 
-            <!-- 6 Fungsi Utama Pemkab Sinjai -->
+            <!-- 6 Fungsi Utama Pemkab Sinjai with Dedicated Landasan Hukum -->
             <div>
               <div class="text-center mb-8">
-                <span class="text-xs font-black uppercase tracking-wider text-emerald-600 bg-emerald-100 px-3 py-1 rounded-full">Fungsi Utama</span>
-                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-2">6 Fungsi Pokok Pemerintah Kabupaten Sinjai</h3>
-                <p class="text-xs sm:text-sm text-slate-500 max-w-2xl mx-auto mt-1">Dalam rangka mewujudkan tata kelola pemerintahan yang bersih, efektif, demokratis, dan terpercaya</p>
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider mb-2">
+                  <i class="fas fa-certificate"></i> Fungsi Utama
+                </div>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800">6 Fungsi Pokok Pemerintah Kabupaten Sinjai</h3>
+                
+                <!-- Landasan Hukum Bar untuk Fungsi Pokok -->
+                <div class="flex items-center justify-center flex-wrap gap-2 mt-2">
+                  <span class="text-xs text-slate-500 font-medium">Landasan Hukum:</span>
+                  <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200">
+                    UU 23/2014 Pasal 11 & Pasal 65 jo. Perbup OTK Perangkat Daerah Kab. Sinjai
+                  </span>
+                  <NuxtLink to="/regulasi" class="text-blue-600 hover:underline font-bold text-xs flex items-center gap-1">
+                    [Lihat Regulasi Pemkab Sinjai <i class="fas fa-arrow-right text-[10px]"></i>]
+                  </NuxtLink>
+                </div>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 <!-- Fungsi 1 -->
-                <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                  <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-4 font-bold">
-                    1
+                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-bold">
+                        1
+                      </div>
+                      <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">Perda & Perbup</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-2">Perumusan & Penetapan Kebijakan Daerah</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                      Menyusun, merumuskan, dan menetapkan Peraturan Daerah (Perda) bersama DPRD serta Peraturan Bupati (Perbup) dan Keputusan Bupati sebagai payung hukum pembangunan dan pelayanan publik di Kabupaten Sinjai.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-base mb-2">Perumusan & Penetapan Kebijakan Daerah</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Menyusun, merumuskan, dan menetapkan Peraturan Daerah (Perda) bersama DPRD serta Peraturan Bupati (Perbup) dan Keputusan Bupati sebagai payung hukum pembangunan dan pelayanan publik di Kabupaten Sinjai.
-                  </p>
+                  <div class="pt-3 border-t border-slate-100 text-[11px] text-blue-600 font-semibold flex items-center justify-between">
+                    <span>Pasal 65 ayat (2) UU 23/2014</span>
+                    <a href="https://jdih.sinjaikab.go.id" target="_blank" rel="noopener" class="hover:underline">JDIH Sinjai →</a>
+                  </div>
                 </div>
 
                 <!-- Fungsi 2 -->
-                <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                  <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-4 font-bold">
-                    2
+                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        2
+                      </div>
+                      <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">Perencanaan</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-2">Perencanaan & Pelaksanaan Pembangunan Daerah</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                      Menyusun dokumen perencanaan jangka panjang (RPJPD), jangka menengah (RPJMD), dan tahunan (RKPD) serta mengeksekusi program pembangunan infrastruktur, ekonomi, dan sosial terpadu.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-base mb-2">Perencanaan & Pelaksanaan Pembangunan Daerah</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Menyusun dokumen perencanaan jangka panjang (RPJPD), jangka menengah (RPJMD), dan tahunan (RKPD) serta mengeksekusi program pembangunan infrastruktur, ekonomi, dan sosial terpadu.
-                  </p>
+                  <div class="pt-3 border-t border-slate-100 text-[11px] text-emerald-600 font-semibold flex items-center justify-between">
+                    <span>Pasal 260 UU 23/2014</span>
+                    <NuxtLink to="/informasi/berkala" class="hover:underline">Dokumen Berkala →</NuxtLink>
+                  </div>
                 </div>
 
                 <!-- Fungsi 3 -->
-                <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                  <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4 font-bold">
-                    3
+                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold">
+                        3
+                      </div>
+                      <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">Pelayanan Publik</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-2">Penyelenggaraan Pelayanan Publik Prima</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                      Menyelenggarakan pelayanan administrasi kependudukan, perizinan berusaha melalui Mal Pelayanan Publik (MPP), kesehatan, pendidikan, dan layanan dasar yang mudah, cepat, dan bebas pungli.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-base mb-2">Penyelenggaraan Pelayanan Publik Prima</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Menyelenggarakan pelayanan administrasi kependudukan, perizinan berusaha melalui Mal Pelayanan Publik (MPP), kesehatan, pendidikan, dan layanan dasar yang mudah, cepat, dan bebas pungli.
-                  </p>
+                  <div class="pt-3 border-t border-slate-100 text-[11px] text-amber-700 font-semibold flex items-center justify-between">
+                    <span>UU No. 25 Tahun 2009</span>
+                    <NuxtLink to="/standar-layanan/dasar-hukum" class="hover:underline">SOP Layanan →</NuxtLink>
+                  </div>
                 </div>
 
                 <!-- Fungsi 4 -->
-                <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                  <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-4 font-bold">
-                    4
+                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl font-bold">
+                        4
+                      </div>
+                      <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200">Pengawasan</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-2">Pembinaan, Pengawasan & Pengendalian Intern</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                      Melaksanakan fungsi pengawasan internal melalui Inspektorat Daerah terhadap kinerja dan pengelolaan keuangan daerah berbasis akuntabilitas, sistem pengendalian intern (SPIP), serta reformasi birokrasi.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-base mb-2">Pembinaan, Pengawasan & Pengendalian Intern</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Melaksanakan fungsi pengawasan internal melalui Inspektorat Daerah terhadap kinerja dan pengelolaan keuangan daerah berbasis akuntabilitas, sistem pengendalian intern (SPIP), serta reformasi birokrasi.
-                  </p>
+                  <div class="pt-3 border-t border-slate-100 text-[11px] text-purple-600 font-semibold flex items-center justify-between">
+                    <span>PP No. 60 Tahun 2008</span>
+                    <NuxtLink to="/lhkpn" class="hover:underline">LHKPN Pejabat →</NuxtLink>
+                  </div>
                 </div>
 
                 <!-- Fungsi 5 -->
-                <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                  <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-4 font-bold">
-                    5
+                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl font-bold">
+                        5
+                      </div>
+                      <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200">Kesejahteraan</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-2">Pemberdayaan Masyarakat & Ekonomi Daerah</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                      Memberdayakan potensi masyarakat pedesaan dan kelurahan, penguatan UMKM, modernisasi pertanian, peternakan, perikanan kelautan, dan pariwisata guna meningkatkan kesejahteraan warga Sinjai.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-base mb-2">Pemberdayaan Masyarakat & Ekonomi Daerah</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Memberdayakan potensi masyarakat pedesaan dan kelurahan, penguatan UMKM, modernisasi pertanian, peternakan, perikanan kelautan, dan pariwisata guna meningkatkan kesejahteraan warga Sinjai.
-                  </p>
+                  <div class="pt-3 border-t border-slate-100 text-[11px] text-rose-600 font-semibold flex items-center justify-between">
+                    <span>Pasal 12 ayat (3) UU 23/2014</span>
+                    <NuxtLink to="/profil/tentang-opd" class="hover:underline">Dinas Terkait →</NuxtLink>
+                  </div>
                 </div>
 
                 <!-- Fungsi 6 -->
-                <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                  <div class="w-12 h-12 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-xl mb-4 font-bold">
-                    6
+                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-xl font-bold">
+                        6
+                      </div>
+                      <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200">Ketertiban</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-2">Ketenteraman, Ketertiban Umum & Linmas</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                      Memelihara ketenteraman dan ketertiban umum masyarakat, penegakan Peraturan Daerah oleh Satpol PP, mitigasi bencana daerah oleh BPBD, serta perlindungan masyarakat dari potensi bahaya bencana.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-base mb-2">Ketenteraman, Ketertiban Umum & Linmas</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Memelihara ketenteraman dan ketertiban umum masyarakat, penegakan Peraturan Daerah oleh Satpol PP, mitigasi bencana daerah oleh BPBD, serta perlindungan masyarakat dari potensi bahaya bencana.
-                  </p>
+                  <div class="pt-3 border-t border-slate-100 text-[11px] text-cyan-600 font-semibold flex items-center justify-between">
+                    <span>PP No. 16 Tahun 2018</span>
+                    <NuxtLink to="/informasi/setiap-saat" class="hover:underline">Info Darurat →</NuxtLink>
+                  </div>
                 </div>
 
               </div>
@@ -553,80 +723,131 @@
         <div v-show="activeFilter === 'all' || activeFilter === 'ruang_lingkup'" id="ruang-lingkup" class="border-t border-slate-200 transition-all duration-300">
           
           <div class="px-8 pt-10 pb-4 border-b border-slate-100 bg-slate-50/50">
-            <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-black text-sm">04</span>
-              <div>
-                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Ruang Lingkup Kegiatan Pemerintah Kabupaten Sinjai</h2>
-                <p class="text-xs sm:text-sm text-slate-500">Kluster Urusan Pemerintahan Wajib, Urusan Pilihan Sektor Unggulan Daerah, dan Urusan Pemerintahan Umum dalam RPJMD & RKPD</p>
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-black text-sm">04</span>
+                <div>
+                  <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Ruang Lingkup Kegiatan Pemerintah Kabupaten Sinjai</h2>
+                  <p class="text-xs sm:text-sm text-slate-500">Kluster Urusan Pemerintahan Wajib, Urusan Pilihan Sektor Unggulan Daerah, dan Urusan Pemerintahan Umum dalam RPJMD & RKPD</p>
+                </div>
+              </div>
+
+              <!-- Landasan Hukum Rujukan Kluster -->
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-xl bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200">
+                  <i class="fas fa-balance-scale mr-1"></i> UU 23/2014 Pasal 11-25
+                </span>
+                <NuxtLink
+                  to="/regulasi"
+                  class="px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-300 transition-all flex items-center gap-1"
+                >
+                  <i class="fas fa-file-pdf text-purple-600"></i>
+                  <span>Perda RPJMD/RKPD</span>
+                </NuxtLink>
               </div>
             </div>
           </div>
 
           <div class="p-8 md:p-12 space-y-8">
             
-            <!-- Kluster 1: Urusan Wajib Pelayanan Dasar (SPM) -->
+            <!-- Kluster 1: Urusan Wajib Pelayanan Dasar (SPM) with Landasan Hukum -->
             <div class="bg-white rounded-3xl p-7 border-2 border-blue-200/80 shadow-md">
-              <div class="flex items-center gap-3 mb-6 pb-3 border-b border-slate-100">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
-                  <i class="fas fa-heartbeat"></i>
+              <div class="flex items-center justify-between flex-wrap gap-3 mb-6 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
+                    <i class="fas fa-heartbeat"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-blue-600">Kluster 1 - Prioritas Mutlak Standar Pelayanan Minimal (SPM)</span>
+                    <h3 class="text-xl font-bold text-slate-900">Urusan Pemerintahan Wajib Pelayanan Dasar</h3>
+                  </div>
                 </div>
-                <div>
-                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-blue-600">Kluster 1 - Prioritas Mutlak Standar Pelayanan Minimal (SPM)</span>
-                  <h3 class="text-xl font-bold text-slate-900">Urusan Pemerintahan Wajib Pelayanan Dasar</h3>
+
+                <!-- Landasan Hukum Rujukan Kluster 1 -->
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold">
+                    <i class="fas fa-gavel mr-1"></i> Rujukan: UU 23/2014 Pasal 12 ayat (1) jo. PP No. 2 Tahun 2018
+                  </span>
+                  <a
+                    href="https://peraturan.bpk.go.id/Details/67634/pp-no-2-tahun-2018"
+                    target="_blank"
+                    rel="noopener"
+                    class="px-2.5 py-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold transition-all"
+                  >
+                    Buka PP SPM <i class="fas fa-external-link-alt text-[8px] ml-1"></i>
+                  </a>
                 </div>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 
                 <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
-                  <h4 class="font-bold text-blue-900 text-sm mb-1.5 flex items-center gap-2">
-                    <i class="fas fa-graduation-cap text-blue-600"></i> 1. Pendidikan
-                  </h4>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                      <i class="fas fa-graduation-cap text-blue-600"></i> 1. Pendidikan
+                    </h4>
+                    <span class="text-[10px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">Dinas Pendidikan</span>
+                  </div>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Pengelolaan PAUD, pendidikan dasar (SD & SMP), beasiswa berprestasi/kurang mampu, peningkatan sarana TIK sekolah, dan pembinaan tenaga kependidikan.
                   </p>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
-                  <h4 class="font-bold text-blue-900 text-sm mb-1.5 flex items-center gap-2">
-                    <i class="fas fa-hospital text-blue-600"></i> 2. Kesehatan
-                  </h4>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                      <i class="fas fa-hospital text-blue-600"></i> 2. Kesehatan
+                    </h4>
+                    <span class="text-[10px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">Dinkes & RSUD</span>
+                  </div>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Layanan RSUD Sinjai & RSUD Pratama, 16 Puskesmas di 9 kecamatan, jaminan kesehatan gratis (UHC), penanganan stunting, dan layanan ambulans PSC 119.
                   </p>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
-                  <h4 class="font-bold text-blue-900 text-sm mb-1.5 flex items-center gap-2">
-                    <i class="fas fa-road text-blue-600"></i> 3. Pekerjaan Umum & Penataan Ruang
-                  </h4>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                      <i class="fas fa-road text-blue-600"></i> 3. Pekerjaan Umum & Penataan Ruang
+                    </h4>
+                    <span class="text-[10px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">Dinas PUPR</span>
+                  </div>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Pembangunan & pemeliharaan jalan/jembatan kabupaten, jaringan irigasi pertanian, sistem drainase kota, air minum, dan penataan tata ruang wilayah (RTRW).
                   </p>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
-                  <h4 class="font-bold text-blue-900 text-sm mb-1.5 flex items-center gap-2">
-                    <i class="fas fa-home text-blue-600"></i> 4. Perumahan Rakyat & Permukiman
-                  </h4>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                      <i class="fas fa-home text-blue-600"></i> 4. Perumahan Rakyat & Permukiman
+                    </h4>
+                    <span class="text-[10px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">Disperkimtan</span>
+                  </div>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Bantuan renovasi Rumah Tidak Layak Huni (RTLH), pencegahan kawasan permukiman kumuh, dan penyediaan PSU (prasarana, sarana, utilitas umum).
                   </p>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
-                  <h4 class="font-bold text-blue-900 text-sm mb-1.5 flex items-center gap-2">
-                    <i class="fas fa-shield-alt text-blue-600"></i> 5. Ketenteraman, Ketertiban Umum & Linmas
-                  </h4>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                      <i class="fas fa-shield-alt text-blue-600"></i> 5. Ketenteraman, Ketertiban & Linmas
+                    </h4>
+                    <span class="text-[10px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">Satpol PP & BPBD</span>
+                  </div>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Penegakan Perda oleh Satpol PP, mitigasi dan posko tanggap bencana BPBD, kesiapsiagaan armada pemadam kebakaran, serta perlindungan masyarakat.
                   </p>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
-                  <h4 class="font-bold text-blue-900 text-sm mb-1.5 flex items-center gap-2">
-                    <i class="fas fa-hands-helping text-blue-600"></i> 6. Sosial
-                  </h4>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                      <i class="fas fa-hands-helping text-blue-600"></i> 6. Sosial
+                    </h4>
+                    <span class="text-[10px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-md">Dinas Sosial</span>
+                  </div>
                   <p class="text-xs text-slate-600 leading-relaxed">
                     Pemberian bantuan sosial terpadu, perlindungan lansia dan penyandang disabilitas, rehabilitasi sosial, dan tanggap darurat logistik kebencanaan.
                   </p>
@@ -635,134 +856,333 @@
               </div>
             </div>
 
-            <!-- Kluster 2: Urusan Wajib Non-Pelayanan Dasar (18 Sektor) -->
+            <!-- Kluster 2: Urusan Wajib Non-Pelayanan Dasar (Nama Urusan + Nama Dinas Pelaksana + Landasan Hukum) -->
             <div class="bg-white rounded-3xl p-7 border-2 border-emerald-200/80 shadow-md">
-              <div class="flex items-center gap-3 mb-6 pb-3 border-b border-slate-100">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-center text-xl shadow-md">
-                  <i class="fas fa-cogs"></i>
+              <div class="flex items-center justify-between flex-wrap gap-3 mb-6 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-center text-xl shadow-md">
+                    <i class="fas fa-cogs"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600">Kluster 2 - Urusan Non-Dasar & Nomenklatur Perangkat Daerah</span>
+                    <h3 class="text-xl font-bold text-slate-900">Urusan Pemerintahan Wajib Non-Pelayanan Dasar</h3>
+                  </div>
                 </div>
-                <div>
-                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600">Kluster 2 - Penunjang Administrasi & Kehidupan Publik</span>
-                  <h3 class="text-xl font-bold text-slate-900">Urusan Pemerintahan Wajib Non-Pelayanan Dasar</h3>
+
+                <!-- Landasan Hukum Rujukan Kluster 2 -->
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+                    <i class="fas fa-gavel mr-1"></i> Rujukan: UU 23/2014 Pasal 12 ayat (2) & Perda OPD Sinjai
+                  </span>
+                  <NuxtLink
+                    to="/profil/tentang-opd"
+                    class="px-2.5 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold transition-all"
+                  >
+                    Daftar OPD <i class="fas fa-arrow-right text-[8px] ml-1"></i>
+                  </NuxtLink>
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-id-card text-emerald-600"></i> Administrasi Kependudukan (Disdukcapil)
+              <!-- Grid 12 Bidang Urusan Lengkap dengan Nama Dinas Pelaksana Resmi di Sinjai -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                <!-- 1. Kependudukan -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-id-card text-emerald-600"></i>
+                    <span>Administrasi Kependudukan</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil)
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Penerbitan KTP-el, Kartu Keluarga, Akta Kelahiran/Kematian, dan pemutakhiran data kependudukan.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-laptop-code text-emerald-600"></i> Komunikasi, Informatika & SPBE
+
+                <!-- 2. Kominfo -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-laptop-code text-emerald-600"></i>
+                    <span>Komunikasi, Informatika & SPBE</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Komunikasi Informatika dan Persandian (DKIP)
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pengelolaan PPID Utama, jaringan intra pemerintah, keamanan siber/persandian, dan sistem SPBE.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-stamp text-emerald-600"></i> Penanaman Modal & Pelayanan Terpadu
+
+                <!-- 3. DPMPTSP -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-stamp text-emerald-600"></i>
+                    <span>Penanaman Modal & Pelayanan Terpadu</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Penanaman Modal dan PTSP (DPMPTSP)
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Penyelenggaraan Mal Pelayanan Publik (MPP), perizinan berusaha OSS, dan promosi investasi daerah.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-users-cog text-emerald-600"></i> Koperasi & Usaha Mikro (UMKM)
+
+                <!-- 4. Koperasi UMKM -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-users-cog text-emerald-600"></i>
+                    <span>Koperasi & Usaha Mikro (UMKM)</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Koperasi, UKM dan Tenaga Kerja
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pembinaan koperasi berbadan hukum, pendampingan NIB dan sertifikasi halal produk UMKM lokal Sinjai.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-leaf text-emerald-600"></i> Lingkungan Hidup & Kebersihan
+
+                <!-- 5. DLHK -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-leaf text-emerald-600"></i>
+                    <span>Lingkungan Hidup & Kebersihan</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Lingkungan Hidup dan Kehutanan (DLHK)
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pengelolaan sampah perkotaan, AMDAL, pemantauan kualitas air dan udara, serta konservasi lingkungan.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-briefcase text-emerald-600"></i> Tenaga Kerja & Transmigrasi
+
+                <!-- 6. Tenaga Kerja -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-briefcase text-emerald-600"></i>
+                    <span>Tenaga Kerja & Transmigrasi</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Koperasi, UKM dan Tenaga Kerja
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pelatihan kerja berbasis kompetensi, penerbitan Kartu Pencari Kerja (AK-1), dan hubungan industrial.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-female text-emerald-600"></i> Pemberdayaan Perempuan & Anak
+
+                <!-- 7. DP3AP2KB -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-female text-emerald-600"></i>
+                    <span>Pemberdayaan Perempuan & Perlindungan Anak</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas DP3AP2KB Kab. Sinjai
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pencegahan kekerasan perempuan/anak, Sinjai Kabupaten Layak Anak (KLA), dan pengendalian penduduk/KB.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-apple-alt text-emerald-600"></i> Ketahanan Pangan Daerah
+
+                <!-- 8. Ketahanan Pangan -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-apple-alt text-emerald-600"></i>
+                    <span>Ketahanan Pangan Daerah</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Ketahanan Pangan
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pengendalian cadangan beras pemerintah daerah, stabilitas harga pangan pokok, dan penganekaragaman pangan.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-map text-emerald-600"></i> Pertanahan Daerah
+
+                <!-- 9. Pertanahan -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-map text-emerald-600"></i>
+                    <span>Pertanahan Daerah</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Perumahan, Kawasan Permukiman & Pertanahan
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Inventarisasi dan sertifikasi aset tanah milik Pemda Sinjai serta fasilitasi pengadaan tanah fasilitas publik.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-village text-emerald-600"></i> Pemberdayaan Masyarakat & Desa
+
+                <!-- 10. DPMD -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-village text-emerald-600"></i>
+                    <span>Pemberdayaan Masyarakat & Desa</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Pemberdayaan Masyarakat dan Desa (DPMD)
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pembinaan tata kelola Dana Desa pada 67 desa di Sinjai, pemilihan kepala desa, dan pemberdayaan BUMDes.
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-bus text-emerald-600"></i> Perhubungan & Lalu Lintas
+
+                <!-- 11. Perhubungan -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-bus text-emerald-600"></i>
+                    <span>Perhubungan & Lalu Lintas</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Perhubungan (Dishub)
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Pengujian kelaikan kendaraan (KIR), manajemen rekayasa lalu lintas perkotaan, dan penerangan jalan umum (PJU).
+                  </p>
                 </div>
-                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 font-medium text-slate-800 flex items-center gap-2">
-                  <i class="fas fa-book text-emerald-600"></i> Kearsipan & Perpustakaan Daerah
+
+                <!-- 12. Perpustakaan & Kearsipan -->
+                <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:border-emerald-300 transition-all">
+                  <div class="flex items-center gap-2.5 text-slate-900 font-bold text-sm mb-1">
+                    <i class="fas fa-book text-emerald-600"></i>
+                    <span>Kearsipan & Perpustakaan Daerah</span>
+                  </div>
+                  <div class="text-xs text-emerald-800 font-semibold mb-1">
+                    Pelaksana: Dinas Perpustakaan dan Kearsipan
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    Layanan perpustakaan umum daerah, pelestarian arsip statis sejarah Sinjai, dan gerakan literasi sekolah.
+                  </p>
                 </div>
+
               </div>
             </div>
 
-            <!-- Kluster 3: Urusan Pilihan (Sektor Unggulan Daerah Kabupaten Sinjai) -->
+            <!-- Kluster 3: Urusan Pilihan (Sektor Unggulan Daerah Kabupaten Sinjai) with Landasan Hukum -->
             <div class="bg-white rounded-3xl p-7 border-2 border-amber-200/80 shadow-md">
-              <div class="flex items-center gap-3 mb-6 pb-3 border-b border-slate-100">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl shadow-md">
-                  <i class="fas fa-fish"></i>
+              <div class="flex items-center justify-between flex-wrap gap-3 mb-6 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl shadow-md">
+                    <i class="fas fa-fish"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700">Kluster 3 - Penggerak Ekonomi & Potensi Unggulan Sinjai</span>
+                    <h3 class="text-xl font-bold text-slate-900">Urusan Pemerintahan Pilihan Daerah</h3>
+                  </div>
                 </div>
-                <div>
-                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700">Kluster 3 - Penggerak Ekonomi & Potensi Unggulan Sinjai</span>
-                  <h3 class="text-xl font-bold text-slate-900">Urusan Pemerintahan Pilihan Daerah</h3>
+
+                <!-- Landasan Hukum Rujukan Kluster 3 -->
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">
+                    <i class="fas fa-gavel mr-1"></i> Rujukan: UU 23/2014 Pasal 12 ayat (3) & Perda RPJMD Sinjai
+                  </span>
+                  <NuxtLink
+                    to="/informasi/berkala"
+                    class="px-2.5 py-1 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold transition-all"
+                  >
+                    Data Sektor <i class="fas fa-arrow-right text-[8px] ml-1"></i>
+                  </NuxtLink>
                 </div>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 
-                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100">
-                  <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center mb-2 font-bold text-sm">
-                    <i class="fas fa-ship"></i>
+                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+                        <i class="fas fa-ship"></i>
+                      </div>
+                      <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">Dinas Perikanan</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Kelautan & Perikanan</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                      Pengelolaan Tempat Pelelangan Ikan (TPI) Lappa, budidaya tambak udang/ikan bandeng, dan pemberdayaan nelayan pesisir & Pulau Sembilan.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-sm mb-1">Kelautan & Perikanan</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Pengelolaan Tempat Pelelangan Ikan (TPI) Lappa, budidaya tambak udang/ikan bandeng, dan pemberdayaan nelayan pesisir & Pulau Sembilan.
-                  </p>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100">
-                  <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center mb-2 font-bold text-sm">
-                    <i class="fas fa-seedling"></i>
+                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+                        <i class="fas fa-seedling"></i>
+                      </div>
+                      <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">Dinas TPHP</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Pertanian & Perkebunan</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                      Pengembangan lada Sinjai, kopi arabika/robusta Borong, cengkeh, padi sawah, serta bantuan pupuk dan alsintan modern bagi kelompok tani.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-sm mb-1">Pertanian & Perkebunan</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Pengembangan lada Sinjai, kopi arabika/robusta Borong, cengkeh, padi sawah, serta bantuan pupuk dan alsintan modern bagi kelompok tani.
-                  </p>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100">
-                  <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center mb-2 font-bold text-sm">
-                    <i class="fas fa-hippo"></i>
+                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+                        <i class="fas fa-hippo"></i>
+                      </div>
+                      <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">Disnakkeswan</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Peternakan Terpadu</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                      Sinjai sebagai sentra sapi potong terkemuka di Sulawesi Selatan, program asuransi sapi peternak, dan pelayanan inseminasi buatan (IB).
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-sm mb-1">Peternakan Terpadu</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Sinjai sebagai sentra sapi potong terkemuka di Sulawesi Selatan, program asuransi sapi peternak, dan pelayanan inseminasi buatan (IB).
-                  </p>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100">
-                  <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center mb-2 font-bold text-sm">
-                    <i class="fas fa-umbrella-beach"></i>
+                <div class="p-4 rounded-2xl bg-amber-50/40 border border-amber-100 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+                        <i class="fas fa-umbrella-beach"></i>
+                      </div>
+                      <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">Disparbud & Disperindag</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">Pariwisata & Industri Kreatif</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                      Destinasi Hutan Mangrove Tongke-Tongke, Pantai Karampuang, Taman Purbakala Batu Pake Gojeng, Benteng Balangnipa, serta produk kuliner IKM Sinjai.
+                    </p>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-sm mb-1">Pariwisata & Industri Kreatif</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">
-                    Destinasi Hutan Mangrove Tongke-Tongke, Pantai Karampuang, Taman Purbakala Batu Pake Gojeng, Benteng Balangnipa, serta produk kuliner IKM Sinjai.
-                  </p>
                 </div>
 
               </div>
             </div>
 
-            <!-- Kluster 4: Pemerintahan Umum & Keterbukaan Informasi Publik -->
-            <div class="p-6 rounded-2xl bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-6">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 flex items-center justify-center text-xl shrink-0">
+            <!-- Kluster 4: Pemerintahan Umum & Keterbukaan Informasi Publik with Landasan Hukum -->
+            <div class="p-7 rounded-3xl bg-slate-900 text-white flex flex-col lg:flex-row items-center justify-between gap-6 shadow-xl">
+              <div class="flex items-start gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 flex items-center justify-center text-2xl shrink-0">
                   <i class="fas fa-bullhorn"></i>
                 </div>
                 <div>
-                  <h4 class="font-bold text-base text-white mb-0.5">Penyelenggaraan Urusan Pemerintahan Umum & Transparansi Publik</h4>
-                  <p class="text-xs text-slate-300 leading-relaxed">
-                    Pembinaan wawasan kebangsaan, koordinasi Forkopimda Kabupaten Sinjai, pemeliharaan kerukunan masyarakat, serta pelayanan hak akses publik atas informasi secara transparan melalui portal PPID.
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 border border-cyan-400/30">
+                      Kluster 4 - Rujukan: UU 23/2014 Pasal 25 jo. UU KIP No. 14/2008
+                    </span>
+                  </div>
+                  <h4 class="font-bold text-base sm:text-lg text-white mb-1">Penyelenggaraan Urusan Pemerintahan Umum & Keterbukaan Informasi Publik</h4>
+                  <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
+                    Meliputi pembinaan wawasan kebangsaan, koordinasi Forkopimda Sinjai, pemeliharaan kerukunan sosial masyarakat, serta penjaminan hak konstitusional setiap warga negara untuk memperoleh informasi publik secara transparan, akuntabel, dan bebas hambatan melalui portal resmi PPID Kabupaten Sinjai.
                   </p>
                 </div>
               </div>
-              <NuxtLink
-                to="/permohonan"
-                class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shrink-0 transition-all shadow-md"
-              >
-                Permohonan Informasi <i class="fas fa-arrow-right ml-1"></i>
-              </NuxtLink>
+              <div class="flex flex-wrap items-center gap-3 shrink-0">
+                <NuxtLink
+                  to="/standar-layanan/dasar-hukum"
+                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/20 transition-all flex items-center gap-2"
+                >
+                  <i class="fas fa-balance-scale text-cyan-300"></i>
+                  <span>Dasar Hukum KIP</span>
+                </NuxtLink>
+                <NuxtLink
+                  to="/permohonan"
+                  class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md shadow-blue-600/30 flex items-center gap-2"
+                >
+                  <span>Permohonan Informasi</span>
+                  <i class="fas fa-arrow-right"></i>
+                </NuxtLink>
+              </div>
             </div>
 
           </div>
@@ -801,7 +1221,7 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Profil resmi PPID, Visi Misi, Alamat Lengkap Pemerintah Kabupaten Sinjai, Tugas dan Fungsi, serta Ruang Lingkup Kegiatan Urusan Pemerintahan Daerah Kabupaten Sinjai.'
+      content: 'Profil resmi PPID, Visi Misi, Alamat Lengkap Pemerintah Kabupaten Sinjai, Tugas dan Fungsi, Landasan Hukum, serta Ruang Lingkup Kegiatan Urusan Pemerintahan Daerah Kabupaten Sinjai.'
     },
     {
       property: 'og:title',
@@ -809,7 +1229,7 @@ useHead({
     },
     {
       property: 'og:description',
-      content: 'Informasi Lengkap Alamat Kantor Bupati Sinjai, Tugas & Fungsi, Ruang Lingkup Kegiatan, dan Pelayanan Informasi Publik PPID Sinjai.'
+      content: 'Informasi Lengkap Alamat Kantor Bupati Sinjai, Tugas & Fungsi, Ruang Lingkup Kegiatan, Landasan Hukum, dan Pelayanan Informasi Publik PPID Sinjai.'
     }
   ]
 })
@@ -875,8 +1295,8 @@ const handlePrint = () => {
   .shadow-xl, .shadow-2xl, .shadow-md, .shadow-sm {
     box-shadow: none !important;
   }
-  .border {
-    border-color: #e2e8f0 !important;
+  .border, .border-2 {
+    border-color: #cbd5e1 !important;
   }
 }
 </style>
