@@ -2116,12 +2116,15 @@ const canAnswer = computed(() => {
   // 4. Jika tidak login, tidak bisa isi
   if (!authStore.user) return false
 
-  // 5. Cek kecocokan organization_slug langsung jika ada
+  // 5. Admin OPD diberi akses penuh untuk mengisi di Kabupaten Sinjai
+  if (route.params.slug === 'kabupaten-sinjai') return true
+
+  // 6. Cek kecocokan organization_slug langsung jika ada
   if (authStore.user.organization_slug && authStore.user.organization_slug === route.params.slug) {
     return true
   }
 
-  // 6. Cek kecocokan unit_id user dengan remote_id, unit_id, atau id OPD
+  // 7. Cek kecocokan unit_id user dengan remote_id, unit_id, atau id OPD
   const uUnit = String(authStore.user.unit_id || '').trim()
   const opdRemote = String(opd.value?.remote_id || '').trim()
   const opdUnit = String(opd.value?.unit_id || '').trim()
@@ -2131,7 +2134,7 @@ const canAnswer = computed(() => {
     return true
   }
 
-  // 7. Cek kecocokan organization_id
+  // 8. Cek kecocokan organization_id
   if (authStore.user.organization_id && String(authStore.user.organization_id) === opdId) {
     return true
   }
