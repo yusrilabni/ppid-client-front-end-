@@ -2776,6 +2776,10 @@ const submitAnswer = async () => {
           fd.append('kategori', uploadKategori.value)
           fd.append('target_upload', uploadTarget.value)
         }
+      } else {
+        fd.append('upload_destination', 'informasi')
+        fd.append('kategori', uploadKategori.value || modal.value.question?.klasifikasi_otomatis || 'Informasi Berkala')
+        fd.append('target_upload', modal.value.question?.target_upload || 'ppid')
       }
 
       if (kataKunciDokumen.value?.trim()) {
@@ -2817,10 +2821,13 @@ const submitAnswer = async () => {
           }
         }
       }
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ppid_token') : null
+      const token = typeof window !== 'undefined' ? (localStorage.getItem('ppid_token') || localStorage.getItem('token')) : null
       const res = await fetch(`${api.defaults.baseURL}/saq/answers`, {
         method: 'POST',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: {
+          'Accept': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: fd,
       })
       const data = await res.json().catch(() => ({}))
@@ -2833,6 +2840,8 @@ const submitAnswer = async () => {
         alasan: form.value.jawaban === 'tidak' ? (form.value.alasan || '').trim() : null,
         visibility: form.value.visibility,
         tanggal_dokumen: docTanggal.value || todayLocal(),
+        target_upload: modal.value.question?.target_upload || 'ppid',
+        kategori: uploadKategori.value || modal.value.question?.klasifikasi_otomatis || 'Informasi Berkala',
         kata_kunci: kataKunciDokumen.value?.trim() || null,
         links: links.map(l => ({ judul: l.judul, link: l.link, deskripsi: l.deskripsi || null, mode: l.mode, sync_url: l.sync_url })),
       }, { skipAuthRedirect: true })
