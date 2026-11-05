@@ -1467,16 +1467,17 @@
                 </div>
 
                 <!-- FORM PILIHAN 2: SUDAH PERNAH DIUNGGAH (SINKRONISASI) -->
+                <!-- TAMPILAN PILIHAN 2: DOKUMEN / HALAMAN SUDAH TERSEDIA DI WEBSITE PPID / PEMKAB SINJAI -->
                 <div v-if="docFlowMode === 'sync'" class="space-y-3 pt-1">
                   <div class="p-4 rounded-2xl border-2 border-cyan-200/90 bg-cyan-50/40 space-y-3.5 shadow-sm">
                     <!-- Keterangan Jelas -->
                     <div class="p-3 bg-white rounded-xl border border-cyan-200 text-xs text-gray-600 space-y-1">
                       <p class="font-bold text-cyan-900 flex items-center gap-1.5">
                         <i class="fas fa-info-circle text-cyan-600"></i>
-                        <span>Ketentuan Sinkronisasi Dokumen Terdaftar:</span>
+                        <span>Ketentuan Sinkronisasi Dokumen & Halaman Resmi Terdaftar:</span>
                       </p>
                       <p class="text-[11px] leading-relaxed">
-                        Jika dokumen sudah pernah diunggah sebelumnya pada website PPID (<code>https://ppid.sinjaikab.go.id/informasi/detail/...</code>) atau website Portal Pemkab Sinjai (<code>https://sinjaikab.go.id/informasi/...</code>), masukkan tautan dokumen tersebut di bawah. Sistem akan memverifikasi dan menyinkronkan dokumen dari database server tanpa menduplikasi data di server.
+                        Jika dokumen, informasi, atau data sudah tersedia pada website resmi PPID (<code>https://ppid.sinjaikab.go.id/...</code>) atau website Portal Pemkab Sinjai (<code>https://sinjaikab.go.id/...</code>) — seperti halaman informasi publik, profil pimpinan/pejabat daerah (Bupati, Wakil Bupati, Sekda), profil atau daftar OPD/Satuan Kerja, regulasi, SOP, LHKPN, maupun halaman resmi lainnya — masukkan tautan halaman tersebut di bawah. Sistem akan memverifikasi dan menyinkronkan datanya secara otomatis tanpa menduplikasi berkas di server.
                       </p>
                       <p class="text-[11px] text-amber-800 font-semibold">
                         <i class="fas fa-shield-alt mr-1"></i>Selain tautan resmi domain PPID atau Portal Pemkab Sinjai, tautan luar dibatasi dan wajib menggunakan <strong>Pilihan 1</strong> (Upload Berkas / Google Drive).
@@ -1485,10 +1486,10 @@
 
                     <!-- Input Tautan & Tombol Sinkronisasi -->
                     <div class="space-y-1.5">
-                      <label class="block text-xs font-bold text-gray-700">Tautan Dokumen PPID / Pemkab Sinjai *</label>
+                      <label class="block text-xs font-bold text-gray-700">Tautan Dokumen / Halaman Resmi PPID / Pemkab Sinjai *</label>
                       <div class="flex flex-col sm:flex-row gap-2">
                         <input v-model="syncUrl" type="url"
-                          placeholder="https://ppid.sinjaikab.go.id/informasi/detail/... atau https://sinjaikab.go.id/informasi/..."
+                          placeholder="https://ppid.sinjaikab.go.id/... atau https://sinjaikab.go.id/... (contoh: informasi, profil bupati/pejabat, daftar OPD)"
                           class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-cyan-600 focus:ring-4 focus:ring-cyan-500/10 outline-none text-xs" />
                         <button type="button" @click="doSyncDocument" :disabled="syncLoading || !syncUrl"
                           class="px-4 py-2.5 rounded-xl bg-cyan-600 text-white font-bold text-xs hover:bg-cyan-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 shadow-sm shrink-0">
@@ -1509,16 +1510,16 @@
                       <div class="flex items-center justify-between border-b border-gray-100 pb-2">
                         <div class="flex items-center gap-1.5 text-xs font-black text-emerald-700">
                           <i class="fas fa-check-circle text-emerald-600"></i>
-                          <span>DOKUMEN TERVERIFIKASI DI SERVER</span>
+                          <span>DATA & HALAMAN TERVERIFIKASI DI SERVER</span>
                         </div>
                         <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                          {{ syncResult.sumber_label || (syncResult.sumber === 'informasi_pemkab' ? 'Informasi Pemkab Sinjai' : 'Informasi PPID') }}
+                          {{ syncResult.sumber_label || (syncResult.sumber === 'informasi_pemkab' ? 'Portal Pemkab Sinjai' : (syncResult.sumber === 'official' ? 'Pejabat Daerah Sinjai' : (syncResult.sumber === 'organization' ? 'Satuan Kerja Pemkab' : 'PPID Kabupaten Sinjai'))) }}
                         </span>
                       </div>
 
                       <div class="space-y-1.5 text-xs">
                         <div>
-                          <span class="text-[11px] text-gray-500 block">Judul Dokumen:</span>
+                          <span class="text-[11px] text-gray-500 block">Judul Dokumen / Halaman Resmi:</span>
                           <p class="font-bold text-gray-900 leading-snug">{{ syncResult.judul }}</p>
                         </div>
 
@@ -1528,15 +1529,19 @@
                             <strong class="text-gray-800 ml-1">{{ syncResult.kategori }}</strong>
                           </div>
                           <div v-if="syncResult.jenis_dokumen">
-                            <span class="text-gray-500">Jenis Dokumen:</span>
+                            <span class="text-gray-500">Jenis Dokumen / Halaman:</span>
                             <strong class="text-gray-800 ml-1">{{ syncResult.jenis_dokumen }}</strong>
                           </div>
+                          <div v-if="syncResult.opd">
+                            <span class="text-gray-500">Satuan Kerja:</span>
+                            <strong class="text-gray-800 ml-1">{{ syncResult.opd }}</strong>
+                          </div>
                           <div v-if="syncResult.tanggal">
-                            <span class="text-gray-500">Tanggal:</span>
+                            <span class="text-gray-500">Tanggal Resmi:</span>
                             <strong class="text-gray-800 ml-1">{{ syncResult.tanggal }}</strong>
                           </div>
                           <div v-if="syncResult.pengupload">
-                            <span class="text-gray-500">Pengunggah:</span>
+                            <span class="text-gray-500">Pengunggah / Unit:</span>
                             <strong class="text-gray-800 ml-1">{{ syncResult.pengupload }} {{ syncResult.opd ? `(${syncResult.opd})` : '' }}</strong>
                           </div>
                         </div>
@@ -1990,7 +1995,7 @@ const isValidDomainForSync = (raw) => {
   try {
     const u = new URL((raw || '').trim())
     const host = u.hostname.replace(/^www\./, '').toLowerCase()
-    return host === 'ppid.sinjaikab.go.id' || host === 'sinjaikab.go.id'
+    return host === 'ppid.sinjaikab.go.id' || host === 'sinjaikab.go.id' || host === 'apps.sinjaikab.go.id' || host === 'localhost' || host === '127.0.0.1'
   } catch {
     return false
   }
@@ -2002,11 +2007,11 @@ const doSyncDocument = async () => {
   syncResult.value = null
   const url = (syncUrl.value || '').trim()
   if (!url) {
-    syncError.value = 'Silakan masukkan tautan dokumen PPID atau Portal Pemkab Sinjai.'
+    syncError.value = 'Silakan masukkan tautan dokumen atau halaman resmi PPID / Portal Pemkab Sinjai.'
     return
   }
   if (!isValidDomainForSync(url)) {
-    syncError.value = 'Hanya tautan resmi PPID (ppid.sinjaikab.go.id) atau Portal Sinjaikab (sinjaikab.go.id) yang dapat disinkronkan di sini. Tautan di luar domain tersebut wajib menggunakan Pilihan 1 (Upload Berkas / Google Drive).'
+    syncError.value = 'Hanya tautan resmi website PPID (ppid.sinjaikab.go.id) atau Portal Sinjaikab (sinjaikab.go.id) yang dapat disinkronkan di Pilihan 2 ini. Tautan di luar website resmi wajib menggunakan Pilihan 1 (Upload Berkas / Google Drive).'
     return
   }
   syncLoading.value = true
@@ -2016,11 +2021,11 @@ const doSyncDocument = async () => {
       syncResult.value = { found: true, ...(res.data.data || {}) }
     } else {
       syncResult.value = null
-      syncError.value = res.data?.message || 'Dokumen tidak ditemukan di database server PPID maupun Pemkab Sinjai. Silakan periksa kembali tautan Anda atau gunakan Pilihan 1 untuk mengunggah berkas baru.'
+      syncError.value = res.data?.message || 'Data atau halaman tidak ditemukan di database server PPID maupun Pemkab Sinjai. Silakan periksa kembali tautan Anda atau gunakan Pilihan 1.'
     }
   } catch (err) {
     syncResult.value = null
-    syncError.value = err.response?.data?.message || err.message || 'Gagal menyinkronkan dokumen dari database server.'
+    syncError.value = err.response?.data?.message || err.message || 'Gagal menyinkronkan data atau dokumen dari database server.'
   } finally {
     syncLoading.value = false
   }
@@ -2604,15 +2609,18 @@ const submitAnswer = async () => {
       }
     } else if (docFlowMode.value === 'sync') {
       if (!syncUrl.value || !syncUrl.value.trim()) {
-        formError.value = 'Silakan masukkan tautan dokumen PPID atau Portal Pemkab Sinjai.'
+        formError.value = 'Silakan masukkan tautan dokumen atau halaman resmi PPID / Portal Pemkab Sinjai.'
         return
       }
       if (!isValidDomainForSync(syncUrl.value)) {
-        formError.value = 'Hanya tautan resmi domain PPID atau Portal Pemkab Sinjai yang dapat disinkronkan di sini.'
+        formError.value = 'Hanya tautan resmi website PPID (ppid.sinjaikab.go.id) atau Portal Sinjaikab (sinjaikab.go.id) yang dapat disinkronkan di Pilihan 2 ini. Tautan di luar website resmi wajib menggunakan Pilihan 1 (Upload Berkas / Google Drive).'
         return
       }
       if (!syncResult.value || !syncResult.value.found) {
-        formError.value = 'Dokumen belum terverifikasi di server. Silakan klik tombol "Cari & Sinkronkan Dokumen" terlebih dahulu dan pastikan dokumen ditemukan.'
+        await doSyncDocument()
+      }
+      if (!syncResult.value || !syncResult.value.found) {
+        formError.value = syncError.value || 'Dokumen atau halaman belum terverifikasi di server. Silakan pastikan tautan valid dan berasal dari website resmi.'
         return
       }
       form.value.visibility = 'public'
@@ -2665,10 +2673,17 @@ const submitAnswer = async () => {
       }
     } else if (!isDigitalQuestion.value && isDokumen) {
       if (docFlowMode.value === 'sync') {
+        const syncDesc = [
+          syncResult.value.jenis_dokumen ? ('Jenis: ' + syncResult.value.jenis_dokumen) : '',
+          syncResult.value.kategori ? ('Kategori: ' + syncResult.value.kategori) : '',
+          syncResult.value.opd ? ('OPD: ' + syncResult.value.opd) : '',
+          syncResult.value.deskripsi ? syncResult.value.deskripsi : '',
+        ].filter(Boolean).join(' | ')
+
         links.push({
-          judul: syncResult.value.judul,
-          link: syncUrl.value.trim(),
-          deskripsi: syncResult.value.kategori ? ('Kategori: ' + syncResult.value.kategori) : '',
+          judul: (syncResult.value.judul || modal.value.question?.pertanyaan || 'Halaman Resmi Terverifikasi').trim(),
+          link: (syncResult.value.detail_url || syncUrl.value).trim(),
+          deskripsi: syncDesc,
           mode: 'sync_ppid',
           sync_url: syncUrl.value.trim(),
         })
