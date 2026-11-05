@@ -20,7 +20,7 @@ const contactInfo = ref({
 })
 
 const navLinks = [
-  { url: '/profil-ppid', title: 'Profil PPID' },
+  { url: '/profil/ppid', title: 'Profil PPID' },
   { url: '/galeri', title: 'Galeri' },
   { url: '/permohonan', title: 'Permohonan Informasi' }
 ]
