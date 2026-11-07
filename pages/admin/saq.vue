@@ -126,7 +126,7 @@
               @change="onOpdChange"
               class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-xs lg:text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all cursor-pointer"
             >
-              <option value="">⭐ Kabupaten Sinjai (Semua Pertanyaan Master)</option>
+              <option value="">⭐ Kabupaten Sinjai (Semua 203 Pertanyaan Master)</option>
               <option v-for="opd in opdsList" :key="opd.id" :value="opd.id">
                 {{ opd.name }} {{ opd.saq_indicators_count !== undefined ? `(${opd.saq_indicators_count} Soal)` : '' }}
               </option>
@@ -245,7 +245,7 @@
           @click="activeTabName = t.tab"
           :class="[
             'px-4 py-2.5 rounded-2xl text-xs lg:text-sm font-bold transition-all flex items-center gap-2',
-            activeTabName === t.tab
+            activeTabName.toLowerCase() === (t.tab || '').toLowerCase()
               ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
               : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
           ]"
@@ -254,7 +254,7 @@
           <span
             :class="[
               'px-2 py-0.5 rounded-full text-[10px] font-black',
-              activeTabName === t.tab ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700'
+              activeTabName.toLowerCase() === (t.tab || '').toLowerCase() ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700'
             ]"
           >
             {{ getTabQuestionCount(t.tab) }}
@@ -313,184 +313,325 @@
           </div>
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold">
-              {{ sec.items.length }} Pertanyaan
+              {{ sec.totalQuestions }} Pertanyaan
             </span>
           </div>
         </div>
 
-        <!-- Section Items -->
+        <!-- Section Entries: Parent Groups & Standalone Questions -->
         <div class="divide-y divide-gray-100">
-          <div
-            v-for="(item, idx) in sec.items"
-            :key="item.id"
-            :class="[
-              'p-4 lg:p-5 transition-all hover:bg-blue-50/30 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4',
-              item.similar_count > 1 ? 'border-l-4 border-amber-400' : ''
-            ]"
-          >
-            <!-- Kolom Informasi Pertanyaan -->
-            <div class="flex-1 min-w-0 space-y-2">
-              <div class="flex flex-wrap items-center gap-2">
-                <!-- Kode Soal -->
-                <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 font-mono text-xs font-bold rounded-xl shadow-2xs">
-                  {{ item.kode || ('ID #' + item.id) }}
+          <template v-for="(entry, entryIdx) in sec.entries" :key="entry.type + '-' + (entry.id || entry.question.id)">
+            <!-- 1. KARTU PARENT GROUP DENGAN SUB-PERTANYAAN -->
+            <div v-if="entry.type === 'group'" class="p-4 lg:p-5 bg-slate-50/50 space-y-3">
+              <!-- Header Grup Induk -->
+              <div class="p-4 rounded-2xl bg-white border border-blue-200/70 shadow-xs flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <span class="w-8 h-8 rounded-xl bg-[#0052FF] text-white flex items-center justify-center text-xs shrink-0 shadow-md shadow-blue-600/20 mt-0.5">
+                    <i class="fas fa-layer-group text-xs"></i>
+                  </span>
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                      <span class="font-mono text-xs font-black text-[#0052FF] bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">
+                        {{ entry.kode || ('GRP #' + entry.id) }}
+                      </span>
+                      <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
+                        Kategori Induk
+                      </span>
+                      <span class="text-xs text-gray-400 font-semibold">
+                        #{{ entry.order }}
+                      </span>
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-900 leading-snug">
+                      {{ entry.pertanyaan }}
+                    </h3>
+                  </div>
+                </div>
+                <span class="shrink-0 text-xs font-black px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
+                  {{ entry.questions.length }} Sub-Soal
                 </span>
+              </div>
 
-                <!-- Urutan (Order) -->
-                <span class="text-[11px] text-gray-400 font-semibold" title="Urutan tampil">
-                  #{{ item.order || (idx + 1) }}
-                </span>
-
-                <!-- Badge Kategori / Parent -->
-                <span v-if="item.parent" class="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-100 rounded-lg text-[10px] font-bold">
-                  Induk: {{ item.parent.kode || '' }} {{ truncate(item.parent.pertanyaan, 30) }}
-                </span>
-
-                <!-- Badge Input Type -->
-                <span
+              <!-- Sub-Pertanyaan Ter-indent di bawah Induk (Garis Kiri) -->
+              <div class="ml-2 md:ml-6 pl-3 md:pl-4 border-l-2 border-blue-300 space-y-3">
+                <div
+                  v-for="(item, subIdx) in entry.questions"
+                  :key="item.id"
                   :class="[
-                    'px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider',
-                    item.input_type === 'foto' ? 'bg-amber-100 text-amber-800' :
-                    item.input_type === 'situs' ? 'bg-emerald-100 text-emerald-800' :
-                    'bg-slate-100 text-slate-800'
+                    'p-4 bg-white rounded-2xl border border-gray-200 shadow-xs transition-all hover:shadow-md hover:border-blue-300 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4',
+                    item.similar_count > 1 ? 'border-l-4 border-l-amber-400' : ''
                   ]"
                 >
-                  <i :class="item.input_type === 'foto' ? 'fas fa-camera mr-1' : item.input_type === 'situs' ? 'fas fa-globe mr-1' : 'fas fa-file-alt mr-1'"></i>
-                  {{ item.input_type || 'dokumen' }}
-                </span>
+                  <!-- Info Sub-Pertanyaan -->
+                  <div class="flex-1 min-w-0 space-y-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-[#0052FF] font-mono text-xs font-bold rounded-xl shadow-2xs">
+                        {{ item.kode || ('ID #' + item.id) }}
+                      </span>
+                      <span class="text-[11px] text-gray-400 font-semibold" title="Urutan tampil">
+                        #{{ item.order || (subIdx + 1) }}
+                      </span>
+                      <span
+                        :class="[
+                          'px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider',
+                          item.input_type === 'foto' ? 'bg-amber-100 text-amber-800' :
+                          item.input_type === 'situs' ? 'bg-emerald-100 text-emerald-800' :
+                          'bg-slate-100 text-slate-800'
+                        ]"
+                      >
+                        <i :class="item.input_type === 'foto' ? 'fas fa-camera mr-1' : item.input_type === 'situs' ? 'fas fa-globe mr-1' : 'fas fa-file-alt mr-1'"></i>
+                        {{ item.input_type || 'dokumen' }}
+                      </span>
+                      <span v-if="item.klasifikasi_otomatis" class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-lg text-[10px] font-medium">
+                        {{ item.klasifikasi_otomatis }}
+                      </span>
+                      <span v-if="item.target_upload" class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-mono">
+                        {{ item.target_upload }}
+                      </span>
+                      <button
+                        v-if="item.similar_count > 1"
+                        @click="openSimilarModal(item)"
+                        class="px-2.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-sm transition-all animate-pulse"
+                        title="Klik untuk melihat dan mengaudit pertanyaan serupa"
+                      >
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>{{ item.similar_count }} Pertanyaan Serupa</span>
+                      </button>
+                    </div>
 
-                <!-- Badge Klasifikasi -->
-                <span v-if="item.klasifikasi_otomatis" class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-lg text-[10px] font-medium">
-                  {{ item.klasifikasi_otomatis }}
-                </span>
+                    <p class="text-sm font-semibold text-gray-800 leading-relaxed">
+                      {{ item.pertanyaan }}
+                    </p>
 
-                <!-- Badge Target -->
-                <span v-if="item.target_upload" class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-mono">
-                  {{ item.target_upload }}
-                </span>
+                    <div v-if="item.dokumen_upload || item.unit_terkait" class="flex flex-wrap gap-3 text-xs text-gray-500">
+                      <span v-if="item.dokumen_upload" class="flex items-center gap-1">
+                        <i class="fas fa-info-circle text-blue-500"></i>
+                        <span class="italic text-[11px]">{{ truncate(item.dokumen_upload, 80) }}</span>
+                      </span>
+                      <span v-if="item.unit_terkait" class="flex items-center gap-1 text-[11px]">
+                        <i class="fas fa-tag text-gray-400"></i> {{ item.unit_terkait }}
+                      </span>
+                    </div>
 
-                <!-- BADGE PERTANYAAN SERUPA (KLIK BUKA AUDIT MODAL) -->
-                <button
-                  v-if="item.similar_count > 1"
-                  @click="openSimilarModal(item)"
-                  class="px-2.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-sm transition-all animate-pulse"
-                  title="Klik untuk melihat dan mengaudit pertanyaan serupa"
-                >
-                  <i class="fas fa-exclamation-triangle"></i>
-                  <span>{{ item.similar_count }} Pertanyaan Serupa</span>
-                </button>
+                    <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                      <button
+                        @click="openMappingModal(item)"
+                        class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                        title="Klik untuk mengubah pemetaan OPD"
+                      >
+                        <i class="fas fa-building text-[10px]"></i>
+                        <span>{{ item.organizations_count || 0 }} OPD Terpetakan</span>
+                        <i class="fas fa-chevron-right text-[9px] opacity-70"></i>
+                      </button>
+                      <span
+                        v-if="selectedOpdId"
+                        class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-bold flex items-center gap-1"
+                      >
+                        <i class="fas fa-check-circle"></i>
+                        <span>Aktif di OPD Ini</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Toolbar Aksi -->
+                  <div class="flex items-center gap-1.5 shrink-0 self-end lg:self-center pt-2 lg:pt-0">
+                    <button
+                      @click="moveOrder(item, 'up')"
+                      :disabled="movingId === item.id"
+                      title="Geser Urutan Naik"
+                      class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
+                    >
+                      <i class="fas fa-arrow-up text-xs"></i>
+                    </button>
+                    <button
+                      @click="moveOrder(item, 'down')"
+                      :disabled="movingId === item.id"
+                      title="Geser Urutan Turun"
+                      class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
+                    >
+                      <i class="fas fa-arrow-down text-xs"></i>
+                    </button>
+                    <button
+                      @click="openMoveModal(item)"
+                      title="Pindahkan ke Tab / Seksi Lain"
+                      class="w-9 h-9 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors"
+                    >
+                      <i class="fas fa-exchange-alt text-xs"></i>
+                    </button>
+                    <button
+                      @click="openEditModal(item)"
+                      title="Edit Pertanyaan"
+                      class="w-9 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-600 flex items-center justify-center transition-colors"
+                    >
+                      <i class="fas fa-pen text-xs"></i>
+                    </button>
+                    <button
+                      @click="openMappingModal(item)"
+                      title="Atur Pemetaan OPD"
+                      class="w-9 h-9 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"
+                    >
+                      <i class="fas fa-sitemap text-xs"></i>
+                    </button>
+                    <button
+                      v-if="selectedOpdId"
+                      @click="detachFromCurrentOpd(item)"
+                      :disabled="detachingId === item.id"
+                      title="Hapus Pertanyaan dari OPD Ini Saja"
+                      class="w-9 h-9 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-600 flex items-center justify-center transition-colors disabled:opacity-50"
+                    >
+                      <i v-if="detachingId === item.id" class="fas fa-spinner fa-spin text-xs"></i>
+                      <i v-else class="fas fa-user-minus text-xs"></i>
+                    </button>
+                    <button
+                      @click="confirmDeleteMaster(item)"
+                      title="Hapus Pertanyaan dari Database"
+                      class="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors"
+                    >
+                      <i class="fas fa-trash text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. KARTU PERTANYAAN MANDIRI / STANDALONE -->
+            <div
+              v-else-if="entry.type === 'question'"
+              :key="'standalone-' + entry.question.id"
+              :class="[
+                'p-4 lg:p-5 transition-all hover:bg-blue-50/30 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4',
+                entry.question.similar_count > 1 ? 'border-l-4 border-amber-400' : ''
+              ]"
+            >
+              <!-- Info Pertanyaan Mandiri -->
+              <div class="flex-1 min-w-0 space-y-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-[#0052FF] font-mono text-xs font-bold rounded-xl shadow-2xs">
+                    {{ entry.question.kode || ('ID #' + entry.question.id) }}
+                  </span>
+                  <span class="text-[11px] text-gray-400 font-semibold" title="Urutan tampil">
+                    #{{ entry.question.order || (entryIdx + 1) }}
+                  </span>
+                  <span
+                    :class="[
+                      'px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider',
+                      entry.question.input_type === 'foto' ? 'bg-amber-100 text-amber-800' :
+                      entry.question.input_type === 'situs' ? 'bg-emerald-100 text-emerald-800' :
+                      'bg-slate-100 text-slate-800'
+                    ]"
+                  >
+                    <i :class="entry.question.input_type === 'foto' ? 'fas fa-camera mr-1' : entry.question.input_type === 'situs' ? 'fas fa-globe mr-1' : 'fas fa-file-alt mr-1'"></i>
+                    {{ entry.question.input_type || 'dokumen' }}
+                  </span>
+                  <span v-if="entry.question.klasifikasi_otomatis" class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-lg text-[10px] font-medium">
+                    {{ entry.question.klasifikasi_otomatis }}
+                  </span>
+                  <span v-if="entry.question.target_upload" class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-mono">
+                    {{ entry.question.target_upload }}
+                  </span>
+                  <button
+                    v-if="entry.question.similar_count > 1"
+                    @click="openSimilarModal(entry.question)"
+                    class="px-2.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-sm transition-all animate-pulse"
+                    title="Klik untuk melihat dan mengaudit pertanyaan serupa"
+                  >
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>{{ entry.question.similar_count }} Pertanyaan Serupa</span>
+                  </button>
+                </div>
+
+                <p class="text-sm font-semibold text-gray-800 leading-relaxed">
+                  {{ entry.question.pertanyaan }}
+                </p>
+
+                <div v-if="entry.question.dokumen_upload || entry.question.unit_terkait" class="flex flex-wrap gap-3 text-xs text-gray-500">
+                  <span v-if="entry.question.dokumen_upload" class="flex items-center gap-1">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                    <span class="italic text-[11px]">{{ truncate(entry.question.dokumen_upload, 80) }}</span>
+                  </span>
+                  <span v-if="entry.question.unit_terkait" class="flex items-center gap-1 text-[11px]">
+                    <i class="fas fa-tag text-gray-400"></i> {{ entry.question.unit_terkait }}
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                  <button
+                    @click="openMappingModal(entry.question)"
+                    class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                    title="Klik untuk mengubah pemetaan OPD"
+                  >
+                    <i class="fas fa-building text-[10px]"></i>
+                    <span>{{ entry.question.organizations_count || 0 }} OPD Terpetakan</span>
+                    <i class="fas fa-chevron-right text-[9px] opacity-70"></i>
+                  </button>
+                  <span
+                    v-if="selectedOpdId"
+                    class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-bold flex items-center gap-1"
+                  >
+                    <i class="fas fa-check-circle"></i>
+                    <span>Aktif di OPD Ini</span>
+                  </span>
+                </div>
               </div>
 
-              <!-- Teks Pertanyaan -->
-              <p class="text-sm font-semibold text-gray-800 leading-relaxed">
-                {{ item.pertanyaan }}
-              </p>
-
-              <!-- Petunjuk Dokumen / Unit Terkait -->
-              <div v-if="item.dokumen_upload || item.unit_terkait" class="flex flex-wrap gap-3 text-xs text-gray-500">
-                <span v-if="item.dokumen_upload" class="flex items-center gap-1">
-                  <i class="fas fa-info-circle text-blue-500"></i>
-                  <span class="italic text-[11px]">{{ truncate(item.dokumen_upload, 80) }}</span>
-                </span>
-                <span v-if="item.unit_terkait" class="flex items-center gap-1 text-[11px]">
-                  <i class="fas fa-tag text-gray-400"></i> {{ item.unit_terkait }}
-                </span>
-              </div>
-
-              <!-- OPD MAPPING BADGES -->
-              <div class="flex flex-wrap items-center gap-1.5 pt-1">
+              <!-- Toolbar Aksi -->
+              <div class="flex items-center gap-1.5 shrink-0 self-end lg:self-center pt-2 lg:pt-0">
                 <button
-                  @click="openMappingModal(item)"
-                  class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
-                  title="Klik untuk mengubah pemetaan OPD"
+                  @click="moveOrder(entry.question, 'up')"
+                  :disabled="movingId === entry.question.id"
+                  title="Geser Urutan Naik"
+                  class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
                 >
-                  <i class="fas fa-building text-[10px]"></i>
-                  <span>{{ item.organizations_count || 0 }} OPD Terpetakan</span>
-                  <i class="fas fa-chevron-right text-[9px] opacity-70"></i>
+                  <i class="fas fa-arrow-up text-xs"></i>
                 </button>
-
-                <!-- Status Terpetakan ke OPD Terpilih -->
-                <span
+                <button
+                  @click="moveOrder(entry.question, 'down')"
+                  :disabled="movingId === entry.question.id"
+                  title="Geser Urutan Turun"
+                  class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
+                >
+                  <i class="fas fa-arrow-down text-xs"></i>
+                </button>
+                <button
+                  @click="openMoveModal(entry.question)"
+                  title="Pindahkan ke Tab / Seksi Lain"
+                  class="w-9 h-9 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors"
+                >
+                  <i class="fas fa-exchange-alt text-xs"></i>
+                </button>
+                <button
+                  @click="openEditModal(entry.question)"
+                  title="Edit Pertanyaan"
+                  class="w-9 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-600 flex items-center justify-center transition-colors"
+                >
+                  <i class="fas fa-pen text-xs"></i>
+                </button>
+                <button
+                  @click="openMappingModal(entry.question)"
+                  title="Atur Pemetaan OPD"
+                  class="w-9 h-9 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"
+                >
+                  <i class="fas fa-sitemap text-xs"></i>
+                </button>
+                <button
                   v-if="selectedOpdId"
-                  class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-bold flex items-center gap-1"
+                  @click="detachFromCurrentOpd(entry.question)"
+                  :disabled="detachingId === entry.question.id"
+                  title="Hapus Pertanyaan dari OPD Ini Saja"
+                  class="w-9 h-9 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-600 flex items-center justify-center transition-colors disabled:opacity-50"
                 >
-                  <i class="fas fa-check-circle"></i>
-                  <span>Aktif di OPD Ini</span>
-                </span>
+                  <i v-if="detachingId === entry.question.id" class="fas fa-spinner fa-spin text-xs"></i>
+                  <i v-else class="fas fa-user-minus text-xs"></i>
+                </button>
+                <button
+                  @click="confirmDeleteMaster(entry.question)"
+                  title="Hapus Pertanyaan dari Database"
+                  class="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors"
+                >
+                  <i class="fas fa-trash text-xs"></i>
+                </button>
               </div>
             </div>
-
-            <!-- Kolom Toolbar Aksi Cepat -->
-            <div class="flex items-center gap-1.5 shrink-0 self-end lg:self-center pt-2 lg:pt-0">
-              <!-- Reorder Up -->
-              <button
-                @click="moveOrder(item, 'up')"
-                :disabled="movingId === item.id"
-                title="Geser Urutan Naik"
-                class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
-              >
-                <i class="fas fa-arrow-up text-xs"></i>
-              </button>
-
-              <!-- Reorder Down -->
-              <button
-                @click="moveOrder(item, 'down')"
-                :disabled="movingId === item.id"
-                title="Geser Urutan Turun"
-                class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
-              >
-                <i class="fas fa-arrow-down text-xs"></i>
-              </button>
-
-              <!-- Pindahkan (Tab / Seksi / Parent) -->
-              <button
-                @click="openMoveModal(item)"
-                title="Pindahkan ke Tab / Seksi Lain"
-                class="w-9 h-9 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-exchange-alt text-xs"></i>
-              </button>
-
-              <!-- Edit Pertanyaan -->
-              <button
-                @click="openEditModal(item)"
-                title="Edit Pertanyaan"
-                class="w-9 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-600 flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-pen text-xs"></i>
-              </button>
-
-              <!-- Mapping OPD -->
-              <button
-                @click="openMappingModal(item)"
-                title="Atur Pemetaan OPD"
-                class="w-9 h-9 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-sitemap text-xs"></i>
-              </button>
-
-              <!-- Lepaskan Dari OPD Ini (Hanya Muncul jika memfilter OPD Spesifik) -->
-              <button
-                v-if="selectedOpdId"
-                @click="detachFromCurrentOpd(item)"
-                :disabled="detachingId === item.id"
-                title="Hapus Pertanyaan dari OPD Ini Saja"
-                class="w-9 h-9 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-600 flex items-center justify-center transition-colors disabled:opacity-50"
-              >
-                <i v-if="detachingId === item.id" class="fas fa-spinner fa-spin text-xs"></i>
-                <i v-else class="fas fa-user-minus text-xs"></i>
-              </button>
-
-              <!-- Hapus Master Pertanyaan -->
-              <button
-                @click="confirmDeleteMaster(item)"
-                title="Hapus Pertanyaan dari Database"
-                class="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-trash text-xs"></i>
-              </button>
-            </div>
-          </div>
+          </template>
         </div>
       </div>
     </div>
@@ -709,16 +850,18 @@ const currentlyMappedIds = computed(() => {
 })
 
 function getTabQuestionCount(tabName) {
-  return questions.value.filter((q) => q.tab === tabName).length
+  const norm = (tabName || '').toLowerCase()
+  return questions.value.filter((q) => (q.tab || '').toLowerCase() === norm).length
 }
 
 // Filtered Questions
 const displayedQuestions = computed(() => {
   let list = questions.value
 
-  // Filter Tab
+  // Filter Tab case-insensitively
   if (activeTabName.value) {
-    list = list.filter((q) => q.tab === activeTabName.value)
+    const normTab = activeTabName.value.toLowerCase()
+    list = list.filter((q) => (q.tab || '').toLowerCase() === normTab)
   }
 
   // Filter Input Type
@@ -739,7 +882,9 @@ const displayedQuestions = computed(() => {
         (item.pertanyaan || '').toLowerCase().includes(q) ||
         (item.kode || '').toLowerCase().includes(q) ||
         (item.section || '').toLowerCase().includes(q) ||
-        (item.unit_terkait || '').toLowerCase().includes(q)
+        (item.unit_terkait || '').toLowerCase().includes(q) ||
+        (item.group_pertanyaan || '').toLowerCase().includes(q) ||
+        (item.group_kode || '').toLowerCase().includes(q)
       )
     })
   }
@@ -747,23 +892,68 @@ const displayedQuestions = computed(() => {
   return list
 })
 
-// Mengelompokkan pertanyaan per Seksi untuk tab aktif
+// Mengelompokkan pertanyaan per Seksi dan Parent Group
+// Persis seperti hierarki yang tampil pada e-Monev Pemkab Sinjai
 const groupedSections = computed(() => {
-  const groups = {}
+  const sectionsMap = new Map()
+
   for (const item of displayedQuestions.value) {
-    const secName = item.section || 'Lainnya'
-    const key = `${item.tab}___${secName}`
-    if (!groups[key]) {
-      groups[key] = {
-        key,
-        tabName: item.tab,
-        sectionName: item.section || '',
-        items: [],
+    const secName = item.section || 'A. Umum'
+    const tabName = item.tab || 'Lainnya'
+    const sectionKey = `${tabName}___${secName}`
+
+    if (!sectionsMap.has(sectionKey)) {
+      sectionsMap.set(sectionKey, {
+        key: sectionKey,
+        tabName,
+        sectionName: secName,
+        orderedEntries: [],
+        groupLookup: new Map(),
+      })
+    }
+
+    const secObj = sectionsMap.get(sectionKey)
+
+    if (item.group_id) {
+      if (!secObj.groupLookup.has(item.group_id)) {
+        const groupEntry = {
+          type: 'group',
+          id: item.group_id,
+          kode: item.group_kode || '',
+          pertanyaan: item.group_pertanyaan || 'Kategori Induk',
+          order: item.group_order ?? 0,
+          questions: [],
+        }
+        secObj.groupLookup.set(item.group_id, groupEntry)
+        secObj.orderedEntries.push(groupEntry)
+      }
+      secObj.groupLookup.get(item.group_id).questions.push(item)
+    } else {
+      secObj.orderedEntries.push({
+        type: 'question',
+        question: item,
+      })
+    }
+  }
+
+  return Array.from(sectionsMap.values()).map(sec => {
+    let totalQuestions = 0
+    for (const entry of sec.orderedEntries) {
+      if (entry.type === 'question') {
+        totalQuestions += 1
+      } else if (entry.type === 'group') {
+        totalQuestions += entry.questions.length
       }
     }
-    groups[key].items.push(item)
-  }
-  return Object.values(groups)
+
+    return {
+      key: sec.key,
+      tabName: sec.tabName,
+      sectionName: sec.sectionName,
+      entries: sec.orderedEntries,
+      totalQuestions,
+    }
+  })
 })
 
 // Toggle Filter Soal Serupa

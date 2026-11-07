@@ -52,13 +52,25 @@
               <!-- Premium Header -->
               <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-6 sm:p-10 text-white relative">
                 <div class="relative z-10">
-                  <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-white/20 backdrop-blur-sm text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest border border-white/20">
-                      {{ item.category }}
-                    </span>
-                    <span v-if="item.status?.toUpperCase() === 'ARSIP'" class="bg-red-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest">
-                      ARSIP
-                    </span>
+                  <div class="flex items-center justify-between gap-4 mb-4 flex-wrap">
+                    <div class="flex items-center gap-2">
+                      <span class="bg-white/20 backdrop-blur-sm text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest border border-white/20">
+                        {{ item.category }}
+                      </span>
+                      <span v-if="item.status?.toUpperCase() === 'ARSIP'" class="bg-red-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest">
+                        ARSIP
+                      </span>
+                    </div>
+
+                    <!-- TOMBOL EDIT UNTUK ADMIN / SUPERADMIN -->
+                    <NuxtLink
+                      v-if="canEdit"
+                      :to="editUrl"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:scale-95"
+                    >
+                      <i class="fas fa-edit"></i>
+                      <span>Edit Informasi Ini</span>
+                    </NuxtLink>
                   </div>
                   <h1 class="text-2xl sm:text-4xl font-black leading-tight">{{ item.title }}</h1>
                 </div>
@@ -152,12 +164,20 @@
                     </div>
 
                     <div class="mt-8 flex flex-col sm:flex-row gap-4">
-                      <a v-if="item.url" :href="item.url" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-blue-200 transition-all active:scale-95">
-                        BUKA TAUTAN <i class="fas fa-external-link-alt ml-2"></i>
+                      <a v-if="item.url" :href="item.url" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <span>BUKA TAUTAN</span> <i class="fas fa-external-link-alt"></i>
                       </a>
-                      <a v-else :href="getStorageUrl(item.file)" target="_blank" download class="flex-1 bg-green-600 hover:bg-green-700 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-green-200 transition-all active:scale-95">
-                        UNDUH DOKUMEN <i class="fas fa-download ml-2"></i>
+                      <a v-else :href="getStorageUrl(item.file)" target="_blank" download class="flex-1 bg-green-600 hover:bg-green-700 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-green-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <span>UNDUH DOKUMEN</span> <i class="fas fa-download"></i>
                       </a>
+                      <NuxtLink
+                        v-if="canEdit"
+                        :to="editUrl"
+                        class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-black py-4 px-8 rounded-2xl text-center shadow-xl shadow-amber-200 transition-all active:scale-95 flex items-center justify-center gap-2"
+                      >
+                        <i class="fas fa-pen-to-square"></i>
+                        <span>EDIT FILE / INFORMASI</span>
+                      </NuxtLink>
                     </div>
                   </template>
                   <div v-else class="p-12 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] text-center">
@@ -193,6 +213,26 @@
           <!-- DESKTOP SIDEBAR -->
           <aside class="hidden lg:block w-80 shrink-0 text-left">
             <div class="sticky top-24 space-y-6 text-left">
+              <!-- AKSI PENGELOLA / ADMIN (DESKTOP) -->
+              <div v-if="canEdit" class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-5 border border-amber-200/90 shadow-sm text-left">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-amber-500/20">
+                    <i class="fas fa-shield-alt"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-black text-amber-900 uppercase tracking-wide">Aksi Pengelola</h4>
+                    <p class="text-[11px] text-amber-700">Izin edit aktif untuk dokumen ini</p>
+                  </div>
+                </div>
+                <NuxtLink
+                  :to="editUrl"
+                  class="w-full mt-3 py-3 px-4 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <i class="fas fa-edit"></i>
+                  <span>Edit Informasi & File</span>
+                </NuxtLink>
+              </div>
+
               <div class="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm text-left">
                 <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 pb-3 border-b border-gray-100 text-left flex items-center gap-2">
                   <i class="fas fa-info-circle text-blue-600"></i> Metadata Dokumen
@@ -309,6 +349,21 @@
               </div>
 
               <div class="flex-1 overflow-y-auto p-6 space-y-4 text-left">
+                  <!-- Aksi Pengelola / Admin (Mobile) -->
+                  <div v-if="canEdit" class="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 text-left">
+                      <div class="flex items-center gap-2 mb-2">
+                          <i class="fas fa-shield-alt text-amber-600 text-xs"></i>
+                          <p class="text-[10px] font-black text-amber-900 uppercase tracking-widest text-left">Aksi Pengelola</p>
+                      </div>
+                      <NuxtLink
+                          :to="editUrl"
+                          class="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2"
+                      >
+                          <i class="fas fa-edit"></i>
+                          <span>Edit Dokumen & File</span>
+                      </NuxtLink>
+                  </div>
+
                   <!-- Unit Kerja -->
                   <div class="flex items-start gap-3.5 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
                       <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-100 mt-0.5">
@@ -387,9 +442,31 @@ import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
 const sideMenuOpen = ref(false)
+
+const canEdit = computed(() => {
+  if (!authStore.isAuthenticated || !item.value) return false
+  if (authStore.isSuperAdmin) return true
+
+  const userUnitId = authStore.user?.unit_id || authStore.user?.organization_id || authStore.user?.unit?.remote_id
+  if (userUnitId && item.value.unit_id) {
+    return String(userUnitId) === String(item.value.unit_id)
+  }
+
+  return authStore.user?.role === 'admin' || authStore.user?.role === 'superadmin'
+})
+
+const editUrl = computed(() => {
+  if (!item.value) return '#'
+  if (item.value.informasi_pemkab_id) {
+    return `/admin/informasi-pemkab/${item.value.slug}/edit`
+  }
+  return `/admin/informasi/${item.value.id}/edit`
+})
 
 const fetchDetail = async () => {
   const res = await api.get('/informasi/' + route.params.slug)
