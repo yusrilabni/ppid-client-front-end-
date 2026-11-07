@@ -122,45 +122,41 @@
             </div>
 
             <div class="mb-8">
-              <label class="block text-gray-700 text-sm font-semibold mb-2">File <span class="text-red-500">*</span></label>
-                            <div class="mb-8 mt-4">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">File <span class="text-red-500">*</span></label>
-                <div class="mb-4 flex space-x-4">
-                  <label class="inline-flex items-center">
-                    <input type="radio" v-model="form.file_type" value="upload" class="form-radio h-4 w-4 text-blue-600">
-                    <span class="ml-2 text-gray-700">Upload File</span>
-                  </label>
-                  <label class="inline-flex items-center">
-                    <input type="radio" v-model="form.file_type" value="url" class="form-radio h-4 w-4 text-blue-600">
-                    <span class="ml-2 text-gray-700">Link File</span>
-                  </label>
-                </div>
+              <label class="block text-gray-700 text-sm font-semibold mb-2">File Dokumen <span class="text-red-500">*</span></label>
+              <div class="mb-4 flex space-x-4">
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" v-model="form.file_type" value="upload" class="form-radio h-4 w-4 text-blue-600">
+                  <span class="ml-2 text-gray-700 font-medium">Upload File</span>
+                </label>
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" v-model="form.file_type" value="url" class="form-radio h-4 w-4 text-blue-600">
+                  <span class="ml-2 text-gray-700 font-medium">Link File</span>
+                </label>
+              </div>
 
-                <div v-if="form.file_type === `upload`" class="mb-6 animate-fadeIn">
-                  <label for="file" class="block text-gray-700 text-sm font-semibold mb-2">Upload File</label>
-                  <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200"
-                       :class="dragActive ? `border-blue-500 bg-blue-50` : ``"
-                       @dragover.prevent="dragActive = true" @dragleave.prevent="dragActive = false" @drop.prevent="handleDrop">
-                    <div class="flex flex-col items-center justify-center">
-                      <i class="fas fa-cloud-upload-alt text-4xl mb-3" :class="fileName ? `text-blue-500` : `text-gray-400`"></i>
-                      <p class="text-gray-600 mb-2" v-if="!fileName">Pilih file untuk diupload</p>
-                      <p class="text-blue-600 font-bold mb-2" v-else>{{ fileName }}</p>
-                      <p class="text-gray-500 text-sm mb-3">Format: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB)</p>
-                      <input type="file" ref="fileInput" id="file" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" @change="handleFileSelect">
-                      <label for="file" @click.prevent="triggerFileInput" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition duration-200">
-                        {{ fileName ? `Ganti File` : `Pilih File` }}
-                      </label>
-                    </div>
+              <div v-if="form.file_type === `upload`" class="mb-6 animate-fadeIn">
+                <label for="file" class="block text-gray-700 text-sm font-semibold mb-2">Upload File</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200"
+                     :class="dragActive ? `border-blue-500 bg-blue-50` : ``"
+                     @dragover.prevent="dragActive = true" @dragleave.prevent="dragActive = false" @drop.prevent="handleDrop">
+                  <div class="flex flex-col items-center justify-center">
+                    <i class="fas fa-cloud-upload-alt text-4xl mb-3" :class="fileName ? `text-blue-500` : `text-gray-400`"></i>
+                    <p class="text-gray-600 mb-2" v-if="!fileName">Pilih file untuk diupload</p>
+                    <p class="text-blue-600 font-bold mb-2" v-else>{{ fileName }}</p>
+                    <p class="text-gray-500 text-sm mb-3">Format: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB)</p>
+                    <input type="file" ref="fileInput" id="file" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" @change="handleFileSelect">
+                    <label for="file" @click.prevent="triggerFileInput" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition duration-200">
+                      {{ fileName ? `Ganti File` : `Pilih File` }}
+                    </label>
                   </div>
-                </div>
-
-                <div v-if="form.file_type === `url`" class="mb-6 animate-fadeIn">
-                  <label for="file_url" class="block text-gray-700 text-sm font-semibold mb-2">Link File (untuk file > 10MB)</label>
-                  <input v-model="form.file_url" type="url" id="file_url" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="https://contoh.com/file.pdf">
-                  <p class="text-gray-500 text-xs mt-2">Gunakan ini jika file Anda lebih besar dan tidak bisa diupload</p>
                 </div>
               </div>
 
+              <div v-if="form.file_type === `url`" class="mb-6 animate-fadeIn">
+                <label for="file_url" class="block text-gray-700 text-sm font-semibold mb-2">Link File (untuk file > 10MB)</label>
+                <input v-model="form.file_url" type="url" id="file_url" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="https://contoh.com/file.pdf">
+                <p class="text-gray-500 text-xs mt-2">Gunakan ini jika file Anda lebih besar dan tidak bisa diupload</p>
+              </div>
             </div>
 
             <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
@@ -317,6 +313,7 @@ const userUnitId = ref('')
 
 const fileInput = ref(null)
 const fileName = ref('')
+const selectedFile = ref(null)
 const dragActive = ref(false)
 const saving = ref(false)
 const generatingAI = ref(false)
@@ -393,17 +390,21 @@ const triggerFileInput = () => {
 }
 
 const handleFileSelect = (e) => {
-  const file = e.target.files[0]
+  const file = e.target.files?.[0]
   if (file) {
+    selectedFile.value = file
     fileName.value = file.name
   }
 }
 
 const handleDrop = (e) => {
   dragActive.value = false
-  const file = e.dataTransfer.files[0]
+  const file = e.dataTransfer.files?.[0]
   if (file) {
-    fileInput.value.files = e.dataTransfer.files
+    selectedFile.value = file
+    if (fileInput.value) {
+      fileInput.value.files = e.dataTransfer.files
+    }
     fileName.value = file.name
   }
 }
@@ -485,8 +486,9 @@ const submitForm = async () => {
     })
     
     if (form.value.file_type === 'upload') {
-      if (fileInput.value && fileInput.value.files[0]) {
-        formData.append('file', fileInput.value.files[0])
+      const uploadFile = selectedFile.value || (fileInput.value && fileInput.value.files?.[0])
+      if (uploadFile) {
+        formData.append('file', uploadFile)
       } else {
         throw new Error('Silakan pilih file untuk diupload.')
       }
@@ -501,7 +503,11 @@ const submitForm = async () => {
       formData.append('target_unit', userUnitId.value)
     }
 
-    const res = await api.post('/informasi-crud', formData)
+    const res = await api.post('/informasi-crud', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
 
     if (res.data.success || res.status === 200 || res.status === 201) {
       success.value = 'Informasi berhasil ditambahkan.'
