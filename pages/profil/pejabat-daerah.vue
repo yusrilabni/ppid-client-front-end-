@@ -7,10 +7,10 @@
       <!-- Header Section -->
       <div class="mb-16 text-center mt-8">
         <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">Daftar Pejabat Daerah</h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Profil pimpinan tinggi pratama (Eselon II) dan pimpinan administrator (Eselon III) di lingkungan Pemerintah Kabupaten Sinjai.</p>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Profil Bupati, Wakil Bupati, Sekretaris Daerah, serta pimpinan tinggi pratama (Eselon II) dan pimpinan administrator (Eselon III) di lingkungan Pemerintah Kabupaten Sinjai.</p>
       </div>
 
-      <div v-if="!loading && (eselon2.length === 0 && eselon3.length === 0)" class="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
+      <div v-if="!loading && (pimpinanDaerah.length === 0 && eselon2.length === 0 && eselon3.length === 0)" class="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
         <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
           <i class="fas fa-users-slash text-3xl"></i>
         </div>
@@ -19,6 +19,75 @@
       </div>
 
       <div v-else-if="!loading" class="space-y-24">
+        
+        <!-- Section Paling Atas: Pimpinan Daerah (Bupati, Wakil Bupati, Sekda) -->
+        <section v-if="pimpinanDaerah.length > 0" class="relative">
+          <div class="sticky top-20 z-20 mb-10">
+            <div class="bg-white/90 backdrop-blur-md border border-amber-200 inline-flex items-center px-8 py-4 rounded-3xl shadow-xl">
+              <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-2xl flex items-center justify-center text-white mr-5 shadow-lg shadow-amber-200">
+                <i class="fas fa-crown text-xl"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black text-amber-600 uppercase tracking-[0.3em] block mb-1">Pimpinan Daerah</span>
+                <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Bupati, Wakil Bupati & Sekda</h2>
+              </div>
+              <div class="ml-8 pl-8 border-l border-amber-100 hidden md:block">
+                <span class="bg-amber-100 text-amber-800 px-4 py-1 rounded-full text-xs font-black uppercase">
+                  Eksekutif Daerah
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid Pimpinan: 3 Kolom Responsif -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            <div v-for="official in pimpinanDaerah" :key="official.id" 
+              class="group h-full bg-white rounded-[2.5rem] shadow-lg hover:shadow-2xl border-2 border-amber-100/70 overflow-hidden flex flex-col transition-all duration-500 hover:-translate-y-2 relative">
+              <div class="absolute top-0 left-0 w-full h-36 bg-gradient-to-br from-amber-500/20 via-yellow-400/10 to-transparent"></div>
+              
+              <div class="p-8 pb-8 flex flex-col items-center text-center flex-grow relative z-10">
+                <div class="relative mb-6">
+                  <div class="absolute inset-0 bg-amber-500 rounded-full blur-2xl opacity-0 group-hover:opacity-25 transition-opacity duration-500"></div>
+                  <img v-if="official.photo"
+                       :src="getStorageUrl(official.photo)"
+                       :alt="official.full_name"
+                       class="w-36 h-36 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105" />
+                  <div v-else class="w-36 h-36 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border-4 border-white shadow-2xl flex items-center justify-center text-amber-400 text-5xl relative z-10">
+                    <i class="fas fa-user-tie"></i>
+                  </div>
+                </div>
+
+                <div class="min-h-[4rem] flex items-center justify-center mb-2">
+                  <NuxtLink :to="`/profil/${official.slug}`" class="text-xl md:text-2xl font-black text-gray-900 hover:text-amber-600 transition-colors leading-tight line-clamp-2">
+                    {{ official.full_name }}
+                  </NuxtLink>
+                </div>
+                
+                <div class="mb-6 min-h-[3rem] flex items-start justify-center">
+                  <span class="px-5 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white text-xs font-black uppercase tracking-wider rounded-full shadow-md text-center">
+                    {{ official.position?.name || 'Pimpinan Daerah' }}
+                  </span>
+                </div>
+
+                <div class="mt-auto w-full">
+                  <div class="flex items-center justify-center text-gray-600 font-bold text-xs mb-6 bg-amber-50/60 px-5 py-2.5 rounded-2xl border border-amber-100 w-full">
+                    <i class="fas fa-landmark mr-2 text-amber-600 flex-shrink-0"></i>
+                    <span class="truncate">{{ official.organization?.name || 'Pemerintah Kabupaten Sinjai' }}</span>
+                  </div>
+
+                  <div class="space-y-3 w-full">
+                    <NuxtLink :to="`/profil/${official.slug}`" 
+                      class="inline-flex items-center justify-center w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-black text-xs py-4 rounded-2xl transition-all duration-300 uppercase tracking-widest gap-2 shadow-lg shadow-amber-200">
+                      Profil Lengkap <i class="fas fa-arrow-right text-sm"></i>
+                    </NuxtLink>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Eselon II & Eselon III Sections -->
         <template v-for="group in groups" :key="group.id">
           <section v-if="group.items.length > 0" class="relative">
             <!-- Category Header (Sticky) -->
@@ -121,6 +190,7 @@ import { useGlobalLoader } from '@/composables/useGlobalLoader'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
+const pimpinanDaerah = ref([])
 const eselon2 = ref([])
 const eselon3 = ref([])
 const totalUnassigned = ref(0)
@@ -128,20 +198,52 @@ const totalUnassigned = ref(0)
 const { isLoading: queryLoading, data: queryData, isFetching, isError, refetch } = useQuery({
   queryKey: ['pejabat_daerah'],
   queryFn: async () => {
-    const res = await api.get('/profil/pejabat-daerah')
-    return res.data
+    let res = null
+    try {
+      res = await api.get('/profil/pejabat-daerah')
+    } catch (err) {
+      console.error('Error fetching /profil/pejabat-daerah:', err)
+    }
+
+    let pimpinan = res?.data?.pimpinan || []
+
+    // Fallback: Jika backend response belum memiliki 'pimpinan', fetch langsung dari /pejabat
+    if (!pimpinan || pimpinan.length === 0) {
+      try {
+        const resPejabat = await api.get('/pejabat')
+        const all = resPejabat.data?.data || resPejabat.data || []
+        pimpinan = all.filter(p => {
+          const pos = (p.position?.name || '').toLowerCase()
+          return pos.includes('bupati') || pos.includes('sekretaris daerah') || pos.includes('sekda')
+        }).sort((a, b) => {
+          const posA = (a.position?.name || '').toLowerCase()
+          const posB = (b.position?.name || '').toLowerCase()
+          const rank = (p) => p.includes('wakil') ? 2 : (p.includes('bupati') ? 1 : 3)
+          return rank(posA) - rank(posB)
+        })
+      } catch (e) {
+        console.error('Failed fetching pimpinan fallback:', e)
+      }
+    }
+
+    return {
+      ...(res?.data || {}),
+      pimpinan
+    }
   },
   staleTime: 60000
 })
-
 
 const loading = computed(() => queryLoading.value || (isFetching.value && !queryData.value))
 useGlobalLoader(loading)
 
 watch(queryData, (newData) => {
-  if (newData && newData.kepalaOpds) {
-    eselon2.value = newData.kepalaOpds.eselon2 || []
-    eselon3.value = newData.kepalaOpds.eselon3 || []
+  if (newData) {
+    pimpinanDaerah.value = newData.pimpinan || []
+    if (newData.kepalaOpds) {
+      eselon2.value = newData.kepalaOpds.eselon2 || []
+      eselon3.value = newData.kepalaOpds.eselon3 || []
+    }
   }
 }, { immediate: true })
 

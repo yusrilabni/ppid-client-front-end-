@@ -44,6 +44,14 @@
               <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">{{ official.full_name }}</h1>
               <p class="text-xl md:text-2xl font-semibold text-gray-600 mb-3">{{ jabatanTampilan }}</p>
               <p v-if="official.organization" class="text-gray-500 italic">{{ official.organization.name }}</p>
+
+              <!-- Tombol Edit Profil bagi Admin -->
+              <div v-if="canEdit" class="mt-4 flex justify-center">
+                <NuxtLink :to="`/profil/pimpinan/${official.slug}/edit`"
+                  class="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs md:text-sm font-bold rounded-xl shadow-md transition-all">
+                  <i class="fas fa-edit mr-2"></i> Edit Profil Pejabat
+                </NuxtLink>
+              </div>
             </div>
           </div>
         </div>
@@ -265,6 +273,21 @@
             </div>
           </div>
 
+          <!-- State jika seluruh rincian riwayat belum diisi -->
+          <div v-if="!hasDetailInfo" class="text-center py-12 px-6 bg-gray-50/80 rounded-2xl border-2 border-dashed border-gray-200 mt-2 mb-6">
+            <div class="w-16 h-16 mx-auto mb-4 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl shadow-sm">
+              <i class="fas fa-user-clock"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Informasi Rincian Belum Diperbarui</h3>
+            <p class="text-sm text-gray-500 max-w-lg mx-auto mb-6 leading-relaxed">
+              Biodata resmi, riwayat pendidikan, rekam jejak karir, serta penghargaan untuk pejabat ini sedang dalam proses pemutakhiran data oleh pengelola PPID Kabupaten Sinjai.
+            </p>
+            <NuxtLink v-if="canEdit" :to="`/profil/pimpinan/${official.slug}/edit`" 
+              class="inline-flex items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-md transition-all">
+              <i class="fas fa-edit mr-2"></i> Lengkapi Data Profil Ini Sekarang
+            </NuxtLink>
+          </div>
+
         </div>
       </div>
       </template>
@@ -281,9 +304,28 @@ import { useQuery } from '@tanstack/vue-query'
 import api, { getStorageUrl } from '@/services/api'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useGlobalLoader } from '@/composables/useGlobalLoader'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
 const official = ref(null)
+
+const canEdit = computed(() => authStore.isAuthenticated && authStore.isAdmin)
+
+const hasDetailInfo = computed(() => {
+  if (!official.value) return false
+  const o = official.value
+  return !!(
+    o.birth_place || o.birth_date || o.religion || o.marital_status || o.nip ||
+    o.start_term || o.end_term || o.email || o.home_address || o.biography ||
+    o.spouse_name || (o.children && o.children.length > 0) ||
+    (o.educations && o.educations.length > 0) ||
+    (o.career_histories && o.career_histories.length > 0) ||
+    (o.awards && o.awards.length > 0) ||
+    (o.training_histories && o.training_histories.length > 0) ||
+    (o.organizational_histories && o.organizational_histories.length > 0)
+  )
+})
 
 const { isLoading: queryLoading, data: queryData, isError: queryError, isFetching, refetch } = useQuery({
   queryKey: computed(() => ['official_profile', route.params.slug]),

@@ -85,40 +85,70 @@
                                     <i class="fas fa-barcode text-sm"></i>
                                 </span>
                                 <input v-model="form.nomor_pendaftaran_pemohon" 
-                                    @blur="verifyPermohonan"
+                                    @keyup.enter="verifyPermohonan"
                                     type="text" required
-                                    class="w-full pl-10 pr-24 py-2.5 md:py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono font-medium uppercase"
-                                    placeholder="Contoh: 6RQGA atau REG-6RQGA">
+                                    class="w-full pl-10 pr-28 py-2.5 md:py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono font-medium uppercase"
+                                    placeholder="Contoh: 6RQGA, #6RQGA, atau REG-6RQGA">
                                 <button type="button" 
                                     @click="verifyPermohonan"
                                     :disabled="verifyingPermohonan || !form.nomor_pendaftaran_pemohon"
-                                    class="absolute inset-y-1.5 right-1.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg border border-blue-200 transition-all disabled:opacity-40">
-                                    <i v-if="verifyingPermohonan" class="fas fa-spinner fa-spin mr-1"></i>
-                                    <i v-else class="fas fa-search mr-1"></i> Cek
+                                    class="absolute inset-y-1.5 right-1.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold rounded-lg shadow transition-all flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <i v-if="verifyingPermohonan" class="fas fa-spinner fa-spin mr-1.5"></i>
+                                    <i v-else class="fas fa-search mr-1.5"></i>
+                                    <span>{{ verifyingPermohonan ? 'Cek...' : 'Cek' }}</span>
                                 </button>
                             </div>
                             <p class="text-[11px] md:text-xs text-gray-500">
-                                Masukkan kode 5 karakter atau kode register permohonan yang hendak Anda ajukan keberatannya.
+                                Masukkan 5 karakter kode unik atau kode register permohonan informasi Anda (tekan <strong>Enter</strong> atau klik <strong>Cek</strong>).
                             </p>
 
+                            <!-- Loading State Pemeriksaan -->
+                            <div v-if="verifyingPermohonan" class="mt-3 p-3.5 bg-blue-50/80 border border-blue-200 rounded-xl flex items-center text-xs md:text-sm text-blue-800 animate-fade-in">
+                                <i class="fas fa-spinner fa-spin text-blue-600 mr-2.5 text-base"></i>
+                                <span>Menghubungi server dan memverifikasi data permohonan...</span>
+                            </div>
+
                             <!-- Mini card info jika permohonan terdeteksi -->
-                            <div v-if="permohonanFound" class="mt-3 p-4 bg-blue-50/70 border border-blue-200 rounded-xl animate-fade-in">
+                            <div v-else-if="permohonanFound" class="mt-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm animate-fade-in">
                                 <div class="flex items-start justify-between">
-                                    <div>
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-200 text-blue-800 mb-1">
-                                            <i class="fas fa-check-circle mr-1 text-green-600"></i> Permohonan Ditemukan
-                                        </span>
-                                        <p class="text-xs md:text-sm font-bold text-gray-800">
-                                            {{ permohonanFound.nama_pemohon }} ({{ permohonanFound.unique_code }})
+                                    <div class="space-y-1.5 flex-1 pr-2">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-green-100 text-green-800 border border-green-200">
+                                                <i class="fas fa-check-circle mr-1 text-green-600"></i> Permohonan Terverifikasi
+                                            </span>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-200 text-blue-800">
+                                                Status: {{ permohonanFound.status_permohonan }}
+                                            </span>
+                                        </div>
+                                        <p class="text-xs md:text-sm font-bold text-gray-900">
+                                            Pemohon: {{ permohonanFound.nama_pemohon }} 
+                                            <span class="font-mono text-blue-600 font-semibold">(#{{ permohonanFound.unique_code }})</span>
                                         </p>
-                                        <p class="text-xs text-gray-600 mt-1 line-clamp-2">
-                                            <strong>Informasi diminta:</strong> {{ permohonanFound.detail_informasi }}
+                                        <p class="text-xs text-gray-700 leading-relaxed">
+                                            <strong>Informasi yang Diminta:</strong> {{ permohonanFound.detail_informasi }}
                                         </p>
-                                        <p class="text-[11px] text-gray-500 mt-1">
-                                            Status saat ini: <span class="font-semibold uppercase text-indigo-700">{{ permohonanFound.status_permohonan }}</span>
+                                        <p v-if="permohonanFound.pekerjaan" class="text-[11px] text-gray-500">
+                                            Pekerjaan: {{ permohonanFound.pekerjaan }}
                                         </p>
                                     </div>
+                                    <button type="button" @click="clearPermohonanCheck" class="text-gray-400 hover:text-gray-600 text-xs p-1" title="Batalkan / Ganti Kode">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 </div>
+                            </div>
+
+                            <!-- Alert jika permohonan TIDAK ditemukan -->
+                            <div v-else-if="permohonanError" class="mt-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs md:text-sm text-amber-900 animate-fade-in flex items-start">
+                                <i class="fas fa-exclamation-triangle text-amber-600 text-base mt-0.5 mr-2.5 flex-shrink-0"></i>
+                                <div class="flex-1">
+                                    <p class="font-bold text-amber-800">{{ permohonanError }}</p>
+                                    <p class="text-[11px] text-amber-700 mt-1 leading-relaxed">
+                                        Catatan: Anda tetap dapat melanjutkan pengisian formulir keberatan ini jika permohonan sebelumnya diajukan secara langsung (luring/offline) di meja layanan PPID.
+                                    </p>
+                                </div>
+                                <button type="button" @click="permohonanError = ''" class="text-amber-500 hover:text-amber-700 ml-2">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -408,6 +438,7 @@ const success = ref(false)
 const trackingCode = ref('')
 const verifyingPermohonan = ref(false)
 const permohonanFound = ref(null)
+const permohonanError = ref('')
 
 const pekerjaanOptions = ref([])
 const selectedPekerjaan = ref('')
@@ -468,27 +499,69 @@ onMounted(async () => {
   }
 })
 
+const cleanInputCode = (val) => {
+  if (!val) return ''
+  return String(val)
+    .trim()
+    .toUpperCase()
+    .replace(/^[#\s]+/, '')
+    .replace(/^REG[-_\s]?/i, '')
+    .trim()
+}
+
+const clearPermohonanCheck = () => {
+  permohonanFound.value = null
+  permohonanError.value = ''
+  form.value.nomor_pendaftaran_pemohon = ''
+}
+
 const verifyPermohonan = async () => {
-  const code = form.value.nomor_pendaftaran_pemohon?.trim()
-  if (!code) return
+  const rawInput = form.value.nomor_pendaftaran_pemohon?.trim()
+  if (!rawInput) {
+    permohonanFound.value = null
+    permohonanError.value = 'Silakan ketik nomor pendaftaran atau kode registrasi permohonan terlebih dahulu.'
+    return
+  }
+
+  const cleanCode = cleanInputCode(rawInput)
+  if (!cleanCode) {
+    permohonanFound.value = null
+    permohonanError.value = 'Format kode registrasi tidak valid.'
+    return
+  }
 
   verifyingPermohonan.value = true
+  permohonanError.value = ''
+  permohonanFound.value = null
+
   try {
-    const res = await api.get(`/permohonan/status/${code}`)
+    const res = await api.get(`/permohonan/status/${encodeURIComponent(cleanCode)}`, {
+      skipAuthRedirect: true
+    })
     if (res.data?.success && res.data?.data) {
       permohonanFound.value = res.data.data
+      permohonanError.value = ''
+      // Standarisasi nilai di input ke kode unik resmi (contoh: 6RQGA)
+      form.value.nomor_pendaftaran_pemohon = res.data.data.unique_code
+
       // Jika nama pemohon di form masih kosong, auto-fill dari permohonan
       if (!form.value.nama_pemohon && res.data.data.nama_pemohon && !res.data.data.nama_pemohon.includes('*')) {
         form.value.nama_pemohon = res.data.data.nama_pemohon
+      }
+      if (!selectedPekerjaan.value && res.data.data.pekerjaan) {
+        selectedPekerjaan.value = res.data.data.pekerjaan
       }
       if (!form.value.alamat_pemohon && res.data.data.alamat_pemohon && !res.data.data.alamat_pemohon.includes('*')) {
         form.value.alamat_pemohon = res.data.data.alamat_pemohon
       }
     } else {
       permohonanFound.value = null
+      permohonanError.value = `Permohonan dengan kode "${rawInput}" tidak ditemukan dalam basis data.`
     }
   } catch (err) {
+    console.error('Error verifying permohonan:', err)
     permohonanFound.value = null
+    permohonanError.value = `Permohonan dengan kode "${rawInput}" tidak ditemukan dalam sistem online.`
   } finally {
     verifyingPermohonan.value = false
   }
@@ -552,6 +625,7 @@ const resetForm = () => {
   hasKuasa.value = false
   suratKuasaFile.value = null
   permohonanFound.value = null
+  permohonanError.value = ''
 
   if (authStore.user) {
     form.value.nama_pemohon = authStore.user.name || ''
