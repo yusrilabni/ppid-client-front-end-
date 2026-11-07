@@ -140,6 +140,7 @@ const menus = [
     children: [
       { title: 'Statistik Layanan', url: '/statistik', icon: 'chart-pie' },
       { title: 'Permohonan Informasi', url: '/laporan/permohonan', icon: 'file-signature' },
+      { title: 'Keberatan Informasi', url: '/laporan/keberatan', icon: 'gavel' },
       { title: 'Survei', url: '/laporan/survei', icon: 'poll' },
       { title: 'Laporan PPID', url: '/laporan/ppid', icon: 'chart-line' },
       { title: 'Informasi Pemkab', url: '/transparansi/informasi-pemkab', icon: 'file-pdf' }

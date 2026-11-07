@@ -43,6 +43,11 @@
                           <i v-if="downloadingPdf === 'download'" class="fas fa-spinner fa-spin mr-1.5 md:mr-2"></i>
                           <i v-else class="fas fa-file-pdf mr-1.5 md:mr-2"></i> PDF
                       </button>
+                      <NuxtLink :to="`/laporan/keberatan/create?permohonan=${result.unique_code}`"
+                         class="flex items-center justify-center px-3 py-2 text-xs md:text-sm font-semibold rounded-lg bg-amber-500 hover:bg-amber-600 text-white shadow-md transition-all"
+                         title="Ajukan keberatan jika permohonan ditolak, tidak ditanggapi, atau tidak dipenuhi">
+                          <i class="fas fa-balance-scale mr-1.5 md:mr-2"></i> Ajukan Keberatan
+                      </NuxtLink>
                       <NuxtLink to="/laporan/permohonan" class="col-span-2 sm:col-span-1 flex items-center justify-center px-3 py-2 text-xs md:text-sm font-semibold rounded-lg bg-white text-blue-700 hover:bg-blue-50 shadow-md transition-all">
                           <i class="fas fa-arrow-left mr-1.5 md:mr-2"></i> Kembali ke Daftar
                       </NuxtLink>
