@@ -21,8 +21,9 @@ const contactInfo = ref({
 
 const navLinks = [
   { url: '/profil/ppid', title: 'Profil PPID' },
+  { url: '/statistik', title: 'Statistik Layanan' },
   { url: '/galeri', title: 'Galeri' },
-  { url: '/permohonan', title: 'Permohonan Informasi' }
+  { url: '/laporan/permohonan', title: 'Permohonan Informasi' }
 ]
 
 const fetchProfilData = async () => {

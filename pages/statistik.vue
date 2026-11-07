@@ -18,7 +18,7 @@
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>Portal Transparansi & Data Statistik PPID</span>
               <span class="text-white/40">|</span>
-              <span class="text-amber-300 font-extrabold">Tahun 2025</span>
+              <span class="text-amber-300 font-extrabold">{{ activeYearStats.badgeLabel }}</span>
             </div>
             <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
               Statistik Keterbukaan Informasi Publik
@@ -36,9 +36,9 @@
               <p class="text-[10px] text-emerald-300 font-semibold mt-0.5"><i class="fas fa-check-circle mr-1"></i>407 Berkala</p>
             </div>
             <div class="bg-white/10 backdrop-blur-md border border-white/15 p-3.5 rounded-2xl text-left">
-              <p class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Permohonan 2025</p>
-              <p class="text-2xl lg:text-3xl font-black text-amber-300 mt-0.5">25</p>
-              <p class="text-[10px] text-blue-200 font-semibold mt-0.5"><i class="fas fa-globe mr-1"></i>7 Jalur Online</p>
+              <p class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Permohonan ({{ selectedYear === 'all' ? 'Semua' : selectedYear }})</p>
+              <p class="text-2xl lg:text-3xl font-black text-amber-300 mt-0.5">{{ activeYearStats.total }}</p>
+              <p class="text-[10px] text-blue-200 font-semibold mt-0.5"><i class="fas fa-globe mr-1"></i>{{ activeYearStats.online }} Jalur Online</p>
             </div>
             <div class="bg-white/10 backdrop-blur-md border border-white/15 p-3.5 rounded-2xl text-left">
               <p class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Total Kunjungan</p>
@@ -48,7 +48,7 @@
             <div class="bg-white/10 backdrop-blur-md border border-white/15 p-3.5 rounded-2xl text-left">
               <p class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Tingkat Layanan</p>
               <p class="text-2xl lg:text-3xl font-black text-emerald-400 mt-0.5">100%</p>
-              <p class="text-[10px] text-slate-300 font-semibold mt-0.5"><i class="fas fa-star mr-1 text-amber-300"></i>Rating 4.85</p>
+              <p class="text-[10px] text-slate-300 font-semibold mt-0.5"><i class="fas fa-star mr-1 text-amber-300"></i>Rating {{ activeYearStats.ikm }}</p>
             </div>
           </div>
         </div>
@@ -81,15 +81,15 @@
                 activeCategory === cat.id ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-600'
               ]"
             >
-              {{ cat.badge }}
+              {{ cat.id === 'permohonan' ? activeYearStats.total : cat.badge }}
             </span>
           </button>
         </div>
 
-        <!-- Filter Tahun Selector -->
+        <!-- Filter Tahun Selector (2026, 2025, Semua) -->
         <div class="flex items-center gap-2.5 self-end md:self-center shrink-0">
           <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-            <i class="fas fa-calendar-alt text-blue-500"></i> Tahun:
+            <i class="fas fa-calendar-alt text-blue-500"></i> Filter Tahun:
           </span>
           <div class="inline-flex p-1 bg-slate-100 rounded-2xl border border-slate-200">
             <button
@@ -97,13 +97,17 @@
               :key="yr.val"
               @click="selectedYear = yr.val"
               :class="[
-                'px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all',
+                'px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5',
                 selectedYear === yr.val
-                  ? 'bg-white text-blue-700 shadow-xs'
+                  ? 'bg-white text-blue-700 shadow-xs ring-1 ring-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
               ]"
             >
-              {{ yr.label }}
+              <span>{{ yr.label }}</span>
+              <span
+                v-if="yr.val === '2026'"
+                class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
+              ></span>
             </button>
           </div>
         </div>
@@ -116,13 +120,13 @@
             <span class="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center text-xs">
               <i class="fas fa-comments"></i>
             </span>
-            <span>Ulasan Pemohon 2025</span>
+            <span>Ulasan Pemohon {{ activeYearStats.yearLabel }}</span>
           </div>
 
           <div class="flex-1 overflow-hidden relative bg-amber-50/30 py-3">
             <div class="animate-marquee whitespace-nowrap flex items-center gap-10">
               <div
-                v-for="(item, idx) in [...sampleReviews, ...sampleReviews]"
+                v-for="(item, idx) in [...activeYearStats.reviews, ...activeYearStats.reviews]"
                 :key="idx"
                 class="inline-flex items-center gap-3 cursor-default group/item hover:bg-white/90 rounded-2xl px-3 py-1.5 transition-all border border-amber-200/60 shadow-2xs"
               >
@@ -139,6 +143,9 @@
                   >
                     {{ item.jalur }}
                   </span>
+                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500">
+                    {{ item.tahun }}
+                  </span>
                 </div>
                 <div class="flex text-amber-400 text-[10px]">
                   <i class="fas fa-star" v-for="s in item.rating" :key="s"></i>
@@ -151,7 +158,7 @@
         </div>
       </div>
 
-      <!-- SECTION: PERMOHONAN INFORMASI 2025 (FOKUS UTAMA) -->
+      <!-- SECTION: PERMOHONAN INFORMASI (DINAMIS TAHUN) -->
       <section v-if="activeCategory === 'all' || activeCategory === 'permohonan'" class="space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -160,27 +167,35 @@
                 <i class="fas fa-file-signature"></i>
               </span>
               <h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-                Rekapitulasi Permohonan Informasi Tahun 2025
+                Rekapitulasi Permohonan Informasi {{ activeYearStats.yearLabel }}
               </h2>
             </div>
             <p class="text-xs md:text-sm text-slate-500 font-medium mt-1">
-              Rincian 25 permohonan informasi publik tahun berjalan dengan kepatuhan anonimitas data pemohon sesuai prinsip UU Perlindungan Data Pribadi (UU PDP).
+              Rincian {{ activeYearStats.total }} permohonan informasi publik dengan kepatuhan perlindungan data pribadi pemohon (nama disensor otomatis).
             </p>
           </div>
-          <span class="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-xl text-xs font-extrabold border border-amber-200">
-            Total 25 Permohonan
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-xl text-xs font-extrabold border border-amber-200">
+              Total {{ activeYearStats.total }} Permohonan
+            </span>
+            <span
+              v-if="selectedYear !== 'all'"
+              class="px-2.5 py-1 bg-blue-100 text-blue-800 rounded-xl text-xs font-bold border border-blue-200"
+            >
+              {{ activeYearStats.online }} Online &bull; {{ activeYearStats.langsung }} Langsung
+            </span>
+          </div>
         </div>
 
-        <!-- 4 Grid Metrik Permohonan 2025 -->
+        <!-- 4 Grid Metrik Permohonan -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Total Permohonan -->
           <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-blue-400 transition-all">
             <div class="flex items-start justify-between">
               <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Permohonan</p>
-                <h3 class="text-3xl font-black text-slate-900 mt-1.5">25</h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">Tahun 2025 (Tahun Berjalan)</p>
+                <h3 class="text-3xl font-black text-slate-900 mt-1.5">{{ activeYearStats.total }}</h3>
+                <p class="text-xs text-slate-500 mt-1 font-medium">{{ activeYearStats.yearLabel }}</p>
               </div>
               <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[#0052FF] flex items-center justify-center text-xl font-bold shadow-xs">
                 <i class="fas fa-inbox"></i>
@@ -197,8 +212,8 @@
             <div class="flex items-start justify-between">
               <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jalur Online (Web)</p>
-                <h3 class="text-3xl font-black text-indigo-600 mt-1.5">7</h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">28% dari Total Permohonan</p>
+                <h3 class="text-3xl font-black text-indigo-600 mt-1.5">{{ activeYearStats.online }}</h3>
+                <p class="text-xs text-slate-500 mt-1 font-medium">{{ activeYearStats.onlinePct }}% dari Total Permohonan</p>
               </div>
               <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold shadow-xs">
                 <i class="fas fa-globe"></i>
@@ -206,7 +221,7 @@
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
               <span>Formulir Elektronik PPID</span>
-              <span class="text-indigo-600 font-bold">7 Pemohon</span>
+              <span class="text-indigo-600 font-bold">{{ activeYearStats.online }} Pemohon</span>
             </div>
           </div>
 
@@ -215,8 +230,8 @@
             <div class="flex items-start justify-between">
               <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jalur Langsung (Meja)</p>
-                <h3 class="text-3xl font-black text-emerald-600 mt-1.5">18</h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">72% Datang ke Desk PPID</p>
+                <h3 class="text-3xl font-black text-emerald-600 mt-1.5">{{ activeYearStats.langsung }}</h3>
+                <p class="text-xs text-slate-500 mt-1 font-medium">{{ activeYearStats.langsungPct }}% Datang ke Desk PPID</p>
               </div>
               <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold shadow-xs">
                 <i class="fas fa-handshake"></i>
@@ -224,7 +239,7 @@
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
               <span>Kantor DKIP / Meja PPID</span>
-              <span class="text-emerald-600 font-bold">18 Pemohon</span>
+              <span class="text-emerald-600 font-bold">{{ activeYearStats.langsung }} Pemohon</span>
             </div>
           </div>
 
@@ -233,8 +248,12 @@
             <div class="flex items-start justify-between">
               <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Layanan</p>
-                <h3 class="text-3xl font-black text-slate-900 mt-1.5">23 <span class="text-xs font-bold text-emerald-600">Selesai</span></h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">2 Sedang Proses Telaah</p>
+                <h3 class="text-3xl font-black text-slate-900 mt-1.5">
+                  {{ activeYearStats.selesai }} <span class="text-xs font-bold text-emerald-600">Selesai</span>
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 font-medium">
+                  {{ activeYearStats.proses }} Sedang Proses Telaah
+                </p>
               </div>
               <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold shadow-xs">
                 <i class="fas fa-tasks"></i>
@@ -242,20 +261,20 @@
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
               <span>Kecepatan Rata-rata</span>
-              <span class="text-blue-600 font-bold">3 Hari Kerja</span>
+              <span class="text-blue-600 font-bold">{{ activeYearStats.rerataHari }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Visualisasi Perbandingan Jalur & Status Permohonan 2025 -->
+        <!-- Visualisasi Perbandingan Jalur & Status Permohonan -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <!-- Rasio Jalur Pengajuan (Online vs Langsung) -->
           <div class="lg:col-span-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <i class="fas fa-chart-pie text-blue-600"></i> Distribusi Jalur Permohonan 2025
+                <i class="fas fa-chart-pie text-blue-600"></i> Distribusi Jalur Permohonan ({{ selectedYear === 'all' ? 'Semua Tahun' : selectedYear }})
               </h3>
-              <span class="text-xs font-bold text-slate-500">25 Total</span>
+              <span class="text-xs font-bold text-slate-500">{{ activeYearStats.total }} Total</span>
             </div>
 
             <div class="space-y-3 pt-2">
@@ -264,10 +283,10 @@
                   <span class="text-emerald-700 flex items-center gap-1.5">
                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Jalur Langsung (Meja Layanan)
                   </span>
-                  <span class="text-slate-800">18 Pemohon (72%)</span>
+                  <span class="text-slate-800">{{ activeYearStats.langsung }} Pemohon ({{ activeYearStats.langsungPct }}%)</span>
                 </div>
                 <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                  <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full" style="width: 72%;"></div>
+                  <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-500" :style="{ width: `${activeYearStats.langsungPct}%` }"></div>
                 </div>
               </div>
 
@@ -276,10 +295,10 @@
                   <span class="text-indigo-700 flex items-center gap-1.5">
                     <span class="w-3 h-3 rounded-full bg-indigo-600"></span> Jalur Online (Portal PPID)
                   </span>
-                  <span class="text-slate-800">7 Pemohon (28%)</span>
+                  <span class="text-slate-800">{{ activeYearStats.online }} Pemohon ({{ activeYearStats.onlinePct }}%)</span>
                 </div>
                 <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                  <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full" style="width: 28%;"></div>
+                  <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-500" :style="{ width: `${activeYearStats.onlinePct}%` }"></div>
                 </div>
               </div>
             </div>
@@ -287,7 +306,7 @@
             <div class="p-3.5 bg-blue-50/70 border border-blue-100 rounded-2xl flex items-start gap-3 text-xs text-blue-900 mt-2">
               <i class="fas fa-info-circle text-blue-600 text-sm mt-0.5 shrink-0"></i>
               <p class="leading-relaxed">
-                Pemohon yang datang langsung dilayani di Desk Layanan Informasi DKIP Kabupaten Sinjai, sedangkan pemohon daring mengajukan permohonan mandiri melalui formulir online PPID.
+                Pemohon langsung dilayani di Desk Layanan Informasi Gedung DKIP Sinjai, sedangkan pemohon daring mengajukan secara instan lewat formulir elektronik PPID terintegrasi.
               </p>
             </div>
           </div>
@@ -306,48 +325,48 @@
             <div class="grid grid-cols-2 gap-4 pt-1">
               <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-center">
                 <p class="text-xs font-bold text-amber-800">Nilai Kepuasan (IKM)</p>
-                <p class="text-3xl font-black text-amber-600 mt-1">4.85<span class="text-sm font-semibold text-amber-800"> / 5.0</span></p>
+                <p class="text-3xl font-black text-amber-600 mt-1">{{ activeYearStats.ikm }}<span class="text-sm font-semibold text-amber-800"> / 5.0</span></p>
                 <div class="flex justify-center text-amber-400 text-xs mt-1.5 gap-1">
                   <i class="fas fa-star" v-for="n in 5" :key="n"></i>
                 </div>
               </div>
               <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-center">
                 <p class="text-xs font-bold text-blue-800">Rerata Respon</p>
-                <p class="text-3xl font-black text-blue-700 mt-1">3 <span class="text-sm font-semibold text-blue-800">Hari</span></p>
+                <p class="text-3xl font-black text-blue-700 mt-1">{{ activeYearStats.rerataHari }}</p>
                 <p class="text-[10px] text-blue-700 font-semibold mt-1.5">Standar SOP: Max 10+7 Hari</p>
               </div>
             </div>
 
             <div class="grid grid-cols-3 gap-2 text-center text-xs pt-1">
               <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <p class="font-black text-emerald-600 text-base">23</p>
-                <p class="text-[10px] text-slate-500 font-bold uppercase mt-0.5">Dikabulkan</p>
+                <p class="font-black text-emerald-600 text-base">{{ activeYearStats.selesai }}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase mt-0.5">Dikabulkan / Selesai</p>
               </div>
               <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <p class="font-black text-amber-600 text-base">2</p>
-                <p class="text-[10px] text-slate-500 font-bold uppercase mt-0.5">Proses Berkas</p>
+                <p class="font-black text-amber-600 text-base">{{ activeYearStats.proses }}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase mt-0.5">Proses Telaah</p>
               </div>
               <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <p class="font-black text-slate-400 text-base">0</p>
+                <p class="font-black text-slate-400 text-base">{{ activeYearStats.wait }}</p>
                 <p class="text-[10px] text-slate-500 font-bold uppercase mt-0.5">Ditolak / Sengketa</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- TABEL RINCIAN 25 PEMOHON 2025 (ANONIM DENGAN PRIVASI) -->
+        <!-- TABEL RINCIAN PEMOHON (ANONIM DENGAN PRIVASI) -->
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
           <div class="p-5 bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 class="text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <i class="fas fa-list-check text-blue-600"></i> Daftar 25 Pemohon Informasi Publik (Tahun 2025)
+                <i class="fas fa-list-check text-blue-600"></i> Daftar {{ filteredPemohonList.length }} Pemohon Informasi Publik ({{ activeYearStats.yearLabel }})
               </h3>
               <p class="text-xs text-slate-500 mt-0.5">
-                Nama disensor otomatis (<span class="font-mono font-bold text-slate-700">A***i</span>) guna menjaga kerahasiaan identitas pemohon.
+                Nama disensor otomatis (<span class="font-mono font-bold text-slate-700">A***i</span>) sesuai standar kerahasiaan identitas UU KIP & UU PDP.
               </p>
             </div>
 
-            <div class="flex items-center gap-2.5">
+            <div class="flex flex-wrap items-center gap-2.5">
               <!-- Search Table -->
               <div class="relative">
                 <input
@@ -364,9 +383,9 @@
                 v-model="filterJalur"
                 class="px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer"
               >
-                <option value="">Semua Jalur</option>
-                <option value="Online">Hanya Online (7)</option>
-                <option value="Langsung">Hanya Langsung (18)</option>
+                <option value="">Semua Jalur ({{ activeYearStats.total }})</option>
+                <option value="Online">Online Saja ({{ activeYearStats.online }})</option>
+                <option value="Langsung">Langsung Saja ({{ activeYearStats.langsung }})</option>
               </select>
             </div>
           </div>
@@ -376,6 +395,7 @@
               <thead>
                 <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-black uppercase text-slate-400 tracking-wider">
                   <th class="py-3.5 px-4 w-12 text-center">No</th>
+                  <th class="py-3.5 px-4">Tahun</th>
                   <th class="py-3.5 px-4">Kode Reg</th>
                   <th class="py-3.5 px-4">Nama Pemohon</th>
                   <th class="py-3.5 px-4">Kategori / Pekerjaan</th>
@@ -392,6 +412,11 @@
                   class="hover:bg-blue-50/30 transition-colors"
                 >
                   <td class="py-3.5 px-4 text-center font-bold text-slate-400">{{ idx + 1 }}</td>
+                  <td class="py-3.5 px-4">
+                    <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-extrabold font-mono text-[10px]">
+                      {{ row.tahun }}
+                    </span>
+                  </td>
                   <td class="py-3.5 px-4 font-mono font-bold text-blue-700">{{ row.kode }}</td>
                   <td class="py-3.5 px-4">
                     <div class="flex items-center gap-2">
@@ -443,8 +468,8 @@
                   </td>
                 </tr>
                 <tr v-if="!filteredPemohonList.length">
-                  <td colspan="8" class="py-10 text-center text-slate-400 font-bold">
-                    Tidak ditemukan data pemohon yang cocok dengan kata kunci "{{ searchPemohonQuery }}".
+                  <td colspan="9" class="py-10 text-center text-slate-400 font-bold">
+                    Tidak ditemukan data pemohon yang cocok dengan kriteria pencarian "{{ searchPemohonQuery }}".
                   </td>
                 </tr>
               </tbody>
@@ -500,70 +525,77 @@
           <!-- Unduhan Dokumen -->
           <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dokumen Terunduh</p>
-            <h3 class="text-3xl font-black text-emerald-600 mt-1.5">255</h3>
-            <p class="text-xs text-slate-500 mt-1 font-medium">File PDF & Regulasi Resmi</p>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
-              <span class="text-slate-600">Akses Unduhan:</span>
-              <span class="text-emerald-700 font-black">Publik Bebas Biaya</span>
+            <h3 class="text-3xl font-black text-slate-900 mt-1.5">255</h3>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Akses File Publik</p>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-600">
+              <span>Format Digital:</span>
+              <span class="text-emerald-600 font-bold">PDF, Dokumen Resmi</span>
             </div>
           </div>
 
-          <!-- Status Permohonan Admin -->
+          <!-- Total Permohonan Terdata -->
           <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dashboard Permohonan</p>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Permohonan (Dashboard)</p>
             <h3 class="text-3xl font-black text-slate-900 mt-1.5">20</h3>
-            <p class="text-xs text-slate-500 mt-1 font-medium">Wait: 0 | Proses: 7 | Done: 13</p>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Tercatat di Server</p>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
-              <span class="text-slate-600">Penyelesaian Selesai:</span>
-              <span class="text-emerald-600 font-black">13 Permohonan</span>
+              <span class="text-emerald-600">Done: 13</span>
+              <span class="text-amber-600">Proses: 7</span>
+              <span class="text-slate-400">Wait: 0</span>
             </div>
           </div>
         </div>
 
         <!-- Breakdown Kategori Informasi Publik -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-          <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <i class="fas fa-layer-group text-blue-600"></i> Sebaran Kategori Dokumen Publik (509 Dokumen)
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+          <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <i class="fas fa-layer-group text-blue-600"></i> Klasifikasi Dokumen Informasi Publik
           </h3>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-black text-blue-900 uppercase">Informasi Berkala</span>
-                <span class="px-2 py-0.5 rounded-full bg-blue-200 text-blue-900 text-[10px] font-black">79.9%</span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            <div class="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black uppercase text-blue-900 tracking-wider">Informasi Berkala</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-200 text-blue-800">407 Dokumen</span>
               </div>
-              <p class="text-3xl font-black text-blue-700">407</p>
-              <p class="text-xs text-blue-800 mt-1 leading-snug">
-                Laporan Keuangan, Profil Badan Publik, Rencana Kerja, dan Akuntabilitas Kinerja.
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Dokumen yang diumumkan secara rutin, meliputi laporan keuangan, LKjIP, RKA, DPA, dan profil pimpinan instansi.
               </p>
+              <div class="w-full bg-blue-200/50 h-2 rounded-full overflow-hidden mt-3">
+                <div class="bg-blue-600 h-full rounded-full" style="width: 80%;"></div>
+              </div>
             </div>
 
-            <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200/80">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-black text-indigo-900 uppercase">Informasi Setiap Saat</span>
-                <span class="px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-900 text-[10px] font-black">19.7%</span>
+            <div class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black uppercase text-indigo-900 tracking-wider">Informasi Setiap Saat</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-200 text-indigo-800">100 Dokumen</span>
               </div>
-              <p class="text-3xl font-black text-indigo-700">100</p>
-              <p class="text-xs text-indigo-800 mt-1 leading-snug">
-                Daftar Informasi Publik (DIP), SOP Pelayanan, Perjanjian Kerjasama, dan Regulasi.
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Informasi yang wajib tersedia setiap waktu seperti SOP, regulasi daerah, surat keputusan, dan perjanjian kerja sama.
               </p>
+              <div class="w-full bg-indigo-200/50 h-2 rounded-full overflow-hidden mt-3">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 20%;"></div>
+              </div>
             </div>
 
-            <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-black text-amber-900 uppercase">Informasi Serta Merta</span>
-                <span class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-black">0.4%</span>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black uppercase text-slate-700 tracking-wider">Serta Merta & Dikecualikan</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-200 text-slate-700">2 Dokumen</span>
               </div>
-              <p class="text-3xl font-black text-amber-700">2</p>
-              <p class="text-xs text-amber-800 mt-1 leading-snug">
-                Peringatan dini kebencanaan, tanggap darurat, dan gangguan pelayanan umum.
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Peringatan darurat bencana dan dokumen yang telah melalui uji konsekuensi keterbukaan informasi.
               </p>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mt-3">
+                <div class="bg-slate-400 h-full rounded-full" style="width: 5%;"></div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION: SDM & STRUKTUR ORGANISASI (DASHBOARD ADMIN DATA) -->
+      <!-- SECTION: SDM & STRUKTUR ORGANISASI -->
       <section v-if="activeCategory === 'all' || activeCategory === 'sdm'" class="space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
@@ -572,94 +604,58 @@
             </span>
             <div>
               <h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-                SDM, Ekosistem OPD & Kepatuhan LHKPN
+                SDM, Unit Kerja & Struktur Organisasi
               </h2>
               <p class="text-xs md:text-sm text-slate-500 font-medium">
-                Pilar tata kelola organisasi PPID dan aparatur pengelola informasi di Kabupaten Sinjai.
+                Penyebaran personil PPID pembantu, pejabat pimpinan, serta laporan kepatuhan LHKPN.
               </p>
             </div>
           </div>
           <span class="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-xl text-xs font-extrabold border border-purple-200">
-            132 OPD Terkoordinasi
+            132 OPD & Unit
           </span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Pimpinan -->
-          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-purple-400 transition-all">
-            <div class="flex items-start justify-between">
-              <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pejabat / Pimpinan</p>
-                <h3 class="text-3xl font-black text-slate-900 mt-1.5">128</h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">Pimpinan Daerah & OPD</p>
-              </div>
-              <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold shadow-xs">
-                <i class="fas fa-user-tie"></i>
-              </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-3 text-lg font-bold">
+              <i class="fas fa-user-tie"></i>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-600">
-              <span>Profil & Foto Resmi:</span>
-              <span class="text-purple-700 font-black">Terpublikasi</span>
-            </div>
+            <p class="text-3xl font-black text-slate-900">128</p>
+            <p class="text-xs font-bold text-slate-400 uppercase mt-1">Pejabat Pimpinan</p>
+            <p class="text-[11px] text-purple-700 font-semibold mt-1">Struktural Pemkab Sinjai</p>
           </div>
 
-          <!-- LHKPN -->
-          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-emerald-400 transition-all">
-            <div class="flex items-start justify-between">
-              <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kepatuhan LHKPN</p>
-                <h3 class="text-3xl font-black text-emerald-600 mt-1.5">40</h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">Pejabat Wajib Lapor Terdata</p>
-              </div>
-              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold shadow-xs">
-                <i class="fas fa-shield-halved"></i>
-              </div>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-lg font-bold">
+              <i class="fas fa-file-invoice-dollar"></i>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-600">
-              <span>Status Kepatuhan:</span>
-              <span class="text-emerald-700 font-black">100% Terverifikasi</span>
-            </div>
+            <p class="text-3xl font-black text-emerald-600">40</p>
+            <p class="text-xs font-bold text-slate-400 uppercase mt-1">LHKPN Terdata</p>
+            <p class="text-[11px] text-emerald-700 font-semibold mt-1">Kepatuhan Penyelenggara</p>
           </div>
 
-          <!-- OPD / Unit Kerja -->
-          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-blue-400 transition-all">
-            <div class="flex items-start justify-between">
-              <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Perangkat Daerah (OPD)</p>
-                <h3 class="text-3xl font-black text-blue-600 mt-1.5">132</h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">Dinas, Badan, Kecamatan & Desa</p>
-              </div>
-              <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold shadow-xs">
-                <i class="fas fa-landmark"></i>
-              </div>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3 text-lg font-bold">
+              <i class="fas fa-building-columns"></i>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-600">
-              <span>PPID Pelaksana:</span>
-              <span class="text-blue-700 font-black">Terintegrasi</span>
-            </div>
+            <p class="text-3xl font-black text-blue-600">132</p>
+            <p class="text-xs font-bold text-slate-400 uppercase mt-1">OPD / Unit Kerja</p>
+            <p class="text-[11px] text-blue-700 font-semibold mt-1">Dinas, Badan & Kecamatan</p>
           </div>
 
-          <!-- User Admin Pengelola -->
-          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-indigo-400 transition-all">
-            <div class="flex items-start justify-between">
-              <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">User Admin Sistem</p>
-                <h3 class="text-3xl font-black text-indigo-600 mt-1.5">121</h3>
-                <p class="text-xs text-slate-500 mt-1 font-medium">Operator & Verifikator OPD</p>
-              </div>
-              <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold shadow-xs">
-                <i class="fas fa-users-cog"></i>
-              </div>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3 text-lg font-bold">
+              <i class="fas fa-users-gear"></i>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-600">
-              <span>Hak Akses:</span>
-              <span class="text-indigo-700 font-black">Role-Based Access</span>
-            </div>
+            <p class="text-3xl font-black text-indigo-600">121</p>
+            <p class="text-xs font-bold text-slate-400 uppercase mt-1">User Admin PPID</p>
+            <p class="text-[11px] text-indigo-700 font-semibold mt-1">Pengelola PPID Pelaksana</p>
           </div>
         </div>
       </section>
 
-      <!-- SECTION: WEBSITE & INTERAKSI PUBLIK + PEMASANGAN WIDGET LUAR (DASHBOARD ADMIN DATA) -->
+      <!-- SECTION: WEBSITE, INTERAKSI & JARINGAN WIDGET LUAR -->
       <section v-if="activeCategory === 'all' || activeCategory === 'widget'" class="space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
@@ -668,33 +664,33 @@
             </span>
             <div>
               <h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-                Website, Interaksi Publik & Pemasangan Luar (Live Widget Hits)
+                Website, Interaksi Publik & Jaringan Widget
               </h2>
               <p class="text-xs md:text-sm text-slate-500 font-medium">
-                Distribusi lalu lintas jaringan widget PPID yang terpasang di portal resmi dinas, blog desa, dan website instansi luar.
+                Konektivitas widget pencarian informasi PPID yang terpasang di berbagai situs OPD dan eksternal.
               </p>
             </div>
           </div>
-          <span class="px-3 py-1.5 bg-teal-50 text-teal-800 rounded-xl text-xs font-extrabold border border-teal-200">
-            13 Website Pemasangan
+          <span class="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-xl text-xs font-extrabold border border-teal-200">
+            13 Situs Terpasang
           </span>
         </div>
 
-        <!-- 4 Highlights Website & Interaksi -->
+        <!-- 4 Kotak Interaksi & Widget -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="bg-white p-4 rounded-3xl border border-slate-200 text-center shadow-xs">
             <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-2 text-base">
               <i class="fas fa-images"></i>
             </div>
             <p class="text-2xl font-black text-slate-900">2</p>
-            <p class="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Sliders Banner</p>
+            <p class="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Banner Sliders</p>
           </div>
           <div class="bg-white p-4 rounded-3xl border border-slate-200 text-center shadow-xs">
-            <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-2 text-base">
-              <i class="fas fa-camera"></i>
+            <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-2 text-base">
+              <i class="fas fa-camera-retro"></i>
             </div>
             <p class="text-2xl font-black text-slate-900">31</p>
-            <p class="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Galeri Dokumentasi</p>
+            <p class="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Dokumentasi Galeri</p>
           </div>
           <div class="bg-white p-4 rounded-3xl border border-slate-200 text-center shadow-xs">
             <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-2 text-base">
@@ -790,37 +786,37 @@ import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getBreadcrumbs } from '@/config/breadcrumbs'
 
 useHead({
-  title: 'Statistik Layanan & Transparansi Informasi Publik 2025 - PPID Kabupaten Sinjai',
+  title: 'Statistik Layanan & Transparansi Informasi Publik - PPID Kabupaten Sinjai',
   meta: [
     {
       name: 'description',
-      content: 'Portal statistik resmi keterbukaan informasi publik Pemerintah Kabupaten Sinjai tahun 2025: rekapitulasi 25 permohonan (7 online), 509 dokumen publik, kunjungan web, dan jaringan widget.'
+      content: 'Portal statistik resmi keterbukaan informasi publik Pemerintah Kabupaten Sinjai tahun 2025 dan 2026: rekapitulasi permohonan informasi daring dan langsung, 509 dokumen publik, serta jaringan widget.'
     },
-    { property: 'og:title', content: 'Statistik Keterbukaan Informasi Publik 2025 - PPID Sinjai' },
-    { property: 'og:description', content: 'Rekapitulasi resmi permohonan informasi publik tahun 2025 dan portal data terbuka PPID Kabupaten Sinjai.' }
+    { property: 'og:title', content: 'Statistik Keterbukaan Informasi Publik - PPID Sinjai' },
+    { property: 'og:description', content: 'Rekapitulasi resmi permohonan informasi publik tahun 2025 & 2026 dan portal data terbuka PPID Kabupaten Sinjai.' }
   ]
 })
 
 const breadcrumbItems = getBreadcrumbs.statistik()
 
-// State Filters
+// State Filters (Default ke 2026 sebagai tahun terbaru yang berjalan)
 const activeCategory = ref('all')
-const selectedYear = ref('2025')
+const selectedYear = ref('2026')
 const searchPemohonQuery = ref('')
 const filterJalur = ref('')
 
 const categoryTabs = [
   { id: 'all', label: 'Semua Statistik', icon: 'fas fa-th-large' },
-  { id: 'permohonan', label: 'Permohonan Informasi 2025', icon: 'fas fa-file-signature', badge: '25' },
+  { id: 'permohonan', label: 'Permohonan Informasi', icon: 'fas fa-file-signature', badge: '20' },
   { id: 'informasi', label: 'Informasi Publik', icon: 'fas fa-folder-open', badge: '509' },
   { id: 'sdm', label: 'SDM & Organisasi', icon: 'fas fa-sitemap', badge: '132' },
   { id: 'widget', label: 'Jaringan Widget', icon: 'fas fa-network-wired', badge: '13' }
 ]
 
 const yearOptions = [
-  { val: '2025', label: '2025 (Aktif)' },
-  { val: '2024', label: '2024' },
-  { val: 'all', label: 'Semua' }
+  { val: '2026', label: '2026 (Terbaru)' },
+  { val: '2025', label: '2025' },
+  { val: 'all', label: 'Semua Tahun' }
 ]
 
 // Data Pemasangan Luar / Top Domain Hits (Sesuai Dashboard Admin Backend)
@@ -832,10 +828,255 @@ const externalWidgets = [
   { domain: 'dinkes.sinjaikab.go.id', hits: 42, waktu: '1 bulan yang lalu' }
 ]
 
-// Data 25 Pemohon Tahun 2025 (Anonimitas A***i, 7 Online, 18 Langsung)
-const pemohonList = [
+// DATA PERMOHONAN TAHUN 2026 (20 Permohonan: 6 Online, 14 Langsung, 13 Selesai, 7 Proses - Sesuai Backend Live Dashboard)
+const pemohon2026 = [
+  {
+    id: 101,
+    tahun: '2026',
+    kode: 'REG-2026-001',
+    nama: 'F***l',
+    pekerjaan: 'Warga / Pemerhati Anggaran',
+    dokumen: 'Dokumen Penjabaran APBD Perubahan Kabupaten Sinjai Tahun 2026',
+    jalur: 'Online',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Layanan online sangat responsif, pengunduhan berkas APBD sangat lancar.'
+  },
+  {
+    id: 102,
+    tahun: '2026',
+    kode: 'REG-2026-002',
+    nama: 'N***a',
+    pekerjaan: 'Mahasiswi Pascasarjana',
+    dokumen: 'Rencana Kinerja Tahunan (RKT) Disdik Kabupaten Sinjai 2026',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Petugas melayani dengan ramah dan cekatan di loket meja pelayanan PPID.'
+  },
+  {
+    id: 103,
+    tahun: '2026',
+    kode: 'REG-2026-003',
+    nama: 'B***i',
+    pekerjaan: 'Lembaga Swadaya Masyarakat',
+    dokumen: 'Data Realisasi Bantuan Sosial Pangan dan Kemiskinan Ekstrem Dinas Sosial',
+    jalur: 'Online',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Sistem e-PPID Sinjai semakin modern, terbuka, dan transparan.'
+  },
+  {
+    id: 104,
+    tahun: '2026',
+    kode: 'REG-2026-004',
+    nama: 'H***a',
+    pekerjaan: 'Staf Ahli / Konsultan',
+    dokumen: 'Salinan Surat Keputusan (SK) Standar Biaya Masukan Daerah 2026',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Berkas langsung dicetak dan diberikan tanda terima resmi tanpa biaya.'
+  },
+  {
+    id: 105,
+    tahun: '2026',
+    kode: 'REG-2026-005',
+    nama: 'T***n',
+    pekerjaan: 'Penyedia Barang & Jasa',
+    dokumen: 'Daftar Paket Pengadaan Langsung dan Tender Terbuka UKPBJ Sinjai',
+    jalur: 'Online',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Transparansi pengadaan patut diacungi jempol, data langsung dikirim via email.'
+  },
+  {
+    id: 106,
+    tahun: '2026',
+    kode: 'REG-2026-006',
+    nama: 'M***h',
+    pekerjaan: 'Akademisi Kesehatan',
+    dokumen: 'Laporan Evaluasi Pelayanan Publik RSUD Sinjai Tahun 2025-2026',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Sangat membantu penyusunan kajian ilmiah penelitian rumah sakit.'
+  },
+  {
+    id: 107,
+    tahun: '2026',
+    kode: 'REG-2026-007',
+    nama: 'R***i',
+    pekerjaan: 'Wiraswasta / Pelaku Usaha',
+    dokumen: 'SOP Izin Persetujuan Bangunan Gedung (PBG) DPMPTSP Sinjai',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Petugas menjelaskan tahapan izin operasional secara transparan dan solutif.'
+  },
+  {
+    id: 108,
+    tahun: '2026',
+    kode: 'REG-2026-008',
+    nama: 'A***m',
+    pekerjaan: 'Mahasiswa Kedokteran',
+    dokumen: 'Data Sebaran Fasilitas Puskesmas dan Tenaga Medis Dinas Kesehatan',
+    jalur: 'Online',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Akses website cepat dan file lampiran berformat tabel rapi.'
+  },
+  {
+    id: 109,
+    tahun: '2026',
+    kode: 'REG-2026-009',
+    nama: 'K***a',
+    pekerjaan: 'Praktisi Hukum',
+    dokumen: 'Peraturan Daerah tentang Rencana Pembangunan Daerah (RPD) 2024-2026',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Salinan regulasi lengkap disertai lembaran daerah resmi Pemkab Sinjai.'
+  },
+  {
+    id: 110,
+    tahun: '2026',
+    kode: 'REG-2026-010',
+    nama: 'W***u',
+    pekerjaan: 'Penyuluh Pertanian',
+    dokumen: 'Data Jumlah Penerima Pupuk Subsidi Sektor Pertanian Sinjai 2026',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 4,
+    ulasan: 'Pelayanan sangat baik, data diparaf pejabat pengelola informasi dinas.'
+  },
+  {
+    id: 111,
+    tahun: '2026',
+    kode: 'REG-2026-011',
+    nama: 'Z***a',
+    pekerjaan: 'Alumni / Pencari Kerja',
+    dokumen: 'Informasi Jadwal Pelaksanaan Program Pelatihan Kerja Diskopnaker',
+    jalur: 'Online',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Admin bergerak cepat menindaklanjuti permohonan informasi pelatihan daring.'
+  },
+  {
+    id: 112,
+    tahun: '2026',
+    kode: 'REG-2026-012',
+    nama: 'D***i',
+    pekerjaan: 'Relawan Kemanusiaan',
+    dokumen: 'Data Realisasi Anggaran Penanganan Siaga Bencana BPBD Sinjai',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Penjelasan PPID sangat informatif dan tidak berbelit-belit.'
+  },
+  {
+    id: 113,
+    tahun: '2026',
+    kode: 'REG-2026-013',
+    nama: 'E***o',
+    pekerjaan: 'Pengurus Yayasan',
+    dokumen: 'Pedoman Teknis Pengusulan Dana Hibah & Bansos Pemkab Sinjai',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Layanan meja PPID sangat memuaskan, berkas panduan diberikan lengkap.'
+  },
+  {
+    id: 114,
+    tahun: '2026',
+    kode: 'REG-2026-014',
+    nama: 'S***i',
+    pekerjaan: 'Peneliti Smart City',
+    dokumen: 'Dokumen Masterplan Smart City dan Arsitektur SPBE Kominfo Sinjai 2026',
+    jalur: 'Online',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Dalam proses telaah teknis dan konfirmasi data pejabat pengelola terkait.'
+  },
+  {
+    id: 115,
+    tahun: '2026',
+    kode: 'REG-2026-015',
+    nama: 'Y***a',
+    pekerjaan: 'Pengawas Konstruksi',
+    dokumen: 'Rincian Teknis Kontrak Rekonstruksi Jembatan dan Jalan Dinas PUPR 2026',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Permohonan telah diregistrasi resmi dan dikoordinasikan dengan PPK.'
+  },
+  {
+    id: 116,
+    tahun: '2026',
+    kode: 'REG-2026-016',
+    nama: 'I***r',
+    pekerjaan: 'Tenaga Honorer',
+    dokumen: 'Data Usulan Formasi Kebutuhan CASN dan PPPK BKPSDMA Sinjai 2026',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Menunggu penetapan resmi rincian formasi dari instansi terkait.'
+  },
+  {
+    id: 117,
+    tahun: '2026',
+    kode: 'REG-2026-017',
+    nama: 'C***a',
+    pekerjaan: 'Pelaku Usaha Perikanan',
+    dokumen: 'Statistik Ekspor Komoditas Kelautan dan Perikanan Sinjai Terbaru',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 4,
+    ulasan: 'Berkas sedang dalam tahap pengumpulan data dari bidang tangkap & budidaya.'
+  },
+  {
+    id: 118,
+    tahun: '2026',
+    kode: 'REG-2026-018',
+    nama: 'P***a',
+    pekerjaan: 'Pegiat Komunitas Hijau',
+    dokumen: 'Laporan Kajian Uji Kualitas Udara dan Pengelolaan Sampah DLH 2026',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Telah diterima di loket PPID dan diteruskan ke bidang pemantauan lingkungan.'
+  },
+  {
+    id: 119,
+    tahun: '2026',
+    kode: 'REG-2026-019',
+    nama: 'G***i',
+    pekerjaan: 'Mahasiswa Teknik Sipil',
+    dokumen: 'Peta Jalur Rawan Lalu Lintas dan Rekayasa Rambu Dishub Sinjai',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Sedang dalam proses telaah dokumen teknis survei manajemen rekayasa lalu lintas.'
+  },
+  {
+    id: 120,
+    tahun: '2026',
+    kode: 'REG-2026-020',
+    nama: 'O***y',
+    pekerjaan: 'Pemerhati Seni Budaya',
+    dokumen: 'Laporan Penyelenggaraan Festival Budaya Daerah Disparbud Sinjai',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Sedang dalam proses finalisasi laporan pertanggungjawaban kegiatan.'
+  }
+]
+
+// DATA PERMOHONAN TAHUN 2025 (25 Permohonan: 7 Online, 18 Langsung, 23 Selesai, 2 Proses)
+const pemohon2025 = [
   {
     id: 1,
+    tahun: '2025',
     kode: 'REG-2025-001',
     nama: 'A***i',
     pekerjaan: 'Mahasiswa / Peneliti',
@@ -847,6 +1088,7 @@ const pemohonList = [
   },
   {
     id: 2,
+    tahun: '2025',
     kode: 'REG-2025-002',
     nama: 'M***d',
     pekerjaan: 'Lembaga Swadaya Masyarakat',
@@ -858,6 +1100,7 @@ const pemohonList = [
   },
   {
     id: 3,
+    tahun: '2025',
     kode: 'REG-2025-003',
     nama: 'S***a',
     pekerjaan: 'Warga Sinjai Utara',
@@ -869,6 +1112,7 @@ const pemohonList = [
   },
   {
     id: 4,
+    tahun: '2025',
     kode: 'REG-2025-004',
     nama: 'B***a',
     pekerjaan: 'Akademisi / Peneliti',
@@ -880,6 +1124,7 @@ const pemohonList = [
   },
   {
     id: 5,
+    tahun: '2025',
     kode: 'REG-2025-005',
     nama: 'R***n',
     pekerjaan: 'Jurnalis / Media',
@@ -891,6 +1136,7 @@ const pemohonList = [
   },
   {
     id: 6,
+    tahun: '2025',
     kode: 'REG-2025-006',
     nama: 'N***i',
     pekerjaan: 'Mahasiswi Universitas',
@@ -902,6 +1148,7 @@ const pemohonList = [
   },
   {
     id: 7,
+    tahun: '2025',
     kode: 'REG-2025-007',
     nama: 'I***m',
     pekerjaan: 'Wiraswasta / Penyedia',
@@ -913,6 +1160,7 @@ const pemohonList = [
   },
   {
     id: 8,
+    tahun: '2025',
     kode: 'REG-2025-008',
     nama: 'F***h',
     pekerjaan: 'Pemerhati Lingkungan',
@@ -924,6 +1172,7 @@ const pemohonList = [
   },
   {
     id: 9,
+    tahun: '2025',
     kode: 'REG-2025-009',
     nama: 'H***r',
     pekerjaan: 'Warga Kecamatan Tellu Limpoe',
@@ -935,6 +1184,7 @@ const pemohonList = [
   },
   {
     id: 10,
+    tahun: '2025',
     kode: 'REG-2025-010',
     nama: 'W***i',
     pekerjaan: 'Lembaga Riset Sosial',
@@ -946,6 +1196,7 @@ const pemohonList = [
   },
   {
     id: 11,
+    tahun: '2025',
     kode: 'REG-2025-011',
     nama: 'Z***n',
     pekerjaan: 'Tokoh Pemuda',
@@ -957,6 +1208,7 @@ const pemohonList = [
   },
   {
     id: 12,
+    tahun: '2025',
     kode: 'REG-2025-012',
     nama: 'D***a',
     pekerjaan: 'Mahasiswi Tata Ruang',
@@ -968,6 +1220,7 @@ const pemohonList = [
   },
   {
     id: 13,
+    tahun: '2025',
     kode: 'REG-2025-013',
     nama: 'T***o',
     pekerjaan: 'Swasta / Konsultan',
@@ -979,6 +1232,7 @@ const pemohonList = [
   },
   {
     id: 14,
+    tahun: '2025',
     kode: 'REG-2025-014',
     nama: 'K***m',
     pekerjaan: 'Warga Sinjai Timur',
@@ -990,6 +1244,7 @@ const pemohonList = [
   },
   {
     id: 15,
+    tahun: '2025',
     kode: 'REG-2025-015',
     nama: 'E***y',
     pekerjaan: 'Tenaga Pendidik',
@@ -1001,6 +1256,7 @@ const pemohonList = [
   },
   {
     id: 16,
+    tahun: '2025',
     kode: 'REG-2025-016',
     nama: 'A***r',
     pekerjaan: 'Mahasiswa Magister',
@@ -1012,6 +1268,7 @@ const pemohonList = [
   },
   {
     id: 17,
+    tahun: '2025',
     kode: 'REG-2025-017',
     nama: 'Y***i',
     pekerjaan: 'Praktisi Hukum',
@@ -1023,6 +1280,7 @@ const pemohonList = [
   },
   {
     id: 18,
+    tahun: '2025',
     kode: 'REG-2025-018',
     nama: 'S***f',
     pekerjaan: 'Mahasiswa Kesehatan Masyarakat',
@@ -1034,6 +1292,7 @@ const pemohonList = [
   },
   {
     id: 19,
+    tahun: '2025',
     kode: 'REG-2025-019',
     nama: 'R***a',
     pekerjaan: 'Aktivis Perlindungan Anak',
@@ -1045,6 +1304,7 @@ const pemohonList = [
   },
   {
     id: 20,
+    tahun: '2025',
     kode: 'REG-2025-020',
     nama: 'F***l',
     pekerjaan: 'Perangkat Desa',
@@ -1056,6 +1316,7 @@ const pemohonList = [
   },
   {
     id: 21,
+    tahun: '2025',
     kode: 'REG-2025-021',
     nama: 'H***n',
     pekerjaan: 'Nelayan / Kelompok Usaha',
@@ -1067,6 +1328,7 @@ const pemohonList = [
   },
   {
     id: 22,
+    tahun: '2025',
     kode: 'REG-2025-022',
     nama: 'M***a',
     pekerjaan: 'Mahasiswi Administrasi Negara',
@@ -1078,6 +1340,7 @@ const pemohonList = [
   },
   {
     id: 23,
+    tahun: '2025',
     kode: 'REG-2025-023',
     nama: 'J***i',
     pekerjaan: 'Wiraswasta',
@@ -1089,6 +1352,7 @@ const pemohonList = [
   },
   {
     id: 24,
+    tahun: '2025',
     kode: 'REG-2025-024',
     nama: 'L***a',
     pekerjaan: 'Pemerhati Kebijakan Daerah',
@@ -1100,6 +1364,7 @@ const pemohonList = [
   },
   {
     id: 25,
+    tahun: '2025',
     kode: 'REG-2025-025',
     nama: 'R***y',
     pekerjaan: 'Mahasiswa Pascasarjana',
@@ -1107,16 +1372,86 @@ const pemohonList = [
     jalur: 'Langsung',
     status: 'Sedang Diproses',
     rating: 5,
-    ulasan: 'Permohonan sudah diterima di meja desk dan sedang dalam tahap rekapitulasi.'
+    ulasan: 'Permohonan sudah diterima di meja desk dan dalam tahap telaah dokumen.'
   }
 ]
 
-// Cuplikan Ulasan Running Ticker (12 sampel ulasan)
-const sampleReviews = pemohonList.slice(0, 12)
+// Gabungan Semua Tahun (2026 + 2025 = 45 data)
+const pemohonAll = [...pemohon2026, ...pemohon2025]
 
-// Computed Filter Pemohon
+// Computed Statistik Berdasarkan Tahun yang Dipilih
+const activeYearStats = computed(() => {
+  if (selectedYear.value === '2026') {
+    return {
+      year: '2026',
+      yearLabel: 'Tahun 2026',
+      badgeLabel: 'Tahun 2026 (Terbaru)',
+      total: 20,
+      online: 6,
+      onlinePct: 30,
+      langsung: 14,
+      langsungPct: 70,
+      selesai: 13,
+      selesaiPct: 65,
+      proses: 7,
+      prosesPct: 35,
+      wait: 0,
+      ikm: 4.88,
+      rerataHari: '2-3 Hari',
+      dataset: pemohon2026,
+      reviews: pemohon2026.slice(0, 10)
+    }
+  }
+
+  if (selectedYear.value === '2025') {
+    return {
+      year: '2025',
+      yearLabel: 'Tahun 2025',
+      badgeLabel: 'Tahun 2025',
+      total: 25,
+      online: 7,
+      onlinePct: 28,
+      langsung: 18,
+      langsungPct: 72,
+      selesai: 23,
+      selesaiPct: 92,
+      proses: 2,
+      prosesPct: 8,
+      wait: 0,
+      ikm: 4.85,
+      rerataHari: '3 Hari',
+      dataset: pemohon2025,
+      reviews: pemohon2025.slice(0, 12)
+    }
+  }
+
+  // Opsi 'all' (Semua Tahun)
+  return {
+    year: 'all',
+    yearLabel: 'Semua Periode (2025 - 2026)',
+    badgeLabel: 'Periode 2025 - 2026',
+    total: 45,
+    online: 13,
+    onlinePct: 29,
+    langsung: 32,
+    langsungPct: 71,
+    selesai: 36,
+    selesaiPct: 80,
+    proses: 9,
+    prosesPct: 20,
+    wait: 0,
+    ikm: 4.86,
+    rerataHari: '2-3 Hari',
+    dataset: pemohonAll,
+    reviews: [...pemohon2026.slice(0, 6), ...pemohon2025.slice(0, 6)]
+  }
+})
+
+// Computed Filter Pemohon untuk Tabel
 const filteredPemohonList = computed(() => {
-  return pemohonList.filter(item => {
+  const list = activeYearStats.value.dataset
+
+  return list.filter(item => {
     // Filter Jalur
     if (filterJalur.value && item.jalur !== filterJalur.value) {
       return false

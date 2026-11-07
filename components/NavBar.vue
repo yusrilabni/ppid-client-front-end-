@@ -138,6 +138,7 @@ const menus = [
     url: '#',
     icon: 'chart-bar',
     children: [
+      { title: 'Statistik Layanan', url: '/statistik', icon: 'chart-pie' },
       { title: 'Permohonan Informasi', url: '/laporan/permohonan', icon: 'file-signature' },
       { title: 'Survei', url: '/laporan/survei', icon: 'poll' },
       { title: 'Laporan PPID', url: '/laporan/ppid', icon: 'chart-line' },
