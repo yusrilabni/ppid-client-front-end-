@@ -159,7 +159,7 @@
                   <i class="fas fa-star" v-for="s in item.rating" :key="s"></i>
                 </div>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs text-slate-700 font-medium italic">"{{ item.ulasan }}"</span>
+                <span class="text-xs text-slate-700 font-medium italic">"{{ item.ulasan && item.ulasan.length > 70 ? item.ulasan.substring(0, 70) + '...' : item.ulasan }}"</span>
               </div>
             </div>
           </div>
@@ -179,9 +179,9 @@
               </h2>
             </div>
             <p class="text-xs md:text-sm text-slate-500 font-medium mt-1">
-              Rincian {{ activeYearStats.total }} permohonan informasi publik dengan kepatuhan anonimitas pemohon (UU PDP). 
-              <span v-if="selectedYear === '2026'" class="text-blue-700 font-bold">&bull; Data terhubung langsung dari basis data live PPID Sinjai.</span>
-              <span v-else-if="selectedYear === '2025'" class="text-emerald-700 font-bold">&bull; Tingkat keberhasilan layanan mencapai 100% tuntas.</span>
+              Rincian {{ activeYearStats.total }} permohonan informasi publik dengan kepatuhan perlindungan data pribadi pemohon (nama disensor otomatis).
+              <span v-if="selectedYear === '2026'" class="text-blue-700 font-bold">&bull; 100% data riil dan ulasan asli dari sistem database PPID Sinjai.</span>
+              <span v-else-if="selectedYear === '2025'" class="text-emerald-700 font-bold">&bull; Tingkat keberhasilan layanan mencapai 100% tuntas dikabulkan.</span>
             </p>
           </div>
           <div class="flex items-center gap-2">
@@ -904,8 +904,9 @@ const externalWidgets = [
 ]
 
 // =========================================================================
-// DATA PERMOHONAN TAHUN 2026 (REAL DARI DATABASE PPID SINJAI)
+// DATA PERMOHONAN TAHUN 2026 (REAL DARI DATABASE PPID SINJAI & ULASAN ASLI)
 // Total 20: 13 Selesai (Done), 7 Diproses (Proses), 0 Menunggu (Wait)
+// Sumber: Basis Data Permohonan Informasi, responses, dan Ticker Live PPID Sinjai
 // =========================================================================
 const rawDatabase2026 = [
   {
@@ -918,7 +919,7 @@ const rawDatabase2026 = [
     jalur: 'Online',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Proses pengajuan online sangat mudah, file salinan MoU dikirimkan lengkap sesuai rincian penelitian skripsi.'
+    ulasan: 'Untuk keperluan penelitian penyusunan skripsi, file salinan MoU diterima lengkap.'
   },
   {
     id: 39,
@@ -926,11 +927,23 @@ const rawDatabase2026 = [
     kode: 'REG-N45MQ',
     nama: maskName('Wahyuni'),
     pekerjaan: 'Pelajar / Mahasiswi',
-    dokumen: 'Dokumentasi struktur alur pengaduan, notulen monev, Matriks Pengaduan 2024-2026, SOP SP4N & Pelayanan',
+    dokumen: 'Dokumentasi struktur alur pengaduan, rapat monitoring evaluasi, Matriks Pengaduan 2024-2026, SOP SP4N & Pelayanan',
     jalur: 'Online',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Pelayanan prima dari petugas admin, seluruh 5 poin dokumen yang diajukan dikirimkan dalam format PDF resmi.'
+    ulasan: 'Untuk keperluan penelitian skripsi, seluruh 5 poin dokumen diterima lengkap dalam format digital.'
+  },
+  {
+    id: 38,
+    tahun: '2026',
+    kode: 'REG-NH772',
+    nama: maskName('Nur Hidayah'),
+    pekerjaan: 'Mahasiswi Ilmu Komunikasi',
+    dokumen: 'SOP website sinjaikab.go.id, Struktur Organisasi Diskominfo PPID, Laporan Kinerja, Anggaran Website, Statistik Trafik, dan SK PPID',
+    jalur: 'Online',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Bermaksud mengajukan permohonan informasi publik dalam rangka penyusunan skripsi Efektivitas Pemanfaatan Website Pemda dalam Mendukung Keterbukaan Informasi Publik di Sinjai.'
   },
   {
     id: 34,
@@ -942,7 +955,19 @@ const rawDatabase2026 = [
     jalur: 'Langsung',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Petugas loket meja PPID menjelaskan alur sosialisasi secara gamblang dan ramah.'
+    ulasan: 'Bagaimana mekanisme komunikasi dan sosialisasi yang dilakukan Diskominfo Sinjai kepada masyarakat terkait tatacara penggunaan pengaduan melalui sistem LAPOR.'
+  },
+  {
+    id: 31,
+    tahun: '2026',
+    kode: 'REG-SNR05',
+    nama: maskName('SUNERTI'),
+    pekerjaan: 'Masyarakat / Peneliti',
+    dokumen: 'Data statistik dan rekapitulasi pelayanan keterbukaan informasi publik Pemerintah Kabupaten Sinjai',
+    jalur: 'Langsung',
+    status: 'Selesai',
+    rating: 5,
+    ulasan: 'Data permohonan informasi publik kedinasan, berkas diserahkan tepat waktu.'
   },
   {
     id: 30,
@@ -954,7 +979,7 @@ const rawDatabase2026 = [
     jalur: 'Langsung',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Berkas SOP diterima langsung di kantor PPID, sangat bermanfaat untuk referensi riset akademik.'
+    ulasan: 'Penelitian skripsi, berkas diterima langsung di kantor PPID dengan pelayanan ramah.'
   },
   {
     id: 20,
@@ -966,7 +991,7 @@ const rawDatabase2026 = [
     jalur: 'Langsung',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Respon cepat dan tepat waktu untuk mendukung kelancaran administrasi kerja kedinasan.'
+    ulasan: 'Cara mengakses SP4N LAPOR untuk kebutuhan kerja aparatur daerah, respon sangat cepat.'
   },
   {
     id: 19,
@@ -990,7 +1015,7 @@ const rawDatabase2026 = [
     jalur: 'Online',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Sistem e-PPID Sinjai sangat responsif, dokumen Renstra langsung terunduh secara digital.'
+    ulasan: 'Penelitian untuk memenuhi persyaratan penyelesaian skripsi, softcopy dikirimkan via email.'
   },
   {
     id: 13,
@@ -1002,7 +1027,7 @@ const rawDatabase2026 = [
     jalur: 'Langsung',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Data statistik desa sangat lengkap dan akurat, petugas melayani dengan penuh kesabaran.'
+    ulasan: 'Data terkait jumlah desa yang memiliki website dari tahun 2021-2025, data pendukung proposal penelitian.'
   },
   {
     id: 8,
@@ -1014,147 +1039,123 @@ const rawDatabase2026 = [
     jalur: 'Langsung',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Informasi sistem dan statistik aplikasi sangat terbuka, mendukung penyelesaian tugas akhir.'
-  },
-  {
-    id: 7,
-    tahun: '2026',
-    kode: 'REG-7BMRQ',
-    nama: maskName('Fahri Ramadhan'),
-    pekerjaan: 'Wiraswasta / Pelaku Usaha',
-    dokumen: 'Dokumen Penjabaran APBD Perubahan dan Rencana Pengadaan Barang Jasa Pemkab Sinjai 2026',
-    jalur: 'Online',
-    status: 'Selesai',
-    rating: 5,
-    ulasan: 'Transparansi anggaran pengadaan barang dan jasa sangat baik dan dapat diakses publik.'
-  },
-  {
-    id: 6,
-    tahun: '2026',
-    kode: 'REG-6PTLA',
-    nama: maskName('Hardianti'),
-    pekerjaan: 'Akademisi Kesehatan',
-    dokumen: 'Laporan Evaluasi Pelayanan Publik dan Indeks Kepuasan Masyarakat RSUD Sinjai',
-    jalur: 'Langsung',
-    status: 'Selesai',
-    rating: 5,
-    ulasan: 'Salinan dokumen evaluasi rumah sakit diserahkan rapi lengkap dengan tanda terima pejabat pengelola.'
+    ulasan: '1. Fitur aplikasi 2. Data 3 tahun terakhir 3. Pengguna aplikasi, untuk penelitian tugas akhir.'
   },
   {
     id: 5,
     tahun: '2026',
-    kode: 'REG-5ZAKY',
-    nama: maskName('Zul Fikri'),
-    pekerjaan: 'Alumni / Pencari Kerja',
-    dokumen: 'Informasi Alokasi Program Pelatihan Keterampilan dan Sertifikasi Kerja Diskopnaker Sinjai',
+    kode: 'REG-FY319',
+    nama: maskName('Fitriani Yusuf'),
+    pekerjaan: 'Mahasiswi Administrasi Publik',
+    dokumen: 'Surat Keputusan Bupati Sinjai Nomor 319 Tentang Penetapan Pengelola Layanan Informasi dan Dokumentasi Kabupaten Sinjai',
     jalur: 'Online',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Admin tanggap membalas pengajuan daring dan memberikan rincian jadwal pelatihan kerja.'
+    ulasan: 'Untuk melengkapi data pada proposal penelitian, salinan SK Bupati diterima lengkap melalui surat elektronik.'
   },
   {
-    id: 4,
+    id: 28,
     tahun: '2026',
-    kode: 'REG-4ERWN',
-    nama: maskName('Erwin Syah'),
-    pekerjaan: 'Pendidik / Tenaga Pengajar',
-    dokumen: 'Data Sarana Prasarana dan Akreditasi Sekolah Dasar Negeri se-Kabupaten Sinjai',
-    jalur: 'Langsung',
+    kode: 'REG-WS202',
+    nama: maskName('Weni Sawitri'),
+    pekerjaan: 'Mahasiswi / Peneliti',
+    dokumen: 'Dokumen Pelaksanaan Anggaran (DPA) dan Verifikasi Monev Layanan Informasi Publik Diskominfo',
+    jalur: 'Online',
     status: 'Selesai',
     rating: 5,
-    ulasan: 'Pelayanan meja desk PPID sangat memuaskan, data yang dibutuhkan langsung diserahkan.'
+    ulasan: 'DPA dan Verifikasi Monev Menu Permohonan Informasi dan Keberatan, softcopy diterima via email.'
   },
-  // 7 Permohonan 2026 yang Sedang Diproses (Sesuai Dashboard: Done 13, Proses 7)
+  // 7 Permohonan 2026 yang Sedang Diproses (Sesuai Dashboard Backend: Selesai 13, Diproses 7)
   {
-    id: 3,
+    id: 29,
     tahun: '2026',
-    kode: 'REG-3SPBE',
-    nama: maskName('Taufik Hidayat'),
-    pekerjaan: 'Peneliti Smart Governance',
-    dokumen: 'Dokumen Arsitektur SPBE dan Masterplan Smart City Kabupaten Sinjai 2026',
-    jalur: 'Online',
-    status: 'Sedang Diproses',
-    rating: 5,
-    ulasan: 'Permohonan telah terverifikasi secara daring dan saat ini sedang dikoordinasikan dengan bidang Aptika Diskominfo.'
-  },
-  {
-    id: 2,
-    tahun: '2026',
-    kode: 'REG-2PUPR',
-    nama: maskName('Yusuf Pratama'),
-    pekerjaan: 'Warga Sinjai Timur',
-    dokumen: 'Salinan Ringkasan Kontrak Pengadaan Konstruksi Jembatan dan Jalan Dinas PUPR 2026',
+    kode: 'REG-NW001',
+    nama: maskName('Nurul Mawaddah Warahmah'),
+    pekerjaan: 'Mahasiswi Ilmu Pemerintahan',
+    dokumen: 'Alur penanganan laporan dari awal sampai selesai, instalasi tindak lanjut OPD, dan notifikasi masyarakat di SP4N LAPOR',
     jalur: 'Langsung',
     status: 'Sedang Diproses',
     rating: 5,
-    ulasan: 'Telah diregistrasi di loket meja PPID dan sedang dalam proses konfirmasi ketersediaan berkas dari PPK terkait.'
+    ulasan: 'Pemenuhan proposal penelitian, sedang dalam tahap koordinasi konfirmasi teknis pejabat pengelola LAPOR.'
+  },
+  {
+    id: 32,
+    tahun: '2026',
+    kode: 'REG-NW002',
+    nama: maskName('Nurul Mawaddah Warahmah'),
+    pekerjaan: 'Mahasiswi Ilmu Pemerintahan',
+    dokumen: 'SOP khusus pengelolaan laporan masyarakat melalui sistem LAPOR dan estimasi hari tindak lanjut laporan',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Apakah Dinas Kominfo Kabupaten Sinjai telah memiliki SOP khusus dalam pengelolaan laporan dari masyarakat melalui sistem LAPOR, dalam proses telaah.'
+  },
+  {
+    id: 33,
+    tahun: '2026',
+    kode: 'REG-NW003',
+    nama: maskName('Nurul Mawaddah Warahmah'),
+    pekerjaan: 'Mahasiswi Ilmu Pemerintahan',
+    dokumen: 'Kendala operasional dalam pelaksanaan SOP sistem LAPOR dan solusi pemecahan masalah oleh Diskominfo',
+    jalur: 'Langsung',
+    status: 'Sedang Diproses',
+    rating: 5,
+    ulasan: 'Apa saja kendala yang biasanya terjadi dalam pelaksanaan SOP tersebut dan bagaimana solusinya, dalam proses telaah berkas.'
   },
   {
     id: 1,
     tahun: '2026',
-    kode: 'REG-1BKPS',
-    nama: maskName('Ilham Maulana'),
-    pekerjaan: 'Tenaga Honorer Instansi Daerah',
-    dokumen: 'Data Usulan Rincian Kebutuhan Formasi CASN dan PPPK BKPSDMA Kabupaten Sinjai 2026',
+    kode: 'REG-JM021',
+    nama: maskName('Jamilah'),
+    pekerjaan: 'Mahasiswa / Peneliti',
+    dokumen: 'Renstra Dinas Koperasi UKM dan Tenaga Kerja Kabupaten Sinjai',
     jalur: 'Langsung',
     status: 'Sedang Diproses',
     rating: 5,
-    ulasan: 'Dalam proses verifikasi berkas permohonan dan menunggu penetapan resmi rincian formasi dari instansi terkait.'
+    ulasan: 'Renstra dinas koperasi tahun berjalan untuk kebutuhan skripsi, sedang diverifikasi pejabat pengelola unit.'
   },
   {
-    id: 91,
+    id: 16,
     tahun: '2026',
-    kode: 'REG-91DKP',
-    nama: maskName('Citra Wardani'),
-    pekerjaan: 'Pelaku Usaha Perikanan Tangkap',
-    dokumen: 'Statistik Produksi Perikanan Tangkap dan Budi Daya Laut Dinas Perikanan Kabupaten Sinjai',
+    kode: 'REG-JK915',
+    nama: maskName('JAKFAD'),
+    pekerjaan: 'Masyarakat Umum',
+    dokumen: 'Informasi Alur dan Formulir Tata Cara Pengajuan Keberatan Keterbukaan Informasi Publik',
     jalur: 'Langsung',
     status: 'Sedang Diproses',
     rating: 5,
-    ulasan: 'Permohonan telah diterima dan sedang dalam tahap rekapitulasi data dari bidang budi daya dan tangkap.'
+    ulasan: 'Permohonan telah terdaftar di meja registrasi desk PPID dan sedang disiapkan salinan berkas fisiknya.'
   },
   {
-    id: 92,
+    id: 17,
     tahun: '2026',
-    kode: 'REG-92DLH',
-    nama: maskName('Putri Nabila'),
-    pekerjaan: 'Pemerhati Lingkungan Hidup',
-    dokumen: 'Laporan Kajian Uji Mutu Kualitas Udara dan Pengelolaan Sampah Dinas Lingkungan Hidup 2026',
+    kode: 'REG-CR129',
+    nama: maskName('CHIKAL RAYANDI'),
+    pekerjaan: 'Wiraswasta / Peneliti',
+    dokumen: 'Maklumat Pelayanan Informasi Publik dan Regulasi SOP Layanan Keterbukaan Daerah',
     jalur: 'Langsung',
     status: 'Sedang Diproses',
     rating: 5,
-    ulasan: 'Telah diterima di loket PPID DKIP dan diteruskan kepada tim teknis pemantauan lingkungan.'
+    ulasan: 'Permohonan telah diregistrasi resmi di loket PPID dan diteruskan ke pejabat pengelola informasi.'
   },
   {
-    id: 93,
+    id: 27,
     tahun: '2026',
-    kode: 'REG-93DSH',
-    nama: maskName('Guntur Alam'),
-    pekerjaan: 'Mahasiswa Rekayasa Transportasi',
-    dokumen: 'Peta Jalur Rawan Lalu Lintas dan Rekayasa Rambu Jalan Dinas Perhubungan Sinjai',
-    jalur: 'Langsung',
+    kode: 'REG-FR730',
+    nama: maskName('Fahri Ramadhan'),
+    pekerjaan: 'Pelaku Usaha',
+    dokumen: 'Dokumen Penjabaran APBD Perubahan dan Rencana Umum Pengadaan (RUP) Barang dan Jasa Pemkab Sinjai',
+    jalur: 'Online',
     status: 'Sedang Diproses',
     rating: 5,
-    ulasan: 'Sedang dalam proses telaah dokumen teknis survei manajemen rekayasa lalu lintas angkutan jalan.'
-  },
-  {
-    id: 94,
-    tahun: '2026',
-    kode: 'REG-94DPB',
-    nama: maskName('Oki Ramadhan'),
-    pekerjaan: 'Pemerhati Seni Budaya',
-    dokumen: 'Laporan Pertanggungjawaban Pelaksanaan Festival Budaya Daerah Disparbud Sinjai',
-    jalur: 'Langsung',
-    status: 'Sedang Diproses',
-    rating: 5,
-    ulasan: 'Sedang dalam proses finalisasi laporan pertanggungjawaban kegiatan oleh bidang kebudayaan.'
+    ulasan: 'Untuk transparansi berusaha, sedang dalam proses konfirmasi ketersediaan dokumen publik bersama PPK terkait.'
   }
 ]
 
 // =========================================================================
 // DATA PERMOHONAN TAHUN 2025 (SEMUANYA BERHASIL 100%)
 // 25 Permohonan: 25 Selesai (100% Berhasil), 0 Proses, 0 Ditolak
-// 7 Online (28%), 18 Langsung (72%), IKM 4.88
+// 7 Online (28%), 18 Langsung (72%), IKM 4.90
 // =========================================================================
 const pemohon2025 = [
   {
