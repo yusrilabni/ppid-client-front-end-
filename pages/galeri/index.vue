@@ -109,10 +109,10 @@ const getYoutubeThumbnail = (url) => {
 
 onMounted(async () => {
   try {
-    const res = await api.get('/galeri')
+    const res = await api.get('/galeri', { params: { _t: Date.now() } })
     // Backend API langsung mengembalikan array, atau kadang dibungkus { data: [...] }
     const rawItems = res.data.data?.data || res.data.data || res.data || []
-    items.value = Array.isArray(rawItems) ? rawItems.filter(i => !i.visibility || i.visibility === 'public') : []
+    items.value = Array.isArray(rawItems) ? rawItems.filter(i => i && String(i.visibility || '').toLowerCase().trim() !== 'private') : []
   } catch (error) {
     console.error('Error fetching gallery:', error)
   } finally {

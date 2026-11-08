@@ -36,7 +36,11 @@ const homeData = ref({
 })
 
 const publicGalleries = computed(() => {
-  return (homeData.value.gallery || []).filter(item => !item.visibility || item.visibility === 'public')
+  return (homeData.value.gallery || []).filter(item => {
+    if (!item) return false
+    const vis = String(item.visibility || '').toLowerCase().trim()
+    return vis !== 'private'
+  })
 })
 
 // Contact form state
@@ -228,9 +232,12 @@ const initSwiper = () => {
 const { isLoading: loading, data: queryData, isFetching, isError, refetch } = useQuery({
   queryKey: ['home_data'],
   queryFn: async () => {
-    const res = await api.get('/home')
+    const res = await api.get('/home', { params: { _t: Date.now() } })
     return res.data.data
-  }
+  },
+  staleTime: 0,
+  gcTime: 0,
+  refetchOnMount: 'always'
 })
 
 const { isLoading: loadingRss, data: rssQueryData } = useQuery({
