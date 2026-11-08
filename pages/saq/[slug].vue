@@ -1716,8 +1716,40 @@
               ></textarea>
             </div>
 
+            <!-- Opsi Keluarkan dari Kategori Informasi Publik -->
+            <div class="p-3.5 rounded-2xl border transition-all" 
+                 :class="repairModal.form.keluarkan_dari_informasi ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300' : 'bg-gray-50/80 border-gray-200'">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  v-model="repairModal.form.keluarkan_dari_informasi" 
+                  class="mt-1 h-4 w-4 rounded text-amber-600 focus:ring-amber-500 border-gray-300 cursor-pointer"
+                >
+                <div class="flex-1 text-xs">
+                  <span class="font-bold text-gray-900 flex items-center gap-1.5">
+                    <i class="fas fa-file-export text-amber-600"></i>
+                    Keluarkan dari Kategori Informasi Publik (Gunakan Link File Storage Asli)
+                  </span>
+                  <span class="text-gray-600 block mt-0.5 text-[11px] leading-relaxed">
+                    Centang opsi ini jika dokumen ini tidak perlu masuk/tampil di Kategori Informasi Publik portal. Tautan bukti dukung di SAQ akan langsung digantikan (replace) dengan link berkas storage aslinya.
+                  </span>
+                  <!-- Link file storage asli jika tersedia -->
+                  <div v-if="repairModal.data.file_url" class="mt-2 p-2 bg-white rounded-xl border border-amber-200 text-[10px] font-mono break-all text-gray-700 flex items-center justify-between gap-2 shadow-xs">
+                    <div class="flex items-center gap-1.5 truncate">
+                      <i class="fas fa-paperclip text-amber-600 shrink-0"></i>
+                      <span class="truncate">{{ repairModal.data.file_url }}</span>
+                    </div>
+                    <a :href="repairModal.data.file_url" target="_blank" rel="noopener" class="text-indigo-600 hover:text-indigo-800 shrink-0 font-sans font-bold flex items-center gap-1">
+                      <span>Buka File</span>
+                      <i class="fas fa-external-link-alt text-[9px]"></i>
+                    </a>
+                  </div>
+                </div>
+              </label>
+            </div>
+
             <!-- Row: Kategori & Jenis Dokumen -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div v-if="!repairModal.form.keluarkan_dari_informasi" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1.5">
                   Kategori Informasi
@@ -1902,7 +1934,8 @@ const openRepairDocModal = async (lnk, ans, q) => {
       judul: lnk.judul || '',
       deskripsi: lnk.deskripsi || '',
       category: 'Informasi Berkala',
-      jenis_dokumen: ''
+      jenis_dokumen: '',
+      keluarkan_dari_informasi: false
     }
   }
 
@@ -1946,7 +1979,7 @@ const generateAiForRepair = async () => {
       prompt,
       pertanyaan,
       context: isPemkab ? 'saq_pemkab' : 'saq'
-    })
+    }, { timeout: 60000 })
 
     if (res.data?.success && res.data.data) {
       const ai = res.data.data
@@ -1970,7 +2003,8 @@ const generateAiForRepair = async () => {
       repairModal.value.error = res.data?.message || 'Gagal menghasilkan rekomendasi AI.'
     }
   } catch (err) {
-    repairModal.value.error = err.response?.data?.message || 'Terjadi kesalahan saat menghubungi layanan AI.'
+    console.error('Error generating AI for repair:', err)
+    repairModal.value.error = err.response?.data?.message || err.message || 'Terjadi kesalahan saat menghubungi layanan AI.'
   } finally {
     repairModal.value.generatingAi = false
   }
@@ -1992,8 +2026,9 @@ const submitRepairModal = async () => {
       sumber: repairModal.value.data.sumber || null,
       judul: repairModal.value.form.judul.trim(),
       deskripsi: repairModal.value.form.deskripsi?.trim() || '',
-      category: repairModal.value.form.category || '',
-      jenis_dokumen: repairModal.value.form.jenis_dokumen || '',
+      category: repairModal.value.form.keluarkan_dari_informasi ? '' : (repairModal.value.form.category || ''),
+      jenis_dokumen: repairModal.value.form.keluarkan_dari_informasi ? '' : (repairModal.value.form.jenis_dokumen || ''),
+      keluarkan_dari_informasi: Boolean(repairModal.value.form.keluarkan_dari_informasi)
     }
 
     const res = await api.post('/saq/repair-evidence-document', payload)
