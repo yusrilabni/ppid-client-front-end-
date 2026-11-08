@@ -301,6 +301,16 @@
                               </div>
                             </div>
 
+                            <!-- Tombol Perbaiki Dokumen (Khusus Superadmin) -->
+                            <button v-if="authStore.isSuperAdmin"
+                              type="button"
+                              @click.stop="openRepairDocModal(lnk, ans)"
+                              class="px-2 py-1 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 shadow-xs transition-all flex items-center gap-1 active:scale-95 cursor-pointer"
+                              title="Perbaiki Judul / Dokumen & Generate AI (Khusus Superadmin)">
+                              <i class="fas fa-magic text-[10px] text-indigo-600"></i>
+                              <span class="text-[10px]">Perbaiki</span>
+                            </button>
+
                             <!-- Tombol Buka Tautan / File -->
                             <a :href="lnk.link" target="_blank" rel="noopener"
                               class="px-2 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
@@ -504,7 +514,17 @@
                                   </div>
                                 </div>
 
-                                <!-- Tombol Buka Tautan / File -->
+                                <!-- Tombol Perbaiki Dokumen (Khusus Superadmin) -->
+                            <button v-if="authStore.isSuperAdmin"
+                              type="button"
+                              @click.stop="openRepairDocModal(lnk, ans)"
+                              class="px-2 py-1 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 shadow-xs transition-all flex items-center gap-1 active:scale-95 cursor-pointer"
+                              title="Perbaiki Judul / Dokumen & Generate AI (Khusus Superadmin)">
+                              <i class="fas fa-magic text-[10px] text-indigo-600"></i>
+                              <span class="text-[10px]">Perbaiki</span>
+                            </button>
+
+                            <!-- Tombol Buka Tautan / File -->
                                 <a :href="lnk.link" target="_blank" rel="noopener"
                                   class="px-2 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all flex items-center gap-1 active:scale-95"
                                   :class="getLinkBadge(lnk).buttonClass"
@@ -1592,6 +1612,179 @@
         </div>
       </div>
     </Transition>
+    <!-- MODAL PERBAIKI DOKUMEN BUKTI DUKUNG SAQ (KHUSUS SUPERADMIN) -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="repairModal.open" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-100 my-8 flex flex-col max-h-[90vh]">
+          <!-- Modal Header -->
+          <div class="p-6 bg-gradient-to-r from-indigo-600 via-indigo-700 to-blue-700 text-white flex items-center justify-between shrink-0">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-xs">
+                  <i class="fas fa-magic"></i>
+                </span>
+                <h3 class="font-extrabold text-lg">Perbaiki Dokumen Bukti Dukung</h3>
+              </div>
+              <p class="text-xs text-indigo-100 mt-1">
+                Perbaiki judul, deskripsi, jenis dokumen, atau gunakan AI Generator. Nama pengunggah & OPD asli tetap terjaga.
+              </p>
+            </div>
+            <button @click="closeRepairModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition cursor-pointer">
+              <i class="fas fa-times text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Loading state -->
+          <div v-if="repairModal.loading" class="p-12 text-center flex flex-col items-center justify-center">
+            <i class="fas fa-spinner fa-spin text-3xl text-indigo-600 mb-3"></i>
+            <p class="text-sm text-gray-600 font-medium">Memuat rincian dokumen bukti dukung...</p>
+          </div>
+
+          <!-- Modal Body -->
+          <form v-else @submit.prevent="submitRepairModal" class="p-6 overflow-y-auto space-y-4 flex-1">
+            <!-- Alert Info Kepemilikan Data Asli -->
+            <div class="p-3.5 rounded-2xl bg-indigo-50/80 border border-indigo-200/80 text-xs text-indigo-950 flex items-start gap-3">
+              <i class="fas fa-shield-alt text-indigo-600 text-base mt-0.5 shrink-0"></i>
+              <div class="min-w-0 flex-1 space-y-1">
+                <div class="font-bold text-indigo-900 flex items-center gap-2">
+                  <span>Kepemilikan Dokumen Asli Terlindungi</span>
+                  <span class="text-[9px] bg-indigo-200 text-indigo-800 px-1.5 py-0.5 rounded font-black uppercase">Aman</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-gray-700 pt-1">
+                  <div>Pengunggah Asli: <strong class="text-gray-900">{{ repairModal.data.pengupload || 'Admin' }}</strong></div>
+                  <div>Unit Kerja / OPD: <strong class="text-gray-900">{{ repairModal.data.opd || 'OPD' }}</strong></div>
+                </div>
+                <p class="text-[10px] text-indigo-700 italic">
+                  * Nama pengunggah dan dinas di atas tidak akan berubah menjadi Superadmin saat disimpan.
+                </p>
+              </div>
+            </div>
+
+            <!-- Error message if any -->
+            <div v-if="repairModal.error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+              <i class="fas fa-exclamation-circle text-red-500"></i>
+              <span>{{ repairModal.error }}</span>
+            </div>
+
+            <!-- Judul Dokumen & Tombol Generate AI -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold text-gray-700">
+                  Judul Dokumen <span class="text-red-500">*</span>
+                </label>
+                <!-- Tombol Generate AI -->
+                <button 
+                  type="button" 
+                  @click="generateAiForRepair"
+                  :disabled="repairModal.generatingAi || !repairModal.form.judul"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-sm flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                  title="Generate otomatis judul dan deskripsi standar keterbukaan informasi publik"
+                >
+                  <i :class="repairModal.generatingAi ? 'fas fa-spinner fa-spin' : 'fas fa-magic text-[10px]'"></i>
+                  <span>{{ repairModal.generatingAi ? 'Memproses AI...' : 'Generate AI' }}</span>
+                </button>
+              </div>
+              <input 
+                v-model="repairModal.form.judul" 
+                type="text" 
+                required
+                placeholder="Contoh: Rencana Kerja Pemerintah Daerah (RKPD) Kabupaten Sinjai..."
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+              >
+              <p class="text-[10px] text-gray-500 mt-1">
+                Ketik kata kunci atau klik <strong>Generate AI</strong> untuk merapikan judul dan deskripsi secara otomatis.
+              </p>
+            </div>
+
+            <!-- Deskripsi Dokumen -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">
+                Deskripsi Singkat / Konten Informasi
+              </label>
+              <textarea 
+                v-model="repairModal.form.deskripsi" 
+                rows="3"
+                placeholder="Ringkasan penjelasan mengenai dokumen publik ini..."
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+              ></textarea>
+            </div>
+
+            <!-- Row: Kategori & Jenis Dokumen -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1.5">
+                  Kategori Informasi
+                </label>
+                <select 
+                  v-model="repairModal.form.category" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white text-gray-700"
+                >
+                  <option value="Informasi Berkala">Informasi Berkala</option>
+                  <option value="Informasi Setiap Saat">Informasi Setiap Saat</option>
+                  <option value="Informasi Serta Merta">Informasi Serta Merta</option>
+                  <option value="Informasi Dikecualikan">Informasi Dikecualikan</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1.5">
+                  Jenis Dokumen DIP
+                </label>
+                <select 
+                  v-model="repairModal.form.jenis_dokumen" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white text-gray-700"
+                >
+                  <option value="">Pilih Jenis Dokumen</option>
+                  <option v-for="(desc, val) in jenisDokumenList" :key="val" :value="val">
+                    {{ val }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Info Tautan & Auto-Sync Notification -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 space-y-1 font-mono">
+              <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                <i class="fas fa-sync text-indigo-600"></i>
+                <span class="font-sans">Tautan Bukti Dukung Saat Ini:</span>
+              </div>
+              <p class="truncate text-slate-500" :title="repairModal.data.detail_url || repairModal.data.file_url">
+                {{ repairModal.data.detail_url || repairModal.data.file_url }}
+              </p>
+              <p class="text-[10px] text-emerald-700 font-sans italic pt-0.5">
+                * Jika judul diubah, slug & URL baru akan langsung disinkronkan otomatis ke jawaban SAQ ini.
+              </p>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="pt-3 border-t border-gray-100 flex items-center justify-end gap-2 shrink-0">
+              <button 
+                type="button" 
+                @click="closeRepairModal"
+                class="px-4 py-2 border border-gray-300 text-gray-700 font-bold rounded-xl text-xs hover:bg-gray-50 transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                :disabled="repairModal.submitting"
+                class="px-5 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-1.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                <i :class="repairModal.submitting ? 'fas fa-spinner fa-spin' : 'fas fa-check'"></i>
+                <span>{{ repairModal.submitting ? 'Menyinkronkan...' : 'Simpan & Sinkronkan ke SAQ' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -1649,6 +1842,169 @@ const simpleEvidenceMode = ref('link') // 'link' (Isi Tautan Langsung) | 'upload
 const uploadDestination = ref('storage') // 'storage' (Langsung Storage) | 'informasi' (Masuk Informasi Publik) | 'galeri' (Masuk Galeri)
 const uploadKategori = ref('Informasi Berkala') // 'Informasi Berkala' | 'Informasi Setiap Saat' | 'Informasi Serta Merta'
 const uploadTarget = ref('ppid') // 'ppid' | 'pemkab'
+
+// State & Helper Fitur Perbaikan Dokumen Bukti Dukung (Khusus Superadmin)
+const jenisDokumenList = {
+  'Profil Badan Publik': 'Sejarah, Visi Misi, Tupoksi, Struktur Organisasi, Profil Pimpinan, Domisili',
+  'Informasi Organisasi & Kepegawaian': 'Data Statistik Pegawai, Daftar Pejabat Struktural, LHKPN/LHKASN',
+  'Dokumen Strategis': 'RPJMD, Renstra, Renja, Indikator Kinerja Utama/IKU',
+  'Program & Kegiatan': 'DPA, Kalender Kegiatan Tahunan, Ringkasan Program Kerja',
+  'Laporan Kinerja Instansi': 'LKjIP, LKPJ, Laporan Tahunan Instansi',
+  'Informasi Keuangan': 'RKA, LRA, Neraca, Laporan Arus Kas, CALK, Opini BPK',
+  'Pengadaan Barang/Jasa': 'RUP, Kerangka Acuan Kerja/KAK, Ringkasan Kontrak, Daftar Pemenang Tender',
+  'Daftar Aset dan Inventaris': 'Buku Inventaris Barang, Rekapitulasi Aset Daerah',
+  'Standar Layanan & SOP PPID': 'Maklumat Pelayanan, SOP Permohonan Informasi, SOP Sengketa, SPM',
+  'Daftar Informasi Publik & Laporan PPID': 'Buku DIP Tahunan, Register Permohonan, Laporan Layanan',
+  'Regulasi & Peraturan': 'Undang-Undang, Perda, Perbup, SK Kepala Daerah/Dinas',
+  'Perjanjian Kerja Sama / MoU': 'Nota Kesepahaman Antar Lembaga, Kontrak Pihak Ketiga',
+  'Pengumuman & Siaran Pers': 'Pengumuman Resmi, Siaran Pers, Surat Edaran, Hasil SKM',
+  'Informasi Serta Merta': 'Peringatan Dini Bencana, Gangguan Layanan, Protokol Darurat',
+  'Lainnya': 'Dokumentasi umum lainnya'
+}
+
+const repairModal = ref({
+  open: false,
+  loading: false,
+  submitting: false,
+  generatingAi: false,
+  error: '',
+  linkId: null,
+  ansContext: null,
+  data: {},
+  form: {
+    judul: '',
+    deskripsi: '',
+    category: 'Informasi Berkala',
+    jenis_dokumen: ''
+  }
+})
+
+const openRepairDocModal = async (lnk, ans) => {
+  repairModal.value = {
+    open: true,
+    loading: true,
+    submitting: false,
+    generatingAi: false,
+    error: '',
+    linkId: lnk.id,
+    ansContext: ans,
+    data: {
+      judul: lnk.judul || '',
+      deskripsi: lnk.deskripsi || '',
+      detail_url: lnk.link || '',
+      file_url: lnk.link || '',
+      pengupload: ans?.penulis || 'Admin OPD',
+      opd: ans?.opd_name || 'OPD Terkait'
+    },
+    form: {
+      judul: lnk.judul || '',
+      deskripsi: lnk.deskripsi || '',
+      category: 'Informasi Berkala',
+      jenis_dokumen: ''
+    }
+  }
+
+  try {
+    const res = await api.get('/saq/evidence-document-detail', {
+      params: { link_id: lnk.id, url: lnk.link }
+    })
+    if (res.data?.success && res.data.data?.document) {
+      const doc = res.data.data.document
+      repairModal.value.data = doc
+      repairModal.value.form.judul = doc.judul || lnk.judul || ''
+      repairModal.value.form.deskripsi = doc.deskripsi || lnk.deskripsi || ''
+      repairModal.value.form.category = doc.category || 'Informasi Berkala'
+      repairModal.value.form.jenis_dokumen = doc.jenis_dokumen || ''
+    }
+  } catch (err) {
+    console.error('Error fetching evidence doc detail:', err)
+  } finally {
+    repairModal.value.loading = false
+  }
+}
+
+const closeRepairModal = () => {
+  repairModal.value.open = false
+}
+
+const generateAiForRepair = async () => {
+  const prompt = repairModal.value.form.judul?.trim()
+  if (!prompt) return
+
+  repairModal.value.generatingAi = true
+  repairModal.value.error = ''
+
+  try {
+    const res = await api.post('/ai-settings/generate', {
+      prompt,
+      context: 'saq'
+    })
+
+    if (res.data?.success && res.data.data) {
+      const ai = res.data.data
+      if (ai.judul) repairModal.value.form.judul = ai.judul
+      if (ai.deskripsi || ai.content) repairModal.value.form.deskripsi = ai.deskripsi || ai.content
+      if (ai.kategori) repairModal.value.form.category = ai.kategori
+      if (ai.jenis_dokumen) repairModal.value.form.jenis_dokumen = ai.jenis_dokumen
+    } else {
+      repairModal.value.error = res.data?.message || 'Gagal menghasilkan judul via AI.'
+    }
+  } catch (err) {
+    repairModal.value.error = err.response?.data?.message || 'Terjadi kesalahan saat menghubungi layanan AI.'
+  } finally {
+    repairModal.value.generatingAi = false
+  }
+}
+
+const submitRepairModal = async () => {
+  if (!repairModal.value.form.judul?.trim()) {
+    repairModal.value.error = 'Judul dokumen wajib diisi.'
+    return
+  }
+
+  repairModal.value.submitting = true
+  repairModal.value.error = ''
+
+  try {
+    const payload = {
+      link_id: repairModal.value.linkId,
+      document_id: repairModal.value.data.document_id || null,
+      sumber: repairModal.value.data.sumber || null,
+      judul: repairModal.value.form.judul.trim(),
+      deskripsi: repairModal.value.form.deskripsi?.trim() || '',
+      category: repairModal.value.form.category || '',
+      jenis_dokumen: repairModal.value.form.jenis_dokumen || '',
+    }
+
+    const res = await api.post('/saq/repair-evidence-document', payload)
+
+    if (res.data?.success) {
+      const updated = res.data.data
+      // SINKRONISASI LANGSUNG DI STATE REACTIVE TAMPILAN
+      if (repairModal.value.ansContext && repairModal.value.ansContext.links) {
+        const found = repairModal.value.ansContext.links.find(l => l.id === updated.link_id)
+        if (found) {
+          found.judul = updated.judul
+          found.link = updated.link
+          found.deskripsi = updated.deskripsi
+        }
+      }
+
+      // Invalidate queries agar seluruh pohon data SAQ ter-refresh
+      queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
+      queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
+
+      closeRepairModal()
+    } else {
+      repairModal.value.error = res.data?.message || 'Gagal memperbarui dokumen.'
+    }
+  } catch (err) {
+    console.error('Error submitting repair document:', err)
+    repairModal.value.error = err.response?.data?.message || 'Terjadi kesalahan saat menyimpan dokumen.'
+  } finally {
+    repairModal.value.submitting = false
+  }
+}
 
 // State Integrasi AI Generator untuk Metadata Dokumen Publik SAQ
 const kataKunciDokumen = ref('')
