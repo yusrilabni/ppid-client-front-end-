@@ -35,6 +35,10 @@ const homeData = ref({
   statistics: {}
 })
 
+const publicGalleries = computed(() => {
+  return (homeData.value.gallery || []).filter(item => !item.visibility || item.visibility === 'public')
+})
+
 // Contact form state
 const contactMethod = ref('email')
 const isSending = ref(false)
@@ -631,8 +635,8 @@ const informasiItems = [
             <h2 class="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-4">Galeri</h2>
             <p class="text-xs md:text-base text-gray-600 max-w-2xl mx-auto">Dokumentasi kegiatan dan momen penting PPID</p>
           </div>
-          <div v-if="homeData.gallery && homeData.gallery.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <div v-for="item in homeData.gallery" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
+          <div v-if="publicGalleries && publicGalleries.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div v-for="item in publicGalleries" :key="item.id" class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow group">
               <div class="aspect-w-16 aspect-h-12 relative overflow-hidden">
                 <a :href="item.type === 'foto' || !item.type ? getStorageUrl(item.image) : item.video"
                    class="block glightbox cursor-pointer"

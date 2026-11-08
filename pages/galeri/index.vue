@@ -111,7 +111,8 @@ onMounted(async () => {
   try {
     const res = await api.get('/galeri')
     // Backend API langsung mengembalikan array, atau kadang dibungkus { data: [...] }
-    items.value = res.data.data?.data || res.data.data || res.data || []
+    const rawItems = res.data.data?.data || res.data.data || res.data || []
+    items.value = Array.isArray(rawItems) ? rawItems.filter(i => !i.visibility || i.visibility === 'public') : []
   } catch (error) {
     console.error('Error fetching gallery:', error)
   } finally {
