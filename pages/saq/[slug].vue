@@ -304,7 +304,7 @@
                             <!-- Tombol Perbaiki Dokumen (Khusus Superadmin) -->
                             <button v-if="authStore.isSuperAdmin"
                               type="button"
-                              @click.stop="openRepairDocModal(lnk, ans)"
+                              @click.stop="openRepairDocModal(lnk, ans, q)"
                               class="px-2 py-1 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 shadow-xs transition-all flex items-center gap-1 active:scale-95 cursor-pointer"
                               title="Perbaiki Judul / Dokumen & Generate AI (Khusus Superadmin)">
                               <i class="fas fa-magic text-[10px] text-indigo-600"></i>
@@ -517,7 +517,7 @@
                                 <!-- Tombol Perbaiki Dokumen (Khusus Superadmin) -->
                             <button v-if="authStore.isSuperAdmin"
                               type="button"
-                              @click.stop="openRepairDocModal(lnk, ans)"
+                              @click.stop="openRepairDocModal(lnk, ans, q)"
                               class="px-2 py-1 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 shadow-xs transition-all flex items-center gap-1 active:scale-95 cursor-pointer"
                               title="Perbaiki Judul / Dokumen & Generate AI (Khusus Superadmin)">
                               <i class="fas fa-magic text-[10px] text-indigo-600"></i>
@@ -1879,7 +1879,8 @@ const repairModal = ref({
   }
 })
 
-const openRepairDocModal = async (lnk, ans) => {
+const openRepairDocModal = async (lnk, ans, q) => {
+  const oldUrl = lnk.link || ''
   repairModal.value = {
     open: true,
     loading: true,
@@ -1888,11 +1889,12 @@ const openRepairDocModal = async (lnk, ans) => {
     error: '',
     linkId: lnk.id,
     ansContext: ans,
+    questionContext: q,
     data: {
       judul: lnk.judul || '',
       deskripsi: lnk.deskripsi || '',
-      detail_url: lnk.link || '',
-      file_url: lnk.link || '',
+      detail_url: oldUrl,
+      file_url: oldUrl,
       pengupload: ans?.penulis || 'Admin OPD',
       opd: ans?.opd_name || 'OPD Terkait'
     },
@@ -1906,7 +1908,7 @@ const openRepairDocModal = async (lnk, ans) => {
 
   try {
     const res = await api.get('/saq/evidence-document-detail', {
-      params: { link_id: lnk.id, url: lnk.link }
+      params: { link_id: lnk.id, url: oldUrl }
     })
     if (res.data?.success && res.data.data?.document) {
       const doc = res.data.data.document
@@ -1935,19 +1937,37 @@ const generateAiForRepair = async () => {
   repairModal.value.error = ''
 
   try {
+    const pertanyaan = repairModal.value.questionContext?.pertanyaan || 
+                       repairModal.value.ansContext?.pertanyaan || 
+                       repairModal.value.questionContext?.soal || ''
+
+    const isPemkab = isSaqPemkab.value
     const res = await api.post('/ai-settings/generate', {
       prompt,
-      context: 'saq'
+      pertanyaan,
+      context: isPemkab ? 'saq_pemkab' : 'saq'
     })
 
     if (res.data?.success && res.data.data) {
       const ai = res.data.data
-      if (ai.judul) repairModal.value.form.judul = ai.judul
-      if (ai.deskripsi || ai.content) repairModal.value.form.deskripsi = ai.deskripsi || ai.content
-      if (ai.kategori) repairModal.value.form.category = ai.kategori
-      if (ai.jenis_dokumen) repairModal.value.form.jenis_dokumen = ai.jenis_dokumen
+      const newJudul = ai.title || ai.judul
+      if (newJudul) {
+        repairModal.value.form.judul = newJudul
+      }
+      const newDesc = ai.doc_desc || ai.doc_content || ai.deskripsi || ai.content
+      if (newDesc) {
+        repairModal.value.form.deskripsi = newDesc
+      }
+      const newCat = ai.category || ai.kategori
+      if (newCat) {
+        repairModal.value.form.category = newCat
+      }
+      const newJenis = Array.isArray(ai.jenis_dokumen) ? ai.jenis_dokumen[0] : (ai.jenis_dokumen || '')
+      if (newJenis) {
+        repairModal.value.form.jenis_dokumen = newJenis
+      }
     } else {
-      repairModal.value.error = res.data?.message || 'Gagal menghasilkan judul via AI.'
+      repairModal.value.error = res.data?.message || 'Gagal menghasilkan rekomendasi AI.'
     }
   } catch (err) {
     repairModal.value.error = err.response?.data?.message || 'Terjadi kesalahan saat menghubungi layanan AI.'
@@ -1980,6 +2000,8 @@ const submitRepairModal = async () => {
 
     if (res.data?.success) {
       const updated = res.data.data
+      const oldUrl = repairModal.value.data.detail_url || ''
+
       // SINKRONISASI LANGSUNG DI STATE REACTIVE TAMPILAN
       if (repairModal.value.ansContext && repairModal.value.ansContext.links) {
         const found = repairModal.value.ansContext.links.find(l => l.id === updated.link_id)
@@ -1990,9 +2012,18 @@ const submitRepairModal = async () => {
         }
       }
 
+      // Sinkronkan juga pada link induk answer jika mengarah ke link lama
+      if (repairModal.value.ansContext) {
+        if (!repairModal.value.ansContext.link || repairModal.value.ansContext.link === oldUrl || repairModal.value.ansContext.link.includes(oldUrl)) {
+          repairModal.value.ansContext.link = updated.link
+          repairModal.value.ansContext.judul = updated.judul
+        }
+      }
+
       // Invalidate queries agar seluruh pohon data SAQ ter-refresh
       queryClient.invalidateQueries({ queryKey: ['saq-structure'] })
       queryClient.invalidateQueries({ queryKey: ['saq-all-answers'] })
+      queryClient.invalidateQueries({ queryKey: ['saq-answers'] })
 
       closeRepairModal()
     } else {
