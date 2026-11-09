@@ -12,11 +12,20 @@ const menuItems = computed(() => {
   const items = [
     { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin-dashboard' },
     { name: 'Permohonan & Keberatan', icon: 'fas fa-inbox', route: 'admin-permohonan' },
+    { name: 'Standar Layanan', icon: 'fas fa-book-open', route: 'admin-standar-layanan' },
+    { name: 'Profil PPID', icon: 'fas fa-id-card', route: 'admin-profil-ppid' },
+    { name: 'Profil Pimpinan & LHKPN', icon: 'fas fa-user-tie', route: 'admin-officials' },
+    { name: 'Organisasi & OPD', icon: 'fas fa-sitemap', route: 'admin-organizations' },
     { name: 'Galeri', icon: 'fas fa-images', route: 'admin-galeri' },
+    { name: 'Sliders / Banner', icon: 'fas fa-sliders-h', route: 'admin-sliders' },
+    { name: 'Survei (SKM)', icon: 'fas fa-poll', route: 'admin-surveys' },
+    { name: 'PBJ Pertanyaan', icon: 'fas fa-tasks', route: 'admin-pbj' },
   ]
   if (authStore.isSuperAdmin) {
     items.push({ name: 'SAQ', icon: 'fas fa-clipboard-list', route: 'admin-saq' })
     items.push({ name: 'Twibbon', icon: 'fas fa-camera-retro', route: 'admin-twibbon' })
+    items.push({ name: 'Manajemen Users', icon: 'fas fa-users-cog', route: 'admin-users' })
+    items.push({ name: 'Security Blocks', icon: 'fas fa-shield-virus', route: 'admin-security' })
   }
   return items
 })
