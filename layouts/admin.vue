@@ -11,6 +11,7 @@ const mobileSidebarOpen = ref(false)
 const menuItems = computed(() => {
   const items = [
     { name: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'admin-dashboard' },
+    { name: 'Permohonan & Keberatan', icon: 'fas fa-inbox', route: 'admin-permohonan' },
     { name: 'Galeri', icon: 'fas fa-images', route: 'admin-galeri' },
   ]
   if (authStore.isSuperAdmin) {
