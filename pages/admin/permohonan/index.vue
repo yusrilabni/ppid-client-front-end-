@@ -367,9 +367,9 @@ onMounted(() => {
                   </span>
                 </td>
                 <td class="py-3 px-4 text-center space-x-2">
-                  <button @click="openDetail(item, 'detail-permohonan')" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-xs font-medium" title="Detail">
+                  <NuxtLink :to="`/admin/permohonan/${item.id}`" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-xs font-semibold inline-flex items-center gap-1" title="Detail">
                     <i class="fas fa-eye"></i> Detail
-                  </button>
+                  </NuxtLink>
                   <button @click="openRespond(item, 'respond-permohonan')" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-medium" title="Tanggapi">
                     <i class="fas fa-reply"></i> Tanggapi
                   </button>
@@ -499,9 +499,9 @@ onMounted(() => {
                   </span>
                 </td>
                 <td class="py-3 px-4 text-center space-x-2">
-                  <button @click="openDetail(item, 'detail-keberatan')" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-xs font-medium" title="Detail">
+                  <NuxtLink :to="`/admin/keberatan/${item.id}`" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-md text-xs font-semibold inline-flex items-center gap-1" title="Detail">
                     <i class="fas fa-eye"></i> Detail
-                  </button>
+                  </NuxtLink>
                   <button @click="openRespond(item, 'respond-keberatan')" class="px-2.5 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-medium" title="Putusan Atasan">
                     <i class="fas fa-gavel"></i> Putusan
                   </button>
