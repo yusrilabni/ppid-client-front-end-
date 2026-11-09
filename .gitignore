@@ -37,3 +37,4 @@ out.html
 .env
 .env.local
 .env.*.local
+*.bak*

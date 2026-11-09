@@ -5,8 +5,7 @@ import api from '@/services/api'
 
 const sliders = ref([])
 const loading = ref(false)
-const showModal = ref(false)
-const form = ref({ title: '', subtitle: '', link: '', order: 0, image: null })
+const alertMsg = ref('')
 
 async function fetchSliders() {
   loading.value = true
@@ -22,37 +21,15 @@ async function fetchSliders() {
   }
 }
 
-async function submitSlider() {
-  if (!form.value.title || !form.value.image) {
-    alert('Judul dan file gambar banner wajib diisi!')
-    return
-  }
-  const fd = new FormData()
-  fd.append('title', form.value.title)
-  if (form.value.subtitle) fd.append('subtitle', form.value.subtitle)
-  if (form.value.link) fd.append('link', form.value.link)
-  fd.append('order', form.value.order || 0)
-  fd.append('image', form.value.image)
-
-  try {
-    const res = await api.post('/admin/sliders', fd)
-    if (res.data?.success) {
-      showModal.value = false
-      form.value = { title: '', subtitle: '', link: '', order: 0, image: null }
-      fetchSliders()
-    }
-  } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menyimpan banner')
-  }
-}
-
-async function deleteSlider(id) {
-  if (!confirm('Hapus banner slider ini?')) return
+async function deleteSlider(id, title) {
+  if (!confirm(`Hapus permanen slide banner: "${title}"?`)) return
   try {
     await api.delete(`/admin/sliders/${id}`)
+    alertMsg.value = `Banner "${title}" berhasil dihapus.`
     fetchSliders()
+    setTimeout(() => alertMsg.value = '', 4000)
   } catch (e) {
-    alert('Gagal menghapus')
+    alert('Gagal menghapus banner slider.')
   }
 }
 
@@ -61,65 +38,106 @@ onMounted(() => fetchSliders())
 
 <template>
   <div class="space-y-6">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <i class="fas fa-sliders-h text-blue-600"></i> Sliders / Banner Beranda
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">Kelola gambar slide carousel promosi di halaman utama portal PPID</p>
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-slate-900 via-rose-950 to-indigo-950 p-8 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-rose-200">
+          <i class="fas fa-panorama"></i> Visual & Promosi Portal
+        </div>
+        <h1 class="text-3xl font-extrabold tracking-tight">Sliders & Banner Beranda</h1>
+        <p class="text-sm text-rose-200/80 max-w-2xl leading-relaxed">
+          Kelola galeri slide gambar interaktif beranda utama portal PPID, judul pengumuman, dan tautan arahan informasi publik.
+        </p>
       </div>
-      <button @click="showModal = true" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold flex items-center gap-2">
-        <i class="fas fa-plus"></i> Tambah Banner
-      </button>
+
+      <!-- Action Button to Dedicated Create Page -->
+      <NuxtLink
+        to="/admin/sliders/create"
+        class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-rose-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-rose-500/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+      >
+        <i class="fas fa-plus-circle text-base"></i>
+        <span>Tambah Banner Baru</span>
+      </NuxtLink>
     </div>
 
+    <!-- Alert Message -->
+    <div v-if="alertMsg" class="p-4 bg-emerald-50 text-emerald-800 rounded-2xl text-sm font-semibold border border-emerald-200 flex items-center justify-between animate-fadeIn">
+      <div class="flex items-center gap-2">
+        <i class="fas fa-check-circle text-emerald-600"></i>
+        <span>{{ alertMsg }}</span>
+      </div>
+      <button @click="alertMsg = ''" class="text-emerald-600 hover:text-emerald-800"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Grid Sliders -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-if="loading" class="col-span-full py-12 text-center text-gray-400">
-        <i class="fas fa-spinner fa-spin mr-2"></i> Memuat banner...
+      <div v-if="loading" class="col-span-full py-16 text-center text-gray-400 bg-white rounded-3xl border border-gray-100">
+        <i class="fas fa-circle-notch fa-spin text-2xl text-rose-600 mb-2"></i>
+        <p class="font-medium text-xs">Memuat galeri banner...</p>
       </div>
-      <div v-else-if="sliders.length === 0" class="col-span-full py-12 text-center text-gray-400">
-        Belum ada slider yang aktif.
-      </div>
-      <div v-for="sl in sliders" :key="sl.id" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between">
-        <img :src="`https://ppidkab.sinjaikab.go.id/storage/${sl.image}`" class="w-full h-44 object-cover bg-gray-100">
-        <div class="p-4 flex-1">
-          <h3 class="font-bold text-gray-800 text-sm line-clamp-1">{{ sl.title }}</h3>
-          <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ sl.subtitle || 'Tanpa subjudul' }}</p>
-        </div>
-        <div class="p-4 pt-0 flex justify-between items-center border-t mt-3 pt-3">
-          <span class="text-xs text-gray-400">Urutan: #{{ sl.order }}</span>
-          <button @click="deleteSlider(sl.id)" class="px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-semibold">
-            <i class="fas fa-trash mr-1"></i> Hapus
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Modal Tambah -->
-    <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
-        <h3 class="font-bold text-lg text-gray-800">Tambah Banner Beranda</h3>
-        <div class="space-y-3 text-sm">
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Judul Banner *</label>
-            <input v-model="form.title" type="text" placeholder="Layanan Informasi Publik Cepat & Akurat" class="w-full p-2 bg-gray-50 border rounded-lg">
+      <div v-else-if="sliders.length === 0" class="col-span-full py-16 text-center text-gray-400 bg-white rounded-3xl border border-gray-100">
+        <i class="fas fa-images text-3xl text-gray-300 mb-2"></i>
+        <p class="font-medium">Belum ada banner slide yang terpasang.</p>
+        <p class="text-xs text-gray-400 mt-1">Gunakan tombol "Tambah Banner Baru" untuk mengunggah banner promosi.</p>
+      </div>
+
+      <div
+        v-for="sl in sliders"
+        :key="sl.id"
+        class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
+      >
+        <div class="relative aspect-video overflow-hidden bg-slate-900">
+          <img
+            :src="`https://ppidkab.sinjaikab.go.id/storage/${sl.image}`"
+            :alt="sl.title"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div class="absolute top-3 right-3">
+            <span
+              class="px-2.5 py-1 rounded-full text-[11px] font-bold shadow-md backdrop-blur-md"
+              :class="sl.is_active ? 'bg-emerald-500/90 text-white' : 'bg-gray-500/90 text-white'"
+            >
+              {{ sl.is_active ? 'Aktif' : 'Non-aktif' }}
+            </span>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Subjudul / Keterangan</label>
-            <input v-model="form.subtitle" type="text" placeholder="Menuju Sinjai yang lebih transparan..." class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Tautan URL (Optional)</label>
-            <input v-model="form.link" type="text" placeholder="https://..." class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">File Gambar Banner (Landscape) *</label>
-            <input type="file" @change="e => form.image = e.target.files[0]" class="w-full text-xs text-gray-500">
+          <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-white text-xs font-mono">
+            Urutan: #{{ sl.order || 0 }}
           </div>
         </div>
-        <div class="flex justify-end gap-2 pt-3 border-t">
-          <button @click="showModal = false" class="px-4 py-2 bg-gray-100 rounded-lg text-sm">Batal</button>
-          <button @click="submitSlider" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">Simpan</button>
+
+        <div class="p-6 flex-1 space-y-2">
+          <h3 class="font-bold text-gray-900 text-sm group-hover:text-rose-600 transition-colors line-clamp-1">
+            {{ sl.title }}
+          </h3>
+          <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+            {{ sl.subtitle || 'Tidak ada subjudul keterangan.' }}
+          </p>
+
+          <div v-if="sl.link" class="pt-2">
+            <a :href="sl.link" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:underline">
+              <i class="fas fa-link text-[10px]"></i>
+              <span class="truncate max-w-[200px]">{{ sl.link }}</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-2 bg-slate-50/50">
+          <NuxtLink
+            :to="`/admin/sliders/${sl.id}/edit`"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-gray-200 rounded-xl text-xs font-bold transition-all"
+          >
+            <i class="fas fa-pen-to-square text-[11px]"></i>
+            <span>Edit</span>
+          </NuxtLink>
+          <button
+            @click="deleteSlider(sl.id, sl.title)"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 border border-gray-200 rounded-xl text-xs font-bold transition-all"
+          >
+            <i class="fas fa-trash-can text-[11px]"></i>
+            <span>Hapus</span>
+          </button>
         </div>
       </div>
     </div>

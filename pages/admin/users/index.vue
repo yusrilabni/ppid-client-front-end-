@@ -2,17 +2,30 @@
 definePageMeta({ layout: 'admin' })
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
+import CustomSelect from '@/components/ui/CustomSelect.vue'
 
 const users = ref([])
 const loading = ref(false)
 const search = ref('')
-const showModal = ref(false)
-const form = ref({ name: '', email: '', role: 'opd', nip: '', password: '' })
+const selectedRole = ref('')
+const alertMsg = ref('')
+
+const roleFilterOptions = [
+  { value: '', label: 'Semua Peran / Otoritas' },
+  { value: 'superadmin', label: 'Super Administrator', badge: 'Superadmin' },
+  { value: 'admin', label: 'Administrator PPID', badge: 'Admin' },
+  { value: 'opd', label: 'Petugas PPID Pelaksana (OPD)', badge: 'OPD' },
+  { value: 'user', label: 'Pemohon / Pengguna Biasa', badge: 'User' }
+]
 
 async function fetchUsers() {
   loading.value = true
   try {
-    const res = await api.get('/admin/users', { params: { search: search.value } })
+    const params = {}
+    if (search.value) params.search = search.value
+    if (selectedRole.value) params.role = selectedRole.value
+
+    const res = await api.get('/admin/users', { params })
     if (res.data?.success) {
       users.value = res.data.data.data || []
     }
@@ -23,30 +36,30 @@ async function fetchUsers() {
   }
 }
 
-async function submitUser() {
-  if (!form.value.name || !form.value.email || !form.value.password) {
-    alert('Nama, email, dan password wajib diisi!')
-    return
-  }
+async function deleteUser(u) {
+  if (!confirm(`Hapus permanen akun pengguna: "${u.name}" (${u.email})?`)) return
   try {
-    const res = await api.post('/admin/users', form.value)
+    const res = await api.delete(`/admin/users/${u.id}`)
     if (res.data?.success) {
-      showModal.value = false
-      form.value = { name: '', email: '', role: 'opd', nip: '', password: '' }
+      alertMsg.value = `Akun ${u.name} berhasil dihapus.`
       fetchUsers()
+      setTimeout(() => alertMsg.value = '', 4000)
     }
   } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menambahkan user')
+    alert(e.response?.data?.message || 'Gagal menghapus pengguna')
   }
 }
 
-async function deleteUser(id) {
-  if (!confirm('Yakin ingin menghapus pengguna ini?')) return
-  try {
-    await api.delete(`/admin/users/${id}`)
-    fetchUsers()
-  } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menghapus user')
+function getRoleBadge(role) {
+  switch (role) {
+    case 'superadmin':
+      return { class: 'bg-purple-100 text-purple-700 border-purple-200', label: 'Super Admin', icon: 'fas fa-shield-halved' }
+    case 'admin':
+      return { class: 'bg-sky-100 text-sky-700 border-sky-200', label: 'PPID Admin', icon: 'fas fa-user-shield' }
+    case 'opd':
+      return { class: 'bg-emerald-100 text-emerald-700 border-emerald-200', label: 'Admin OPD', icon: 'fas fa-building' }
+    default:
+      return { class: 'bg-gray-100 text-gray-700 border-gray-200', label: role, icon: 'fas fa-user' }
   }
 }
 
@@ -55,96 +68,153 @@ onMounted(() => fetchUsers())
 
 <template>
   <div class="space-y-6">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <i class="fas fa-users-cog text-blue-600"></i> Manajemen Pengguna & Hak Akses
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">Kelola akun Admin Utama, Petugas PPID Pelaksana (OPD), dan Tingkat Otoritas</p>
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 p-8 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-purple-200">
+          <i class="fas fa-users-gear"></i> Autentikasi & Otoritas Sistem
+        </div>
+        <h1 class="text-3xl font-extrabold tracking-tight">Manajemen Pengguna & Akun</h1>
+        <p class="text-sm text-purple-200/80 max-w-2xl leading-relaxed">
+          Kelola hak akses Superadmin, Administrator Utama PPID Sinjai, dan Akun Petugas PPID Pelaksana tiap Perangkat Daerah (OPD).
+        </p>
       </div>
-      <button @click="showModal = true" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold flex items-center gap-2">
-        <i class="fas fa-user-plus"></i> Tambah Pengguna
+
+      <!-- Action Button to Dedicated Create Page -->
+      <NuxtLink
+        to="/admin/users/create"
+        class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+      >
+        <i class="fas fa-user-plus text-base"></i>
+        <span>Tambah Pengguna Baru</span>
+      </NuxtLink>
+    </div>
+
+    <!-- Alert Message -->
+    <div v-if="alertMsg" class="p-4 bg-emerald-50 text-emerald-800 rounded-2xl text-sm font-semibold border border-emerald-200 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i class="fas fa-check-circle text-emerald-600"></i>
+        <span>{{ alertMsg }}</span>
+      </div>
+      <button @click="alertMsg = ''" class="text-emerald-600 hover:text-emerald-800"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1 max-w-2xl">
+        <div class="relative flex-1">
+          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input
+            v-model="search"
+            @keyup.enter="fetchUsers"
+            type="text"
+            placeholder="Cari berdasarkan nama lengkap, NIP, atau email..."
+            class="w-full pl-11 pr-4 py-3 bg-gray-50/70 border border-gray-200 rounded-2xl text-sm outline-none focus:border-purple-500 focus:bg-white focus:ring-4 focus:ring-purple-50 transition-all duration-200"
+          />
+        </div>
+
+        <div class="w-full sm:w-64">
+          <CustomSelect
+            v-model="selectedRole"
+            :options="roleFilterOptions"
+            placeholder="Filter Role"
+          />
+        </div>
+      </div>
+
+      <button
+        @click="fetchUsers"
+        class="w-full md:w-auto px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl text-sm transition-all flex items-center justify-center gap-2"
+      >
+        <i class="fas fa-filter"></i>
+        <span>Terapkan</span>
       </button>
     </div>
 
-    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex gap-3">
-      <input v-model="search" @keyup.enter="fetchUsers" placeholder="Cari nama, email atau NIP pengguna..." class="w-full md:w-80 px-4 py-2 bg-gray-50 border rounded-lg text-sm">
-      <button @click="fetchUsers" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">Cari</button>
-    </div>
+    <!-- Users Table Card -->
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-50/80 border-b border-gray-100 text-[11px] font-black uppercase tracking-wider text-slate-500">
+              <th class="py-4 px-6">Identitas Pengguna</th>
+              <th class="py-4 px-6">Peran / Otoritas</th>
+              <th class="py-4 px-6">Unit OPD Penugasan</th>
+              <th class="py-4 px-6 text-center">Aksi Manajemen</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 font-normal">
+            <tr v-if="loading">
+              <td colspan="4" class="py-16 text-center text-gray-400">
+                <i class="fas fa-circle-notch fa-spin text-2xl text-purple-600 mb-2"></i>
+                <p class="font-medium text-xs">Memuat daftar pengguna...</p>
+              </td>
+            </tr>
 
-    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <table class="w-full text-left text-sm">
-        <thead class="bg-gray-50 border-b text-gray-600 uppercase text-xs">
-          <tr>
-            <th class="py-3 px-4">Nama Lengkap</th>
-            <th class="py-3 px-4">Email</th>
-            <th class="py-3 px-4">Role / Peran</th>
-            <th class="py-3 px-4">Unit / OPD</th>
-            <th class="py-3 px-4 text-center">Aksi</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr v-if="loading"><td colspan="5" class="py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data user...</td></tr>
-          <tr v-else-if="users.length === 0"><td colspan="5" class="py-8 text-center text-gray-400">Pengguna tidak ditemukan.</td></tr>
-          <tr v-for="u in users" :key="u.id" class="hover:bg-gray-50">
-            <td class="py-3 px-4 font-semibold text-gray-800">{{ u.name }}</td>
-            <td class="py-3 px-4 text-gray-600 text-xs">{{ u.email }}</td>
-            <td class="py-3 px-4">
-              <span class="px-2.5 py-0.5 rounded text-xs font-bold uppercase"
-                :class="{
-                  'bg-purple-100 text-purple-700': u.role === 'superadmin',
-                  'bg-blue-100 text-blue-700': u.role === 'admin',
-                  'bg-emerald-100 text-emerald-700': u.role === 'opd',
-                  'bg-gray-100 text-gray-700': !['superadmin', 'admin', 'opd'].includes(u.role)
-                }">
-                {{ u.role }}
-              </span>
-            </td>
-            <td class="py-3 px-4 text-gray-500 text-xs">{{ u.unit?.name || '-' }}</td>
-            <td class="py-3 px-4 text-center">
-              <button @click="deleteUser(u.id)" class="px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-xs font-semibold">
-                <i class="fas fa-trash"></i> Hapus
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            <tr v-else-if="users.length === 0">
+              <td colspan="4" class="py-16 text-center text-gray-400">
+                <i class="fas fa-user-slash text-3xl text-gray-300 mb-2"></i>
+                <p class="font-medium">Tidak ada akun pengguna yang sesuai.</p>
+              </td>
+            </tr>
 
-    <!-- Modal Tambah -->
-    <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
-        <h3 class="font-bold text-lg text-gray-800">Tambah Akun Pengguna</h3>
-        <div class="space-y-3 text-sm">
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap *</label>
-            <input v-model="form.name" type="text" placeholder="Nama Operator / Admin" class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Email *</label>
-            <input v-model="form.email" type="email" placeholder="admin@sinjaikab.go.id" class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">NIP (Optional)</label>
-            <input v-model="form.nip" type="text" placeholder="198xxxx..." class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Hak Akses / Role *</label>
-            <select v-model="form.role" class="w-full p-2 bg-gray-50 border rounded-lg">
-              <option value="opd">Admin OPD (PPID Pelaksana)</option>
-              <option value="admin">Admin PPID Utama</option>
-              <option value="superadmin">Superadmin</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Password *</label>
-            <input v-model="form.password" type="password" placeholder="Minimal 6 karakter" class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 pt-3 border-t">
-          <button @click="showModal = false" class="px-4 py-2 bg-gray-100 rounded-lg text-sm">Batal</button>
-          <button @click="submitUser" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">Simpan</button>
-        </div>
+            <tr v-for="u in users" :key="u.id" class="hover:bg-slate-50/60 transition-colors">
+              <td class="py-4 px-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-sm border border-purple-100 flex-shrink-0">
+                    {{ u.name ? u.name.charAt(0).toUpperCase() : 'U' }}
+                  </div>
+                  <div>
+                    <div class="font-bold text-gray-900">{{ u.name }}</div>
+                    <div class="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                      <span><i class="fas fa-envelope text-[10px] text-gray-400 mr-1"></i>{{ u.email }}</span>
+                      <span v-if="u.nip" class="text-gray-400">• NIP: {{ u.nip }}</span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td class="py-4 px-6">
+                <span
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border"
+                  :class="getRoleBadge(u.role).class"
+                >
+                  <i :class="getRoleBadge(u.role).icon"></i>
+                  <span>{{ getRoleBadge(u.role).label }}</span>
+                </span>
+              </td>
+
+              <td class="py-4 px-6">
+                <div v-if="u.unit" class="text-xs text-gray-700 font-medium flex items-center gap-1.5">
+                  <i class="fas fa-landmark text-gray-400"></i>
+                  <span>{{ u.unit.name }}</span>
+                </div>
+                <div v-else class="text-xs text-gray-400 italic">
+                  Tidak terikat OPD khusus (Global)
+                </div>
+              </td>
+
+              <td class="py-4 px-6 text-center">
+                <div class="inline-flex items-center gap-2">
+                  <NuxtLink
+                    :to="`/admin/users/${u.id}/edit`"
+                    class="p-2.5 bg-gray-50 hover:bg-purple-50 text-gray-600 hover:text-purple-600 rounded-xl transition-all border border-gray-100"
+                    title="Edit Profil & Hak Akses"
+                  >
+                    <i class="fas fa-user-pen text-xs"></i>
+                  </NuxtLink>
+                  <button
+                    @click="deleteUser(u)"
+                    class="p-2.5 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-xl transition-all border border-gray-100"
+                    title="Hapus Pengguna"
+                  >
+                    <i class="fas fa-trash-can text-xs"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

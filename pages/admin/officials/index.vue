@@ -6,8 +6,7 @@ import api from '@/services/api'
 const officials = ref([])
 const loading = ref(false)
 const search = ref('')
-const showModal = ref(false)
-const form = ref({ name: '', position: '', nip: '', order: 0, photo: null })
+const alertMsg = ref('')
 
 async function fetchOfficials() {
   loading.value = true
@@ -23,34 +22,15 @@ async function fetchOfficials() {
   }
 }
 
-async function submitOfficial() {
-  if (!form.value.name || !form.value.position) return
-  const fd = new FormData()
-  fd.append('name', form.value.name)
-  fd.append('position', form.value.position)
-  if (form.value.nip) fd.append('nip', form.value.nip)
-  fd.append('order', form.value.order || 0)
-  if (form.value.photo) fd.append('photo', form.value.photo)
-
-  try {
-    const res = await api.post('/admin/officials', fd)
-    if (res.data?.success) {
-      showModal.value = false
-      form.value = { name: '', position: '', nip: '', order: 0, photo: null }
-      fetchOfficials()
-    }
-  } catch (e) {
-    alert(e.response?.data?.message || 'Gagal menyimpan profil pimpinan')
-  }
-}
-
-async function deleteOfficial(id) {
-  if (!confirm('Yakin ingin menghapus data pejabat ini?')) return
+async function deleteOfficial(id, name) {
+  if (!confirm(`Hapus permanen profil pejabat: "${name}"?`)) return
   try {
     await api.delete(`/admin/officials/${id}`)
+    alertMsg.value = `Profil "${name}" berhasil dihapus.`
     fetchOfficials()
+    setTimeout(() => alertMsg.value = '', 4000)
   } catch (e) {
-    alert('Gagal menghapus')
+    alert('Gagal menghapus profil pejabat.')
   }
 }
 
@@ -59,75 +39,141 @@ onMounted(() => fetchOfficials())
 
 <template>
   <div class="space-y-6">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <i class="fas fa-user-tie text-blue-600"></i> Profil Pimpinan & LHKPN
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">Kelola data pimpinan daerah, pejabat struktural, dan integrasi LHKPN</p>
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 p-8 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-indigo-200">
+          <i class="fas fa-users-viewfinder"></i> Manajemen Pejabat & Transparansi
+        </div>
+        <h1 class="text-3xl font-extrabold tracking-tight">Profil Pimpinan & LHKPN</h1>
+        <p class="text-sm text-indigo-200/80 max-w-2xl leading-relaxed">
+          Kelola data pimpinan daerah Pemkab Sinjai, foto resmi, jabatan, NIP, serta pelaporan riwayat LHKPN secara transparan.
+        </p>
       </div>
-      <button @click="showModal = true" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold flex items-center gap-2">
-        <i class="fas fa-plus"></i> Tambah Pejabat
+
+      <!-- Action Button to Dedicated Create Page -->
+      <NuxtLink
+        to="/admin/officials/create"
+        class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+      >
+        <i class="fas fa-user-plus text-base"></i>
+        <span>Tambah Pejabat Baru</span>
+      </NuxtLink>
+    </div>
+
+    <!-- Alert Message -->
+    <div v-if="alertMsg" class="p-4 bg-emerald-50 text-emerald-800 rounded-2xl text-sm font-semibold border border-emerald-200 flex items-center justify-between animate-fadeIn">
+      <div class="flex items-center gap-2">
+        <i class="fas fa-check-circle text-emerald-600"></i>
+        <span>{{ alertMsg }}</span>
+      </div>
+      <button @click="alertMsg = ''" class="text-emerald-600 hover:text-emerald-800"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Search Toolbar -->
+    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-4">
+      <div class="relative w-full flex-1">
+        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input
+          v-model="search"
+          @keyup.enter="fetchOfficials"
+          type="text"
+          placeholder="Cari nama pejabat, jabatan, atau NIP..."
+          class="w-full pl-11 pr-4 py-3 bg-gray-50/70 border border-gray-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all duration-200"
+        />
+      </div>
+
+      <button
+        @click="fetchOfficials"
+        class="w-full md:w-auto px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+      >
+        <i class="fas fa-magnifying-glass text-xs"></i>
+        <span>Cari Pejabat</span>
       </button>
     </div>
 
-    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex gap-3">
-      <input v-model="search" @keyup.enter="fetchOfficials" placeholder="Cari nama atau jabatan pejabat..." class="w-full md:w-80 px-4 py-2 bg-gray-50 border rounded-lg text-sm">
-      <button @click="fetchOfficials" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">Cari</button>
-    </div>
-
+    <!-- Officials Card Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-if="loading" class="col-span-full py-12 text-center text-gray-400">
-        <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data pimpinan...
+      <div v-if="loading" class="col-span-full py-16 text-center text-gray-400 bg-white rounded-3xl border border-gray-100">
+        <i class="fas fa-circle-notch fa-spin text-2xl text-indigo-600 mb-2"></i>
+        <p class="font-medium text-xs">Memuat data pimpinan & pejabat...</p>
       </div>
-      <div v-else-if="officials.length === 0" class="col-span-full py-12 text-center text-gray-400">
-        Belum ada profil pimpinan.
+
+      <div v-else-if="officials.length === 0" class="col-span-full py-16 text-center text-gray-400 bg-white rounded-3xl border border-gray-100">
+        <i class="fas fa-user-slash text-3xl text-gray-300 mb-2"></i>
+        <p class="font-medium">Tidak ada data pimpinan ditemukan.</p>
+        <p class="text-xs text-gray-400 mt-1">Gunakan tombol "Tambah Pejabat Baru" untuk menginput data pimpinan.</p>
       </div>
-      <div v-for="off in officials" :key="off.id" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col justify-between">
-        <div class="flex items-start gap-4">
-          <img :src="off.photo ? `https://ppidkab.sinjaikab.go.id/storage/${off.photo}` : '/images/avatar-default.png'" class="w-16 h-16 rounded-xl object-cover bg-gray-100">
-          <div>
-            <h3 class="font-bold text-gray-800 text-sm">{{ off.name }}</h3>
-            <p class="text-xs text-blue-600 font-semibold">{{ off.position }}</p>
-            <p v-if="off.nip" class="text-xs text-gray-400 mt-1">NIP: {{ off.nip }}</p>
-            <span class="mt-2 inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-green-50 text-green-700">
-              {{ off.lhkpn_list?.length || 0 }} Riwayat LHKPN
+
+      <div
+        v-for="off in officials"
+        :key="off.id"
+        class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
+      >
+        <div class="space-y-4">
+          <!-- Top Row: Avatar & Details -->
+          <div class="flex items-start gap-4">
+            <div class="relative flex-shrink-0">
+              <img
+                :src="off.photo ? `https://ppidkab.sinjaikab.go.id/storage/${off.photo}` : '/images/avatar-default.png'"
+                class="w-16 h-16 rounded-2xl object-cover bg-slate-100 ring-2 ring-indigo-50 shadow-sm"
+                :alt="off.name"
+              />
+              <span
+                class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white"
+                :class="off.status === 'inactive' ? 'bg-gray-400' : 'bg-emerald-500'"
+              ></span>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-gray-900 text-sm group-hover:text-indigo-600 transition-colors line-clamp-1">
+                {{ off.name }}
+              </h3>
+              <p class="text-xs font-semibold text-indigo-600 mt-0.5 line-clamp-1">
+                {{ off.position }}
+              </p>
+              <div class="text-[11px] text-gray-400 font-mono mt-1">
+                NIP: {{ off.nip || '-' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- OPD / Instansi Badge -->
+          <div v-if="off.organization" class="px-3 py-1.5 bg-slate-50 rounded-xl text-xs text-gray-600 flex items-center gap-2">
+            <i class="fas fa-building text-slate-400 text-xs"></i>
+            <span class="truncate">{{ off.organization.name }}</span>
+          </div>
+
+          <!-- LHKPN Badge -->
+          <div class="flex items-center justify-between text-xs pt-2 border-t border-gray-50">
+            <span class="text-gray-400 font-medium">Riwayat LHKPN:</span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700">
+              <i class="fas fa-file-shield text-[10px]"></i>
+              {{ off.lhkpn_list?.length || 0 }} Laporan
             </span>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t flex justify-end gap-2">
-          <button @click="deleteOfficial(off.id)" class="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-semibold">
-            <i class="fas fa-trash mr-1"></i> Hapus
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Modal Tambah -->
-    <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
-        <h3 class="font-bold text-lg text-gray-800">Tambah Profil Pimpinan</h3>
-        <div class="space-y-3 text-sm">
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap & Gelar *</label>
-            <input v-model="form.name" type="text" placeholder="Contoh: Andi Jefrianto Asapa, S.Sos., M.Si." class="w-full p-2 bg-gray-50 border rounded-lg">
+        <!-- Card Action Footer -->
+        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+          <span class="text-[11px] font-bold text-gray-400">Urutan: #{{ off.order || 0 }}</span>
+
+          <div class="flex items-center gap-2">
+            <NuxtLink
+              :to="`/admin/officials/${off.id}/edit`"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-xl text-xs font-bold transition-all"
+            >
+              <i class="fas fa-pen-to-square text-[11px]"></i>
+              <span>Edit</span>
+            </NuxtLink>
+            <button
+              @click="deleteOfficial(off.id, off.name)"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 rounded-xl text-xs font-bold transition-all"
+            >
+              <i class="fas fa-trash-can text-[11px]"></i>
+              <span>Hapus</span>
+            </button>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Jabatan *</label>
-            <input v-model="form.position" type="text" placeholder="Contoh: Pj. Bupati Sinjai" class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">NIP</label>
-            <input v-model="form.nip" type="text" placeholder="197xxxx..." class="w-full p-2 bg-gray-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Foto Pejabat</label>
-            <input type="file" @change="e => form.photo = e.target.files[0]" class="w-full text-xs text-gray-500">
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 pt-3 border-t">
-          <button @click="showModal = false" class="px-4 py-2 bg-gray-100 rounded-lg text-sm">Batal</button>
-          <button @click="submitOfficial" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">Simpan</button>
         </div>
       </div>
     </div>
