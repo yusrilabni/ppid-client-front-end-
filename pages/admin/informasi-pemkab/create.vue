@@ -175,7 +175,7 @@
                     <input type="radio" v-model="form.upload_method" value="file" class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500">
                     <div class="ml-3">
                       <span class="block text-sm font-bold text-gray-800">Upload File Lokal</span>
-                      <span class="block text-xs text-gray-500 mt-0.5">PDF, Word, Excel, ZIP, PNG, JPG, WEBP, SVG (Max 10MB)</span>
+                      <span class="block text-xs text-gray-500 mt-0.5">PDF, Word, Excel, ZIP, PNG, JPG, WEBP, SVG (Max 2MB)</span>
                     </div>
                   </label>
                   <label class="flex items-center cursor-pointer p-4 border border-blue-100 rounded-xl bg-white shadow-sm hover:shadow-md hover:border-blue-300 transition-all">
@@ -483,7 +483,11 @@ const submitForm = async () => {
     
     if (form.value.upload_method === 'file') {
       if (fileInput.value && fileInput.value.files[0]) {
-        formData.append('file', fileInput.value.files[0])
+        const uploadFile = fileInput.value.files[0]
+        if (uploadFile.size > 2 * 1024 * 1024) {
+          throw new Error(`Ukuran file ${(uploadFile.size / 1024 / 1024).toFixed(2)} MB melebihi batas maksimal 2 MB. Silakan pilih file yang lebih kecil atau gunakan opsi Link File.`)
+        }
+        formData.append('file', uploadFile)
       } else {
         throw new Error('Silakan pilih file dari perangkat.')
       }
@@ -500,7 +504,9 @@ const submitForm = async () => {
       router.push(`/transparansi/informasi-pemkab?message=${encodeURIComponent('Dokumen berhasil ditambahkan')}`)
     }
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || 'Terjadi kesalahan saat menyimpan.'
+    const fieldErrors = err.response?.data?.errors
+    const firstFieldError = fieldErrors ? Object.values(fieldErrors).flat()[0] : null
+    error.value = firstFieldError || err.response?.data?.message || err.message || 'Terjadi kesalahan saat menyimpan.'
     if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
   } finally {
     submitting.value = false

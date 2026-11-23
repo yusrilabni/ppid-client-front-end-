@@ -161,7 +161,7 @@
                     <i class="fas fa-cloud-upload-alt text-4xl mb-3" :class="fileName ? 'text-blue-500' : 'text-gray-400'"></i>
                     <p class="text-gray-600 mb-2" v-if="!fileName">Pilih file baru untuk diupload</p>
                     <p class="text-blue-600 font-bold mb-2" v-else>{{ fileName }}</p>
-                    <p class="text-gray-500 text-sm mb-3">Format: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB)</p>
+                    <p class="text-gray-500 text-sm mb-3">Format: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 2MB)</p>
                     <input type="file" ref="fileInput" id="file" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" @change="handleFileSelect">
                     <label for="file" @click.prevent="triggerFileInput" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition duration-200">
                       {{ fileName ? 'Ganti File' : 'Pilih File' }}
@@ -171,7 +171,7 @@
               </div>
 
               <div v-if="form.file_type === 'url'" class="mb-6 animate-fadeIn">
-                <label for="file_url" class="block text-gray-700 text-sm font-semibold mb-2">Link File</label>
+                <label for="file_url" class="block text-gray-700 text-sm font-semibold mb-2">Link File (untuk file &gt; 2MB)</label>
                 <input v-model="form.file_url" type="url" id="file_url" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="https://contoh.com/file.pdf">
               </div>
             </div>
@@ -428,7 +428,11 @@ const submitForm = async () => {
 
     if (form.value.file_type === 'upload') {
       if (fileInput.value && fileInput.value.files[0]) {
-        formData.append('file', fileInput.value.files[0])
+        const newFile = fileInput.value.files[0]
+        if (newFile.size > 2 * 1024 * 1024) {
+          throw new Error(`Ukuran file ${(newFile.size / 1024 / 1024).toFixed(2)} MB melebihi batas maksimal 2 MB. Silakan pilih file yang lebih kecil atau gunakan opsi Link File.`)
+        }
+        formData.append('file', newFile)
       }
       // If no new file selected, backend keeps existing file
     } else {
@@ -450,7 +454,9 @@ const submitForm = async () => {
       }, 1500)
     }
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || 'Terjadi kesalahan saat menyimpan.'
+    const fieldErrors = err.response?.data?.errors
+    const firstFieldError = fieldErrors ? Object.values(fieldErrors).flat()[0] : null
+    error.value = firstFieldError || err.response?.data?.message || err.message || 'Terjadi kesalahan saat menyimpan.'
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
