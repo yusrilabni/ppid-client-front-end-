@@ -536,7 +536,6 @@ const submitForm = async () => {
   
   try {
     const formData = new FormData()
-    formData.append('_method', 'PUT')
     formData.append('judul', form.value.judul)
     formData.append('deskripsi', form.value.deskripsi || '')
     formData.append('kategori', form.value.kategori)
